@@ -11,12 +11,12 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 
 set(zoomzoomtune_SRC
   src/main.cpp
-  src/zoomzoomtune.cpp
+  src/ui/mainwindow.cpp
 )
 
 # Create code from a list of Qt designer ui files.
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
-qt5_wrap_ui(zoomzoomtune_SRC src/zoomzoomtune.ui)
+qt5_wrap_ui(zoomzoomtune_SRC src/ui/mainwindow.ui)
 
 # Tell CMake to create the helloworld executable
 add_executable(zoomzoomtune ${zoomzoomtune_SRC})

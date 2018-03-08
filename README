@@ -1,18 +1,19 @@
-CMake Qt5 GUI Template
+Zoom Zoom Tune
 ----------------------
+Open source tuning software for Mazda platforms
 
+Building
+--------
 You need Qt5 and CMake 2.8.11 or higher
 
 -- Build instructions --
 
-cd /your/project/build
-cmake ../
-make
+`git clone https://github.com/MazdaspeedRE/ZoomZoomTune.git`
+`cd ZoomZoomTune`
 
-./zoomzoomtune
+`cmake .`
+`make`
+
+`./zoomzoomtune`
 
 
--- Tutorials and resources --
-
-Qt online docs
-https://doc.qt.io/
