@@ -1,4 +1,4 @@
-Zoom Zoom Tune
+LibreTune
 ----------------------
 Open source tuning software for Mazda platforms
 

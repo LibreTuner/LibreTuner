@@ -1,11 +1,11 @@
-#include "ui/mainwindow.h"
-#include <QApplication>
+#include "libretune.h"
+#include <iostream>
+
+
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    MainWindow w;
-    w.show();
+    LibreTune app(argc, argv);
 
     return app.exec();
 }
