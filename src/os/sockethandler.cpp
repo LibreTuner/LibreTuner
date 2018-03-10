@@ -1,6 +1,5 @@
 #include "sockethandler.h"
 #include <cassert>
-#include <iostream>
 
 SocketHandler::SocketHandler()
 {

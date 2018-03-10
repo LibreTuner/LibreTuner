@@ -3,10 +3,12 @@
 
 #include <QApplication>
 #include "ui/mainwindow.h"
+#include "protocols/canlog.h"
 
 #include <memory>
 
-class CanHandler;
+class IsoTpInterface;
+class IsoTpTest;
 
 class LibreTune : public QApplication
 {
@@ -17,11 +19,10 @@ public:
     /* Returns the global LibreTune object */
     static LibreTune *get();
     
-    /* Returns the CAN handler. Returns nullptr if a handler
-     * does not exist */
-    CanHandler *canHandler()
+    /* Returns the CAN log. */
+    CanLog *canLog()
     {
-        return canHandler_.get();
+        return &canLog_;
     }
 
     ~LibreTune();
@@ -29,11 +30,7 @@ public:
 
 private:
     std::unique_ptr<MainWindow> mainWindow_;
-    std::unique_ptr<CanHandler> canHandler_;
-    
-    
-signals:
-    void canHandlerChanged(CanHandler *handler);
+    CanLog canLog_;
 };
 
 #endif // LIBRETUNE_H

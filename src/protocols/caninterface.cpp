@@ -31,6 +31,13 @@ std::string CanMessage::strMessage() const
 
 
 
+CanMessage::CanMessage()
+{
+    memset(message_, 0, 8);
+}
+
+
+
 CanMessage::CanMessage(uint32_t id, const uint8_t* message, uint8_t length)
 {
     setMessage(id, message, length);
@@ -38,7 +45,7 @@ CanMessage::CanMessage(uint32_t id, const uint8_t* message, uint8_t length)
 
 
 
-CanInterface::CanInterface(Callbacks &callbacks) : callbacks_(callbacks)
+CanInterface::CanInterface(Callbacks *callbacks) : callbacks_(callbacks)
 {
 }
 

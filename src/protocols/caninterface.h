@@ -6,12 +6,12 @@
 #include <string>
 
 
-class CanMessage
+struct CanMessage
 {
 public:
     void setMessage(uint32_t id, const uint8_t *message, uint8_t length);
     
-    CanMessage() {};
+    CanMessage();
     CanMessage(uint32_t id, const uint8_t *message, uint8_t length);
     
     uint32_t id() const
@@ -32,7 +32,16 @@ public:
         return messageLength_;
     }
     
-private:
+    uint8_t &operator[](uint8_t index)
+    {
+        return message_[index];
+    }
+    
+    const uint8_t &operator[](uint8_t index) const
+    {
+        return message_[index];
+    }
+    
     uint32_t id_;
     uint8_t message_[8];
     uint8_t messageLength_;
@@ -46,8 +55,10 @@ class CanInterface
 public:
     enum CanError
     {
+        ERR_SUCCESS,
         ERR_SOCKET, // Socket creation error. err will be set
         ERR_READ, // Read error. err will be set
+        ERR_WRITE,
     };
     
     class Callbacks
@@ -61,7 +72,7 @@ public:
         virtual void onError(CanError error, int err) =0;
     };
     
-    CanInterface(Callbacks& callbacks);
+    CanInterface(Callbacks *callbacks);
     virtual ~CanInterface() {};
     
     /* Send a CAN message. len should be no greater than 8.
@@ -76,8 +87,33 @@ public:
      * if an error occured while reading. */
     virtual bool recv(CanMessage &message) =0;
     
+    /* Returns the last error. Returns ERR_SUCCESS if there
+     * have been no errors. */
+    CanError lastError()
+    {
+        return lastError_;
+    }
+    
+    int lastErrno()
+    {
+        return lastErrno_;
+    }
+    
+    void setCallbacks(Callbacks *callbacks)
+    {
+        callbacks_ = callbacks;
+    }
+    
+    /* Returns true if the socket is ready for reading/writing */
+    virtual bool valid() =0;
+    
+    /* Starts reading from the interface and calling callbacks */
+    virtual void start() =0;
+    
 protected:
-    Callbacks &callbacks_;
+    Callbacks *callbacks_;
+    CanError lastError_;
+    int lastErrno_;
 };
 
 #endif // CANINTERFACE_H

@@ -11,7 +11,11 @@
 class SocketCanInterface : public CanInterface, public Socket
 {
 public:
-    SocketCanInterface(CanInterface::Callbacks &callbacks);
+    SocketCanInterface(CanInterface::Callbacks *callbacks);
+    /* Creates a socket and attempts to bind to an interface.
+     * For errors, check valid() and lastError() */
+    SocketCanInterface(CanInterface::Callbacks *callbacks, const char *ifname);
+    
     ~SocketCanInterface();
     
     bool send(const CanMessage &message) override;
@@ -22,14 +26,14 @@ public:
     void close();
     
     /* Starts the read loop thread for asynchronous operations */
-    void runAsync();
+    void start() override;
     
     /* Binds the socket to a SocketCAN interface. Returns false
      * if an error occured. */
     bool bind(const char *ifname);
     
-    /* Returns true if the socket exists */
-    bool valid()
+    /* Returns true if the socket is ready for reading/writing */
+    bool valid() override
     {
         return socket_ > 0;
     }

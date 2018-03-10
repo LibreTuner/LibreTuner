@@ -23,7 +23,6 @@ private:
     QAbstractItemModel *logModel_ = nullptr;
     
 public slots:
-    void canHandlerChanged(CanHandler *handler);
     void rowsInserted(const QModelIndex &parent, int first, int last);
 };
 

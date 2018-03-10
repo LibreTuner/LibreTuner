@@ -24,8 +24,7 @@ set(libretune_SRC
   protocols/socketcaninterface.h
   protocols/canlog.cpp
   protocols/canlog.h
-  protocols/canhandler.cpp
-  protocols/canhandler.h
+  protocols/isotpinterface.cpp
   
   os/sockethandler.cpp
   os/sockethandler.h

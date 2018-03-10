@@ -12,10 +12,18 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <unistd.h>
+#include <libretune.h>
 
-SocketCanInterface::SocketCanInterface(CanInterface::Callbacks& callbacks) : CanInterface(callbacks)
+SocketCanInterface::SocketCanInterface(CanInterface::Callbacks *callbacks) : CanInterface(callbacks)
 {
-    socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    
+}
+
+
+
+SocketCanInterface::SocketCanInterface(CanInterface::Callbacks* callbacks, const char* ifname) : CanInterface(callbacks)
+{
+    bind(ifname);
 }
 
 
@@ -39,11 +47,17 @@ bool SocketCanInterface::recv(CanMessage &message)
     int nbytes = read(socket_, &frame, sizeof(can_frame));
     if (nbytes < 0)
     {
+        lastError_ = ERR_READ;
+        lastErrno_ = errno;
         return false;
     }
     
     // TODO: remove EFF/RTR/ERR flags
     message.setMessage(frame.can_id, frame.data, frame.can_dlc);
+    
+    // Add message to log
+    LibreTune::get()->canLog()->addMessage(message);
+    
     return true;
 }
 
@@ -67,7 +81,14 @@ bool SocketCanInterface::send(const CanMessage &message)
 
 bool SocketCanInterface::bind(const char* ifname)
 {
-    assert(socket_ != 0);
+    socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if (socket_ == -1)
+    {
+        lastError_ = ERR_SOCKET;
+        lastErrno_ = errno;
+        socket_ = 0;
+        return false;
+    }
     
     sockaddr_can addr;
     ifreq ifr;
@@ -83,6 +104,8 @@ bool SocketCanInterface::bind(const char* ifname)
     
     if (::bind(socket_, (sockaddr*)&addr, sizeof(addr)) < 0)
     {
+        lastError_ = ERR_SOCKET;
+        lastErrno_ = errno;
         return false;
     }
     
@@ -101,7 +124,7 @@ void SocketCanInterface::close()
 
 
 
-void SocketCanInterface::runAsync()
+void SocketCanInterface::start()
 {
     assert(socket_ != 0);
     
@@ -128,11 +151,17 @@ void SocketCanInterface::onRead()
             return;
         }
         
-        callbacks_.onError(ERR_READ, errno);
+        if (callbacks_ != nullptr)
+        {
+            callbacks_->onError(ERR_READ, errno);
+        }
         return;
     }
     
-    callbacks_.onRecv(message);
+    if (callbacks_ != nullptr)
+    {
+        callbacks_->onRecv(message);
+    }
 }
 
 
