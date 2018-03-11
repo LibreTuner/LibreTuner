@@ -151,17 +151,11 @@ void SocketCanInterface::onRead()
             return;
         }
         
-        if (callbacks_ != nullptr)
-        {
-            callbacks_->onError(ERR_READ, errno);
-        }
+        callOnError(ERR_READ, errno);
         return;
     }
     
-    if (callbacks_ != nullptr)
-    {
-        callbacks_->onRecv(message);
-    }
+    callOnRecv(message);
 }
 
 

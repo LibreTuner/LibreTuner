@@ -7,13 +7,71 @@
     <x>0</x>
     <y>0</y>
     <width>773</width>
-    <height>474</height>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>LibreTune</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="tabOverview">
+       <attribute name="title">
+        <string>Overview</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tabTunes">
+       <attribute name="title">
+        <string>Tunes</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tabRoms">
+       <attribute name="title">
+        <string>ROM Dumps</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>737</width>
+             <height>317</height>
+            </rect>
+           </property>
+           <layout class="FlowLayout" name="romLayout"/>
+          </widget>
+         </widget>
+        </item>
+        <item>
+            <widget class="QPushButton" name="buttonDownloadRom">
+                <property name="text">
+                <string>Download new ROM</string>
+                </property>
+            </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -51,14 +109,6 @@
    <addaction name="menuHelp_2"/>
    <addaction name="menuView"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
    <property name="text">
@@ -72,10 +122,17 @@
   </action>
   <action name="actionCAN_Log">
    <property name="text">
-    <string>CAN Log</string>
+    <string>&amp;CAN Log</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FlowLayout</class>
+   <extends>QLayout</extends>
+   <header>ui/flowlayout.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

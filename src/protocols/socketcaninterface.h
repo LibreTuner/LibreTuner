@@ -11,7 +11,7 @@
 class SocketCanInterface : public CanInterface, public Socket
 {
 public:
-    SocketCanInterface(CanInterface::Callbacks *callbacks);
+    SocketCanInterface(CanInterface::Callbacks *callbacks = nullptr);
     /* Creates a socket and attempts to bind to an interface.
      * For errors, check valid() and lastError() */
     SocketCanInterface(CanInterface::Callbacks *callbacks, const char *ifname);

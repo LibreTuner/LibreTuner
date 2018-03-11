@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 
 struct CanMessage
@@ -55,7 +56,7 @@ class CanInterface
 public:
     enum CanError
     {
-        ERR_SUCCESS,
+        ERR_SUCCESS = 0,
         ERR_SOCKET, // Socket creation error. err will be set
         ERR_READ, // Read error. err will be set
         ERR_WRITE,
@@ -72,7 +73,7 @@ public:
         virtual void onError(CanError error, int err) =0;
     };
     
-    CanInterface(Callbacks *callbacks);
+    CanInterface(Callbacks *callbacks = nullptr);
     virtual ~CanInterface() {};
     
     /* Send a CAN message. len should be no greater than 8.
@@ -87,22 +88,30 @@ public:
      * if an error occured while reading. */
     virtual bool recv(CanMessage &message) =0;
     
+    /* Returns a human-readable string representing an error code */
+    static std::string strError(CanError error, int err = 0);
+    
+    /* Returns a human-readable string representing the last error */
+    std::string strError();
+    
     /* Returns the last error. Returns ERR_SUCCESS if there
      * have been no errors. */
-    CanError lastError()
+    CanError lastError() const
     {
         return lastError_;
     }
     
-    int lastErrno()
+    int lastErrno() const
     {
         return lastErrno_;
     }
     
-    void setCallbacks(Callbacks *callbacks)
+    void addCallbacks(Callbacks *callbacks)
     {
-        callbacks_ = callbacks;
+        callbacks_.push_back(callbacks);
     }
+    
+    void removeCallbacks(Callbacks *callbacks);
     
     /* Returns true if the socket is ready for reading/writing */
     virtual bool valid() =0;
@@ -111,7 +120,13 @@ public:
     virtual void start() =0;
     
 protected:
-    Callbacks *callbacks_;
+    /* Calls the onRecv callbacks */
+    void callOnRecv(const CanMessage &message);
+    
+    /* Calls the onError callbacks */
+    void callOnError(CanError error, int err);
+    
+    std::vector<Callbacks*> callbacks_;
     CanError lastError_;
     int lastErrno_;
 };

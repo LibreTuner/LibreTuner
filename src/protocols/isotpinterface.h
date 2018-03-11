@@ -69,9 +69,7 @@ public:
     };
     
     
-    /* Takes ownership of the CAN interface. It should not be
-     * used for anything else. */
-    IsoTpInterface(Callbacks *callbacks, CanInterface *can, int srcId = 0x7DF, int dstId = 0x7E8);
+    IsoTpInterface(Callbacks *callbacks, std::shared_ptr<CanInterface> can, int srcId = 0x7DF, int dstId = 0x7E8);
     
     ~IsoTpInterface();
     
@@ -81,17 +79,22 @@ public:
      * Returns false if a request is already being processed. */
     IsoTpError request(const char *message, size_t length, int timeout=200);
     
+    static std::string strError(IsoTpError error);
     
     /* CAN callbacks */
-    
     void onError(CanInterface::CanError error, int err) override;
     void onRecv(const CanMessage & message) override;
     
     /* Returns true if the interface is valid */
-    bool valid()
+    bool valid() const
     {
         return canInterface_->valid();
     } 
+    
+    CanInterface *canInterface()
+    {
+        return canInterface_.get();
+    }
     
     enum State
     {
@@ -102,7 +105,7 @@ public:
     };
     
 private:
-    std::unique_ptr<CanInterface> canInterface_;
+    std::shared_ptr<CanInterface> canInterface_;
     int srcId_, dstId_;
     Callbacks *callbacks_;
     

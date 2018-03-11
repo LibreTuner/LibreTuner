@@ -19,11 +19,11 @@ void IsoTpMessage::append(const uint8_t* message, size_t length)
 
 
 
-IsoTpInterface::IsoTpInterface(Callbacks *callbacks, CanInterface *can, int srcId, int dstId) : callbacks_(callbacks), canInterface_(std::unique_ptr<CanInterface>(can)), srcId_(srcId), dstId_(dstId)
+IsoTpInterface::IsoTpInterface(Callbacks *callbacks, std::shared_ptr<CanInterface> can, int srcId, int dstId) : callbacks_(callbacks), canInterface_(can), srcId_(srcId), dstId_(dstId)
 {
     assert(can != nullptr);
     assert(callbacks != nullptr);
-    can->setCallbacks(this);
+    can->addCallbacks(this);
     
     if (can->valid())
     {
@@ -394,7 +394,34 @@ void IsoTpInterface::timeout()
 
 
 
+std::string IsoTpInterface::strError(IsoTpInterface::IsoTpError error)
+{
+    switch(error)
+    {
+        case ERR_BUSY:
+            return "a request is already active on the ISO-TP interface";
+        case ERR_CAN:
+            return "an error occured on the CAN interface";
+        case ERR_CONSEC:
+            return "a received consecutive frame index was incorrect";
+        case ERR_SIZE:
+            return "a received CAN frame was too short";
+        case ERR_SUCCESS:
+            return "success";
+        default:
+            break;
+    }
+    
+    return "unknown. You should never see this. If you do, please submit a pull request";
+}
+
+
+
 IsoTpInterface::~IsoTpInterface()
 {
     stopTimer();
+    if (canInterface_)
+    {
+        canInterface_->removeCallbacks(this);
+    }
 }

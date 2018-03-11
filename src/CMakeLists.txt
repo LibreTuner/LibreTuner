@@ -17,6 +17,14 @@ set(libretune_SRC
   ui/canviewer.h
   ui/canlogview.cpp
   ui/canlogview.h
+  ui/romlistmodel.cpp
+  ui/romlistmodel.h
+  ui/flowlayout.cpp
+  ui/flowlayout.h
+  ui/romwidget.cpp
+  ui/romwidget.h
+  ui/downloadwindow.cpp
+  ui/downloadwindow.h
   
   protocols/caninterface.cpp
   protocols/caninterface.h
@@ -35,6 +43,11 @@ set(libretune_SRC
 qt5_wrap_ui(libretune_SRC
 ui/mainwindow.ui
 ui/canviewer.ui
+ui/downloadwindow.ui
+)
+
+qt5_add_resources(libretune_SRC
+resources/icons.qrc
 )
 
 # Tell CMake to create the helloworld executable
