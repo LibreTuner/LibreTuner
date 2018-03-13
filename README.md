@@ -1,4 +1,4 @@
-LibreTune
+LibreTuner
 =========
 Open source tuning software for Mazda platforms
 
@@ -8,7 +8,7 @@ You need Qt5 and CMake 2.8.11 or higher
 
 ### Build instructions
 
-`git clone https://github.com/MazdaspeedRE/LibreTune.git`
+`git clone https://github.com/Libretuner/LibreTuner.git`
 
 `cd LibreTune`
 
