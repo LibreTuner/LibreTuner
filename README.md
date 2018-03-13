@@ -2,6 +2,8 @@ LibreTuner
 =========
 Open source tuning software for Mazda platforms
 
+[Join the Discord server](https://discord.gg/Sdh3mV)
+
 Building
 --------
 You need Qt5 and CMake 2.8.11 or higher
