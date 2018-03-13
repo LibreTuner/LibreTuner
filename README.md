@@ -14,13 +14,13 @@ Screenshots
 
 `git clone https://github.com/Libretuner/LibreTuner.git`
 
-`cd LibreTune`
+`cd LibreTuner`
 
 `cmake .`
 
 `make`
 
-`./LibreTune`
+`./LibreTuner`
 
 
 Credits
