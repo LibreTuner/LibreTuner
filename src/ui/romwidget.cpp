@@ -1,21 +1,46 @@
 #include "romwidget.h"
+#include "rommanager.h"
+
 #include <QVBoxLayout>
 #include <QGraphicsPixmapItem>
+#include <QPushButton>
+#include <QStyle>
+#include "createtunedialog.h"
 
-RomWidget::RomWidget(QWidget* parent) : QWidget(parent)
+RomWidget::RomWidget(RomDataPtr rom, QWidget* parent) : rom_(rom), QFrame(parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    QVBoxLayout *buttonLayout = new QVBoxLayout;
     
-    label_ = new QLabel("N/A", this);
+    label_ = new QLabel(QString::fromStdString(rom->name()), this);
     label_->setAlignment(Qt::AlignCenter);
+
+    QLabel *icon = new QLabel();
+    icon->setPixmap(QPixmap(":/icons/rom-file.png"));
+    vlayout->addWidget(label_);
+    vlayout->addLayout(hlayout);
+    hlayout->addWidget(icon);
+    hlayout->addLayout(buttonLayout);
     
-    scene_.addItem(new QGraphicsPixmapItem(QPixmap(":/icons/rom-file.png")));
+    tuneButton_ = new QPushButton(style()->standardIcon(QStyle::SP_DirIcon), "Create tune");
+    deleteButton_ = new QPushButton(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
     
-    image_ = new QGraphicsView(&scene_, this);
-    layout->addWidget(image_);
-    layout->addWidget(label_);
+    connect(tuneButton_, &QPushButton::clicked, this, &RomWidget::createTuneClicked);
     
-    setLayout(layout);
+    buttonLayout->addWidget(tuneButton_);
+    buttonLayout->addWidget(deleteButton_);
+    
+    setLayout(vlayout);
+    
+    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    setLineWidth(0);
 }
 
 
+
+void RomWidget::createTuneClicked()
+{
+    CreateTuneDialog dlg;
+    dlg.exec();
+}

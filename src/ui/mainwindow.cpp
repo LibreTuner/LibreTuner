@@ -11,11 +11,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    //ui->listRoms->setModel(&romModel_);
-    
-    for (int i = 1; i < 10; ++i)
+    connect(RomManager::get(), &RomManager::updateRoms, this, &MainWindow::updateRoms);
+    updateRoms();
+}
+
+
+
+void MainWindow::updateRoms()
+{
+    QLayoutItem *child;
+    while ((child = ui->romLayout->takeAt(0)) != 0)
     {
-        ui->romLayout->addWidget(new RomWidget(ui->tabRoms));
+        delete child;
+    }
+    
+    for (RomDataPtr rom : RomManager::get()->roms())
+    {
+        ui->romLayout->addWidget(new RomWidget(rom));
     }
 }
 

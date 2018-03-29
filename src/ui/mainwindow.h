@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "canviewer.h"
-#include "romlistmodel.h"
 #include "downloadwindow.h"
 
 namespace Ui {
@@ -28,7 +27,8 @@ private:
     CanViewer canViewer_;
     DownloadWindow *downloadWindow_;
     
-    RomListModel romModel_;
+public slots:
+    void updateRoms();
 };
 
 #endif // MAINWINDOW_H

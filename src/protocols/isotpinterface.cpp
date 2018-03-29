@@ -3,6 +3,7 @@
 #include <cassert>
 #include <chrono>
 
+#include <iostream>
 
 
 IsoTpMessage::IsoTpMessage(int id) : id_(id)
@@ -24,11 +25,6 @@ IsoTpInterface::IsoTpInterface(Callbacks *callbacks, std::shared_ptr<CanInterfac
     assert(can != nullptr);
     assert(callbacks != nullptr);
     can->addCallbacks(this);
-    
-    if (can->valid())
-    {
-        can->start();
-    }
 }
 
 
@@ -40,11 +36,16 @@ void IsoTpInterface::onError(CanInterface::CanError error, int err)
 
 
 
+// TODO: this function should be cleaned up in the future
 void IsoTpInterface::onRecv(const CanMessage& message)
 {
-    std::lock_guard<std::mutex> lk(mutex_);
+    std::unique_lock<std::mutex> lk(mutex_);
     if (message.id() != dstId_ || state_ == STATE_NONE)
     {
+        if (message.id() == dstId_)
+        {
+            std::cout << "Lost message" << std::endl;
+        }
         return;
     }
     
@@ -74,8 +75,14 @@ void IsoTpInterface::onRecv(const CanMessage& message)
                 // Single frame
                 recvMsg_->append(&message[1], message[0] & 0x0F);
                 state_ = STATE_NONE;
-                callbacks_->onRecv(recvMsg_);
+                
+                std::shared_ptr<IsoTpMessage> msg(recvMsg_);
                 recvMsg_.reset();
+                
+                lk.unlock();
+                callbacks_->onRecv(msg);
+                lk.lock();
+                
                 
                 break;
             }
@@ -108,8 +115,13 @@ void IsoTpInterface::onRecv(const CanMessage& message)
                     
                     recvMsg_->append(&message[2], recvRemaining_);
                     state_ = STATE_NONE;
-                    callbacks_->onRecv(recvMsg_);
+                    
+                    std::shared_ptr<IsoTpMessage> msg(recvMsg_);
                     recvMsg_.reset();
+                
+                    lk.unlock();
+                    callbacks_->onRecv(msg);
+                    lk.lock();
                     
                     break;
                 }
@@ -266,8 +278,13 @@ void IsoTpInterface::onRecv(const CanMessage& message)
             if (recvRemaining_ == 0)
             {
                 state_ = STATE_NONE;
-                callbacks_->onRecv(recvMsg_);
+                
+                std::shared_ptr<IsoTpMessage> msg(recvMsg_);
                 recvMsg_.reset();
+                
+                lk.unlock();
+                callbacks_->onRecv(msg);
+                lk.lock();
                 
                 return;
             }
@@ -317,6 +334,7 @@ void IsoTpInterface::stopTimer()
             std::lock_guard<std::mutex> lk(cv_m_);
             interruptTime_ = true;
         }
+        
         cv_.notify_all();
         conThread_.join();
     }
@@ -324,7 +342,7 @@ void IsoTpInterface::stopTimer()
 
 
 
-IsoTpInterface::IsoTpError IsoTpInterface::request(const char* message, size_t length, int timeout)
+IsoTpInterface::IsoTpError IsoTpInterface::request(const uint8_t* message, size_t length, int timeout)
 {
     assert(length <= 4095);
     std::lock_guard<std::mutex> lk(mutex_);
@@ -347,11 +365,14 @@ IsoTpInterface::IsoTpError IsoTpInterface::request(const char* message, size_t l
         
         if (!canInterface_->send(msg))
         {
+            stopTimer();
+            state_ = STATE_NONE;
+            recvMsg_.reset();
             return ERR_CAN;
         }
         
-        state_ = STATE_RESP;
         recvMsg_ = std::make_shared<IsoTpMessage>(dstId_);
+        state_ = STATE_RESP;
         startTimer();
     }
     else

@@ -29,7 +29,11 @@ SocketHandler * SocketHandler::get()
 
 void SocketHandler::addSocket(Socket* socket)
 {
+    std::unique_lock<std::mutex> lk(cv_m_);
     sockets_.push_back(socket);
+    runLooped_ = false;
+    cv_.wait(lk, [this]{return runLooped_ == true; });
+    
 }
 
 
@@ -83,6 +87,13 @@ void SocketHandler::run()
         {
             break;
         }
+        
+        {
+            // trigger runLooped_ for the addSocket() block
+            std::lock_guard<std::mutex> lk(cv_m_);
+            runLooped_ = true;
+        }
+        cv_.notify_all();
         
         if (res == 0)
         {

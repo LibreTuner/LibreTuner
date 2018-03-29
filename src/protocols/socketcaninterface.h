@@ -14,7 +14,7 @@ public:
     SocketCanInterface(CanInterface::Callbacks *callbacks = nullptr);
     /* Creates a socket and attempts to bind to an interface.
      * For errors, check valid() and lastError() */
-    SocketCanInterface(CanInterface::Callbacks *callbacks, const char *ifname);
+    SocketCanInterface(CanInterface::Callbacks *callbacks, const std::string &ifname);
     
     ~SocketCanInterface();
     
@@ -30,7 +30,7 @@ public:
     
     /* Binds the socket to a SocketCAN interface. Returns false
      * if an error occured. */
-    bool bind(const char *ifname);
+    bool bind(const std::string &ifname);
     
     /* Returns true if the socket is ready for reading/writing */
     bool valid() override

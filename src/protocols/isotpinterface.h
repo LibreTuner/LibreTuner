@@ -77,7 +77,7 @@ public:
      * the onRecv() callback or onTimeout() will be called if
      * a response wasn't received in time. The timeout unit is milliseconds.
      * Returns false if a request is already being processed. */
-    IsoTpError request(const char *message, size_t length, int timeout=200);
+    IsoTpError request(const uint8_t *message, size_t length, int timeout=200);
     
     static std::string strError(IsoTpError error);
     

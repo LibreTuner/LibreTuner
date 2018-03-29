@@ -116,7 +116,8 @@ public:
     /* Returns true if the socket is ready for reading/writing */
     virtual bool valid() =0;
     
-    /* Starts reading from the interface and calling callbacks */
+    /* Starts reading from the interface and calling callbacks. This function
+     * may block until the the interface has fully started. */
     virtual void start() =0;
     
 protected:

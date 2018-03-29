@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <thread>
+#include <condition_variable>
 
 class Socket {
 public:
@@ -34,6 +35,12 @@ public:
 private:
     std::thread thread_;
     std::vector<Socket*> sockets_;
+    
+    /* Condition variable and mutex used for addSocket() blocking */
+    std::condition_variable cv_;
+    std::mutex cv_m_;
+    /* Set to true after select() returns in run() */
+    bool runLooped_;
 
     
     void run();

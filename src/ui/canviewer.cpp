@@ -1,7 +1,7 @@
 #include "canviewer.h"
 #include "ui_canviewer.h"
-#include "../protocols/canlog.h"
-#include "../libretune.h"
+#include "protocols/canlog.h"
+#include "libretuner.h"
 #include "canlogview.h"
 
 #include <QAbstractItemModel>
@@ -12,7 +12,7 @@ CanViewer::CanViewer(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    logModel_ = LibreTune::get()->canLog();
+    logModel_ = LibreTuner::get()->canLog();
     ui->logView->setModel(logModel_);
     connect(logModel_, &QAbstractItemModel::rowsInserted, this, &CanViewer::rowsInserted);
 }

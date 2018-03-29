@@ -1,32 +1,56 @@
-#include "libretune.h"
+#include "libretuner.h"
 #include "os/sockethandler.h"
 #include "protocols/socketcaninterface.h"
 #include "protocols/isotpinterface.h"
+#include "rommanager.h"
+
+#include <QStandardPaths>
+#include <QDir>
+#include <QMessageBox>
 
 
-static LibreTune *_global;
+static LibreTuner *_global;
 
 
-LibreTune::LibreTune(int& argc, char *argv[]) : QApplication(argc, argv)
+LibreTuner::LibreTuner(int& argc, char *argv[]) : QApplication(argc, argv)
 {
     _global = this;
+    home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    
+    SocketHandler::get()->initialize();
+    if (!RomManager::get()->load())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not load ROMs: " + RomManager::get()->lastError());
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setWindowTitle("RomManager error");
+        msgBox.exec();
+    }
     
     mainWindow_ = std::unique_ptr<MainWindow>(new MainWindow);
     mainWindow_->show();
-
     
-    SocketHandler::get()->initialize();
+    checkHome();
 }
 
 
 
-LibreTune * LibreTune::get()
+LibreTuner * LibreTuner::get()
 {
     return _global;
 }
 
 
 
-LibreTune::~LibreTune()
+LibreTuner::~LibreTuner()
 {
+}
+
+
+
+void LibreTuner::checkHome()
+{
+    QDir home(home_);
+    home.mkpath(".");
+    home.mkdir("roms");
 }

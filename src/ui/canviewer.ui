@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>LibreTune - CAN Log</string>
+   <string>LibreTuner - CAN Log</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

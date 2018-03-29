@@ -10,14 +10,14 @@
 class IsoTpInterface;
 class IsoTpTest;
 
-class LibreTune : public QApplication
+class LibreTuner : public QApplication
 {
     Q_OBJECT
 public:
-    LibreTune(int &argc, char *argv[]);
+    LibreTuner(int &argc, char *argv[]);
     
     /* Returns the global LibreTune object */
-    static LibreTune *get();
+    static LibreTuner *get();
     
     /* Returns the CAN log. */
     CanLog *canLog()
@@ -25,12 +25,22 @@ public:
         return &canLog_;
     }
 
-    ~LibreTune();
+    ~LibreTuner();
     
+    /* Checks if the home directory exists and if it does not,
+     * creates it. */
+    void checkHome();
+    
+    QString home() {
+        return home_;
+    }
 
 private:
     std::unique_ptr<MainWindow> mainWindow_;
     CanLog canLog_;
+    
+    /* Location of home directory. */
+    QString home_;
 };
 
 #endif // LIBRETUNE_H

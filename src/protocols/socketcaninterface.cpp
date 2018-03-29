@@ -12,7 +12,8 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <unistd.h>
-#include <libretune.h>
+
+#include "libretuner.h"
 
 SocketCanInterface::SocketCanInterface(CanInterface::Callbacks *callbacks) : CanInterface(callbacks)
 {
@@ -21,7 +22,7 @@ SocketCanInterface::SocketCanInterface(CanInterface::Callbacks *callbacks) : Can
 
 
 
-SocketCanInterface::SocketCanInterface(CanInterface::Callbacks* callbacks, const char* ifname) : CanInterface(callbacks)
+SocketCanInterface::SocketCanInterface(CanInterface::Callbacks* callbacks, const std::string &ifname) : CanInterface(callbacks)
 {
     bind(ifname);
 }
@@ -56,7 +57,12 @@ bool SocketCanInterface::recv(CanMessage &message)
     message.setMessage(frame.can_id, frame.data, frame.can_dlc);
     
     // Add message to log
-    LibreTune::get()->canLog()->addMessage(message);
+    
+    if (frame.can_id == 0x7e8 || frame.can_id == 0x7e0)
+    {
+        LibreTuner::get()->canLog()->addMessage(message);
+    }
+    // 
     
     return true;
 }
@@ -79,7 +85,7 @@ bool SocketCanInterface::send(const CanMessage &message)
 
 
 
-bool SocketCanInterface::bind(const char* ifname)
+bool SocketCanInterface::bind(const std::string &ifname)
 {
     socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (socket_ == -1)
@@ -93,7 +99,7 @@ bool SocketCanInterface::bind(const char* ifname)
     sockaddr_can addr;
     ifreq ifr;
     
-    strcpy(ifr.ifr_name, ifname);
+    strcpy(ifr.ifr_name, ifname.c_str());
     if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0)
     {
         return false;
@@ -144,18 +150,21 @@ int SocketCanInterface::fd()
 void SocketCanInterface::onRead()
 {
     CanMessage message;
-    if (!recv(message))
+    while (true)
     {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        if (!recv(message))
         {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                return;
+            }
+            
+            callOnError(ERR_READ, errno);
             return;
         }
         
-        callOnError(ERR_READ, errno);
-        return;
+        callOnRecv(message);
     }
-    
-    callOnRecv(message);
 }
 
 
