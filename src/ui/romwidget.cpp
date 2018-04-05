@@ -7,11 +7,11 @@
 #include <QStyle>
 #include "createtunedialog.h"
 
-RomWidget::RomWidget(RomDataPtr rom, QWidget* parent) : rom_(rom), QFrame(parent)
+RomWidget::RomWidget(RomPtr rom, QWidget* parent) : rom_(rom), QFrame(parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout(this);
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    QVBoxLayout *buttonLayout = new QVBoxLayout;
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    QVBoxLayout *buttonLayout = new QVBoxLayout();
     
     label_ = new QLabel(QString::fromStdString(rom->name()), this);
     label_->setAlignment(Qt::AlignCenter);
@@ -23,7 +23,7 @@ RomWidget::RomWidget(RomDataPtr rom, QWidget* parent) : rom_(rom), QFrame(parent
     hlayout->addWidget(icon);
     hlayout->addLayout(buttonLayout);
     
-    tuneButton_ = new QPushButton(style()->standardIcon(QStyle::SP_DirIcon), "Create tune");
+    tuneButton_ = new QPushButton(style()->standardIcon(QStyle::SP_FileDialogNewFolder), "Create tune");
     deleteButton_ = new QPushButton(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
     
     connect(tuneButton_, &QPushButton::clicked, this, &RomWidget::createTuneClicked);
@@ -41,6 +41,6 @@ RomWidget::RomWidget(RomDataPtr rom, QWidget* parent) : rom_(rom), QFrame(parent
 
 void RomWidget::createTuneClicked()
 {
-    CreateTuneDialog dlg;
+    CreateTuneDialog dlg(rom_);
     dlg.exec();
 }

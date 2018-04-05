@@ -119,7 +119,7 @@ void DownloadWindow::mainOnCompletion()
 {
     QMessageBox msgBox;
     msgBox.setText("Download complete");
-    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setIcon(QMessageBox::Information);
     msgBox.setWindowTitle("Download complete");
     msgBox.exec();
     

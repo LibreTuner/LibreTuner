@@ -29,6 +29,7 @@ private:
     
 public slots:
     void updateRoms();
+    void updateTunes();
 };
 
 #endif // MAINWINDOW_H

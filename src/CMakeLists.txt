@@ -18,6 +18,20 @@ set(libretuner_SRC
   tunemanager.h
   tune.cpp
   tune.h
+  rom.cpp
+  rom.h
+  tablegroup.cpp
+  tablegroup.h
+  table.cpp
+  table.h
+  tablelocations.cpp
+  tablelocations.h
+  tabledefinitions.cpp
+  tabledefinitions.h
+  
+  definitions/definitions.cpp
+  definitions/definitions.h
+  definitions/mazdaspeed6.cpp
   
   ui/mainwindow.cpp
   ui/mainwindow.h
@@ -35,6 +49,8 @@ set(libretuner_SRC
   ui/createtunedialog.h
   ui/tuneeditor.cpp
   ui/tuneeditor.h
+  ui/tunewidget.cpp
+  ui/tunewidget.h
   
   protocols/caninterface.cpp
   protocols/caninterface.h

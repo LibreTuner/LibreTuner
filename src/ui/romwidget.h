@@ -10,8 +10,8 @@
 
 class QPushButton;
 
-class RomData;
-typedef std::shared_ptr<RomData> RomDataPtr;
+class Rom;
+typedef std::shared_ptr<Rom> RomPtr;
 
 /**
  * Widget for the ROM list
@@ -20,14 +20,14 @@ class RomWidget : public QFrame
 {
     Q_OBJECT
 public:
-    explicit RomWidget(RomDataPtr rom, QWidget *parent = 0);
+    explicit RomWidget(RomPtr rom, QWidget *parent = 0);
 
 private:
     QLabel *label_;
     QPushButton *deleteButton_;
     QPushButton *tuneButton_;
     
-    RomDataPtr rom_;
+    RomPtr rom_;
     
 public slots:
     void createTuneClicked();

@@ -10,6 +10,10 @@
 class IsoTpInterface;
 class IsoTpTest;
 
+class TuneEditor;
+class Tune;
+typedef std::shared_ptr<Tune> TunePtr;
+
 class LibreTuner : public QApplication
 {
     Q_OBJECT
@@ -34,9 +38,13 @@ public:
     QString home() {
         return home_;
     }
+    
+    /* Open the tune editor */
+    void editTune(TunePtr tune);
 
 private:
     std::unique_ptr<MainWindow> mainWindow_;
+    std::unique_ptr<TuneEditor> tuneEditor_;
     CanLog canLog_;
     
     /* Location of home directory. */

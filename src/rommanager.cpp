@@ -33,7 +33,9 @@ bool RomManager::load()
     }
     
     QXmlStreamReader xml(&listFile);
-    
+    // set nextId_ to -1 for checking the highest ROM id
+    nextId_ = -1;
+
     if (xml.readNextStartElement()) 
     {
         if (xml.name() == "roms")
@@ -42,9 +44,11 @@ bool RomManager::load()
         }
         else
         {
-            xml.raiseError(QObject::tr("This file is not a ROM list document"));
+            xml.raiseError(QObject::tr("Unexpected element"));
         }
     }
+    
+    nextId_++;
     
     if (xml.error())
     {
@@ -76,7 +80,8 @@ void RomManager::readRoms(QXmlStreamReader &xml)
         }
         
         
-        RomDataPtr rom = std::make_shared<RomData>();
+        RomPtr rom = std::make_shared<Rom>();
+        rom->setId(-1);
         
         // Read ROM data
         while (xml.readNextStartElement())
@@ -113,6 +118,19 @@ void RomManager::readRoms(QXmlStreamReader &xml)
                     xml.raiseError("Unknown ROM subtype");
                 }
             }
+            else if (xml.name() == "id")
+            {
+                bool ok;
+                rom->setId(xml.readElementText().toInt(&ok));
+                if (!ok)
+                {
+                    xml.raiseError("id is not a valid decimal number");
+                }
+                if (rom->id() > nextId_)
+                {
+                    nextId_ = rom->id();
+                }
+            }
         }
         
         // Verifications
@@ -131,6 +149,10 @@ void RomManager::readRoms(QXmlStreamReader &xml)
         if (rom->subType() == ROM_SUB_NONE)
         {
             xml.raiseError("ROM subtype is empty");
+        }
+        if (rom->id() < 0)
+        {
+            xml.raiseError("ROM id is empty or negative");
         }
         
         if (xml.hasError())
@@ -160,16 +182,17 @@ bool RomManager::save()
     
     QXmlStreamWriter xml(&listFile);
     xml.setAutoFormatting(true);
-    xml.setAutoFormattingIndent(-4); // tabs > spaces
+    xml.setAutoFormattingIndent(-1); // tabs > spaces
     
     xml.writeStartDocument();
     xml.writeDTD("<!DOCTYPE roms>");
     xml.writeStartElement("roms");
-    for (const RomDataPtr rom : roms_)
+    for (const RomPtr rom : roms_)
     {
         xml.writeStartElement("rom");
         xml.writeTextElement("name", QString::fromStdString(rom->name()));
         xml.writeTextElement("path", QString::fromStdString(rom->path()));
+        xml.writeTextElement("id", QString::number(rom->id()));
         switch(rom->type())
         {
             case ROM_MAZDASPEED6:
@@ -246,11 +269,12 @@ bool RomManager::addRom(const std::string& name, RomType type, const uint8_t* da
         return false;
     }
     
-    RomDataPtr rom = std::make_shared<RomData>();
+    RomPtr rom = std::make_shared<Rom>();
     rom->setName(name);
     rom->setPath(path.toStdString());
     rom->setType(type);
     rom->setSubType(subtype);
+    rom->setId(nextId_++);
     roms_.push_back(rom);
     
     emit updateRoms();
@@ -262,4 +286,19 @@ bool RomManager::addRom(const std::string& name, RomType type, const uint8_t* da
 
 RomManager::RomManager()
 {
+}
+
+
+
+RomPtr RomManager::fromId(int id)
+{
+    for (RomPtr &rom : roms_)
+    {
+        if (rom->id() == id)
+        {
+            return rom;
+        }
+    }
+    
+    return nullptr;
 }

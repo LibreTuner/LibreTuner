@@ -11,6 +11,9 @@
 class Tune;
 typedef std::shared_ptr<Tune> TunePtr;
 
+class Rom;
+typedef std::shared_ptr<Rom> RomPtr;
+
 /**
  * Manages tunes and tune metadata
  */
@@ -34,6 +37,15 @@ public:
     {
         return lastError_;
     }
+    
+    std::vector<TunePtr> &tunes()
+    {
+        return tunes_;
+    }
+    
+    /* Creates a new tune with base 'base'. Returns the new tune.
+     * If the tune could not be created, returns nullptr and sets lastError */
+    TunePtr createTune(RomPtr base, const std::string &name);
     
 private:
     TuneManager();

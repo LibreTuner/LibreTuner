@@ -3,6 +3,8 @@
 
 #include "romwidget.h"
 #include "flowlayout.h"
+#include "tunemanager.h"
+#include "tunewidget.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -12,7 +14,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     
     connect(RomManager::get(), &RomManager::updateRoms, this, &MainWindow::updateRoms);
+    connect(TuneManager::get(), &TuneManager::updateTunes, this, &MainWindow::updateTunes);
     updateRoms();
+    updateTunes();
+}
+
+
+
+void MainWindow::updateTunes()
+{
+    QLayoutItem *child;
+    while ((child = ui->tuneLayout->takeAt(0)) != 0)
+    {
+        delete child;
+    }
+    
+    for (TunePtr tune : TuneManager::get()->tunes())
+    {
+        ui->tuneLayout->addWidget(new TuneWidget(tune));
+    }
 }
 
 
@@ -25,7 +45,7 @@ void MainWindow::updateRoms()
         delete child;
     }
     
-    for (RomDataPtr rom : RomManager::get()->roms())
+    for (RomPtr rom : RomManager::get()->roms())
     {
         ui->romLayout->addWidget(new RomWidget(rom));
     }

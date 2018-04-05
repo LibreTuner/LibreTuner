@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabOverview">
        <attribute name="title">
@@ -29,6 +29,39 @@
        <attribute name="title">
         <string>Tunes</string>
        </attribute>
+       <layout class="QVBoxLayout" name="tunesVerticalLayout">
+        <item>
+         <widget class="QScrollArea" name="tunesScrollArea">
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustIgnored</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="tunesScrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>737</width>
+             <height>317</height>
+            </rect>
+           </property>
+           <layout class="FlowLayout" name="tuneLayout"/>
+          </widget>
+         </widget>
+        </item>
+        <item>
+            <widget class="QPushButton" name="buttonCreateTune">
+                <property name="text">
+                <string>Create new tune</string>
+                </property>
+            </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tabRoms">
        <attribute name="title">
