@@ -385,11 +385,10 @@ void Table1d<T>::calcDifference(TablePtr table)
 }
 
 
-
 template<typename T>
 bool Table1d<T>::serialize(uint8_t *data, size_t length, Endianness endian)
 {
-    if (length <= data_.size() * sizeof(T))
+    if (length < data_.size() * sizeof(T))
     {
         return false;
     }

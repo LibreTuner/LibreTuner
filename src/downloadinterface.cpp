@@ -44,11 +44,11 @@ private:
     std::string key_;
     
     /* Next memory location to be read from */
-    uint32_t downloadOffset_;
+    size_t downloadOffset_;
     /* Amount of data left to be transfered */
-    uint32_t downloadSize_;
+    size_t downloadSize_;
     /* Total size to be transfered. Used for progress updates */
-    uint32_t totalSize_;
+    size_t totalSize_;
     
     std::vector<uint8_t> downloadData_;
     

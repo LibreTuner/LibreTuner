@@ -60,17 +60,22 @@ set(libretuner_SRC
   
   protocols/caninterface.cpp
   protocols/caninterface.h
-  protocols/socketcaninterface.cpp
-  protocols/socketcaninterface.h
   protocols/canlog.cpp
   protocols/canlog.h
   protocols/isotpinterface.cpp
   protocols/udsprotocol.cpp
   protocols/udsprotocol.h
-  
-  os/sockethandler.cpp
-  os/sockethandler.h
 )
+
+if (UNIX)
+    set(libretuner_SRC ${libretuner_SRC}
+        protocols/socketcaninterface.cpp
+        protocols/socketcaninterface.h
+        os/sockethandler.cpp
+        os/sockethandler.h
+    )
+endif (UNIX)
+
 
 # Create code from a list of Qt designer ui files.
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
@@ -90,7 +95,8 @@ resources/icons.qrc
 add_executable(LibreTuner ${libretuner_SRC})
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(LibreTuner Qt5::Widgets ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization ${CMAKE_THREAD_LIBS_INIT})
+
 
 if (UNIX)
     target_compile_definitions(LibreTuner PRIVATE WITH_SOCKETCAN=1)

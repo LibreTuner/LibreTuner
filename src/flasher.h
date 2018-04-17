@@ -2,6 +2,7 @@
 #define FLASHER_H
 
 #include <memory>
+#include <string>
 
 class Flasher;
 typedef std::shared_ptr<Flasher> FlasherPtr;

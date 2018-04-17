@@ -20,7 +20,9 @@ LibreTuner::LibreTuner(int& argc, char *argv[]) : QApplication(argc, argv)
     _global = this;
     home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     
+#ifdef WITH_SOCKETCAN
     SocketHandler::get()->initialize();
+#endif
     if (!RomManager::get()->load())
     {
         QMessageBox msgBox;

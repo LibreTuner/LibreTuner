@@ -126,11 +126,11 @@ bool UdsProtocol::requestSecuritySeed()
 
 bool UdsProtocol::requestSecurityKey(const uint8_t* key, uint8_t length)
 {
-    uint8_t req[length + 2];
+    std::vector<uint8_t> req(length + 2);
     req[0] = UDS_REQ_SECURITY;
     req[1] = 2;
-    memcpy(req + 2, key, length);
-    return request(req, length + 2);
+    memcpy(req.data() + 2, key, length);
+    return request(req.data(), length + 2);
 }
 
 
