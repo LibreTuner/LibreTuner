@@ -207,7 +207,7 @@ bool RomManager::save()
         }
         xml.writeEndElement();
     }
-    
+    xml.writeEndElement();
     xml.writeEndDocument();
     return true;
 }

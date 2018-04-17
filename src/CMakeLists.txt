@@ -28,6 +28,10 @@ set(libretuner_SRC
   tablelocations.h
   tabledefinitions.cpp
   tabledefinitions.h
+  flasher.cpp
+  flasher.h
+  flashable.cpp
+  flashable.h
   
   definitions/definitions.cpp
   definitions/definitions.h
@@ -51,6 +55,8 @@ set(libretuner_SRC
   ui/tuneeditor.h
   ui/tunewidget.cpp
   ui/tunewidget.h
+  ui/verticallabel.cpp
+  ui/verticallabel.h
   
   protocols/caninterface.cpp
   protocols/caninterface.h

@@ -14,6 +14,34 @@ Qt::ItemFlags Table::flags(const QModelIndex& index) const
 
 
 
+QVariant Table::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole || section < 0)
+    {
+        return QVariant();
+    }
+    
+    
+    if (orientation == Qt::Horizontal)
+    {
+        if (definition_->axisX() != nullptr && section < definition_->sizeX())
+        {
+            return QString::number(definition_->axisX()->label(section));
+        }
+    }
+    else
+    {
+        if (definition_->axisY() != nullptr && section < definition_->sizeY())
+        {
+            return QString::number(definition_->axisY()->label(section));
+        }
+    }
+    
+    return QVariant();
+}
+
+
+
 template<>
 QString Table::toString<float>(float t)
 {
@@ -51,3 +79,38 @@ void Table::readRow<float>(std::vector<float> &data, Endianness endian, const ui
         raw += sizeof(float);
     }
 }
+
+
+
+template<>
+void Table::writeRow<float>(std::vector<float> &data, Endianness endian, uint8_t *odata)
+{
+    if (endian == ENDIAN_BIG)
+    {
+        for (float f : data)
+        {
+            uint32_t raw = *reinterpret_cast<uint32_t*>(&f);
+            *(odata++) = (raw >> 24);
+            *(odata++) = ((raw >> 16) & 0xFF);
+            *(odata++) = ((raw >> 8) & 0xFF);
+            *(odata++) = (raw & 0xFF);
+        }
+        return;
+    }
+    
+    // Little endian
+    for (float f : data)
+    {
+        uint32_t raw = *reinterpret_cast<uint32_t*>(&f);
+        *(odata++) = (raw & 0xFF);
+        *(odata++) = ((raw >> 8) & 0xFF);
+        *(odata++) = ((raw >> 16) & 0xFF);
+        *(odata++) = (raw >> 24);
+    }
+}
+
+
+
+
+
+

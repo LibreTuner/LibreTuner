@@ -140,6 +140,21 @@ public:
         return definitions_;
     }
     
+    const uint8_t *data() const
+    {
+        return data_.data();
+    }
+    
+    uint8_t *data()
+    {
+        return data_.data();
+    }
+    
+    size_t size() const
+    {
+        return data_.size();
+    }
+    
 private:
     RomPtr rom_;
     

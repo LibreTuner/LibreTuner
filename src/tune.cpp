@@ -1,6 +1,16 @@
 #include "tune.h"
 #include "rom.h"
 #include "tablegroup.h"
+#include "libretuner.h"
+
+#include <QFile>
+#include <QXmlStreamReader>
+#include <QString>
+#include <QByteArray>
+
+#include <iostream>
+
+#include <cassert>
 
 TuneData::TuneData(TunePtr tune) : tune_(tune)
 {
@@ -19,5 +29,133 @@ TuneData::TuneData(TunePtr tune) : tune_(tune)
     }
     
     tables_ = std::make_shared<TableGroup>(rom_);
+    
+    // Load tables
+    QFile file(LibreTuner::get()->home() + "/tunes/" + QString::fromStdString(tune->path()));
+    if (!file.open(QFile::ReadOnly))
+    {
+        lastError_ = file.errorString().toStdString();
+        valid_ = false;
+        return;
+    }
+    
+    QXmlStreamReader xml(&file);
+    if (xml.readNextStartElement()) 
+    {
+        if (xml.name() == "tables")
+        {
+            readTables(xml);
+        }
+        else
+        {
+            xml.raiseError(QObject::tr("Unexpected element"));
+        }
+    }
+    
+    
+    if (xml.error())
+    {
+        lastError_ = QString("%1\nLine %2, column %3")
+                    .arg(xml.errorString())
+                    .arg(xml.lineNumber())
+                    .arg(xml.columnNumber()).toStdString();
+        valid_ = false;
+        return;
+    }
+    
+    
     valid_ = true;
 }
+
+
+
+void TuneData::readTables(QXmlStreamReader& xml)
+{
+    assert(xml.isStartElement() && xml.name() == "tables");
+    
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() != "table")
+        {
+            xml.raiseError("Unexpected element in tables");
+            return;
+        }
+        
+        if (!xml.attributes().hasAttribute("id"))
+        {
+            xml.raiseError("Expected id attribute");
+            return;
+        }
+        
+        bool valid;
+        int id = xml.attributes().value("id").toInt(&valid);
+        if (!valid)
+        {
+            xml.raiseError("id is not a number");
+            return;
+        }
+        
+        if (id >= tables_->count())
+        {
+            xml.raiseError("id is out of range");
+            return;
+        }
+        
+        
+        
+        QByteArray data = QByteArray::fromBase64(xml.readElementText().toLatin1());
+        
+        auto res = tables_->set(id, reinterpret_cast<const uint8_t*>(data.data()), data.size());
+        if (!res.first)
+        {
+            xml.raiseError(QString::fromStdString("Error reading table data: " + res.second));
+            return;
+        }
+    }
+}
+
+
+
+bool TuneData::save()
+{
+    QFile file(LibreTuner::get()->home() + "/tunes/" + QString::fromStdString(tune_->path()));
+    if (!file.open(QFile::WriteOnly))
+    {
+        lastError_ = file.errorString().toStdString();
+        return false;
+    }
+    
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.setAutoFormattingIndent(-1); // tabs > spaces
+    
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE tune>");
+    xml.writeStartElement("tables");
+    
+    for (int i = 0; i < tables_->count(); ++i)
+    {
+        TablePtr table = tables_->get(i, false);
+        if (table && table->modified())
+        {
+            xml.writeStartElement("table");
+            xml.writeAttribute("id", QString::number(i));
+            std::vector<uint8_t> data;
+            data.resize(table->rawSize());
+            assert(table->serialize(data.data(), data.size()));
+            xml.writeCharacters(QString(QByteArray(reinterpret_cast<const char*>(data.data()), data.size()).toBase64()));
+            xml.writeEndElement();
+        }
+    }
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    
+    if (xml.hasError())
+    {
+        lastError_ = "Unknown error while writing tables";
+        return false;
+    }
+    
+    return true;
+}
+

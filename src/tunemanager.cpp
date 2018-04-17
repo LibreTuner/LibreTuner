@@ -25,13 +25,13 @@ TunePtr TuneManager::createTune(RomPtr base, const std::string& name)
     LibreTuner::get()->checkHome();
     
     QString tuneRoot = LibreTuner::get()->home() + "/tunes/";
-    QString path = QString::fromStdString(name);
+    QString path = QString::fromStdString(name) + ".xml";
     if (QFile::exists(path))
     {
         int count = 0;
         do
         {
-            path = QString::fromStdString(name) + QString::number(++count);
+            path = QString::fromStdString(name) + QString::number(++count) + ".xml";
         } while (QFile::exists(tuneRoot + path));
     }
     
@@ -45,6 +45,8 @@ TunePtr TuneManager::createTune(RomPtr base, const std::string& name)
     QXmlStreamWriter xml(&file);
     xml.writeStartDocument();
     xml.writeDTD("<!DOCTYPE tune>");
+    xml.writeStartElement("tables");
+    xml.writeEndElement();
     xml.writeEndDocument();
     file.close();
     
@@ -139,6 +141,7 @@ bool TuneManager::save()
         xml.writeStartElement("tune");
         xml.writeTextElement("name", QString::fromStdString(tune->name()));
         xml.writeTextElement("path", QString::fromStdString(tune->path()));
+        xml.writeTextElement("base", QString::number(tune->base()->id()));
         
         xml.writeEndElement();
     }

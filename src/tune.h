@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include <QXmlStreamReader>
+
 
 class Rom;
 typedef std::shared_ptr<Rom> RomPtr;
@@ -92,6 +94,8 @@ public:
         return rom_;
     }
     
+    bool save();
+    
 private:
     TunePtr tune_;
     RomDataPtr rom_;
@@ -101,6 +105,8 @@ private:
     bool valid_;
     
     TableGroupPtr tables_;
+    
+    void readTables(QXmlStreamReader &xml);
 };
 typedef std::shared_ptr<TuneData> TuneDataPtr;
 

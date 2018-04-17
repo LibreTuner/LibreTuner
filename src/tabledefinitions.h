@@ -34,7 +34,8 @@ enum DataType
     TDATA_INT32,
 };
 
-class TableDefinition;
+
+struct TableDefinition;
 
 
 /**
@@ -62,15 +63,39 @@ private:
 };
 
 
-
-class TableDefinition
+struct TableAxis
 {
 public:
-    TableDefinition(int id, const std::string &name, TableType type, TableCategory category, DataType dataType, uint32_t sizeX = 1, uint32_t sizeY = 1, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max());
+    TableAxis(const std::string &name = "", double start = 0, double increment = 1);
+    
+    /* Returns the label for a given axis position */
+    double label(int idx) const;
+    
+    std::string label() const
+    {
+        return name_;
+    }
+    
+private:
+    std::string name_;
+    double start_;
+    double increment_;
+};
+
+
+struct TableDefinition
+{
+public:
+    TableDefinition(int id, const std::string &name, const std::string &description, TableType type, TableCategory category, DataType dataType, uint32_t sizeX = 1, const TableAxis *axisX = nullptr, uint32_t sizeY = 1, const TableAxis* axisY = nullptr, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max());
     
     std::string name() const
     {
         return name_;
+    }
+    
+    std::string description() const
+    {
+        return description_;
     }
     
     TableType type() const
@@ -108,23 +133,25 @@ public:
         return max_;
     }
     
-    void setMax(int max)
-    {
-        max_ = max;
-    }
-    
     int min() const
     {
         return min_;
     }
     
-    void setMin(int min)
+    const TableAxis *axisX() const
     {
-        min_ = min;
+        return axisX_;
     }
+    
+    const TableAxis *axisY() const
+    {
+        return axisY_;
+    }
+
 private:
     int id_;
     std::string name_;
+    std::string description_;
     TableType type_;
     TableCategory category_;
     DataType dataType_;
@@ -132,6 +159,8 @@ private:
     uint32_t sizeY_;
     int max_;
     int min_;
+    const TableAxis *axisX_;
+    const TableAxis *axisY_;
     
     TableDefinition(TableDefinitions &) = delete;
 };

@@ -21,7 +21,17 @@ public:
         return tables_.size();
     }
     
-    TablePtr get(size_t idx);
+    /* Returns a table from a table id. If create is true and
+     * a table does not exist, creates a new table
+     * from the ROM data. Returns nullptr if create is false
+     * and the table does not exist. */
+    TablePtr get(size_t idx, bool create = true);
+    
+    /* Creates a new table from data. Returns (false, error) on error and (true, "") on success. */
+    std::pair<bool, std::string> set(size_t idx, const uint8_t *data, size_t size);
+    
+    /* Applies table modifications to data */
+    void apply(uint8_t *data, size_t length);
     
 private:
     RomDataPtr base_;

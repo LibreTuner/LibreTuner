@@ -1,10 +1,10 @@
 #include "tunewidget.h"
-#include "ui_tunewidget.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QStyle>
 
 #include "tune.h"
 #include "libretuner.h"

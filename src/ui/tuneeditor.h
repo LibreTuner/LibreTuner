@@ -27,13 +27,20 @@ class TuneEditor : public QMainWindow
 public:
     TuneEditor(TuneDataPtr tune, QWidget *parent = 0);
 
+    void closeEvent(QCloseEvent * event) override;
+    
+    bool save();
 private:
     TuneDataPtr tune_;
     Ui::TuneEditor* ui;
     TablePtr currentTable_;
     
+    /* Set to true if a table has been modified */
+    bool changed_ = false;
+    
 private slots:
     void on_treeTables_itemActivated(QTreeWidgetItem *item, int column);
+    void onTableModified();
 };
 
 #endif // TUNEEDITOR_H

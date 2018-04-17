@@ -7,6 +7,7 @@
 #include "tabledefinitions.h"
 
 #include <memory>
+#include <cassert>
 
 #include <QAbstractTableModel>
 #include <QApplication>
@@ -18,6 +19,7 @@
  */
 class Table : public QAbstractTableModel
 {
+Q_OBJECT
 public:
     virtual TableType type() const =0;
 
@@ -37,17 +39,35 @@ public:
     {
         return modified_;
     }
+    
+    void setModified(bool modified)
+    {
+        modified_ = modified;
+    }
 
     virtual ~Table() {};
     
     /* Used to set the editable flag */
     virtual Qt::ItemFlags flags(const QModelIndex & index) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    
+    /* Serializes raw data. Returns false if the buffer is too small. */
+    virtual bool serialize(uint8_t *data, size_t length, Endianness endian = ENDIAN_BIG) =0;
+    
+    /* Returns the minimum buffer size for serialization */
+    virtual size_t rawSize() =0;
+    
+    /* Sets modified data depending on the difference with another table */
+    virtual void calcDifference(TablePtr table) =0;
     
 protected:
     Table(const TableDefinition *definition);
     
     template<typename T>
     static void readRow(std::vector<T> &data, Endianness endian, const uint8_t *raw, size_t length);
+    
+    template<typename T>
+    static void writeRow(std::vector<T> &data, Endianness endian, uint8_t *odata);
     
     template<typename T>
     static QString toString(T t);
@@ -58,6 +78,9 @@ protected:
     bool modified_;
     
     const TableDefinition *definition_;
+    
+signals:
+    void onModified();
 };
 typedef std::shared_ptr<Table> TablePtr;
 
@@ -90,6 +113,7 @@ public:
         data_[idx] = t;
         modifiedv_[idx] = true;
         modified_ = true;
+        emit onModified();
     }
     
     T &operator[](int idx)
@@ -101,6 +125,12 @@ public:
     {
         return TABLE_1D;
     }
+    
+    void calcDifference(TablePtr table) override;
+    
+    bool serialize(uint8_t *data, size_t length, Endianness endian = ENDIAN_BIG) override;
+    
+    size_t rawSize() override;
     
     /* Qt model functions */
     int columnCount(const QModelIndex & parent) const override;
@@ -145,12 +175,19 @@ public:
         data_[y][x] = t;
         modifiedv_[y][x] = true;
         modified_ = true;
+        emit onModified();
     }
     
     TableType type() const override
     {
         return TABLE_2D;
     }
+    
+    void calcDifference(TablePtr table) override;
+    
+    bool serialize(uint8_t *data, size_t length, Endianness endian = ENDIAN_BIG) override;
+    
+    size_t rawSize() override;
     
     /* Qt model functions */
     int columnCount(const QModelIndex & parent) const override;
@@ -183,6 +220,54 @@ Table2d<T>::Table2d(const TableDefinition* definition, Endianness endian, const 
         readRow(data_[i], endian, data, definition->sizeX());
         data += sizeof(T) * definition->sizeX();
     }
+}
+
+
+
+template<typename T>
+void Table2d<T>::calcDifference(TablePtr table)
+{
+    assert(table->type() == type());
+    assert(table->dataType() == dataType());
+    
+    std::shared_ptr<Table2d> table2d = std::static_pointer_cast<Table2d>(table);
+    
+    for (int i = 0; i < definition_->sizeY(); ++i)
+    {
+        for (int x = 0; x < definition_->sizeX(); ++x)
+        {
+            if (data_[i][x] != table2d->at(x, i))
+            {
+                modifiedv_[i][x] = true;
+                modified_ = true;
+            }
+        }
+    }
+}
+
+
+
+template<typename T>
+bool Table2d<T>::serialize(uint8_t *data, size_t length, Endianness endian)
+{
+    if (length < definition_->sizeX() * definition_->sizeY() * sizeof(T))
+    {
+        return false;
+    }
+    for (std::vector<T> &row : data_)
+    {
+        writeRow(row, endian, data);
+    }
+    
+    return true;
+}
+
+
+
+template<typename T>
+size_t Table2d<T>::rawSize()
+{
+    return definition_->sizeX() * definition_->sizeY() * sizeof(T);
 }
 
 
@@ -237,12 +322,8 @@ QVariant Table2d<T>::data(const QModelIndex& index, int role) const
     
     if (role == Qt::BackgroundColorRole)
     {
-        if (index.row() % 2 == 0)
-        {
-            // Even row
-            return QColor::fromRgb(255, 140, 140);
-        }
-        return QColor::fromRgb(255, 166, 166);
+        double ratio = static_cast<double>(at(index.column(), index.row()) - definition_->min()) / (definition_->max() - definition_->min());
+        return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
     }
     
     if (role != Qt::DisplayRole && role != Qt::EditRole)
@@ -275,10 +356,54 @@ bool Table2d<T>::setData(const QModelIndex& index, const QVariant& value, int ro
 
 
 
+
+
 template<typename T>
 Table1d<T>::Table1d(const TableDefinition *definition, Endianness endian, const uint8_t *data) : Table(definition), modifiedv_(definition->sizeX())
 {
     readRow(data_, endian, data, definition->sizeX());
+}
+
+
+
+template<typename T>
+void Table1d<T>::calcDifference(TablePtr table)
+{
+    assert(table->type() == type());
+    assert(table->dataType() == dataType());
+    
+    std::shared_ptr<Table1d> table1d = std::static_pointer_cast<Table1d>(table);
+    
+    for (int x = 0; x < definition_->sizeX(); ++x)
+    {
+        if (data_[x] != table1d->at(x))
+        {
+            modifiedv_[x] = true;
+            modified_ = true;
+        }
+    }
+}
+
+
+
+template<typename T>
+bool Table1d<T>::serialize(uint8_t *data, size_t length, Endianness endian)
+{
+    if (length <= data_.size() * sizeof(T))
+    {
+        return false;
+    }
+    writeRow(data_, endian, data);
+    
+    return true;
+}
+
+
+
+template<typename T>
+size_t Table1d<T>::rawSize()
+{
+    return data_.size() * sizeof(T);
 }
 
 
@@ -320,7 +445,12 @@ QVariant Table1d<T>::data(const QModelIndex& index, int role) const
     
     if (role == Qt::BackgroundColorRole)
     {
-        return QColor::fromRgb(255, 140, 140);
+        double ratio = static_cast<double>(at(index.column()) - definition_->min()) / (definition_->max() - definition_->min());
+        if (ratio < 0.0)
+        {
+            return QVariant();
+        }
+        return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
     }
     
     if (role != Qt::DisplayRole && role != Qt::EditRole)

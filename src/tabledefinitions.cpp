@@ -5,7 +5,7 @@
 #include <cassert>
 
 
-TableDefinition::TableDefinition(int id, const std::string& name, TableType type, TableCategory category, DataType dataType, uint32_t sizeX, uint32_t sizeY, int min, int max) : id_(id), name_(name), type_(type), category_(category), dataType_(dataType), sizeX_(sizeX), sizeY_(sizeY), max_(max), min_(min)
+TableDefinition::TableDefinition(int id, const std::string& name, const std::string &description, TableType type, TableCategory category, DataType dataType, uint32_t sizeX, const TableAxis *axisX, uint32_t sizeY, const TableAxis *axisY, int min, int max) : id_(id), name_(name), description_(description), type_(type), category_(category), dataType_(dataType), sizeX_(sizeX), sizeY_(sizeY), max_(max), min_(min), axisX_(axisX), axisY_(axisY)
 {
 }
 
@@ -31,4 +31,17 @@ const TableDefinition *TableDefinitions::at(int id) const
 {
     assert(id < count());
     return &definitions()[id];
+}
+
+
+
+TableAxis::TableAxis(const std::string& name, double start, double increment) : name_(name), start_(start), increment_(increment)
+{
+}
+
+
+
+double TableAxis::label(int idx) const
+{
+    return start_ + increment_ * idx;
 }
