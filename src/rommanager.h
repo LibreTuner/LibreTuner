@@ -44,11 +44,7 @@ public:
         return roms_;
     }
     
-    bool addRom(const std::string &name, RomType type, const uint8_t *data, size_t size);
-    
-    /* Analyzes the ROM data to determine the subtype. Returns
-     * ROM_SUB_NONE if the subtype could not be determined. */
-    RomSubType getSubType(RomType type, const uint8_t *data, size_t size);
+    bool addRom(const std::string &name, DefinitionPtr definition, const uint8_t *data, size_t size);
     
     /* Returns the ROM with id or nullptr if the ROM does
      * not exist */

@@ -45,7 +45,7 @@ private:
     Ui::DownloadWindow* ui;
     std::shared_ptr<DownloadInterface> downloadInterface_;
     std::string name_;
-    RomType vehicle_;
+    DefinitionPtr definition_;
 
     void start();
 };

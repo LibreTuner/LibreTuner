@@ -43,7 +43,8 @@ public:
     /* Creates a T1 flash interface */
     static FlasherPtr createT1(CanInterfacePtr can);
     
-    void flash(const Flashable &f);
+    /* Flash that shit */
+    void flash(const Flashable &flashable);
 };
 
 #endif // FLASHER_H

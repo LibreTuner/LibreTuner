@@ -3,7 +3,9 @@
 #include "tune.h"
 #include "table.h"
 #include "tablegroup.h"
-#include "tabledefinitions.h"
+#include "definitions/tabledefinitions.h"
+#include "definitions/definition.h"
+#include "graphwidget.h"
 
 #include <utility>
 #include <vector>
@@ -23,11 +25,19 @@ TuneEditor::TuneEditor(TuneDataPtr tune, QWidget* parent) : QMainWindow(parent),
     ui->labelAxisX->setVisible(false);
     ui->labelAxisY->setVisible(false);
     
+    connect(this, &TuneEditor::tableChanged, ui->graphWidget, &GraphWidget::tableChanged);
+    
     std::vector<std::pair<TableCategory, QTreeWidgetItem*> > categories_;
     
-    for (int i = 0; i < tune_->romData()->definitions()->count(); ++i)
+    TableDefinitions *tables = tune_->romData()->definition()->tables();
+    
+    for (int i = 0; i < tables->count(); ++i)
     {
-        const TableDefinition *def = tune_->romData()->definitions()->at(i);
+        const TableDefinition *def = tables->at(i);
+        if (!def->valid())
+        {
+            continue;
+        }
         
         QTreeWidgetItem *par = nullptr;
         
@@ -83,12 +93,16 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem* item, int column)
     }
     
     currentTable_ = tune_->tables()->get(index);
+    if (!currentTable_)
+    {
+        return;
+    }
     connect(currentTable_.get(), &Table::onModified, this, &TuneEditor::onTableModified);
     
     ui->tableEdit->setModel(currentTable_.get());
     
     // This is not elegant. Maybe the class structure should be changed
-    ui->labelMemory->setText(QStringLiteral("0x") + QString::number(tune_->romData()->locations()->get(currentTable_->definition()->id()), 16));
+    ui->labelMemory->setText(QStringLiteral("0x") + QString::number(tune_->romData()->subDefinition()->getTableLocation(currentTable_->definition()->id()), 16));
     ui->infoName->setText(QString::fromStdString(currentTable_->definition()->name()));
     ui->infoDesc->setText(QString::fromStdString(currentTable_->definition()->description()));
     
@@ -117,6 +131,8 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem* item, int column)
         ui->labelAxisY->setVisible(false);
         ui->tableEdit->verticalHeader()->setVisible(false);
     }
+    
+    emit tableChanged(currentTable_);
 }
 
 

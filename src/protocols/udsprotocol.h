@@ -6,6 +6,7 @@
 #include <vector>
 
 class CanInterface;
+typedef std::shared_ptr<CanInterface> CanInterfacePtr;
 
 /* Request SIDs */
 #define UDS_REQ_SESSION 0x10
@@ -81,7 +82,7 @@ public:
     };
     
     /* Create an interface with an ISO-TP layer */
-    static std::shared_ptr<UdsProtocol> create(Callbacks *callbacks, std::shared_ptr<CanInterface> can, int srcId = 0x7E0, int dstId = 0x7E8);
+    static std::shared_ptr<UdsProtocol> create(Callbacks *callbacks, CanInterfacePtr can, int srcId = 0x7E0, int dstId = 0x7E8);
     
     /* Sends a request. Returns false on failure. */
     virtual bool request(const uint8_t *message, size_t length) =0;

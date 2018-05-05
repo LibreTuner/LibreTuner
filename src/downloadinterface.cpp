@@ -1,5 +1,6 @@
 #include "downloadinterface.h"
 #include "protocols/udsprotocol.h"
+#include "definitions/definition.h"
 
 #include <cassert>
 #include <vector>
@@ -67,7 +68,7 @@ Uds23DownloadInterface::Uds23DownloadInterface(DownloadInterface::Callbacks *cal
 
 
 #ifdef WITH_SOCKETCAN
-std::shared_ptr<DownloadInterface> DownloadInterface::createSocketCan(DownloadInterface::Callbacks* callbacks, const std::string& device, RomType vehicle)
+std::shared_ptr<DownloadInterface> DownloadInterface::createSocketCan(DownloadInterface::Callbacks* callbacks, const std::string& device, DefinitionPtr definition)
 {
     assert(callbacks != nullptr);
     std::shared_ptr<SocketCanInterface> can = std::make_shared<SocketCanInterface>(nullptr, device);
@@ -79,11 +80,11 @@ std::shared_ptr<DownloadInterface> DownloadInterface::createSocketCan(DownloadIn
     
     can->start();
     
-    switch (vehicle)
+    switch (definition->downloadMode())
     {
-    case ROM_MAZDASPEED6:
+    case DM_MAZDA23:
         // Mazdaspeed 6 ROM size is 1 MiB
-        return std::make_shared<Uds23DownloadInterface>(callbacks, can, "MazdA", 1024 * 1024, 0x7E0, 0x7E8);
+        return std::make_shared<Uds23DownloadInterface>(callbacks, can, definition->key(), 1024 * 1024, definition->serverId(), definition->serverId() + 8);
     default:
         callbacks->downloadError("CAN is not supported on this vehicle");
         break;

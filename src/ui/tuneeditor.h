@@ -41,6 +41,9 @@ private:
 private slots:
     void on_treeTables_itemActivated(QTreeWidgetItem *item, int column);
     void onTableModified();
+    
+signals:
+    void tableChanged(TablePtr table);
 };
 
 #endif // TUNEEDITOR_H

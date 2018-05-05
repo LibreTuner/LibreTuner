@@ -23,19 +23,13 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tabTable">
+      <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Table</string>
+        <string>Tab 1</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="VerticalLabel" name="labelAxisY">
-          <property name="maximumSize">
-           <size>
-            <width>110</width>
-            <height>16777215</height>
-           </size>
-          </property>
+         <widget class="QLabel" name="labelAxisX">
           <property name="text">
            <string/>
           </property>
@@ -45,12 +39,15 @@
          </widget>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>6</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="labelAxisX">
+           <widget class="VerticalLabel" name="labelAxisY">
+            <property name="maximumSize">
+             <size>
+              <width>110</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -76,10 +73,15 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabGraph">
+      <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Graph</string>
+        <string>Tab 2</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="GraphWidget" name="graphWidget" native="true"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -96,7 +98,7 @@
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tables</string>
+    <string>&amp;Tables</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -135,7 +137,7 @@
     <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Information</string>
+    <string>&amp;Information</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -167,8 +169,8 @@
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Noto Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -193,19 +195,6 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -215,6 +204,12 @@ p, li { white-space: pre-wrap; }
    <class>VerticalLabel</class>
    <extends>QLabel</extends>
    <header>ui/verticallabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GraphWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/graphwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

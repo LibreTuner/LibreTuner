@@ -2,6 +2,8 @@
 #include "rom.h"
 #include "tablegroup.h"
 #include "libretuner.h"
+#include "table.h"
+#include "definitions/definition.h"
 
 #include <QFile>
 #include <QXmlStreamReader>
@@ -11,6 +13,7 @@
 #include <iostream>
 
 #include <cassert>
+#include "util.hpp"
 
 TuneData::TuneData(TunePtr tune) : tune_(tune)
 {
@@ -158,4 +161,21 @@ bool TuneData::save()
     
     return true;
 }
+
+
+
+bool TuneData::apply(uint8_t* data, size_t length)
+{
+    tables_->apply(data, length);
+    
+    // Checksums
+    std::pair<bool, std::string> res = rom_->subDefinition()->checksums()->correct(data, length);
+    if (res.first)
+    {
+        lastError_ = std::string("Failed to correct checksum: ") + res.second;
+        return false;
+    }
+    return true;
+}
+
 

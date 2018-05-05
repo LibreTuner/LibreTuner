@@ -20,7 +20,7 @@ void UdsResponse::setMessage(const uint8_t* message, size_t length)
 
 class IsoTpUdsInterface : public UdsProtocol, public IsoTpInterface::Callbacks {
 public:
-    IsoTpUdsInterface(UdsProtocol::Callbacks *callbacks, std::shared_ptr<CanInterface> can, int srcId = 0x7E0, int dstId = 0x7E8);
+    IsoTpUdsInterface(UdsProtocol::Callbacks *callbacks, CanInterfacePtr can, int srcId = 0x7E0, int dstId = 0x7E8);
     
     bool request(const uint8_t * message, size_t length) override;
     

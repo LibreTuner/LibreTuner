@@ -8,6 +8,12 @@
 
 #include "rommanager.h"
 
+enum DownloadMode
+{
+    DM_NONE = 0,
+    DM_MAZDA23,
+};
+
 class CanInterface;
 
 class DownloadInterface {
@@ -38,7 +44,7 @@ public:
 
 #ifdef WITH_SOCKETCAN
     /* Creates a socketcan downloader. device is the name of the socketcan interface. */
-    static std::shared_ptr<DownloadInterface> createSocketCan(Callbacks *callbacks, const std::string &device, RomType vehicle);
+    static std::shared_ptr<DownloadInterface> createSocketCan(Callbacks *callbacks, const std::string &device, DefinitionPtr definition);
 #endif
     
 protected:

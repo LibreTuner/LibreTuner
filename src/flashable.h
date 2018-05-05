@@ -8,7 +8,7 @@ class TuneData;
 typedef std::shared_ptr<TuneData> TuneDataPtr;
 
 /**
- * @todo write docs
+ * A representation of data able to be flashed.
  */
 class Flashable
 {
@@ -20,6 +20,15 @@ public:
         return valid_;
     }
     
+    size_t size() const
+    {
+        return data_.size();
+    }
+    
+    const uint8_t *data() const
+    {
+        return data_.data();
+    }
     
 private:
     std::vector<uint8_t> data_;
