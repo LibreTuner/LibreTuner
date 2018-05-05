@@ -504,6 +504,7 @@ bool Definition::loadMain(const QString& path)
     // Default endianness is big
     endianness_ = ENDIAN_BIG;
     downloadMode_ = DM_NONE;
+    flashMode_ = FLASH_NONE;
     
     if (xml.readNextStartElement()) 
     {
@@ -559,7 +560,15 @@ bool Definition::loadMain(const QString& path)
             {
                 if (xml.name() == "flashmode")
                 {
-                    xml.readElementText();
+                    QString sMode = xml.readElementText().toLower();
+                    if (sMode == "mazdat1")
+                    {
+                        flashMode_ = FLASH_T1;
+                    }
+                    else
+                    {
+                        xml.raiseError("Invalid flash mode");
+                    }
                 }
                 else if (xml.name() == "downloadmode")
                 {

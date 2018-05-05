@@ -16,6 +16,7 @@ class Flashable;
 
 enum FlashMode
 {
+    FLASH_NONE = 0,
     FLASH_T1, // Uses a CAN interface. Supported: Mazdaspeed 6
     
 };

@@ -23,8 +23,13 @@ TuneWidget::TuneWidget(TunePtr tune, QWidget *parent) : QFrame(parent), tune_(tu
     QPushButton *buttonEdit = new QPushButton(style()->standardIcon(QStyle::SP_DialogOpenButton), "Edit", this);
     vlayout->addWidget(buttonEdit);
     connect(buttonEdit, &QPushButton::clicked, this, &TuneWidget::editClicked);
+    
     QPushButton *buttonDelete = new QPushButton(style()->standardIcon(QStyle::SP_TrashIcon), "Delete", this);
     vlayout->addWidget(buttonDelete);
+    
+    QPushButton *buttonFlash = new QPushButton(style()->standardIcon(QStyle::SP_CommandLink), "Flash", this);
+    vlayout->addWidget(buttonFlash);
+    connect(buttonFlash, &QPushButton::clicked, this, &TuneWidget::flashClicked);
     
     setLayout(vlayout);
     
@@ -37,4 +42,11 @@ TuneWidget::TuneWidget(TunePtr tune, QWidget *parent) : QFrame(parent), tune_(tu
 void TuneWidget::editClicked()
 {
     LibreTuner::get()->editTune(tune_);
+}
+
+
+
+void TuneWidget::flashClicked()
+{
+    LibreTuner::get()->flashTune(tune_);
 }
