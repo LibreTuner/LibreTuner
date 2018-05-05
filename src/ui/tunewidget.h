@@ -23,6 +23,7 @@ private:
     
 private slots:
     void editClicked();
+    void flashClicked();
 };
 
 #endif // TUNEWIDGET_H

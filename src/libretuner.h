@@ -42,6 +42,9 @@ public:
     
     /* Open the tune editor */
     void editTune(TunePtr tune);
+    
+    /* Open tune flasher */
+    void flashTune(TunePtr tune);
 
 private:
     std::unique_ptr<MainWindow> mainWindow_;

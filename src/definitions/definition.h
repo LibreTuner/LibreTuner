@@ -11,6 +11,7 @@
 #include "checksummanager.h"
 #include "endian.h"
 #include "downloadinterface.h"
+#include "flasher.h"
 
 class Definition;
 
@@ -184,6 +185,11 @@ public:
         return downloadMode_;
     }
     
+    FlashMode flashMode() const
+    {
+        return flashMode_;
+    }
+    
     std::string key() const
     {
         return key_;
@@ -208,6 +214,7 @@ private:
     std::string id_;
     
     DownloadMode downloadMode_;
+    FlashMode flashMode_;
     /* Security key */
     std::string key_;
     /* Server ID for ISO-TP reqeusts */

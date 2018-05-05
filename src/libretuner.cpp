@@ -78,6 +78,13 @@ void LibreTuner::editTune(TunePtr tune)
 
 
 
+void LibreTuner::flashTune(TunePtr tune)
+{
+    
+}
+
+
+
 LibreTuner * LibreTuner::get()
 {
     return _global;
@@ -88,6 +95,7 @@ LibreTuner * LibreTuner::get()
 LibreTuner::~LibreTuner()
 {
 }
+
 
 
 void LibreTuner::checkHome()

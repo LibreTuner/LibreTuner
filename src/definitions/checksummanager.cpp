@@ -20,7 +20,7 @@ uint32_t ChecksumBasic::compute(uint8_t* data, std::size_t length, bool* ok) con
         return 0;
     }
     
-    uint32_t sum;
+    uint32_t sum = 0;
     // Add up the big endian int32s
     for (int i = 0; i < length / 4; ++i, data += 4)
     {
