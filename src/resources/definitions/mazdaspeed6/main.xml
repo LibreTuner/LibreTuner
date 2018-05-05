@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE maindefinition>
+<definition>
+	<name>Mazdaspeed 6</name>
+	<id>mazdaspeed6</id>
+	<romsize>1048576</romsize>
+
+	<transfer>
+		<flashmode>MazdaT1</flashmode>
+		<downloadmode>Mazda23</downloadmode>
+		<key>MazdA</key>
+		<serverid>7E0</serverid>
+	</transfer>
+
+	<tables>
+		<table type='1d' id='0'>
+			<name>Speed Limiter (fuel cut)</name>
+			<description>Maximum speed before fuel is cut</description>
+			<datatype>float</datatype>
+			<category>Limiters</category>
+			<size>1</size>
+		</table>
+
+		<table type='1d' id='1'>
+			<name>Speed Limiter (Throttle close)</name>
+			<description>Maximum speed before the throttle plate is closed</description>
+			<datatype>float</datatype>
+			<category>Limiters</category>
+			<size>1</size>
+		</table>
+
+		<table type='2d' id='2'>
+			<name>Some Timing Table</name>
+			<description>Unknown</description>
+			<datatype>float</datatype>
+			<category>Miscellaneous</category>
+			<sizex>8</sizex>
+			<sizey>28</sizey>
+			<axisx>rpm_500</axisx>
+			<axisy>load_3125</axisy>
+			<minimum>-20</minimum>
+			<maximum>60</maximum>
+		</table>
+
+		<table type='2d' id='3'>
+			<name>Maximum Ignition Timing (Open Loop)</name>
+			<description>Maximum iginition timing during open loop operation</description>
+			<category>Miscellaneous</category>
+			<datatype>float</datatype>
+			<sizex>14</sizex>
+			<sizey>31</sizey>
+			<axisx>rpm_500</axisx>
+			<axisy>load_125</axisy>
+			<minimum>-20</minimum>
+			<maximum>60</maximum>
+		</table>
+
+		<table type='1d' id='4'>
+			<name>Operating Load Limit 1</name>
+			<description>Maximum permitted operating load</description>
+			<category>Miscellaneous</category>
+			<datatype>float</datatype>
+			<sizex>14</sizex>
+			<axisx>rpm_500</axisx>
+			<minimum>0</minimum>
+			<maximum>4</maximum>
+		</table>
+	</tables>
+
+	<axes>
+		<axis id="rpm_500" type="linear">
+			<name>RPM</name>
+			<minimum>500</minimum>
+			<increment>500</increment>
+		</axis>
+		<axis id="load_125" type="linear">
+			<name>Load</name>
+			<minimum>0.125</minimum>
+			<increment>0.0625</increment>
+		</axis>
+		<axis id="load_3125" type="linear">
+			<name>Load</name>
+			<minimum>0.3125</minimum>
+			<increment>0.0625</increment>
+		</axis>
+	</axes>
+</definition>

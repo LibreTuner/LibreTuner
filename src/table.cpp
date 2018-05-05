@@ -29,7 +29,7 @@ QVariant Table::headerData(int section, Qt::Orientation orientation, int role) c
             return QString::number(definition_->axisX()->label(section));
         }
     }
-    else
+    else if (orientation == Qt::Vertical)
     {
         if (definition_->axisY() != nullptr && section < definition_->sizeY())
         {

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE subdefinition>
+<subdefinition>
+	<name>L38K</name>
+	<id>l38k</id>
+
+	<tables>
+		<table id='0'>
+			<offset>836C</offset>
+		</table>
+		<table id='1'>
+			<offset>9AE4</offset>
+		</table>
+		<table id='2'>
+			<offset>1CE84</offset>
+		</table>
+		<table id='3'>
+			<offset>1FE54</offset>
+		</table>
+		<table id='4'>
+			<offset>9BD0</offset>
+		</table>
+	</tables>
+
+	<axes>
+		<axis id='rpm_500'>
+			<offset>0</offset>
+		</axis>
+	</axes>
+
+	<checksums>
+		<checksum mode='basic' offset='48000' size='B8000' target='5AA55AA5'>
+			<modify offset='0' size='4' /> 
+		</checksum>
+	</checksums>
+
+
+	<identifiers>
+		<identifier offset='2A7C8'>
+			<text>L38K</text>
+		</identifier>
+	</identifiers>
+</subdefinition>

@@ -69,6 +69,10 @@ class TuneData
 public:
     TuneData(TunePtr tune);
     
+    /* Applies table modifications to data and computes checksums.
+     * Returns false on error and sets lastError. */
+    bool apply(uint8_t *data, size_t length);
+    
     bool valid() const
     {
         return valid_;

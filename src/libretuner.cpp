@@ -23,6 +23,16 @@ LibreTuner::LibreTuner(int& argc, char *argv[]) : QApplication(argc, argv)
 #ifdef WITH_SOCKETCAN
     SocketHandler::get()->initialize();
 #endif
+    
+    if (!DefinitionManager::get()->load())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Could not load definitions: " + QString::fromStdString(DefinitionManager::get()->lastError()));
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setWindowTitle("DefinitionManager error");
+        msgBox.exec();
+    }
+    
     if (!RomManager::get()->load())
     {
         QMessageBox msgBox;
@@ -40,6 +50,7 @@ LibreTuner::LibreTuner(int& argc, char *argv[]) : QApplication(argc, argv)
         msgBox.setWindowTitle("TuneManager error");
         msgBox.exec();
     }
+
     
     mainWindow_ = std::unique_ptr<MainWindow>(new MainWindow);
     mainWindow_->show();
@@ -79,11 +90,28 @@ LibreTuner::~LibreTuner()
 }
 
 
-
 void LibreTuner::checkHome()
 {
     QDir home(home_);
     home.mkpath(".");
     home.mkdir("roms");
     home.mkdir("tunes");
+    
+    if (!home.exists("definitions")) 
+    {
+        home.mkdir("definitions");
+        // Copy definitions
+        QDir dDir(":/definitions");
+        
+        for (QFileInfo &info : dDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::NoSort))
+        {
+            QDir realDefDir(home.path() + "/definitions/" + info.fileName() + "/");
+            realDefDir.mkpath(".");
+            QDir subDir(info.filePath());
+            for (QFileInfo &i : subDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot, QDir::NoSort))
+            {
+                QFile::copy(i.filePath(), realDefDir.path() + "/" + i.fileName());
+            }
+        }
+    }
 }

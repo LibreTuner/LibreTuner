@@ -5,29 +5,15 @@
 #include <memory>
 #include <vector>
 
-enum RomType
-{
-    ROM_NONE = 0,
-    ROM_MAZDASPEED6,
-};
-
-/* Sub types are used for specific firmware versions */
-enum RomSubType
-{
-    ROM_SUB_NONE = 0,
-    
-    // Mazdaspeed6 ECU models
-    ROM_SUB_L38K, 
-};
-
-enum Endianness
-{
-    ENDIAN_BIG,
-    ENGINE_LITTLE,
-};
 
 class RomData;
 typedef std::shared_ptr<RomData> RomDataPtr;
+
+class Definition;
+typedef std::shared_ptr<Definition> DefinitionPtr;
+
+class SubDefinition;
+typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 
 /* ROM Metadata */
 class Rom
@@ -53,24 +39,6 @@ public:
         return path_;
     }
     
-    /* Sets the type and calculated endianness */
-    void setType(RomType type);
-    
-    RomType type() const
-    {
-        return type_;
-    }
-    
-    void setSubType(RomSubType type)
-    {
-        subType_ = type;
-    }
-    
-    RomSubType subType() const
-    {
-        return subType_;
-    }
-    
     int id() const {
         return id_;
     }
@@ -79,34 +47,36 @@ public:
     {
         id_ = id;
     }
-    
-    bool bigEndian() const
+
+    std::string definitionId() const
     {
-        return endianness_ == ENDIAN_BIG;
+        return definitionId_;
     }
     
-    Endianness endian() const
+    void setDefinition(const std::string &id)
     {
-        return endianness_;
+        definitionId_ = id;
+    }
+    
+    std::string subDefinitionId() const
+    {
+        return subDefinitionId_;
+    }
+    
+    void setSubDefinition(const std::string &id)
+    {
+        subDefinitionId_ = id;
     }
     
 private:
     std::string name_;
     std::string path_;
+    std::string definitionId_;
+    std::string subDefinitionId_;
     int id_;
-    RomType type_ = ROM_NONE;
-    RomSubType subType_ = ROM_SUB_NONE;
-    Endianness endianness_;
+    
 };
-
 typedef std::shared_ptr<Rom> RomPtr;
-
-
-class TableLocations;
-typedef std::shared_ptr<TableLocations> TableLocationsPtr;
-
-class TableDefinitions;
-typedef std::shared_ptr<TableDefinitions> TableDefinitionsPtr;
 
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
@@ -130,16 +100,6 @@ public:
         return lastError_;
     }
     
-    TableLocationsPtr locations() const
-    {
-        return locations_;
-    }
-    
-    TableDefinitionsPtr definitions() const
-    {
-        return definitions_;
-    }
-    
     const uint8_t *data() const
     {
         return data_.data();
@@ -155,14 +115,29 @@ public:
         return data_.size();
     }
     
+    RomPtr rom() const
+    {
+        return rom_;
+    }
+    
+    DefinitionPtr definition() const
+    {
+        return definition_;
+    }
+    
+    SubDefinitionPtr subDefinition() const
+    {
+        return subDefinition_;
+    }
+
 private:
     RomPtr rom_;
     
     bool valid_;
     std::string lastError_;
     
-    TableLocationsPtr locations_;
-    TableDefinitionsPtr definitions_;
+    DefinitionPtr definition_;
+    SubDefinitionPtr subDefinition_;
     
     /* Raw firmware data */
     std::vector<uint8_t> data_;

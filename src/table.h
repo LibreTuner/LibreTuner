@@ -4,7 +4,8 @@
 /* Because this file includes function definitions, only include
  * it if absolutely necessary to decrease compile times. */
 
-#include "tabledefinitions.h"
+#include "definitions/tabledefinitions.h"
+#include "endian.h"
 
 #include <memory>
 #include <cassert>
@@ -13,6 +14,9 @@
 #include <QApplication>
 #include <QFont>
 #include <QColor>
+
+class Table;
+typedef std::shared_ptr<Table> TablePtr;
 
 /**
  * @todo write docs
@@ -294,7 +298,8 @@ int Table2d<T>::rowCount(const QModelIndex& parent) const
     return definition_->sizeY();
 }
 
-
+#include <iostream>
+#include "endian.h"
 
 template<typename T>
 QVariant Table2d<T>::data(const QModelIndex& index, int role) const
@@ -351,6 +356,7 @@ bool Table2d<T>::setData(const QModelIndex& index, const QVariant& value, int ro
     }
     
     set(index.column(), index.row(), res);
+    emit dataChanged(index, index);
     return true;
 }
 
@@ -489,6 +495,7 @@ bool Table1d<T>::setData(const QModelIndex& index, const QVariant& value, int ro
     }
     
     set(index.column(), res);
+    emit dataChanged(index, index);
     return true;
 }
 

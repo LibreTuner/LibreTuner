@@ -4,6 +4,7 @@
 #include <QApplication>
 #include "ui/mainwindow.h"
 #include "protocols/canlog.h"
+#include "definitions/definitionmanager.h"
 
 #include <memory>
 

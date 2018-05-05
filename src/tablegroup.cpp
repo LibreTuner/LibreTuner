@@ -1,12 +1,12 @@
 #include "tablegroup.h"
+#include "table.h"
+#include "definitions/definition.h"
 
 #include <cassert>
 
 TableGroup::TableGroup(RomDataPtr base) : base_(base)
 {
-    definitions_ = base_->definitions();
-    locations_ = base_->locations();
-    tables_.resize(definitions_->count());
+    tables_.resize(base->definition()->tables()->count());
 }
 
 
@@ -31,7 +31,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx, const uint8_t* data, si
     assert(idx < tables_.size());
     assert(size >= 0);
     
-    const TableDefinition *definition = definitions_->at(idx);
+    const TableDefinition *definition = base_->definition()->tables()->at(idx);
     
     TableType type = definition->type();
     DataType dataType = definition->dataType();
@@ -89,7 +89,7 @@ void TableGroup::apply(uint8_t* data, size_t length)
     {
         if (table && table->modified())
         {
-            size_t offset = locations_->get(table->definition()->id());
+            size_t offset = base_->subDefinition()->getTableLocation(table->definition()->id());
             assert(offset < length);
             assert(table->serialize(data + offset, length - offset));
         }

@@ -1,6 +1,5 @@
 #include "rom.h"
-#include "tabledefinitions.h"
-#include "tablelocations.h"
+#include "definitions/definition.h"
 #include "table.h"
 #include "libretuner.h"
 
@@ -8,30 +7,23 @@
 
 #include <QFile>
 
-
-void Rom::setType(RomType type)
-{
-    type_ = type;
-    
-    switch (type)
-    {
-        case ROM_NONE:
-        case ROM_MAZDASPEED6:
-            endianness_ = ENDIAN_BIG;
-            break;
-            
-        default:
-            endianness_ = ENDIAN_BIG;
-            break;
-    }
-}
-
-
 RomData::RomData(RomPtr rom) : rom_(rom)
 {
     assert(rom);
-    locations_ = TableLocations::get(rom->type(), rom->subType());
-    definitions_ = TableDefinitions::get(rom->type());
+    definition_ = DefinitionManager::get()->getDefinition(rom->definitionId());
+    if (!definition_)
+    {
+        lastError_ = "Definition does not exist";
+        valid_ = false;
+        return;
+    }
+    subDefinition_ = definition_->findSubtype(rom->subDefinitionId());
+    if (!subDefinition_)
+    {
+        lastError_ = "Sub-definition '" + rom->subDefinitionId() + "' does not exist";
+        valid_ = false;
+        return;
+    }
     
     QFile file(LibreTuner::get()->home() + "/roms/" + QString::fromStdString(rom->path()));
     if (!file.open(QFile::ReadOnly))
@@ -53,9 +45,11 @@ RomData::RomData(RomPtr rom) : rom_(rom)
 
 TablePtr RomData::getTable(int idx)
 {
-    assert(idx < definitions_->count());
-    
-    const TableDefinition *def = definitions_->at(idx);
+    const TableDefinition *def = definition_->tables()->at(idx);
+    if (!def->valid())
+    {
+        return nullptr;
+    }
     
     switch(def->type())
     {
@@ -64,7 +58,7 @@ TablePtr RomData::getTable(int idx)
             {
                 case TDATA_FLOAT:
                 {
-                    return std::make_shared<Table1d<float>>(def, rom_->endian(), data_.data() + locations_->get(idx));
+                    return std::make_shared<Table1d<float>>(def, definition_->endianness(), data_.data() + subDefinition_->getTableLocation(idx));
                 }
             }
         case TABLE_2D:
@@ -72,7 +66,7 @@ TablePtr RomData::getTable(int idx)
             {
                 case TDATA_FLOAT:
                 {
-                    return std::make_shared<Table2d<float>>(def, rom_->endian(), data_.data() + locations_->get(idx));
+                    return std::make_shared<Table2d<float>>(def, definition_->endianness(), data_.data() + subDefinition_->getTableLocation(idx));
                 }
             }
     }

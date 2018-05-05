@@ -1,5 +1,6 @@
 #include "rommanager.h"
 #include "libretuner.h"
+#include "definitions/definition.h"
 
 #include <QFileInfo>
 #include <cassert>
@@ -65,7 +66,6 @@ bool RomManager::load()
 }
 
 
-
 void RomManager::readRoms(QXmlStreamReader &xml)
 {
     assert(xml.isStartElement() && xml.name() == "roms");
@@ -97,26 +97,19 @@ void RomManager::readRoms(QXmlStreamReader &xml)
             else if (xml.name() == "type")
             {
                 QString type = xml.readElementText().toLower();
-                if (type == "mazdaspeed6")
+                DefinitionPtr def = DefinitionManager::get()->getDefinition(type.toStdString());
+                if (!def)
                 {
-                    rom->setType(ROM_MAZDASPEED6);
+                    xml.raiseError("Invalid ROM type");
+                    break;
                 }
-                else
-                {
-                    xml.raiseError("Unknown ROM type");
-                }
+                rom->setDefinition(def->id());
             }
             else if (xml.name() == "subtype")
             {
                 QString type = xml.readElementText().toLower();
-                if (type == "l38k")
-                {
-                    rom->setSubType(ROM_SUB_L38K);
-                }
-                else
-                {
-                    xml.raiseError("Unknown ROM subtype");
-                }
+                rom->setSubDefinition(type.toStdString());
+                // TODO: check if this subtype exists
             }
             else if (xml.name() == "id")
             {
@@ -134,25 +127,28 @@ void RomManager::readRoms(QXmlStreamReader &xml)
         }
         
         // Verifications
-        if (rom->name().empty())
+        if (!xml.hasError())
         {
-            xml.raiseError("ROM name is empty");
-        }
-        if (rom->path().empty())
-        {
-            xml.raiseError("ROM path is empty");
-        }
-        if (rom->type() == ROM_NONE)
-        {
-            xml.raiseError("ROM type is empty");
-        }
-        if (rom->subType() == ROM_SUB_NONE)
-        {
-            xml.raiseError("ROM subtype is empty");
-        }
-        if (rom->id() < 0)
-        {
-            xml.raiseError("ROM id is empty or negative");
+            if (rom->name().empty())
+            {
+                xml.raiseError("ROM name is empty");
+            }
+            if (rom->path().empty())
+            {
+                xml.raiseError("ROM path is empty");
+            }
+            if (rom->definitionId().empty())
+            {
+                xml.raiseError("ROM type is empty");
+            }
+            if (rom->subDefinitionId().empty())
+            {
+                xml.raiseError("ROM subtype is empty");
+            }
+            if (rom->id() < 0)
+            {
+                xml.raiseError("ROM id is empty or negative");
+            }
         }
         
         if (xml.hasError())
@@ -193,18 +189,8 @@ bool RomManager::save()
         xml.writeTextElement("name", QString::fromStdString(rom->name()));
         xml.writeTextElement("path", QString::fromStdString(rom->path()));
         xml.writeTextElement("id", QString::number(rom->id()));
-        switch(rom->type())
-        {
-            case ROM_MAZDASPEED6:
-                xml.writeTextElement("type", "MAZDASPEED6");
-                break;
-        }
-        switch(rom->subType())
-        {
-            case ROM_SUB_L38K:
-                xml.writeTextElement("subtype", "L38K");
-                break;
-        }
+        xml.writeTextElement("type", QString::fromStdString(rom->definitionId()));
+        xml.writeTextElement("subtype", QString::fromStdString(rom->subDefinitionId()));
         xml.writeEndElement();
     }
     xml.writeEndElement();
@@ -214,29 +200,7 @@ bool RomManager::save()
 
 
 
-RomSubType RomManager::getSubType(RomType type, const uint8_t* data, size_t size)
-{
-    switch (type)
-    {
-        case ROM_MAZDASPEED6:
-            // Check L38K. Offset 0x2a7c8 will be L38K
-            if (memcmp(data + 0x2A7C8, "L38K", 4) == 0)
-            {
-                return ROM_SUB_L38K;
-            }
-            // TODO: add the other models
-            break;
-            
-        default:
-            break;
-    }
-    
-    return ROM_SUB_NONE;
-}
-
-
-
-bool RomManager::addRom(const std::string& name, RomType type, const uint8_t* data, size_t size)
+bool RomManager::addRom(const std::string& name, DefinitionPtr definition, const uint8_t* data, size_t size)
 {
     LibreTuner::get()->checkHome();
     
@@ -262,8 +226,8 @@ bool RomManager::addRom(const std::string& name, RomType type, const uint8_t* da
     file.close();
     
     // Determine the subtype
-    RomSubType subtype = getSubType(type, data, size);
-    if (subtype == ROM_SUB_NONE)
+    SubDefinitionPtr subtype = definition->identifySubtype(data, size);
+    if (!subtype)
     {
         lastError_ = "Unknown firmware version or this is the wrong vehicle. If this is the correct vehicle, please submit a bug report so we can add support for this firmware version.";
         return false;
@@ -272,8 +236,8 @@ bool RomManager::addRom(const std::string& name, RomType type, const uint8_t* da
     RomPtr rom = std::make_shared<Rom>();
     rom->setName(name);
     rom->setPath(path.toStdString());
-    rom->setType(type);
-    rom->setSubType(subtype);
+    rom->setDefinition(definition->id());
+    rom->setSubDefinition(subtype->id());
     rom->setId(nextId_++);
     roms_.push_back(rom);
     

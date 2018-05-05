@@ -1,10 +1,15 @@
 #include "downloadwindow.h"
 #include "ui_downloadwindow.h"
 
-#include <QMessageBox>
 #include "protocols/socketcaninterface.h"
 #include "protocols/isotpinterface.h"
+#include "definitions/definitionmanager.h"
+#include "definitions/definition.h"
 
+#include <QMessageBox>
+
+
+Q_DECLARE_METATYPE(DefinitionPtr)
 
 
 DownloadWindow::DownloadWindow(QWidget* parent) : QWidget(parent), ui(new Ui::DownloadWindow)
@@ -13,6 +18,14 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QWidget(parent), ui(new Ui::Do
     setWindowFlags(Qt::Window);
     
     layout()->setSizeConstraint(QLayout::SetFixedSize);
+    
+    // Populate vehicle combo
+    ui->comboVehicle->clear();
+    DefinitionPtr *defs = DefinitionManager::get()->definitions();
+    for (int i = 0; i < DefinitionManager::get()->count(); ++i)
+    {
+        ui->comboVehicle->addItem(QString::fromStdString(defs[i]->name()), QVariant::fromValue(defs[i]));
+    }
     
     on_comboMode_activated(ui->comboMode->currentIndex());
 }
@@ -38,12 +51,8 @@ void DownloadWindow::on_comboMode_activated(int index)
 
 void DownloadWindow::start()
 {
-    switch(ui->comboVehicle->currentIndex())
-    {
-        case 0: // Mazdaspeed 6
-            vehicle_ = ROM_MAZDASPEED6;
-            break;
-    }
+    definition_ = ui->comboVehicle->currentData().value<DefinitionPtr>();
+
     name_ = ui->lineName->text().toStdString();
     switch (ui->comboMode->currentIndex())
     {
@@ -51,7 +60,7 @@ void DownloadWindow::start()
         case 0:
         {
             // SocketCAN
-            downloadInterface_ = DownloadInterface::createSocketCan(this, ui->editSocketCAN->text().toStdString(), vehicle_);
+            downloadInterface_ = DownloadInterface::createSocketCan(this, ui->editSocketCAN->text().toStdString(), definition_);
             if (!downloadInterface_)
             {
                 // The interface should have called the downloadError callback
@@ -130,7 +139,7 @@ void DownloadWindow::mainOnCompletion()
 
 void DownloadWindow::onCompletion(const uint8_t* data, size_t length)
 {
-    if (!RomManager::get()->addRom(name_, vehicle_, data, length))
+    if (!RomManager::get()->addRom(name_, definition_, data, length))
     {
         QMessageBox msgBox;
         msgBox.setText("Failed to save rom: " + RomManager::get()->lastError());

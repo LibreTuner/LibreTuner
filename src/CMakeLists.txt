@@ -24,18 +24,20 @@ set(libretuner_SRC
   tablegroup.h
   table.cpp
   table.h
-  tablelocations.cpp
-  tablelocations.h
-  tabledefinitions.cpp
-  tabledefinitions.h
   flasher.cpp
   flasher.h
   flashable.cpp
   flashable.h
+  endian.h
   
-  definitions/definitions.cpp
-  definitions/definitions.h
-  definitions/mazdaspeed6.cpp
+  definitions/definitionmanager.cpp
+  definitions/definitionmanager.h
+  definitions/definition.cpp
+  definitions/definition.h
+  definitions/tabledefinitions.cpp
+  definitions/tabledefinitions.h
+  definitions/checksummanager.cpp
+  definitions/checksummanager.h
   
   ui/mainwindow.cpp
   ui/mainwindow.h
@@ -57,6 +59,8 @@ set(libretuner_SRC
   ui/tunewidget.h
   ui/verticallabel.cpp
   ui/verticallabel.h
+  ui/graphwidget.cpp
+  ui/graphwidget.h
   
   protocols/caninterface.cpp
   protocols/caninterface.h
@@ -89,13 +93,13 @@ ui/tuneeditor.ui
 
 qt5_add_resources(libretuner_SRC
 resources/icons.qrc
+resources/definitions.qrc
 )
 
-# Tell CMake to create the helloworld executable
+# Tell CMake to create the executable
 add_executable(LibreTuner ${libretuner_SRC})
 
-# Use the Widgets module from Qt 5.
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts ${CMAKE_THREAD_LIBS_INIT})
 
 
 if (UNIX)

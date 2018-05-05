@@ -11,9 +11,8 @@ Flashable::Flashable(TuneDataPtr tune)
     assert(rom);
     
     data_.assign(rom->data(), rom->data() + rom->size());
-    // Apply tune on top of ROM
     
-    TableGroupPtr tables = tune->tables();
-
-    tables->apply(data_.data(), data_.size());
+    // Apply tune on top of ROM
+    tune->apply(data_.data(), data_.size());
+    valid_ = true;
 }

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
 
 struct CanMessage
@@ -47,6 +48,11 @@ public:
     uint8_t message_[8];
     uint8_t messageLength_;
 };
+
+
+
+class CanInterface;
+typedef std::shared_ptr<CanInterface> CanInterfacePtr;
 
 
 
