@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,67 +20,66 @@
 #define CHECKSUMMANAGER_H
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 class Checksum;
 typedef std::shared_ptr<Checksum> ChecksumPtr;
 
-class Checksum
-{
+class Checksum {
 public:
-    Checksum(uint32_t offset, uint32_t size, uint32_t target) : offset_(offset), size_(size), target_(target) {}
-    
-    /* Adds a region modifiable for checksum computation */
-    void addModifiable(uint32_t offset, uint32_t size);
-    
-    /* Corrects the checksum for the data using modifiable sections.
-     * Returns (false, errmsg) on failure and (true, "") on success. */
-    virtual std::pair<bool, std::string> correct (uint8_t *data, size_t length) const =0;
-    
-    /* Returns the computed checksum. If length is too small,
-     * returns 0 and sets ok to false.*/
-    virtual uint32_t compute(uint8_t *data, size_t length, bool *ok = nullptr) const =0;
-    
+  Checksum(uint32_t offset, uint32_t size, uint32_t target)
+      : offset_(offset), size_(size), target_(target) {}
+
+  /* Adds a region modifiable for checksum computation */
+  void addModifiable(uint32_t offset, uint32_t size);
+
+  /* Corrects the checksum for the data using modifiable sections.
+   * Returns (false, errmsg) on failure and (true, "") on success. */
+  virtual std::pair<bool, std::string> correct(uint8_t *data,
+                                               size_t length) const = 0;
+
+  /* Returns the computed checksum. If length is too small,
+   * returns 0 and sets ok to false.*/
+  virtual uint32_t compute(uint8_t *data, size_t length,
+                           bool *ok = nullptr) const = 0;
+
 protected:
-    uint32_t offset_;
-    uint32_t size_;
-    uint32_t target_;
-    
-    std::vector<std::pair<uint32_t, uint32_t> > modifiable_;
+  uint32_t offset_;
+  uint32_t size_;
+  uint32_t target_;
+
+  std::vector<std::pair<uint32_t, uint32_t>> modifiable_;
 };
-
-
 
 /* Basic type checksum */
-class ChecksumBasic : public Checksum
-{
+class ChecksumBasic : public Checksum {
 public:
-    ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target) : Checksum(offset, size, target) {}
-    
-    uint32_t compute(uint8_t * data, std::size_t length, bool *ok = nullptr) const override;
-    
-    std::pair<bool, std::string> correct(uint8_t *data, std::size_t length) const override;
+  ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
+      : Checksum(offset, size, target) {}
+
+  uint32_t compute(uint8_t *data, std::size_t length,
+                   bool *ok = nullptr) const override;
+
+  std::pair<bool, std::string> correct(uint8_t *data,
+                                       std::size_t length) const override;
 };
-
-
 
 /**
  * Manages ECU checksums
  */
-class ChecksumManager
-{
+class ChecksumManager {
 public:
-    /* Adds a basic type checksum */
-    ChecksumBasic *addBasic(uint32_t offset, uint32_t size, uint32_t target);
-    
-    /* Corrects the checksums for the data using modifiable sections.
-     * Returns (false, errmsg) on failure and (true, "") on success. */
-    std::pair<bool, std::string> correct(uint8_t *data, size_t length);
-    
+  /* Adds a basic type checksum */
+  ChecksumBasic *addBasic(uint32_t offset, uint32_t size, uint32_t target);
+
+  /* Corrects the checksums for the data using modifiable sections.
+   * Returns (false, errmsg) on failure and (true, "") on success. */
+  std::pair<bool, std::string> correct(uint8_t *data, size_t length);
+
 private:
-    std::vector<ChecksumPtr> checksums_;
+  std::vector<ChecksumPtr> checksums_;
 };
 
 #endif // CHECKSUMMANAGER_H

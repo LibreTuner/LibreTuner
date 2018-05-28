@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,11 +24,10 @@
 /**
  * @todo write docs
  */
-class CanLogView : public QTableView
-{
-    Q_OBJECT
+class CanLogView : public QTableView {
+  Q_OBJECT
 public:
-    explicit CanLogView(QWidget *parent = 0);
+  explicit CanLogView(QWidget *parent = 0);
 };
 
 #endif // CANLOGVIEW_H

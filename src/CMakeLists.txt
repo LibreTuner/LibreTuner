@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(LibreTuner)
 
+set(CMAKE_CXX_STANDARD 14)
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
 set(libretuner_SRC
-  main.cpp
   libretuner.cpp
   libretuner.h
   downloadinterface.cpp
@@ -29,6 +30,13 @@ set(libretuner_SRC
   flashable.cpp
   flashable.h
   endian.h
+  udsauthenticator.cpp
+  udsauthenticator.h
+  timer.cpp
+  timer.h
+
+  util/signal.cpp
+  util/signal.h
   
   definitions/definitionmanager.cpp
   definitions/definitionmanager.h
@@ -61,6 +69,8 @@ set(libretuner_SRC
   ui/verticallabel.h
   ui/graphwidget.cpp
   ui/graphwidget.h
+  ui/flashwindow.cpp
+  ui/flashwindow.h
   
   protocols/caninterface.cpp
   protocols/caninterface.h
@@ -69,6 +79,8 @@ set(libretuner_SRC
   protocols/isotpinterface.cpp
   protocols/udsprotocol.cpp
   protocols/udsprotocol.h
+  protocols/mockcaninterface.cpp
+  protocols/mockcaninterface.h
 )
 
 if (UNIX)
@@ -89,6 +101,7 @@ ui/canviewer.ui
 ui/downloadwindow.ui
 ui/createtunedialog.ui
 ui/tuneeditor.ui
+ui/flashwindow.ui
 )
 
 qt5_add_resources(libretuner_SRC
@@ -96,16 +109,21 @@ resources/icons.qrc
 resources/definitions.qrc
 )
 
-# Tell CMake to create the executable
-add_executable(LibreTuner ${libretuner_SRC})
+# Separate the program into a library for testing
+add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
+
+target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 if (UNIX)
-    target_compile_definitions(LibreTuner PRIVATE WITH_SOCKETCAN=1)
+    target_compile_definitions(LibreTuner_lib PRIVATE WITH_SOCKETCAN=1)
 endif (UNIX)
 
 if (WIN32)
-    target_compile_definitions(LibreTuner PRIVATE WITH_J2534=1)
+    target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
 endif (WIN32)
+
+add_executable(LibreTuner main.cpp)
+target_link_libraries(LibreTuner LibreTuner_lib)

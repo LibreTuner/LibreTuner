@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,117 +25,92 @@
 #include <QString>
 #include <QXmlStreamReader>
 
-#include "tabledefinitions.h"
 #include "checksummanager.h"
-#include "endian.h"
 #include "downloadinterface.h"
+#include "endian.h"
 #include "flasher.h"
+#include "tabledefinitions.h"
 
 class Definition;
 
 /* Subtype definition. Includes the table locations */
 // Subtype is a misnomer, but it's too late to change
-class SubDefinition
-{
+class SubDefinition {
 public:
-    SubDefinition(Definition *definition);
-    
-    /* Attempts to load a subtype definition. Returns false and sets
-     * lastError on failure. */
-    bool load(const QString &path);
-    
-    /* Returns the location of the table
-     * If ok is not nullptr, sets to true if the table
-     * exists and false if it does not exist. Returns 0 on failure,
-     * however, ok should be used for error handling. */
-    uint32_t getTableLocation(int tableId, bool *ok = nullptr);
-    
-    /* Returns the location of the axis. axisId can be obtained from
-     * Definition::axisId(string_id). If ok is not nullptr, sets to
-     * true if the axis exists and false if it does not exist.
-     * Returns 0 on failure, however, ok should be used for
-     * error handling. */
-    uint32_t getAxisLocation(int axisId, bool *ok = nullptr);
-    
-    /* Returns true if the ROM data is of the subtype/firmware version */
-    bool check(const uint8_t *data, size_t length);
-    
-    Definition *definition() const
-    {
-        return definition_;
-    }
-    
-    std::string lastError() const
-    {
-        return lastError_;
-    }
-    
-    std::string id() const
-    {
-        return id_;
-    }
-    
-    const ChecksumManager *checksums() const
-    {
-        return &checksums_;
-    }
-    
-    ChecksumManager *checksums()
-    {
-        return &checksums_;
-    }
-    
-    class Identifier
-    {
-    public:
-        Identifier(uint32_t offset, const uint8_t *data, size_t length) : offset_(offset), data_(data, data + length) {}
-        
-        uint32_t offset() const
-        {
-            return offset_;
-        }
-        
-        const uint8_t *data() const
-        {
-            return data_.data();
-        }
-        
-        size_t size() const
-        {
-            return data_.size();
-        }
-    private:
-        uint32_t offset_;
-        std::vector<uint8_t> data_;
-    };
-    
+  SubDefinition(Definition *definition);
+
+  /* Attempts to load a subtype definition. Returns false and sets
+   * lastError on failure. */
+  bool load(const QString &path);
+
+  /* Returns the location of the table
+   * If ok is not nullptr, sets to true if the table
+   * exists and false if it does not exist. Returns 0 on failure,
+   * however, ok should be used for error handling. */
+  uint32_t getTableLocation(int tableId, bool *ok = nullptr);
+
+  /* Returns the location of the axis. axisId can be obtained from
+   * Definition::axisId(string_id). If ok is not nullptr, sets to
+   * true if the axis exists and false if it does not exist.
+   * Returns 0 on failure, however, ok should be used for
+   * error handling. */
+  uint32_t getAxisLocation(int axisId, bool *ok = nullptr);
+
+  /* Returns true if the ROM data is of the subtype/firmware version */
+  bool check(const uint8_t *data, size_t length);
+
+  Definition *definition() const { return definition_; }
+
+  std::string lastError() const { return lastError_; }
+
+  std::string id() const { return id_; }
+
+  const ChecksumManager *checksums() const { return &checksums_; }
+
+  ChecksumManager *checksums() { return &checksums_; }
+
+  class Identifier {
+  public:
+    Identifier(uint32_t offset, const uint8_t *data, size_t length)
+        : offset_(offset), data_(data, data + length) {}
+
+    uint32_t offset() const { return offset_; }
+
+    const uint8_t *data() const { return data_.data(); }
+
+    size_t size() const { return data_.size(); }
+
+  private:
+    uint32_t offset_;
+    std::vector<uint8_t> data_;
+  };
+
 private:
-    Definition *definition_;
-    std::string id_;
-    std::string name_;
-    std::string lastError_;
-    
-    ChecksumManager checksums_;
-    
-    /* Table offsets */
-    std::vector<uint32_t> locations_;
-    
-    std::vector<uint32_t> axesOffsets_;
-    
-    std::vector<Identifier> identifiers_;
-    
-    /* Loads table locations from the current element. */
-    void loadTables(QXmlStreamReader &xml);
-    
-    /* Loads model-specific axis information from current element */
-    void loadAxes(QXmlStreamReader &xml);
-    
-    void loadChecksums(QXmlStreamReader &xml);
-    
-    void loadIdentifiers(QXmlStreamReader &xml);
-    
-    
-    // Assign an id (automatically) to each axis for easy lookup?
+  Definition *definition_;
+  std::string id_;
+  std::string name_;
+  std::string lastError_;
+
+  ChecksumManager checksums_;
+
+  /* Table offsets */
+  std::vector<uint32_t> locations_;
+
+  std::vector<uint32_t> axesOffsets_;
+
+  std::vector<Identifier> identifiers_;
+
+  /* Loads table locations from the current element. */
+  void loadTables(QXmlStreamReader &xml);
+
+  /* Loads model-specific axis information from current element */
+  void loadAxes(QXmlStreamReader &xml);
+
+  void loadChecksums(QXmlStreamReader &xml);
+
+  void loadIdentifiers(QXmlStreamReader &xml);
+
+  // Assign an id (automatically) to each axis for easy lookup?
 };
 typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 typedef std::weak_ptr<SubDefinition> SubDefinitionWeakPtr;
@@ -143,112 +118,86 @@ typedef std::weak_ptr<SubDefinition> SubDefinitionWeakPtr;
 /**
  * An ECU definition
  */
-class Definition
-{
+class Definition {
 public:
-    /* Loads a definition directory */
-    bool load(const QString &path);
-    
-    /* Loads the main definition file into definition. */
-    bool loadMain(const QString &path);
-    
-    /* Loads a subtype (ECU model or firmware version) definition. */
-    bool loadSubtype(const QString &path);
-    
-    /* Attempts to determine the subtype of the data. Returns
-     * nullptr if no subtypes match. */
-    SubDefinitionPtr identifySubtype(const uint8_t *data, size_t length);
-    
-    /* Returns the axis with the specified ID. If none exists, returns
-     * nullptr. */
-    TableAxis *getAxis(const std::string &id);
-    
-    std::string name() const
-    {
-        return name_;
-    }
-    
-    std::string id() const
-    {
-        return id_;
-    }
-    
-    std::string lastError() const
-    {
-        return lastError_;
-    }
-    
-    uint32_t size() const
-    {
-        return size_;
-    }
-    
-    const TableDefinitions *tables() const
-    {
-        return &tables_;
-    }
-    
-    TableDefinitions *tables()
-    {
-        return &tables_;
-    }
-    
-    Endianness endianness() const
-    {
-        return endianness_;
-    }
-    
-    DownloadMode downloadMode() const
-    {
-        return downloadMode_;
-    }
-    
-    FlashMode flashMode() const
-    {
-        return flashMode_;
-    }
-    
-    std::string key() const
-    {
-        return key_;
-    }
-    
-    int serverId() const
-    {
-        return serverId_;
-    }
-    
-    /* Returns the subtype definition with the id. Returns blank pointer
-     * if the subtype does not exist. */
-    SubDefinitionPtr findSubtype(const std::string &id);
-    
-    /* Gets the axis id from the string identifier. Returns -1
-     * if the id does not exist. */
-    int axisId(const std::string &id);
+  /* Loads a definition directory */
+  bool load(const QString &path);
+
+  /* Loads the main definition file into definition. */
+  bool loadMain(const QString &path);
+
+  /* Loads a subtype (ECU model or firmware version) definition. */
+  bool loadSubtype(const QString &path);
+
+  /* Attempts to determine the subtype of the data. Returns
+   * nullptr if no subtypes match. */
+  SubDefinitionPtr identifySubtype(const uint8_t *data, size_t length);
+
+  /* Returns the axis with the specified ID. If none exists, returns
+   * nullptr. */
+  TableAxis *getAxis(const std::string &id);
+
+  std::string name() const { return name_; }
+
+  std::string id() const { return id_; }
+
+  std::string lastError() const { return lastError_; }
+
+  uint32_t size() const { return size_; }
+
+  const TableDefinitions *tables() const { return &tables_; }
+
+  TableDefinitions *tables() { return &tables_; }
+
+  Endianness endianness() const { return endianness_; }
+
+  DownloadMode downloadMode() const { return downloadMode_; }
+
+  FlashMode flashMode() const { return flashMode_; }
+
+  std::string key() const { return key_; }
+
+  int serverId() const { return serverId_; }
+
+  size_t flashOffset() const { return flashOffset_; }
+
+  size_t flashSize() const { return flashSize_; }
+
+  /* Returns the subtype definition with the id. Returns blank pointer
+   * if the subtype does not exist. */
+  SubDefinitionPtr findSubtype(const std::string &id);
+
+  /* Gets the axis id from the string identifier. Returns -1
+   * if the id does not exist. */
+  int axisId(const std::string &id);
+
 private:
-    std::string lastError_;
-    
-    std::string name_;
-    std::string id_;
-    
-    DownloadMode downloadMode_;
-    FlashMode flashMode_;
-    /* Security key */
-    std::string key_;
-    /* Server ID for ISO-TP reqeusts */
-    int serverId_;
-    
-    Endianness endianness_;
-    
-    int lastAxisId_ = 0;
-    uint32_t size_;
-    
-    TableDefinitions tables_;
-    std::unordered_map<std::string, TableAxisPtr> axes_;
-    std::vector<SubDefinitionPtr> subtypes_;
-    
-    void readTables(QXmlStreamReader &xml);
-    void loadAxes(QXmlStreamReader &xml);
+  std::string lastError_;
+
+  std::string name_;
+  std::string id_;
+
+  DownloadMode downloadMode_;
+  FlashMode flashMode_;
+  /* Security key */
+  std::string key_;
+  /* Server ID for ISO-TP reqeusts */
+  int serverId_;
+
+  /* Flash region */
+  size_t flashOffset_, flashSize_;
+
+  Endianness endianness_;
+
+  int lastAxisId_ = 0;
+  uint32_t size_;
+
+  TableDefinitions tables_;
+  std::unordered_map<std::string, TableAxisPtr> axes_;
+  std::vector<SubDefinitionPtr> subtypes_;
+
+  void readTables(QXmlStreamReader &xml);
+  void loadAxes(QXmlStreamReader &xml);
 };
 typedef std::shared_ptr<Definition> DefinitionPtr;
 
