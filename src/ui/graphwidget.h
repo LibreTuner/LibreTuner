@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,10 +19,10 @@
 #ifndef GRAPHWIDGET_H
 #define GRAPHWIDGET_H
 
-#include <QWidget>
+#include <Q3DSurface>
 #include <QItemModelSurfaceDataProxy>
 #include <QSurface3DSeries>
-#include <Q3DSurface>
+#include <QWidget>
 #include <QtCharts>
 
 #include <memory>
@@ -33,22 +33,21 @@ typedef std::shared_ptr<Table> TablePtr;
 /**
  * @todo write docs
  */
-class GraphWidget : public QWidget
-{
+class GraphWidget : public QWidget {
 public:
-    explicit GraphWidget(QWidget *parent = 0);
-    
+  explicit GraphWidget(QWidget *parent = 0);
+
 public slots:
-    void tableChanged(TablePtr table);
-    
+  void tableChanged(TablePtr table);
+
 private:
-    TablePtr table_;
-    QtDataVisualization::Q3DSurface *surface_;
-    QWidget *container_;
-    QtCharts::QChart *chart_;
-    QtCharts::QChartView *chartView_;
-    
-    QtDataVisualization::QSurface3DSeries series3d_;
+  TablePtr table_;
+  QtDataVisualization::Q3DSurface *surface_;
+  QWidget *container_;
+  QtCharts::QChart *chart_;
+  QtCharts::QChartView *chartView_;
+
+  QtDataVisualization::QSurface3DSeries series3d_;
 };
 
 #endif // GRAPHWIDGET_H

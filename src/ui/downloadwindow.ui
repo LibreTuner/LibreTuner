@@ -31,9 +31,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -71,6 +68,9 @@
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select a vehicle to download the ROM from and a name&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -96,11 +96,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <item>
-            <property name="text">
-             <string>Mazdaspeed 6/Mazda 6 MPS/Mazdaspeed Atenza</string>
-            </property>
-           </item>
           </widget>
          </item>
          <item row="1" column="0">

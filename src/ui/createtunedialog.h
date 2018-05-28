@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,8 +23,7 @@
 
 #include <memory>
 
-namespace Ui
-{
+namespace Ui {
 class CreateTuneDialog;
 }
 
@@ -34,18 +33,18 @@ typedef std::shared_ptr<Rom> RomPtr;
 /**
  * @todo write docs
  */
-class CreateTuneDialog : public QDialog
-{
-    Q_OBJECT
+class CreateTuneDialog : public QDialog {
+  Q_OBJECT
 public:
-    CreateTuneDialog(RomPtr base = nullptr);
-    
-    ~CreateTuneDialog();
+  CreateTuneDialog(RomPtr base = nullptr);
+
+  ~CreateTuneDialog();
+
 private:
-    Ui::CreateTuneDialog* ui_;
-    
+  Ui::CreateTuneDialog *ui_;
+
 private slots:
-    void on_buttonCreate_clicked();
+  void on_buttonCreate_clicked();
 };
 
 #endif // CREATETUNEDIALOG_H

@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,147 +19,145 @@
 #ifndef ISOTPINTERFACE_H
 #define ISOTPINTERFACE_H
 
+#include <chrono>
 #include <memory>
 #include <vector>
-#include <thread>
-#include <condition_variable>
+#include <functional>
+
+#define BOOST_THREAD_PROVIDES_FUTURE
+#define BOOST_THREAD_PROVIDES_FUTURE_CONTINUATION
+#include <boost/thread/future.hpp>
 
 #include <QObject>
-#include <QTimer>
 
 #include "caninterface.h"
+#include "signal.h"
 
-
-class IsoTpMessage
-{
+class IsoTpMessage {
 public:
-    IsoTpMessage(int id);
-    
-    const uint8_t *message() const
-    {
-        return message_.data();
-    }
-    
-    size_t length() const
-    {
-        return message_.size();
-    }
-    
-    int id() const
-    {
-        return id_;
-    }
-    
-    /* Appends data to the message */
-    void append(const uint8_t *message, size_t length);
-    
+  IsoTpMessage(int id);
+
+  // TODO: Remove this line \/ \/ \/ and add a [] operator
+  const uint8_t *message() const { return message_.data(); }
+
+  size_t length() const { return message_.size(); }
+
+  int id() const { return id_; }
+
+  /* Appends data to the message */
+  void append(const uint8_t *message, size_t length);
+
 private:
-    std::vector<uint8_t> message_;
-    int id_;
+  std::vector<uint8_t> message_;
+  int id_;
 };
 
 
-typedef std::shared_ptr<IsoTpMessage> IsoTpMessagePtr;
 
-
-
-
-class IsoTpInterface : public CanInterface::Callbacks
-{
+class IsoTpOptions {
 public:
-    enum IsoTpError {
-        ERR_SUCCESS = 0,
-        ERR_BUSY, // The interface is already processing a request
-        ERR_CAN,
-        ERR_SIZE, // The CAN frame size was too short
-        ERR_CONSEC, // Incorrect consecutive index
-    };
-    
-    class Callbacks {
-    public:
-        virtual void onRecv(IsoTpMessagePtr message) =0;
-        
-        virtual void onCanError(CanInterface::CanError error, int err) =0;
-        
-        virtual void onError(IsoTpError error) =0;
-        
-        virtual void onTimeout() =0;
-    };
-    
-    
-    IsoTpInterface(Callbacks *callbacks, std::shared_ptr<CanInterface> can, int srcId = 0x7DF, int dstId = 0x7E8);
-    
-    ~IsoTpInterface();
-    
-    /* Sends an isotp request. The response will be sent through
-     * the onRecv() callback or onTimeout() will be called if
-     * a response wasn't received in time. The timeout unit is milliseconds.
-     * Returns false if a request is already being processed. */
-    IsoTpError request(const uint8_t *message, size_t length, int timeout=200);
-    
-    static std::string strError(IsoTpError error);
-    
-    /* CAN callbacks */
-    void onError(CanInterface::CanError error, int err) override;
-    void onRecv(const CanMessage & message) override;
-    
-    /* Returns true if the interface is valid */
-    bool valid() const
-    {
-        return canInterface_->valid();
-    } 
-    
-    CanInterface *canInterface()
-    {
-        return canInterface_.get();
-    }
-    
-    enum State
-    {
-        STATE_NONE, // Waiting for a request
-        STATE_RESP, // Waiting for a single/first frame
-        STATE_CONSEC, // Waiting for a consecutive frame
-        STATE_FLOW, // Waiting for a flow control frame
-    };
-    
-private:
-    std::shared_ptr<CanInterface> canInterface_;
-    int srcId_, dstId_;
-    Callbacks *callbacks_;
-    
-    /* Data being sent */
-    std::vector<uint8_t> msg_;
-    std::vector<uint8_t>::iterator msgPtr_;
-    
-    /* The message being received */
-    IsoTpMessagePtr recvMsg_;
-    /* Amount of bytes remaining to be received */
-    size_t recvRemaining_;
-    
-    /* Consecutive index. Resets at 15. Used to both
-     * sending and receiving. */
-    uint8_t consecIndex_;
-    
-    State state_ = STATE_NONE;
-    
-    std::mutex mutex_;
+  IsoTpOptions(
+      int srcId = 0x7DF, int dstId = 0x7E8,
+      std::chrono::milliseconds timeout = std::chrono::milliseconds(100));
 
-    void timeout();
+  void setSrcId(int srcId) { srcId_ = srcId; }
+
+  int srcId() const { return srcId_; }
+
+  void setDstId(int dstId) { dstId_ = dstId; }
+
+  int dstId() const { return dstId_; }
+
+  void setTimeout(std::chrono::milliseconds timeout) { timeout_ = timeout; }
+
+  std::chrono::milliseconds timeout() const { return timeout_; }
+
+private:
+  int srcId_, dstId_;
+  std::chrono::milliseconds timeout_;
+};
+
+class IsoTpRequest;
+
+enum class IsoTpError {
+  Success,
+  Unknown,
+  Consec,
+  Size,
+};
+
+class IsoTpInterface {
+public:
+  class Response {
+  public:
+    Response(std::unique_ptr<IsoTpMessage> message);
+    Response(); // Constructed on timeout
+    Response(IsoTpError error);
+    Response(CanInterface::CanError error, int canErrno);
+
+    /* Returns true if the request timed out */
+    bool timedout() const { return error_ == Error::Timeout; };
+
+    /* Returns true if the request was successful */
+    bool success() const { return error_ == Error::Success; };
+
+    enum class Error { Success, IsoTpError, CanError, Timeout };
+
+    Error error() const { return error_; }
+
+    std::string errorString() const;
+
+    IsoTpMessage &message() const { return *message_; }
     
-    /* Thread used for sending consecutive frames */
-    std::thread conThread_;
+    IsoTpError isotpError() const { return isoTpError_; };
     
-    std::condition_variable cv_;
-    std::mutex cv_m_;
+    CanInterface::CanError canError() const { return canError_; };
     
-    /* Starts the timeout timer */
-    void startTimer();
-    /* Stops the timeout timer */
-    void stopTimer();
-    
-    bool interruptTime_;
-    int timeout_;
-    void runTime(int timeout);
+    int canErrno() const { return canErrno_; };
+
+  private:
+    std::unique_ptr<IsoTpMessage> message_;
+    Error error_;
+    union {
+      IsoTpError isoTpError_;
+      struct {
+        CanInterface::CanError canError_;
+        int canErrno_;
+      };
+    };
+  };
+  
+  using Callback = std::function<void(const Response &response)>;
+
+  /* Sends an isotp request. The response will be sent through
+   * the onRecv() callback or onTimeout() will be called if
+   * a response wasn't received in time. The timeout unit is milliseconds.
+   * Returns false if a request is already being processed. */
+  boost::future<Response> request(const uint8_t *message, size_t length, const IsoTpOptions &options);
+
+  static std::string strError(IsoTpError error);
+
+  /* Returns true if the interface is valid */
+  bool valid() const { return can_->valid(); }
+
+  std::shared_ptr<CanInterface> can() {
+    return can_;
+  }
+  
+  /* Returns the ISO-TP interface for the CAN device. Creates a new interface
+   * if one does not exist. */
+  static std::shared_ptr<IsoTpInterface> get(const std::shared_ptr<CanInterface> &can);
+  
+  ~IsoTpInterface();
+
+private:
+  
+  IsoTpInterface(const std::shared_ptr<CanInterface> &can);
+
+  std::shared_ptr<CanInterface> can_;
+  std::vector<std::unique_ptr<IsoTpRequest>> requests_;
+  
+  static void removeDead();
 };
 
 #endif // ISOTPINTERFACE_H

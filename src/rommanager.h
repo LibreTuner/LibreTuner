@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,65 +20,55 @@
 #define ROMMANAGER_H
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
+#include <QObject>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QObject>
 
 #include "rom.h"
 
 /**
  * Manages ROM files and metadata
  */
-class RomManager : public QObject
-{
-    Q_OBJECT
+class RomManager : public QObject {
+  Q_OBJECT
 public:
-    static RomManager *get();
-    
-    /* Loads rom list and metadata. Returns true if no errors
-     * occurred */
-    bool load();
-    
-    /* Saves rom list and metadata */
-    bool save();
-    
-    QString lastError() const
-    {
-        return lastError_;
-    }
-    
-    /* Returns the amount of roms */
-    size_t count() const
-    {
-        return roms_.size();
-    }
-    
-    std::vector<RomPtr> &roms()
-    {
-        return roms_;
-    }
-    
-    bool addRom(const std::string &name, DefinitionPtr definition, const uint8_t *data, size_t size);
-    
-    /* Returns the ROM with id or nullptr if the ROM does
-     * not exist */
-    RomPtr fromId(int id);
-    
+  static RomManager *get();
+
+  /* Loads rom list and metadata. Returns true if no errors
+   * occurred */
+  bool load();
+
+  /* Saves rom list and metadata */
+  bool save();
+
+  QString lastError() const { return lastError_; }
+
+  /* Returns the amount of roms */
+  size_t count() const { return roms_.size(); }
+
+  std::vector<RomPtr> &roms() { return roms_; }
+
+  bool addRom(const std::string &name, const DefinitionPtr &definition,
+              const uint8_t *data, size_t size);
+
+  /* Returns the ROM with id or nullptr if the ROM does
+   * not exist */
+  RomPtr fromId(int id);
+
 private:
-    RomManager();
-    QString lastError_;
-    std::vector<RomPtr> roms_;
-    int nextId_;
-    
-    
-    void readRoms(QXmlStreamReader &xml);
-    
+  RomManager();
+  QString lastError_;
+  std::vector<RomPtr> roms_;
+  int nextId_;
+
+  void readRoms(QXmlStreamReader &xml);
+
 signals:
-    void updateRoms();
+  void updateRoms();
 };
 
 #endif // ROMMANAGER_H

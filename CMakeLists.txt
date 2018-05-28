@@ -7,7 +7,18 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5DataVisualization CONFIG REQUIRED)
 find_package(Qt5Charts CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(Boost 1.40 COMPONENTS system thread REQUIRED)
 
+option(Test "Build all tests." ON)
 
 add_subdirectory(src)
 
+if (Test)
+  add_subdirectory(lib/googletest)
+
+  enable_testing()
+
+  include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+  add_subdirectory(test)
+endif()

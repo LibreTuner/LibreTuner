@@ -1,12 +1,12 @@
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,8 +19,8 @@
 #ifndef TUNEWIDGET_H
 #define TUNEWIDGET_H
 
-#include <QWidget>
 #include <QFrame>
+#include <QWidget>
 
 #include <memory>
 
@@ -30,18 +30,17 @@ typedef std::shared_ptr<Tune> TunePtr;
 /**
  * @todo write docs
  */
-class TuneWidget : public QFrame
-{
-    Q_OBJECT
+class TuneWidget : public QFrame {
+  Q_OBJECT
 public:
-    TuneWidget(TunePtr tune, QWidget *parent = 0);
+  TuneWidget(TunePtr tune, QWidget *parent = 0);
 
 private:
-    TunePtr tune_;
-    
+  TunePtr tune_;
+
 private slots:
-    void editClicked();
-    void flashClicked();
+  void editClicked();
+  void flashClicked();
 };
 
 #endif // TUNEWIDGET_H
