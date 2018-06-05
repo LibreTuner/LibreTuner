@@ -38,7 +38,7 @@ typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
  */
 class Flashable {
 public:
-  Flashable(TuneDataPtr tune);
+  explicit Flashable(TuneDataPtr tune);
 
   bool valid() const { return valid_; }
 

@@ -28,9 +28,11 @@
 #include <vector>
 #include <functional>
 
+#include <gsl/span>
+
 struct CanMessage {
 public:
-  void setMessage(uint32_t id, const uint8_t *message, uint8_t length);
+  void setMessage(uint32_t id, gsl::span<const uint8_t> data);
   
   bool valid() const {
     return messageLength_ != 0;
@@ -41,7 +43,7 @@ public:
   }
 
   CanMessage();
-  CanMessage(uint32_t id, const uint8_t *message, uint8_t length);
+  CanMessage(uint32_t id, gsl::span<const uint8_t> data);
 
   uint32_t id() const { return id_; }
 
@@ -78,16 +80,16 @@ public:
   using SignalType = Signal<Listener>;
 
   CanInterface();
-  virtual ~CanInterface(){};
+  virtual ~CanInterface() = default;
 
-  /* Send a CAN message. len should be no greater than 8.
+  /* Send a CAN message. The size of data must be <= 8
    * Returns true if a message was sent */
-  void send(int id, const uint8_t *message, uint8_t len);
+  void send(int id, gsl::span<const uint8_t> data);
 
   virtual void send(const CanMessage &message) = 0;
 
   /* Connects a new listener */
-  std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) { return signal_->connect(listener); }
+  std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) { return signal_->connect(std::move(listener)); }
   
   /* Returns true if the socket is ready for reading/writing */
   virtual bool valid() = 0;

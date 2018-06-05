@@ -21,116 +21,147 @@
 #include "isotpinterface.h"
 
 #include <cassert>
+#include <utility>
+#include <array>
 
-UdsResponse::UdsResponse(uint8_t id, const uint8_t *message, size_t length)
-    : responseId_(id), message_(message, message + length), error_(UdsError::Success) {}
-
-UdsResponse::UdsResponse(IsoTpError error) : error_(UdsError::IsoTp), isotpError_(error) {
-}
-
-std::string UdsResponse::strError() const
-{
-  switch (error_) {
-    case UdsError::Success:
+namespace uds {
+std::string strError(Error error) {
+  switch (error) {
+    case Error::Success:
       return "success";
-    case UdsError::IsoTp:
-      return IsoTpInterface::strError(isotpError_);
-    case UdsError::Timeout:
+    case Error::IsoTp:
+      return "ISO-TP error";
+    case Error::Timeout:
       return "timed out";
-    case UdsError::BlankResponse:
+    case Error::BlankResponse:
       return "received a blank response";
-    case UdsError::Can:
-      return "CAN error";
+    case Error::Consec:
+      return "ISO-TP consecutive index invalid in frame";
+    case Error::Negative:
+      return "negative response code received";
+    case Error::Malformed:
+      return "malformed UDS response";
+    case Error::UnexpectedResponse:
+      return "unexpected response";
     default:
       return "unknown";
   }
   return "you should never see this";
 }
 
-
-void UdsResponse::setMessage(const uint8_t *message, size_t length) {
-  message_.assign(message, message + length);
-}
-
-class IsoTpUdsInterface : public UdsProtocol {
+class IsoTpInterface : public Protocol {
 public:
-  IsoTpUdsInterface(const std::shared_ptr<IsoTpInterface> &isotp,
-                    const IsoTpOptions &options);
+  explicit IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp);
 
-  boost::future<UdsResponse> request(const uint8_t *message, size_t length) override;
+  void request(gsl::span<uint8_t>, uint8_t expectedId, Callback &&cb) override;
+
 private:
-  std::shared_ptr<IsoTpInterface> isotp_;
-  IsoTpOptions options_;
+  std::shared_ptr<isotp::Protocol> isotp_;
 };
 
-boost::future<UdsResponse> IsoTpUdsInterface::request(const uint8_t *message, size_t length) {
-  std::shared_ptr<boost::promise<UdsResponse>> promise = std::make_shared<boost::promise<UdsResponse>>();
-  isotp_->request(message, length, options_).then([promise, this](boost::future<IsoTpInterface::Response> f) {
-    IsoTpInterface::Response res = f.get();
-    if (!res.success()) {
-      IsoTpInterface::Response::Error error = res.error();
+void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) {
+  isotp_->request(isotp::Packet(data), [this, cb, expectedId](isotp::Error error, isotp::Packet &&packet) {
+    if (error != isotp::Error::Success) {
       switch (error) {
-        case IsoTpInterface::Response::Error::CanError:
-          promise->set_value(UdsResponse(UdsError::Can));
+        case isotp::Error::Timeout:
+          cb(Error::Timeout, Packet{});
           break;
-        case IsoTpInterface::Response::Error::IsoTpError:
-          promise->set_value(UdsResponse(res.isotpError()));
-          break;
-        case IsoTpInterface::Response::Error::Timeout:
-          promise->set_value(UdsResponse(UdsError::Timeout));
+        case isotp::Error::Consec:
+          cb(Error::Consec, Packet{});
           break;
         default:
-          promise->set_value(UdsResponse(UdsError::Unknown));
+          cb(Error::IsoTp, Packet{});
           break;
       }
       return;
     }
-    
-    IsoTpMessage &msg = res.message();
-    if (msg.length() == 0) {
-      promise->set_value(UdsResponse(UdsError::BlankResponse));
+
+    Packet res;
+    packet.moveAll(res.data);
+    if (res.data.empty()) {
+      cb(Error::BlankResponse, Packet{});
+      return;
     }
-    
-    promise->set_value(UdsResponse(msg.message()[0], msg.message() + 1, msg.length() - 1));
+    res.id = res.data[0];
+    if (res.id == UDS_RES_NEGATIVE) {
+      cb(Error::Negative, Packet{});
+      return;
+    }
+    if (res.id != expectedId) {
+      cb(Error::UnexpectedResponse, Packet{});
+      return;
+    }
+    res.data.erase(std::begin(res.data));
+    cb(Error::Success, res);
   });
-  return promise->get_future();
 }
 
-IsoTpUdsInterface::IsoTpUdsInterface(const std::shared_ptr<IsoTpInterface> &isotp,
-                                     const IsoTpOptions &options)
-    : isotp_(isotp), options_(options) {
-      
+IsoTpInterface::IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp)
+    : isotp_(std::move(isotp)) {
+
 }
 
-
-
-std::shared_ptr<UdsProtocol>
-UdsProtocol::create(const std::shared_ptr<IsoTpInterface> &isotp,
-                    const IsoTpOptions &options) {
-  return std::make_shared<IsoTpUdsInterface>(isotp, options);
+std::shared_ptr<Protocol>
+Protocol::create(std::shared_ptr<isotp::Protocol> isotp) {
+  return std::make_shared<IsoTpInterface>(std::move(isotp));
 }
 
-boost::future<UdsResponse> UdsProtocol::requestSession(uint8_t type) {
-  uint8_t req[] = {UDS_REQ_SESSION, type};
-  return request(req, sizeof(req));
+void Protocol::requestSession(uint8_t type, RequestSessionCallback &&cb) {
+  std::array<uint8_t, 2> req = {UDS_REQ_SESSION, type};
+  request(req, UDS_RES_SESSION, [cb{std::move(cb)}] (Error error, const Packet &packet) {
+    if (error != Error::Success) {
+      cb(error, 0, gsl::span<uint8_t>());
+      return;
+    }
+
+    if (packet.data.empty()) {
+      cb(Error::Malformed, 0, gsl::span<uint8_t>());
+      return;
+    }
+
+    cb(Error::Success, packet.data[0], gsl::make_span(packet.data).subspan(1));
+  });
 }
 
-boost::future<UdsResponse> UdsProtocol::requestSecuritySeed() {
-  uint8_t req[] = {UDS_REQ_SECURITY, 1};
-  return request(req, sizeof(req));
+void Protocol::requestSecuritySeed(RequestSecuritySeedCallback &&cb) {
+  std::array<uint8_t, 2> req  = {UDS_REQ_SECURITY, 1};
+  return request(req, UDS_RES_SECURITY, [cb{std::move(cb)}] (Error error, const Packet &packet) {
+    if (error != Error::Success) {
+      cb(error, 0, gsl::span<uint8_t>());
+      return;
+    }
+
+    if (packet.data.empty()) {
+      cb(Error::Malformed, 0, gsl::span<uint8_t>());
+      return;
+    }
+
+    cb(Error::Success, packet.data[0], gsl::make_span(packet.data).subspan(1));
+  });
 }
 
-boost::future<UdsResponse> UdsProtocol::requestSecurityKey(const uint8_t *key, uint8_t length) {
-  std::vector<uint8_t> req(length + 2);
+void Protocol::requestSecurityKey(gsl::span<uint8_t> key, RequestSecurityKeyCallback &&cb) {
+  std::vector<uint8_t> req(key.size() + 2);
   req[0] = UDS_REQ_SECURITY;
   req[1] = 2;
-  memcpy(req.data() + 2, key, length);
-  return request(req.data(), length + 2);
+  std::copy(key.begin(), key.end(), req.begin() + 2);
+  request(req, UDS_RES_SECURITY, [cb{std::move(cb)}] (Error error, const Packet &packet) {
+    if (error != Error::Success) {
+      cb(error, 0);
+      return;
+    }
+
+    if (packet.data.empty()) {
+      cb(Error::Malformed, 0);
+      return;
+    }
+
+    cb(Error::Success, packet.data[0]);
+  });
 }
 
-boost::future<UdsResponse> UdsProtocol::requestReadMemoryAddress(const uint32_t address,
-                                           uint16_t length) {
-  uint8_t req[7];
+void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length, RequestMemoryAddressCallback &&cb) {
+  std::array<uint8_t, 7> req;
   req[0] = UDS_REQ_READMEM;
 
   req[1] = (address & 0xFF000000) >> 24;
@@ -141,5 +172,13 @@ boost::future<UdsResponse> UdsProtocol::requestReadMemoryAddress(const uint32_t 
   req[5] = length >> 8;
   req[6] = length & 0xFF;
 
-  return request(req, sizeof(req));
+  request(req, UDS_RES_READMEM, [cb{std::move(cb)}] (Error error, const Packet &packet) {
+    if (error != Error::Success) {
+      cb(error, gsl::span<uint8_t>());
+      return;
+    }
+
+    cb(Error::Success, packet.data);
+  });
+}
 }

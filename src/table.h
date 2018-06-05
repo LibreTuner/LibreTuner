@@ -85,7 +85,7 @@ protected:
 
   template <typename T> static T fromVariant(const QVariant &v, bool &success);
 
-  bool modified_;
+  bool modified_{};
 
   const TableDefinition *definition_;
 
@@ -225,6 +225,7 @@ bool Table2d<T>::serialize(uint8_t *data, size_t length, Endianness endian) {
   }
   for (std::vector<T> &row : data_) {
     writeRow(row, endian, data);
+    data += definition_->sizeX() * sizeof(T);
   }
 
   return true;

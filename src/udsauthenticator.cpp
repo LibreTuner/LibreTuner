@@ -21,99 +21,81 @@
 #include <cassert>
 #include <sstream>
 
-UdsAuthenticator::UdsAuthenticator(UdsAuthenticator::Callback callback)
-    : callback_(callback) {
+namespace uds {
+Authenticator::Authenticator(Callback &&callback)
+    : callback_(std::move(callback)) {
 }
 
-void UdsAuthenticator::start(const std::string &key, const std::shared_ptr<IsoTpInterface> &isotp,
-                             const IsoTpOptions &options) {
-  key_ = key;
-  uds_ = UdsProtocol::create(isotp, options);
-  state_ = STATE_SESSION;
-  uds_->requestSession(0x87);
-}
-
-void UdsAuthenticator::onFail(const std::string &error) {
-  callback_(false, error);
-}
-
-void UdsAuthenticator::onRecv(const UdsResponse &response) {
-  if (response.id() == UDS_RES_NEGATIVE) {
-    if (response.length() > 0) {
-      onNegativeResponse(response[0]);
-    } else {
-      onNegativeResponse(0);
-    }
-    return;
+bool Authenticator::checkError(Error error) {
+  if (error != Error::Success) {
+    onFail(strError(error));
+    return false;
   }
+  return true;
+}
 
-  switch (state_) {
-  case STATE_SESSION:
-    if (response.id() != UDS_RES_SESSION) {
-      onFail("Unepected response. Expected session.");
+void Authenticator::auth(const std::string &key, std::shared_ptr<uds::Protocol> uds, uint8_t sessionType) {
+  key_ = key;
+  uds_ = std::move(uds);
+
+  do_session(sessionType);
+}
+
+void Authenticator::do_session(uint8_t sessionType) {
+  uds_->requestSession(sessionType, [this](Error error, uint8_t type, gsl::span<const uint8_t>) {
+    if (!checkError(error)) {
       return;
     }
 
-    // Request security seed
-    state_ = STATE_SECURITY_REQUEST;
-    uds_->requestSecuritySeed();
+    do_request_seed();
+  });
+}
 
-    break;
-  case STATE_SECURITY_REQUEST: {
-    if (response.id() != UDS_RES_SECURITY) {
-      onFail("Unepected response. Expected security.");
-      return;
-    }
-
-    // TODO: Change to actual length
-    if (response.length() < 2) {
-      onFail("Unexpected message length in security request response");
+void Authenticator::do_request_seed() {
+  uds_->requestSecuritySeed([this](Error error, uint8_t type, gsl::span<const uint8_t> seed) {
+    if (!checkError(error)) {
       return;
     }
 
     // Generate key from seed
     uint32_t key = generateKey(
-        0xC541A9, reinterpret_cast<const uint8_t *>(response.message() + 1),
-        response.length() - 1);
+        0xC541A9, seed);
 
-    uint8_t kData[3];
-    kData[0] = key & 0xFF;
-    kData[1] = (key & 0xFF00) >> 8;
-    kData[2] = (key & 0xFF0000) >> 16;
+    do_send_key(key);
+  });
+}
 
-    // Send key
-    state_ = STATE_SECURITY_KEY;
-    uds_->requestSecurityKey(kData, sizeof(kData));
+void Authenticator::do_send_key(uint32_t key) {
+  uint8_t kData[3];
+  kData[0] = key & 0xFF;
+  kData[1] = (key & 0xFF00) >> 8;
+  kData[2] = (key & 0xFF0000) >> 16;
 
-    break;
-  }
-  case STATE_SECURITY_KEY:
-    if (response.id() != UDS_RES_SECURITY) {
-      onFail("Unepected response. Expected security.");
+  uds_->requestSecurityKey(kData, [this](Error error, uint8_t type) {
+    if (!checkError(error)) {
       return;
     }
 
-    // Begin downloading
-    state_ = STATE_IDLE;
     callback_(true, "");
-
-    break;
-  default:
-    // STATE_IDLE
-    break;
-  }
+  });
 }
 
-void UdsAuthenticator::onNegativeResponse(int code) {
+void Authenticator::onFail(const std::string &error) {
+  callback_(false, error);
+}
+
+void Authenticator::onNegativeResponse(int code) {
   std::stringstream ss;
   ss << "Received negative UDS response: 0x" << std::hex << code;
   onFail(ss.str());
 }
 
-uint32_t UdsAuthenticator::generateKey(uint32_t parameter, const uint8_t *seed,
-                                       size_t len) {
-  std::vector<uint8_t> nseed(seed, seed + len);
+uint32_t Authenticator::generateKey(uint32_t parameter, gsl::span<const uint8_t> seed) {
+  std::vector<uint8_t> nseed(seed.begin(), seed.end());
   nseed.insert(nseed.end(), key_.begin(), key_.end());
+
+  // This is Mazda's key generation algorithm reverse engineered from a Mazdaspeed6 ROM.
+  // Internally, the ECU uses a timer/counter for the seed
 
   for (uint8_t c : nseed) {
     for (int r = 8; r > 0; --r) {
@@ -138,7 +120,8 @@ uint32_t UdsAuthenticator::generateKey(uint32_t parameter, const uint8_t *seed,
 
   uint32_t res = (parameter >> 4) & 0xFF;
   res |= (((parameter >> 20) & 0xFF) + ((parameter >> 8) & 0xF0)) << 8;
-  res |= (((parameter << 4) & 0xFF) + ((parameter >> 16) & 0xF)) << 16;
+  res |= (((parameter << 4) & 0xFF) + ((parameter >> 16) & 0x0F)) << 16;
 
   return res;
+}
 }

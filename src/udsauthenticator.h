@@ -26,39 +26,32 @@
 /**
  * Handles UDS authentication for flashing & downloading
  */
-class UdsAuthenticator {
+namespace uds {
+class Authenticator {
 public:
   using Callback = std::function<void(bool success, const std::string &error)>;
-  
-  UdsAuthenticator(Callback callback);
 
-  /* UDS Callback */
-  void onRecv(const UdsResponse &response);
-  
+  explicit Authenticator(Callback &&callback);
+
   /* Start authentication */
-  void start(const std::string &key, const std::shared_ptr<IsoTpInterface> &isotp, const IsoTpOptions &options);
+  void auth(const std::string &key, std::shared_ptr<uds::Protocol> uds, uint8_t sessionType = 0x87);
   // void start(std::shared_ptr<UdsProtocol> uds, const std::string &key);
 
-  uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t len);
-
-  enum State {
-    STATE_IDLE,
-    STATE_SESSION,          // Waiting for response from session control
-    STATE_SECURITY_REQUEST, // Waiting for response from security access
-                            // requestSeed
-    STATE_SECURITY_KEY,     // Waiting for response from security access sendKey
-  };
-
+  uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
 private:
-  std::shared_ptr<UdsProtocol> uds_;
-  State state_;
-
+  std::shared_ptr<uds::Protocol> uds_;
   std::string key_;
+
+  void do_session(uint8_t sessionType);
+  void do_request_seed();
+  void do_send_key(uint32_t key);
 
   void onNegativeResponse(int code);
   void onFail(const std::string &error);
+  bool checkError(Error error);
 
   Callback callback_;
 };
+}
 
 #endif // UDSAUTHENTICATOR_H

@@ -272,14 +272,14 @@ uint32_t SubDefinition::getAxisLocation(int axisId, bool *ok) {
   return axesOffsets_[axisId];
 }
 
-bool SubDefinition::check(const uint8_t *data, size_t length) {
+bool SubDefinition::check(gsl::span<const uint8_t> data) {
   for (Identifier &identifier : identifiers_) {
-    if (identifier.offset() + identifier.size() > length) {
+    if (identifier.offset() + identifier.size() > data.size()) {
       return false;
     }
 
-    if (memcmp(data + identifier.offset(), identifier.data(),
-               identifier.size()) != 0) {
+    if (std::equal(data.begin() + identifier.offset(), data.end(), identifier.data(),
+               identifier.data() + identifier.size()) != 0) {
       return false;
     }
   }
@@ -340,10 +340,9 @@ int Definition::axisId(const std::string &id) {
   return it->second->iId();
 }
 
-SubDefinitionPtr Definition::identifySubtype(const uint8_t *data,
-                                             size_t length) {
+SubDefinitionPtr Definition::identifySubtype(gsl::span<const uint8_t> data) {
   for (SubDefinitionPtr &def : subtypes_) {
-    if (def->check(data, length)) {
+    if (def->check(data)) {
       return def;
     }
   }
@@ -397,7 +396,7 @@ bool Definition::loadMain(const QString &path) {
   flashMode_ = FLASH_NONE;
 
   if (xml.readNextStartElement()) {
-    if (xml.name() != "definition") {
+    if (xml.name() != "maindefinition") {
       xml.raiseError("Unexpected element");
     }
   }

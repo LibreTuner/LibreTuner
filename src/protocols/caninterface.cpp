@@ -22,12 +22,11 @@
 #include <cstring>
 #include <sstream>
 
-void CanMessage::setMessage(uint32_t id, const uint8_t *message,
-                            uint8_t length) {
-  assert(length <= 8 && "Message length is too long!");
+void CanMessage::setMessage(uint32_t id, gsl::span<const uint8_t> data) {
+  Expects(data.size() <= 8);
   id_ = id;
-  messageLength_ = length;
-  memcpy(message_, message, length);
+  messageLength_ = static_cast<uint8_t>(data.size());
+  std::copy(data.begin(), data.end(), message_);
 }
 
 std::string CanMessage::strMessage() const {
@@ -44,16 +43,16 @@ std::string CanMessage::strMessage() const {
 
 CanMessage::CanMessage() { std::memset(message_, 0, 8); }
 
-CanMessage::CanMessage(uint32_t id, const uint8_t *message, uint8_t length) {
-  setMessage(id, message, length);
+CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
+  setMessage(id, data);
 }
 
 CanInterface::CanInterface() : signal_(SignalType::create()) {
   
 }
 
-void CanInterface::send(int id, const uint8_t *message, uint8_t len) {
-  send(CanMessage(id, message, len));
+void CanInterface::send(int id, gsl::span<const uint8_t> data) {
+  send(CanMessage(id, data));
 }
 /*
 std::string CanInterface::strError(CanInterface::CanError error, int err) {

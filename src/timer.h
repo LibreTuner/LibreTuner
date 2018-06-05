@@ -31,25 +31,25 @@
 class Timer {
 public:
   using Callback = std::function<void()>;
-  /* Called when the timer runs out */
-  virtual void timedout() = 0;
 
+  Timer() = default;
+  explicit Timer(Callback &&cb);
+
+  void setCallback(Callback &&cb);
   void setTimeout(std::chrono::milliseconds timeout) { timeout_ = timeout; }
-
   std::chrono::milliseconds timeout() const { return timeout_; }
-  
-  virtual ~Timer();
-
-protected:
   /* Starts the timeout timer */
-  void startTimer();
+  void start();
   /* Stops the timeout timer */
-  void stopTimer();
+  void stop();
+  
+  ~Timer();
 
 private:
   void run();
 
   std::chrono::milliseconds timeout_;
+  Callback callback_;
 
   std::thread thread_;
 

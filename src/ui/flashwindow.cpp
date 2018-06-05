@@ -52,7 +52,7 @@ void FlashWindow::on_buttonFlash_clicked() {
     // SocketCAN
     std::shared_ptr<SocketCanInterface> can;
     try {
-      can = std::make_shared<SocketCanInterface>(ui->editSocketCAN->text().toStdString());
+      can = SocketCanInterface::create(ui->editSocketCAN->text().toStdString());
     } catch (const std::exception &e) {
       QMessageBox msgBox;
       msgBox.setWindowTitle("SocketCan error");
@@ -64,7 +64,7 @@ void FlashWindow::on_buttonFlash_clicked() {
     }
     int serverId = flashable_->definition()->definition()->serverId();
     flasher_ = Flasher::createT1(
-        this, flashable_->definition()->definition()->key(), IsoTpInterface::get(can), IsoTpOptions(serverId, serverId + 8));
+        this, flashable_->definition()->definition()->key(), std::make_shared<isotp::Protocol>(can, isotp::Options{serverId, serverId + 8}));
     if (!flasher_) {
       // The interface should have called the downloadError callback
       return;
@@ -129,5 +129,5 @@ void FlashWindow::onError(const std::string &error) {
 
 void FlashWindow::onProgress(double percent) {
   QMetaObject::invokeMethod(ui->progressBar, "setValue", Qt::QueuedConnection,
-                            Q_ARG(int, (int)percent));
+                            Q_ARG(int, (int)(percent * 100)));
 }
