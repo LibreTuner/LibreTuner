@@ -21,7 +21,6 @@
 
 #include "definitions/definition.h"
 #include "definitions/definitionmanager.h"
-#include "protocols/isotpinterface.h"
 #include "protocols/socketcaninterface.h"
 
 #include <QMessageBox>

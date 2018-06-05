@@ -18,7 +18,6 @@
 
 #include "libretuner.h"
 #include "os/sockethandler.h"
-#include "protocols/isotpinterface.h"
 #include "protocols/socketcaninterface.h"
 #include "rommanager.h"
 #include "tune.h"

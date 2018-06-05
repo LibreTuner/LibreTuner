@@ -26,7 +26,6 @@
 #include <cassert>
 #include <sstream>
 #include <utility>
-#include <protocols/isotpinterface.h>
 
 #include <iostream>
 

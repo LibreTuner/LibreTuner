@@ -18,7 +18,6 @@
 
 #include "udsprotocol.h"
 #include "caninterface.h"
-#include "isotpinterface.h"
 
 #include <cassert>
 #include <utility>
