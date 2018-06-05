@@ -36,12 +36,12 @@ class DownloadWindow;
 class DownloadWindow : public QWidget, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
-  DownloadWindow(QWidget *parent = 0);
-  ~DownloadWindow();
+  explicit DownloadWindow(QWidget *parent = 0);
+  ~DownloadWindow() override;
 
   /* Download interface callbacks */
   void downloadError(const QString &error) override;
-  void onCompletion(const uint8_t *data, size_t length) override;
+  void onCompletion(gsl::span<const uint8_t> data) override;
   void updateProgress(float progress) override;
 
 private slots:

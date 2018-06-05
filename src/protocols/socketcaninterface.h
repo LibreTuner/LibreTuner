@@ -29,16 +29,16 @@
  */
 class SocketCanInterface : public CanInterface, public Socket {
 public:
-  SocketCanInterface();
+  static std::shared_ptr<SocketCanInterface> create();
   /* Creates a socket and attempts to bind to an interface.
    * Throws an error if unsuccessful */
-  SocketCanInterface(const std::string &ifname);
+  static std::shared_ptr<SocketCanInterface> create(const std::string &ifname);
   
   SocketCanInterface(SocketCanInterface &) = delete;
   SocketCanInterface(const SocketCanInterface &) = delete;
   SocketCanInterface(SocketCanInterface &&) = delete;
 
-  ~SocketCanInterface();
+  ~SocketCanInterface() override;
 
   void send(const CanMessage &message) override;
   
@@ -67,9 +67,15 @@ public:
   int fd() override;
   void onRead() override;
 
+  // These constructors should never be used directly!
+  SocketCanInterface() = default;
+  explicit SocketCanInterface(const std::string &ifname);
+
 private:
   int socket_ = 0;
   std::mutex mutex_;
+
+  std::weak_ptr<SocketCanInterface> self_;
 };
 
 #endif // SOCKETCANINTERFACE_H

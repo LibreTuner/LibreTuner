@@ -21,6 +21,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <gsl/span>
 
 #include <QString>
 #include <QXmlStreamReader>
@@ -37,7 +38,7 @@ class Definition;
 // Subtype is a misnomer, but it's too late to change
 class SubDefinition {
 public:
-  SubDefinition(Definition *definition);
+  explicit SubDefinition(Definition *definition);
 
   /* Attempts to load a subtype definition. Returns false and sets
    * lastError on failure. */
@@ -57,7 +58,7 @@ public:
   uint32_t getAxisLocation(int axisId, bool *ok = nullptr);
 
   /* Returns true if the ROM data is of the subtype/firmware version */
-  bool check(const uint8_t *data, size_t length);
+  bool check(gsl::span<const uint8_t> data);
 
   Definition *definition() const { return definition_; }
 
@@ -131,7 +132,7 @@ public:
 
   /* Attempts to determine the subtype of the data. Returns
    * nullptr if no subtypes match. */
-  SubDefinitionPtr identifySubtype(const uint8_t *data, size_t length);
+  SubDefinitionPtr identifySubtype(gsl::span<const uint8_t> data);
 
   /* Returns the axis with the specified ID. If none exists, returns
    * nullptr. */

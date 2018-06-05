@@ -23,6 +23,7 @@
 #include <QString>
 
 #include <memory>
+#include <gsl/span>
 
 #include "rommanager.h"
 
@@ -40,7 +41,7 @@ public:
     TYPE_J2534,
   };
 
-  virtual ~DownloadInterface(){};
+  virtual ~DownloadInterface() = default;
 
   /* Starts downloading. Calls updateProgress if possible.
    * Signals onError if an error occurs. */
@@ -54,7 +55,7 @@ public:
     virtual void downloadError(const QString &error) = 0;
 
     /* Called when the ROM has finished downloading. */
-    virtual void onCompletion(const uint8_t *data, size_t length) = 0;
+    virtual void onCompletion(gsl::span<const uint8_t> data) = 0;
   };
 
 #ifdef WITH_SOCKETCAN
@@ -68,7 +69,7 @@ public:
 protected:
   Callbacks *callbacks_;
 
-  DownloadInterface(Callbacks *callbacks);
+  explicit DownloadInterface(Callbacks *callbacks);
 };
 
 #endif // DOWNLOADINTERFACE_H

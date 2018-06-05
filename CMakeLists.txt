@@ -11,6 +11,7 @@ find_package(Boost 1.40 COMPONENTS system thread REQUIRED)
 
 option(Test "Build all tests." ON)
 
+add_subdirectory(lib/GSL)
 add_subdirectory(src)
 
 if (Test)

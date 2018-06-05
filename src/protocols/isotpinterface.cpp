@@ -25,16 +25,20 @@
 #include <memory>
 #include <exception>
 
-class IsoTpRequest : public Timer {
+#define BOOST_THREAD_PROVIDES_FUTURE
+#include <boost/thread.hpp>
+#include <boost/thread/future.hpp>
+
+class IsoTpRequest {
 public:
   IsoTpRequest(IsoTpInterface &interface, const IsoTpOptions options, const uint8_t *message, size_t length) : interface_(interface), options_(options), msg_(message, message + length) {
     assert(length <= 4095 && "Messsage is too long to to transmit over ISO-TP");
     connection_ = interface.can()->connect(std::bind(&IsoTpRequest::onCanMessage, this, std::placeholders::_1));
-    setTimeout(options_.timeout());
+    // setTimeout(options_.timeout());
     send();
   }
   
-  void timedout() override;
+  // void timedout() override;
   
   boost::future<IsoTpInterface::Response> future() {
     return promise_.get_future();
@@ -45,9 +49,10 @@ private:
     None,   // Waiting for a request
     Resp,   // Waiting for a single/first frame
     Consec, // Waiting for a consecutive frame
-    Flow,   // Waiting for a flow control frame
+    SendingConsec,
+    Flow, // Waiting for a flow control frame
   };
-  
+
   boost::promise<IsoTpInterface::Response> promise_;
   
   State state_;
@@ -89,7 +94,7 @@ private:
   
   void throwError(IsoTpError error);
 };
-
+/*
 void IsoTpRequest::timedout()
 {
   state_ = State::None;
@@ -97,7 +102,7 @@ void IsoTpRequest::timedout()
   connection_->disconnect();
   
   promise_.set_value(IsoTpInterface::Response());
-}
+}*/
 
 void IsoTpRequest::throwError(IsoTpError error)
 {
@@ -158,7 +163,7 @@ void IsoTpRequest::send(){
   } else {
     sendFirst();
   }
-  startTimer();
+  //startTimer();
 }
 
 void IsoTpRequest::sendFlowControl() {
@@ -173,7 +178,7 @@ void IsoTpRequest::sendFlowControl() {
 }
 
 void IsoTpRequest::received() {
-  stopTimer();
+  //stopTimer();
   state_ = State::None;
   promise_.set_value(IsoTpInterface::Response(std::move(recvMsg_)));
 }
@@ -262,12 +267,17 @@ void IsoTpRequest::sendConsecFrames(uint8_t fcFlag, uint8_t blockSize, uint8_t s
     
     if (blocksRemaining > 0) {
       if (blocksRemaining == 1) {
-        state_ = State::Flow;
         break;
       }
       
       --blocksRemaining;
     }
+  }
+
+  if (msgPtr_ == msg_.end()) {
+    state_ = State::Resp;
+  } else {
+    state_ = State::Flow;
   }
 }
 
@@ -322,7 +332,7 @@ void IsoTpRequest::handleFlow(const CanMessage& message) {
   uint8_t blockSize = message[1];
   uint8_t sepTime = message[2]; // Separation time
   consecIndex_ = 1;
-  
+  state_ = State::SendingConsec;
   consecThread_ = std::thread(std::bind(&IsoTpRequest::sendConsecFrames, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), fcFlag, blockSize, sepTime);
 }
 
@@ -334,6 +344,8 @@ void IsoTpRequest::onCanMessage(const CanMessage& message) {
   if (message.length() == 0) {
     return;
   }
+
+  //stopTimer();
   
   switch (state_) {
     case State::Resp: 
@@ -350,8 +362,8 @@ void IsoTpRequest::onCanMessage(const CanMessage& message) {
       break;
   }
   
-  if (state_ != State::None) {
-    startTimer();
+  if (state_ != State::None && state_ != State::SendingConsec) {
+    //startTimer();
   }
 }
 
@@ -442,8 +454,6 @@ IsoTpInterface::Response::Response(IsoTpError error) : error_(Error::IsoTpError)
 IsoTpInterface::Response::Response(std::unique_ptr<IsoTpMessage> message) : message_(std::move(message)), error_(Error::Success)
 {
 }
-
-
 
 std::string IsoTpInterface::strError(IsoTpError error) {
   switch (error) {

@@ -18,27 +18,38 @@
 
 #include "timer.h"
 
+Timer::Timer(Timer::Callback &&cb) : callback_(std::move(cb)) {
+
+}
+
 void Timer::run() {
   std::unique_lock<std::mutex> lk(cv_m_);
   if (!cv_.wait_for(lk, timeout_, [this]() { return canceled_; })) {
-    if (!canceled_)
-      timedout();
+    if (!canceled_) {
+      if (callback_) {
+        callback_();
+      }
+    }
   }
+}
+
+void Timer::setCallback(Timer::Callback &&cb) {
+  callback_ = std::move(cb);
 }
 
 Timer::~Timer()
 {
-  stopTimer();
+  stop();
 }
 
-void Timer::startTimer() {
-  stopTimer();
+void Timer::start() {
+  stop();
 
   canceled_ = false;
   thread_ = std::thread(&Timer::run, this);
 }
 
-void Timer::stopTimer() {
+void Timer::stop() {
   if (thread_.joinable()) {
     {
       std::lock_guard<std::mutex> lk(cv_m_);

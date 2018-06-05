@@ -23,12 +23,14 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <gsl/span>
 
 #include <QObject>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
 #include "rom.h"
+
 
 /**
  * Manages ROM files and metadata
@@ -53,17 +55,17 @@ public:
   std::vector<RomPtr> &roms() { return roms_; }
 
   bool addRom(const std::string &name, const DefinitionPtr &definition,
-              const uint8_t *data, size_t size);
+              gsl::span<const uint8_t> data);
 
   /* Returns the ROM with id or nullptr if the ROM does
    * not exist */
   RomPtr fromId(int id);
 
 private:
-  RomManager();
+  RomManager() = default;
   QString lastError_;
   std::vector<RomPtr> roms_;
-  int nextId_;
+  int nextId_{};
 
   void readRoms(QXmlStreamReader &xml);
 

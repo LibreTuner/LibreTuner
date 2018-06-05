@@ -24,6 +24,7 @@
 #include <cassert>
 
 #include <iostream>
+#include <fstream>
 
 RomManager *RomManager::get() {
   static RomManager romManager;
@@ -161,7 +162,7 @@ bool RomManager::save() {
   xml.writeStartDocument();
   xml.writeDTD("<!DOCTYPE roms>");
   xml.writeStartElement("roms");
-  for (const RomPtr rom : roms_) {
+  for (const RomPtr &rom : roms_) {
     xml.writeStartElement("rom");
     xml.writeTextElement("name", QString::fromStdString(rom->name()));
     xml.writeTextElement("path", QString::fromStdString(rom->path()));
@@ -177,7 +178,7 @@ bool RomManager::save() {
 }
 
 bool RomManager::addRom(const std::string &name, const DefinitionPtr &definition,
-                        const uint8_t *data, size_t size) {
+                        gsl::span<const uint8_t> data) {
   LibreTuner::get()->checkHome();
 
   QString romRoot = LibreTuner::get()->home() + "/roms/";
@@ -189,17 +190,12 @@ bool RomManager::addRom(const std::string &name, const DefinitionPtr &definition
     } while (QFile::exists(romRoot + path));
   }
 
-  QFile file(romRoot + path);
-  if (!file.open(QFile::WriteOnly)) {
-    lastError_ = file.errorString();
-    return false;
-  }
-
-  file.write(reinterpret_cast<const char *>(data), size);
+  std::ofstream file((romRoot + path).toStdString(), std::fstream::out | std::fstream::binary);
+  file.write(reinterpret_cast<const char*>(data.data()), data.size());
   file.close();
 
   // Determine the subtype
-  SubDefinitionPtr subtype = definition->identifySubtype(data, size);
+  SubDefinitionPtr subtype = definition->identifySubtype(data);
   if (!subtype) {
     lastError_ = "Unknown firmware version or this is the wrong vehicle. If "
                  "this is the correct vehicle, please submit a bug report so "
@@ -219,8 +215,6 @@ bool RomManager::addRom(const std::string &name, const DefinitionPtr &definition
 
   return save();
 }
-
-RomManager::RomManager() {}
 
 RomPtr RomManager::fromId(int id) {
   for (RomPtr &rom : roms_) {

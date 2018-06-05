@@ -23,7 +23,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <vector>
 
 #ifdef WITH_SOCKETCAN
@@ -38,52 +37,41 @@ DownloadInterface::DownloadInterface(DownloadInterface::Callbacks *callbacks)
 class Uds23DownloadInterface : public DownloadInterface {
 public:
   Uds23DownloadInterface(DownloadInterface::Callbacks *callbacks,
-                         const std::shared_ptr<IsoTpInterface> &isotp,
-                         const std::string &key, int size, const IsoTpOptions &options);
+                         std::shared_ptr<isotp::Protocol> isotp,
+                         const std::string &key, int size);
   void download() override;
-  
-  /* UDS Callback */
-  void onRecv(const UdsResponse &message);
 
   /* UdsAuthenticator Callback */
   void onAuthenticated(bool success, const std::string &error);
 
 private:
-  enum State {
-    STATE_AUTHENTICATING, // Waiting for auth success
-    STATE_DOWNLOADING,
-  };
+  uds::Authenticator auth_;
 
-  State state_;
-  UdsAuthenticator auth_;
-  
-  IsoTpOptions options_;
-
-  std::shared_ptr<IsoTpInterface> isotp_;
-  
-  std::shared_ptr<UdsProtocol> uds_;
+  std::shared_ptr<uds::Protocol> uds_;
 
   std::string key_;
 
   /* Next memory location to be read from */
-  size_t downloadOffset_;
+  size_t downloadOffset_{};
   /* Amount of data left to be transfered */
-  size_t downloadSize_;
+  size_t downloadSize_{};
   /* Total size to be transfered. Used for progress updates */
   size_t totalSize_;
 
   std::vector<uint8_t> downloadData_;
 
-  void onNegativeResponse(uint8_t code);
+  bool checkError(uds::Error error);
+  void do_download();
+  bool update_progress();
 };
 
 Uds23DownloadInterface::Uds23DownloadInterface(
-    DownloadInterface::Callbacks *callbacks, const std::shared_ptr<IsoTpInterface> &isotp,
-    const std::string &key, int size, const IsoTpOptions &options)
+    DownloadInterface::Callbacks *callbacks, std::shared_ptr<isotp::Protocol> isotp,
+    const std::string &key, int size)
     : DownloadInterface(callbacks),
-    options_(options), isotp_(isotp), auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this, std::placeholders::_1, std::placeholders::_2)),
+    auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this, std::placeholders::_1, std::placeholders::_2)),
       key_(key), totalSize_(size) {
-  uds_ = UdsProtocol::create(isotp_, options_);
+  uds_ = uds::Protocol::create(std::move(isotp));
   
 }
 
@@ -95,7 +83,7 @@ DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
   assert(callbacks != nullptr);
   std::shared_ptr<SocketCanInterface> can;
   try {
-      can = std::make_shared<SocketCanInterface>(device);
+      can = SocketCanInterface::create(device);
       can->start();
   } catch (std::exception &e) {
     callbacks->downloadError("Could not initialize SocketCAN device \"" +
@@ -108,8 +96,7 @@ DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
   switch (definition->downloadMode()) {
     case DM_MAZDA23:
       return std::make_shared<Uds23DownloadInterface>(
-          callbacks, IsoTpInterface::get(can), definition->key(), definition->size(),
-          IsoTpOptions(definition->serverId(), definition->serverId() + 8));
+          callbacks, std::make_shared<isotp::Protocol>(can, isotp::Options{definition->serverId(), definition->serverId() + 8, std::chrono::milliseconds(100)}), definition->key(), definition->size());
     default:
       callbacks->downloadError("CAN is not supported on this vehicle");
       break;
@@ -119,75 +106,54 @@ DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
 }
 #endif
 
+bool Uds23DownloadInterface::checkError(uds::Error error) {
+  if (error != uds::Error::Success) {
+    callbacks_->downloadError(QString::fromStdString(uds::strError(error)));
+    return false;
+  }
+  return true;
+}
+
 void Uds23DownloadInterface::onAuthenticated(bool success, const std::string &error) {
   if (!success) {
     callbacks_->downloadError(QString::fromStdString(error));
     return;
   }
-  state_ = STATE_DOWNLOADING;
+  do_download();
+}
+
+void Uds23DownloadInterface::do_download() {
   uds_->requestReadMemoryAddress(downloadOffset_,
-                                 std::min<uint32_t>(downloadSize_, 0xFFE));
+                                 std::min<uint32_t>(downloadSize_, 0xFFE), [this](uds::Error error, gsl::span<const uint8_t> data) {
+    if (!checkError(error)) {
+      return;
+    }
+
+    if (data.empty()) {
+      callbacks_->downloadError("received 0 bytes in download packet");
+    }
+
+    downloadData_.insert(downloadData_.end(), data.begin(), data.end());
+    downloadOffset_ += data.size();
+    downloadSize_ -= data.size();
+
+    if (update_progress()) {
+      do_download();
+    }
+  });
+}
+
+bool Uds23DownloadInterface::update_progress() {
+  callbacks_->updateProgress((1.0f - ((float)downloadSize_ / totalSize_)));
+  if (downloadSize_ == 0) {
+    callbacks_->onCompletion(downloadData_);
+    return false;
+  }
+  return true;
 }
 
 void Uds23DownloadInterface::download() {
   downloadOffset_ = 0;
-  downloadSize_ = totalSize_; // 1 MiB
-  // Start a UDS session using mode 0x87
-  state_ = STATE_AUTHENTICATING;
-  auth_.start(key_, isotp_, options_);
-}
-
-void Uds23DownloadInterface::onRecv(const UdsResponse &message) {
-  if (!message.success()) {
-    callbacks_->downloadError(QString::fromStdString(message.strError()));
-  }
-  
-  if (message.id() == UDS_RES_NEGATIVE) {
-    if (message.length() > 0) {
-      onNegativeResponse(message[0]);
-    } else {
-      onNegativeResponse(0);
-    }
-    return;
-  }
-
-  switch (state_) {
-  case STATE_DOWNLOADING:
-    if (message.id() != UDS_RES_READMEM) {
-      callbacks_->downloadError(
-          "Unepected response. Expected ReadMemoryByAddress.");
-      return;
-    }
-
-    if (message.length() == 0) {
-      callbacks_->downloadError("Received 0 bytes in a download packet.");
-      return;
-    }
-
-    downloadData_.insert(downloadData_.end(), message.message(),
-                         message.message() + message.length());
-    downloadOffset_ += message.length();
-    downloadSize_ -= message.length();
-
-    callbacks_->updateProgress((1.0f - ((float)downloadSize_ / totalSize_)) *
-                               100.0f);
-
-    if (downloadSize_ == 0) {
-      // finished downloading
-      callbacks_->onCompletion(downloadData_.data(), downloadData_.size());
-    } else {
-      uds_->requestReadMemoryAddress(downloadOffset_,
-                                     std::min<uint32_t>(downloadSize_, 0xFFE));
-    }
-
-    break;
-  default:
-    // This should never happen
-    assert(false);
-  }
-}
-
-void Uds23DownloadInterface::onNegativeResponse(uint8_t code) {
-  callbacks_->downloadError("Received negative UDS response: 0x" +
-                            QString::number(code, 16));
+  downloadSize_ = totalSize_;
+  auth_.auth(key_, uds_);
 }

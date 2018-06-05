@@ -9,79 +9,81 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 set(libretuner_SRC
-  libretuner.cpp
-  libretuner.h
-  downloadinterface.cpp
-  downloadinterface.h
-  rommanager.cpp
-  rommanager.h
-  tunemanager.cpp
-  tunemanager.h
-  tune.cpp
-  tune.h
-  rom.cpp
-  rom.h
-  tablegroup.cpp
-  tablegroup.h
-  table.cpp
-  table.h
-  flasher.cpp
-  flasher.h
-  flashable.cpp
-  flashable.h
-  endian.h
-  udsauthenticator.cpp
-  udsauthenticator.h
-  timer.cpp
-  timer.h
+    libretuner.cpp
+    libretuner.h
+    downloadinterface.cpp
+    downloadinterface.h
+    rommanager.cpp
+    rommanager.h
+    tunemanager.cpp
+    tunemanager.h
+    tune.cpp
+    tune.h
+    rom.cpp
+    rom.h
+    tablegroup.cpp
+    tablegroup.h
+    table.cpp
+    table.h
+    flasher.cpp
+    flasher.h
+    flashable.cpp
+    flashable.h
+    endian.h
+    udsauthenticator.cpp
+    udsauthenticator.h
+    timer.cpp
+    timer.h
 
-  util/signal.cpp
-  util/signal.h
-  
-  definitions/definitionmanager.cpp
-  definitions/definitionmanager.h
-  definitions/definition.cpp
-  definitions/definition.h
-  definitions/tabledefinitions.cpp
-  definitions/tabledefinitions.h
-  definitions/checksummanager.cpp
-  definitions/checksummanager.h
-  
-  ui/mainwindow.cpp
-  ui/mainwindow.h
-  ui/canviewer.cpp
-  ui/canviewer.h
-  ui/canlogview.cpp
-  ui/canlogview.h
-  ui/flowlayout.cpp
-  ui/flowlayout.h
-  ui/romwidget.cpp
-  ui/romwidget.h
-  ui/downloadwindow.cpp
-  ui/downloadwindow.h
-  ui/createtunedialog.cpp
-  ui/createtunedialog.h
-  ui/tuneeditor.cpp
-  ui/tuneeditor.h
-  ui/tunewidget.cpp
-  ui/tunewidget.h
-  ui/verticallabel.cpp
-  ui/verticallabel.h
-  ui/graphwidget.cpp
-  ui/graphwidget.h
-  ui/flashwindow.cpp
-  ui/flashwindow.h
-  
-  protocols/caninterface.cpp
-  protocols/caninterface.h
-  protocols/canlog.cpp
-  protocols/canlog.h
-  protocols/isotpinterface.cpp
-  protocols/udsprotocol.cpp
-  protocols/udsprotocol.h
-  protocols/mockcaninterface.cpp
-  protocols/mockcaninterface.h
-)
+    util/signal.cpp
+    util/signal.h
+
+    definitions/definitionmanager.cpp
+    definitions/definitionmanager.h
+    definitions/definition.cpp
+    definitions/definition.h
+    definitions/tabledefinitions.cpp
+    definitions/tabledefinitions.h
+    definitions/checksummanager.cpp
+    definitions/checksummanager.h
+
+    ui/mainwindow.cpp
+    ui/mainwindow.h
+    ui/canviewer.cpp
+    ui/canviewer.h
+    ui/canlogview.cpp
+    ui/canlogview.h
+    ui/flowlayout.cpp
+    ui/flowlayout.h
+    ui/romwidget.cpp
+    ui/romwidget.h
+    ui/downloadwindow.cpp
+    ui/downloadwindow.h
+    ui/createtunedialog.cpp
+    ui/createtunedialog.h
+    ui/tuneeditor.cpp
+    ui/tuneeditor.h
+    ui/tunewidget.cpp
+    ui/tunewidget.h
+    ui/verticallabel.cpp
+    ui/verticallabel.h
+    ui/graphwidget.cpp
+    ui/graphwidget.h
+    ui/flashwindow.cpp
+    ui/flashwindow.h
+
+    protocols/caninterface.cpp
+    protocols/caninterface.h
+    protocols/canlog.cpp
+    protocols/canlog.h
+    protocols/udsprotocol.cpp
+    protocols/udsprotocol.h
+    protocols/mockcaninterface.cpp
+    protocols/mockcaninterface.h
+    protocols/isotpserver.cpp
+    protocols/isotpserver.h
+    protocols/isotpprotocol.cpp
+    protocols/isotpprotocol.h)
 
 if (UNIX)
     set(libretuner_SRC ${libretuner_SRC}
@@ -96,23 +98,23 @@ endif (UNIX)
 # Create code from a list of Qt designer ui files.
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
 qt5_wrap_ui(libretuner_SRC
-ui/mainwindow.ui
-ui/canviewer.ui
-ui/downloadwindow.ui
-ui/createtunedialog.ui
-ui/tuneeditor.ui
-ui/flashwindow.ui
+    ui/mainwindow.ui
+    ui/canviewer.ui
+    ui/downloadwindow.ui
+    ui/createtunedialog.ui
+    ui/tuneeditor.ui
+    ui/flashwindow.ui
 )
 
 qt5_add_resources(libretuner_SRC
-resources/icons.qrc
-resources/definitions.qrc
+    resources/icons.qrc
+    resources/definitions.qrc
 )
 
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts GSL ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

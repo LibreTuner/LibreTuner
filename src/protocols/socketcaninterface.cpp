@@ -33,8 +33,6 @@
 
 #include "libretuner.h"
 
-SocketCanInterface::SocketCanInterface() {}
-
 SocketCanInterface::SocketCanInterface(const std::string &ifname) {
   bind(ifname);
 }
@@ -52,9 +50,10 @@ void SocketCanInterface::recv(CanMessage &message) {
     message.invalidate();
     return;
   }
+
   can_frame frame;
 
-  int nbytes = read(socket_, &frame, sizeof(can_frame));
+  int nbytes = ::recv(socket_, &frame, sizeof(can_frame), MSG_DONTWAIT);
   if (nbytes < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       message.invalidate();
@@ -64,12 +63,12 @@ void SocketCanInterface::recv(CanMessage &message) {
   }
 
   // TODO: remove EFF/RTR/ERR flags
-  message.setMessage(frame.can_id, frame.data, frame.can_dlc);
+  message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
 
   // Add message to log
 
   if (frame.can_id == 0x7e8 || frame.can_id == 0x7e0) {
-    LibreTuner::get()->canLog()->addMessage(message);
+    //LibreTuner::get()->canLog()->addMessage(message);
   }
 }
 
@@ -127,19 +126,25 @@ void SocketCanInterface::close() {
 void SocketCanInterface::start() {
   assert(socket_ != 0);
 
-  setNonblocking();
+  // setNonblocking();
   SocketHandler::get()->addSocket(this);
 }
 
 int SocketCanInterface::fd() { return socket_; }
 
 void SocketCanInterface::onRead() {
+  auto ptr = self_.lock();
+  if (!ptr) {
+    return;
+  }
   CanMessage message;
   while (true) {
     try {
       recv(message);
       if (message.valid()) {
         signal_->call(message);
+      } else {
+        break;
       }
     } catch (...) {
       // rethrow for now...
@@ -154,3 +159,16 @@ void SocketCanInterface::setNonblocking() {
   int flags = fcntl(socket_, F_GETFL, 0);
   fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
 }
+
+std::shared_ptr<SocketCanInterface> SocketCanInterface::create() {
+  auto ptr = std::make_shared<SocketCanInterface>();
+  ptr->self_ = ptr;
+  return ptr;
+}
+
+std::shared_ptr<SocketCanInterface> SocketCanInterface::create(const std::string &ifname) {
+  auto ptr = std::make_shared<SocketCanInterface>(ifname);
+  ptr->self_ = ptr;
+  return ptr;
+}
+

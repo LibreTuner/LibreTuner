@@ -23,7 +23,7 @@
 #include <string>
 
 #include "flashable.h"
-#include "protocols/isotpinterface.h"
+#include "protocols/isotpprotocol.h"
 
 class Flasher;
 typedef std::shared_ptr<Flasher> FlasherPtr;
@@ -45,24 +45,23 @@ class Flasher {
 public:
   class Callbacks {
   public:
-    virtual void onProgress(double percent) = 0;
+    virtual void onProgress(double progress) = 0;
 
     virtual void onCompletion() = 0;
 
     virtual void onError(const std::string &error) = 0;
   };
 
-  virtual ~Flasher(){};
+  virtual ~Flasher() = default;
 
   /* Creates a MazdaT1 flash interface */
-  static FlasherPtr createT1(Callbacks *callbacks, const std::string &key, const std::shared_ptr<IsoTpInterface> &isotp,
-                             const IsoTpOptions &options);
+  static FlasherPtr createT1(Callbacks *callbacks, const std::string &key, std::shared_ptr<isotp::Protocol> isotp);
 
   /* Flash that shit */
   virtual void flash(FlashablePtr flashable) = 0;
 
 protected:
-  Flasher(Callbacks *callbacks);
+  explicit Flasher(Callbacks *callbacks);
 
   Callbacks *callbacks_;
 };

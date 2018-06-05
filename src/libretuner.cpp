@@ -34,6 +34,10 @@ static LibreTuner *_global;
 
 LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
   _global = this;
+
+  Q_INIT_RESOURCE(icons);
+  Q_INIT_RESOURCE(definitions);
+
   home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
 #ifdef WITH_SOCKETCAN

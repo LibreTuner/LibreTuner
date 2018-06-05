@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE maindefinition>
-<definition>
+<maindefinition>
 	<name>Mazdaspeed 6/Mazda 6 MPS/Mazdaspeed Atenza</name>
 	<id>mazdaspeed6</id>
 	<romsize>1048576</romsize>
@@ -91,4 +91,4 @@
 	</flashregion>
 
 	<!-- Absolute flash offset? -->
-</definition>
+</maindefinition>

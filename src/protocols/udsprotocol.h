@@ -23,8 +23,9 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <gsl/span>
 
-#include "isotpinterface.h"
+#include "isotpprotocol.h"
 
 /* Request SIDs */
 #define UDS_REQ_SESSION 0x10
@@ -41,74 +42,56 @@
 #define UDS_RES_READMEM 0x63
 #define UDS_RES_REQUESTUPLOAD 0x75
 #define UDS_RES_REQUESTDOWNLOAD 0x74
-#define UDS_RES_TRANSFERDATA 0x36
+#define UDS_RES_TRANSFERDATA 0x76
 
-enum class UdsError {
+namespace uds {
+
+enum class Error {
   Success,
-  Can,
+  Consec, // ISO-TP consecutive frame error
   IsoTp,
   Timeout,
   BlankResponse,
+  Negative,
+  UnexpectedResponse,
+  Malformed,
   Unknown,
 };
 
-class UdsResponse {
-public:
-  UdsResponse(UdsError error) : error_(error) {};
-  /* Successful response */
-  UdsResponse(uint8_t id, const uint8_t *message, size_t length);
-  /* Iso-Tp error'd response */
-  UdsResponse(IsoTpError error);
+std::string strError(Error error);
 
-  uint8_t id() const { return responseId_; }
-
-  void setId(uint8_t id) { responseId_ = id; }
-
-  size_t length() const { return message_.size(); }
-
-  uint8_t &operator[](int index) { return message_[index]; }
-
-  const uint8_t *message() const { return message_.data(); }
-
-  const uint8_t &operator[](int index) const { return message_[index]; }
-
-  void setMessage(const uint8_t *message, size_t length);
-
-  bool success() const { return error_ == UdsError::Success; };
-  
-  UdsError error() const { return error_; };
-  
-  IsoTpError isotpError() const { return isotpError_; };
-  
-  std::string strError() const;
-private:
-  uint8_t responseId_ = 0;
-  std::vector<uint8_t> message_;
-  UdsError error_;
-  IsoTpError isotpError_;
+struct Packet {
+  uint8_t id;
+  std::vector<uint8_t> data;
 };
 
-class UdsProtocol {
+class Protocol {
 public:
+  using Callback = std::function<void(Error, const Packet&)>;
+
   /* Create an interface with an ISO-TP layer */
-  static std::shared_ptr<UdsProtocol> create(const std::shared_ptr<IsoTpInterface> &isotp,
-                                             const IsoTpOptions &options);
+  static std::shared_ptr<Protocol> create(std::shared_ptr<isotp::Protocol> isotp);
 
   /* Sends a request. May throw an exception. */
-  virtual boost::future<UdsResponse> request(const uint8_t *message, size_t length) = 0;
+  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) = 0;
 
   /* All requests may throw an exception */
   /* Sends a DiagnosticSessionControl request */
-  boost::future<UdsResponse> requestSession(uint8_t type);
+  using RequestSessionCallback = std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
+  void requestSession(uint8_t type, RequestSessionCallback &&cb);
 
-  boost::future<UdsResponse> requestSecuritySeed();
+  using RequestSecuritySeedCallback = std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
+  void requestSecuritySeed(RequestSecuritySeedCallback &&cb);
 
-  boost::future<UdsResponse> requestSecurityKey(const uint8_t *key, uint8_t length);
+  using RequestSecurityKeyCallback = std::function<void(Error, uint8_t)>;
+  void requestSecurityKey(gsl::span<uint8_t> key, RequestSecurityKeyCallback &&cb);
 
   /* ReadMemoryByAddress */
-  boost::future<UdsResponse> requestReadMemoryAddress(uint32_t address, uint16_t length);
+  using RequestMemoryAddressCallback = std::function<void(Error, gsl::span<const uint8_t>)>;
+  void requestReadMemoryAddress(uint32_t address, uint16_t length, RequestMemoryAddressCallback &&cb);
 
-  virtual ~UdsProtocol(){};
+  virtual ~Protocol() = default;
 };
 
+}
 #endif // UDSPROTOCOL_H
