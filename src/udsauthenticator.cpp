@@ -84,12 +84,6 @@ void Authenticator::onFail(const std::string &error) {
   callback_(false, error);
 }
 
-void Authenticator::onNegativeResponse(int code) {
-  std::stringstream ss;
-  ss << "Received negative UDS response: 0x" << std::hex << code;
-  onFail(ss.str());
-}
-
 uint32_t Authenticator::generateKey(uint32_t parameter, gsl::span<const uint8_t> seed) {
   std::vector<uint8_t> nseed(seed.begin(), seed.end());
   nseed.insert(nseed.end(), key_.begin(), key_.end());
