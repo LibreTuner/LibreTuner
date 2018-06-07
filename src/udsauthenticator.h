@@ -46,7 +46,6 @@ private:
   void do_request_seed();
   void do_send_key(uint32_t key);
 
-  void onNegativeResponse(int code);
   void onFail(const std::string &error);
   bool checkError(Error error);
 
