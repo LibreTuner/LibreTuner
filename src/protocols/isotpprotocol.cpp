@@ -356,7 +356,7 @@ void Sender::onFlow(FlowControlFrame &frame) {
   consecIndex_ = 0;
 
   if (frame.separationTime.count() == 0) {
-    frame.separationTime = std::chrono::milliseconds(4);
+    frame.separationTime = std::chrono::microseconds(100);
   }
 
   consecThread_ = std::thread([this, frame] {

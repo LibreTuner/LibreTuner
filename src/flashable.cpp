@@ -34,7 +34,7 @@ Flashable::Flashable(TuneDataPtr tune) {
   data_.assign(rom->data(), rom->data() + rom->size());
 
   // Apply tune on top of ROM
-  if (!tune->apply(data_.data(), data_.size())) {
+  if (!tune->apply(data_)) {
     lastError_ = tune->lastError();
     valid_ = false;
     return;

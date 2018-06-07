@@ -52,44 +52,40 @@ template <> float Table::fromVariant<float>(const QVariant &v, bool &success) {
   return v.toFloat(&success);
 }
 
-template <>
-void Table::readRow<float>(std::vector<float> &data, Endianness endian,
-                           const uint8_t *raw, size_t length) {
-  if (endian == ENDIAN_BIG) {
-    for (int i = 0; i < length; ++i) {
-      data.push_back(toBEFloat(raw));
-      raw += sizeof(float);
+template<template <class Type> class TemplateType>
+class TCreator {
+public:
+  static std::shared_ptr<Table>
+  create(DataType dt, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data) {
+    switch (dt) {
+      case TDATA_FLOAT:
+        return std::make_shared<TemplateType<float>>
+            (def, endian, data);
+      case TDATA_INT32:
+        return std::make_shared<TemplateType<int32_t>>(def, endian, data);
+      case TDATA_INT16:
+        return std::make_shared<TemplateType<int16_t>>(def, endian, data);
+      case TDATA_INT8:
+        return std::make_shared<TemplateType<int8_t>>(def, endian, data);
+      case TDATA_UINT8:
+        return std::make_shared<TemplateType<uint8_t>>(def, endian, data);
+      case TDATA_UINT16:
+        return std::make_shared<TemplateType<uint16_t>>(def, endian, data);
+      case TDATA_UINT32:
+        return std::make_shared<TemplateType<uint32_t>>(def, endian, data);
     }
-    return;
+    return nullptr;
   }
+};
 
-  // Little endian
-  for (int i = 0; i < length; ++i) {
-    data.push_back(toLEFloat(raw));
-    raw += sizeof(float);
+std::shared_ptr<Table> Table::create(TableType tableType, DataType dataType, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data) {
+  switch(tableType) {
+    case TABLE_1D:
+      return TCreator<Table1d>::create(dataType, def, endian, data);
+    case TABLE_2D:
+      return TCreator<Table2d>::create(dataType, def, endian, data);
+    default:
+      assert(false && "unimplemented");
   }
-}
-
-template <>
-void Table::writeRow<float>(std::vector<float> &data, Endianness endian,
-                            uint8_t *odata) {
-  if (endian == ENDIAN_BIG) {
-    for (float f : data) {
-      uint32_t raw = *reinterpret_cast<uint32_t *>(&f);
-      *(odata++) = (raw >> 24);
-      *(odata++) = ((raw >> 16) & 0xFF);
-      *(odata++) = ((raw >> 8) & 0xFF);
-      *(odata++) = (raw & 0xFF);
-    }
-    return;
-  }
-
-  // Little endian
-  for (float f : data) {
-    uint32_t raw = *reinterpret_cast<uint32_t *>(&f);
-    *(odata++) = (raw & 0xFF);
-    *(odata++) = ((raw >> 8) & 0xFF);
-    *(odata++) = ((raw >> 16) & 0xFF);
-    *(odata++) = (raw >> 24);
-  }
+  return nullptr;
 }

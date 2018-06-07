@@ -63,23 +63,42 @@ TablePtr RomData::getTable(int idx) {
     return nullptr;
   }
 
-  switch (def->type()) {
-  case TABLE_1D:
-    switch (def->dataType()) {
-    case TDATA_FLOAT: {
-      return std::make_shared<Table1d<float>>(
-          def, definition_->endianness(),
-          data_.data() + subDefinition_->getTableLocation(idx));
+  // Check if the table location is within the data region
+  bool ok;
+  uint32_t location = subDefinition_->getTableLocation(idx, &ok);
+  if (!ok) {
+    return nullptr;
+  }
+
+  if (location > data_.size()) {
+    // out-of-range
+    return nullptr;
+  }
+
+  return Table::create(def->type(), def->dataType(), def, definition_->endianness(), gsl::make_span(data_).subspan(location));
+
+  try {
+    switch (def->type()) {
+      case TABLE_1D:
+        switch (def->dataType()) {
+          case TDATA_FLOAT: {
+            return std::make_shared<Table1d<float>>(
+                def, definition_->endianness(),
+                gsl::make_span(data_).subspan(location));
+          }
+        }
+      case TABLE_2D:
+        switch (def->dataType()) {
+          case TDATA_FLOAT: {
+            return std::make_shared<Table2d<float>>(
+                def, definition_->endianness(),
+                gsl::make_span(data_).subspan(location));
+          }
+        }
     }
-    }
-  case TABLE_2D:
-    switch (def->dataType()) {
-    case TDATA_FLOAT: {
-      return std::make_shared<Table2d<float>>(
-          def, definition_->endianness(),
-          data_.data() + subDefinition_->getTableLocation(idx));
-    }
-    }
+  } catch (const std::out_of_range &err) {
+    // TODO: log this
+    return nullptr;
   }
 
   assert(false && "unimplemented");

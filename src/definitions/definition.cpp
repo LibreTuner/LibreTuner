@@ -29,10 +29,10 @@ SubDefinition::SubDefinition(Definition *definition)
 uint32_t SubDefinition::getTableLocation(int tableId, bool *ok) {
   assert(tableId >= 0);
   if (locations_.size() <= tableId) {
-    return 0;
     if (ok != nullptr) {
       *ok = false;
     }
+    return 0;
   }
 
   if (ok != nullptr) {
@@ -67,7 +67,7 @@ void SubDefinition::loadTables(QXmlStreamReader &xml) {
       bool foundOffset = false;
       while (xml.readNextStartElement()) {
         if (xml.name() == "offset") {
-          uint32_t offset = xml.readElementText().toLongLong(&ok, 16);
+          uint32_t offset = xml.readElementText().toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid offset: not an integer");
             return;
@@ -115,7 +115,7 @@ void SubDefinition::loadAxes(QXmlStreamReader &xml) {
       bool foundOffset = false;
       while (xml.readNextStartElement()) {
         if (xml.name() == "offset") {
-          uint32_t offset = xml.readElementText().toLongLong(&ok, 16);
+          uint32_t offset = xml.readElementText().toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid offset: not an integer");
             return;
@@ -152,7 +152,7 @@ void SubDefinition::loadIdentifiers(QXmlStreamReader &xml) {
       }
 
       bool ok;
-      uint32_t offset = attributes.value("offset").toInt(&ok, 16);
+      uint32_t offset = attributes.value("offset").toUInt(&ok, 16);
       if (!ok) {
         xml.raiseError("Invalid offset: not a number");
         return;
@@ -170,7 +170,7 @@ void SubDefinition::loadIdentifiers(QXmlStreamReader &xml) {
         }
       }
 
-      identifiers_.push_back(Identifier(offset, data.data(), data.size()));
+      identifiers_.emplace_back(offset, data.data(), data.size());
     } else {
       xml.raiseError("Unexpected element");
       return;
@@ -200,17 +200,17 @@ void SubDefinition::loadChecksums(QXmlStreamReader &xml) {
       }
       QStringRef sMode = attributes.value("mode");
       bool ok;
-      uint32_t offset = attributes.value("offset").toInt(&ok, 16);
+      uint32_t offset = attributes.value("offset").toUInt(&ok, 16);
       if (!ok) {
         xml.raiseError("Invalid offset: not a number");
         return;
       }
-      uint32_t size = attributes.value("size").toInt(&ok, 16);
+      uint32_t size = attributes.value("size").toUInt(&ok, 16);
       if (!ok) {
         xml.raiseError("Invalid size: not a number");
         return;
       }
-      uint32_t target = attributes.value("target").toInt(&ok, 16);
+      uint32_t target = attributes.value("target").toUInt(&ok, 16);
       if (!ok) {
         xml.raiseError("Invalid target: not a number");
         return;
@@ -237,12 +237,12 @@ void SubDefinition::loadChecksums(QXmlStreamReader &xml) {
             return;
           }
 
-          offset = attributes.value("offset").toInt(&ok, 16);
+          offset = attributes.value("offset").toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid offset: not a number");
             return;
           }
-          size = attributes.value("size").toInt(&ok, 16);
+          size = attributes.value("size").toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid size: not a number");
             return;
@@ -260,10 +260,10 @@ void SubDefinition::loadChecksums(QXmlStreamReader &xml) {
 uint32_t SubDefinition::getAxisLocation(int axisId, bool *ok) {
   assert(axisId >= 0);
   if (axisId >= axesOffsets_.size()) {
-    return 0;
     if (ok != nullptr) {
       *ok = false;
     }
+    return 0;
   }
 
   if (ok != nullptr) {
@@ -334,7 +334,7 @@ bool SubDefinition::load(const QString &path) {
 
 int Definition::axisId(const std::string &id) {
   auto it = axes_.find(id);
-  if (it == axes_.end()) {
+  if (it == std::end(axes_)) {
     return -1;
   }
   return it->second->iId();
@@ -408,7 +408,7 @@ bool Definition::loadMain(const QString &path) {
     } else if (xml.name() == "id") {
       id_ = xml.readElementText().trimmed().toStdString();
     } else if (xml.name() == "romsize") {
-      size_ = xml.readElementText().toInt(&ok);
+      size_ = xml.readElementText().toUInt(&ok);
       if (!ok) {
         xml.raiseError("Invalid romsize: not a number");
       }
@@ -444,7 +444,7 @@ bool Definition::loadMain(const QString &path) {
         } else if (xml.name() == "key") {
           key_ = xml.readElementText().toStdString();
         } else if (xml.name() == "serverid") {
-          serverId_ = xml.readElementText().toInt(&ok, 16);
+          serverId_ = xml.readElementText().toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid server id: not a number");
           }
@@ -457,13 +457,13 @@ bool Definition::loadMain(const QString &path) {
     } else if (xml.name() == "flashregion") {
       while (xml.readNextStartElement()) {
         if (xml.name() == "offset") {
-          flashOffset_ = xml.readElementText().toInt(&ok, 16);
+          flashOffset_ = xml.readElementText().toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid flash offset: not a number");
           }
           foundFlashOffset = true;
         } else if (xml.name() == "size") {
-          flashSize_ = xml.readElementText().toInt(&ok, 16);
+          flashSize_ = xml.readElementText().toUInt(&ok, 16);
           if (!ok) {
             xml.raiseError("Invalid flash size: not a number");
           }
@@ -529,7 +529,7 @@ bool Definition::loadSubtype(const QString &path) {
 
 TableAxis *Definition::getAxis(const std::string &id) {
   auto it = axes_.find(id);
-  if (it == axes_.end()) {
+  if (it == std::end(axes_)) {
     return nullptr;
   }
   return it->second.get();

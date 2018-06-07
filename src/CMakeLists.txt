@@ -38,6 +38,8 @@ set(libretuner_SRC
     util/signal.cpp
     util/signal.h
 
+    util.hpp
+
     definitions/definitionmanager.cpp
     definitions/definitionmanager.h
     definitions/definition.cpp

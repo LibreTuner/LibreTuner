@@ -37,10 +37,9 @@ TablePtr TableGroup::get(size_t idx, bool create) {
   return table;
 }
 
-std::pair<bool, std::string> TableGroup::set(size_t idx, const uint8_t *data,
-                                             size_t size) {
+std::pair<bool, std::string> TableGroup::set(size_t idx, gsl::span<const uint8_t> data) {
   assert(idx < tables_.size());
-  assert(size >= 0);
+  assert(data.size() >= 0);
 
   const TableDefinition *definition = base_->definition()->tables()->at(idx);
 
@@ -53,7 +52,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx, const uint8_t *data,
   case TABLE_1D:
     switch (dataType) {
     case TDATA_FLOAT:
-      if (size != (definition->sizeX() * sizeof(float))) {
+      if (data.size() != (definition->sizeX() * sizeof(float))) {
         return std::make_pair(false, "Invalid table size");
       }
       table = std::make_shared<Table1d<float>>(definition, ENDIAN_BIG, data);
@@ -63,7 +62,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx, const uint8_t *data,
   case TABLE_2D:
     switch (dataType) {
     case TDATA_FLOAT:
-      if (size != (definition->sizeX() * definition->sizeY() * sizeof(float))) {
+      if (data.size() != (definition->sizeX() * definition->sizeY() * sizeof(float))) {
         return std::make_pair(false, "Invalid table size");
       }
       table = std::make_shared<Table2d<float>>(definition, ENDIAN_BIG, data);
@@ -84,14 +83,14 @@ std::pair<bool, std::string> TableGroup::set(size_t idx, const uint8_t *data,
   return std::make_pair(true, "");
 }
 
-void TableGroup::apply(uint8_t *data, size_t length) {
+void TableGroup::apply(gsl::span<uint8_t> data) {
   std::vector<uint8_t> res;
-  for (TablePtr table : tables_) {
+  for (const TablePtr &table : tables_) {
     if (table && table->modified()) {
       size_t offset =
           base_->subDefinition()->getTableLocation(table->definition()->id());
-      assert(offset < length);
-      assert(table->serialize(data + offset, length - offset));
+      assert(offset < data.size());
+      assert(table->serialize(data.subspan(offset)));
     }
   }
 }

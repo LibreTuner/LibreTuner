@@ -19,38 +19,134 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-/* Decodes an int32 encoded in big endian */
+#include <gsl/gsl>
+
+namespace util {
+template<typename T, int Size>
+class SConverter {};
+
 template<typename T>
-inline uint32_t toBEInt32(T data) {
-  return ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
+class SConverter<T, 1> {
+public:
+  static T readBE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 1, "type parameter of this class must have a size of 1 byte");
+    uint8_t n = data[0];
+    return *reinterpret_cast<T*>(&n);
+  }
+
+  static void writeBE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 1, "type parameter of this class must have a size of 1 byte");
+    data[0] = *reinterpret_cast<uint8_t*>(&t);
+  }
+
+  static void writeLE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 1, "type parameter of this class must have a size of 1 byte");
+    data[0] = *
+        reinterpret_cast<uint8_t*>(&t);
+  }
+
+  static T readLE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 1, "type parameter of this class must have a size of 1 byte");
+    uint8_t n = data[0];
+    return *reinterpret_cast<T*>(&n);
+  }
+};
+
+template<typename T>
+class SConverter<T, 2> {
+public:
+  static T readBE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 2, "type parameter of this class must have a size of 2 bytes");
+    uint16_t n = (data[0] << 8) | data[1];
+    return *reinterpret_cast<T*>(&n);
+  }
+
+  static void writeBE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 2, "type parameter of this class must have a size of 2 bytes");
+    uint16_t n = *reinterpret_cast<uint16_t*>(&t);
+    data[0] = n >> 8;
+    data[1] = n & 0xFF;
+  }
+
+  static void writeLE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 2, "type parameter of this class must have a size of 2 bytes");
+    uint16_t n = *reinterpret_cast<uint16_t*>(&t);
+    data[1] = n >> 8;
+    data[0] = n & 0xFF;
+  }
+
+  static T readLE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 2, "type parameter of this class must have a size of 2 bytes");
+    uint16_t n = (data[1] << 8) | data[0];
+    return *reinterpret_cast<T*>(&n);
+  }
+};
+
+template<typename T>
+class SConverter<T, 4> {
+public:
+  static T readBE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 4, "type parameter of this class must have a size of 4 bytes");
+    uint32_t n = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    return *reinterpret_cast<T*>(&n);
+  }
+
+  static void writeBE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 4, "type parameter of this class must have a size of 4 bytes");
+    uint32_t n = *reinterpret_cast<uint32_t*>(&t);
+    data[0] = n >> 24;
+    data[1] = (n >> 16) & 0xFF;
+    data[2] = (n >> 8) & 0xFF;
+    data[3] = n & 0xFF;
+  }
+
+  static void writeLE(T t, gsl::span<uint8_t> &data) {
+    static_assert(sizeof(T) == 4, "type parameter of this class must have a size of 4 bytes");
+    uint32_t n = *reinterpret_cast<uint32_t*>(&t);
+    data[3] = n >> 24;
+    data[2] = (n >> 16) & 0xFF;
+    data[1] = (n >> 8) & 0xFF;
+    data[0] = n & 0xFF;
+  }
+
+  static T readLE(gsl::span<const uint8_t> data) {
+    static_assert(sizeof(T) == 4, "type parameter of this class must have a size of 4 bytes");
+    uint32_t n = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+    return *reinterpret_cast<T*>(&n);
+  }
+};
 }
 
 template<typename T>
-inline void writeBEInt32(uint32_t i, T data) {
-  data[0] = (i & 0xFF000000) >> 24;
-  data[1] = (i & 0xFF0000) >> 16;
-  data[2] = (i & 0xFF00) >> 8;
-  data[3] = i & 0xFF;
+static T readBE(gsl::span<const uint8_t> data) {
+  if (data.size() < sizeof(T)) {
+    throw std::length_error("size of data is less than size of type");
+  }
+  return util::SConverter<T, sizeof(T)>::readBE(data);
 }
 
-/* Decodes an int32 encoded in little endian */
 template<typename T>
-inline uint32_t toLEInt32(T data) {
-  return (data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+static T readLE(gsl::span<const uint8_t> data) {
+  if (data.size() < sizeof(T)) {
+    throw std::length_error("size of data is less than size of type");
+  }
+  return util::SConverter<T, sizeof(T)>::readLE(data);
 }
 
-/* Decodes a float encoded in big endian */
 template<typename T>
-inline float toBEFloat(T data) {
-  uint32_t raw = toBEInt32(data);
-  return *(float *)(&raw);
+static void writeBE(T t, gsl::span<uint8_t> data) {
+  if (data.size() < sizeof(T)) {
+    throw std::length_error("size of data is less than size of type");
+  }
+  return util::SConverter<T, sizeof(T)>::writeBE(t, data);
 }
 
-/* Decodes a float encoded in little endian */
 template<typename T>
-inline float toLEFloat(T data) {
-  uint32_t raw = toLEInt32(data);
-  return *(float *)(&raw);
+static void writeLE(T t, gsl::span<uint8_t> data) {
+  if (data.size() < sizeof(T)) {
+    throw std::length_error("size of data is less than size of type");
+  }
+  return util::SConverter<T, sizeof(T)>::writeLE(t, data);
 }
 
 #endif

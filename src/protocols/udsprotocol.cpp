@@ -50,53 +50,97 @@ std::string strError(Error error) {
 
 class IsoTpInterface : public Protocol {
 public:
+  class Request {
+  public:
+    explicit Request(std::shared_ptr<isotp::Protocol> isotp);
+    void request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb);
+
+    bool active() const {
+      return active_;
+    }
+  private:
+    uint8_t expectedId_{};
+    Callback cb_;
+    bool active_ = false;
+    std::shared_ptr<isotp::Protocol> isotp_;
+
+    void do_recv();
+  };
+
   explicit IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp);
 
   void request(gsl::span<uint8_t>, uint8_t expectedId, Callback &&cb) override;
 
 private:
-  std::shared_ptr<isotp::Protocol> isotp_;
+  Request request_;
 };
 
-void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) {
-  isotp_->request(isotp::Packet(data), [this, cb, expectedId](isotp::Error error, isotp::Packet &&packet) {
+IsoTpInterface::Request::Request(std::shared_ptr<isotp::Protocol> isotp) : isotp_(std::move(isotp)) {
+
+}
+
+void IsoTpInterface::Request::request(gsl::span<uint8_t> data, uint8_t expectedId, Protocol::Callback &&cb) {
+  expectedId_ = expectedId;
+  cb_ = std::move(cb);
+  do_recv();
+  isotp_->send(isotp::Packet(data));
+}
+
+void IsoTpInterface::Request::do_recv() {
+  isotp_->recvPacketAsync([this](isotp::Error error, isotp::Packet &&packet) {
     if (error != isotp::Error::Success) {
       switch (error) {
         case isotp::Error::Timeout:
-          cb(Error::Timeout, Packet{});
+          cb_(Error::Timeout, Packet{});
           break;
         case isotp::Error::Consec:
-          cb(Error::Consec, Packet{});
+          cb_(Error::Consec, Packet{});
           break;
         default:
-          cb(Error::IsoTp, Packet{});
+          cb_(Error::IsoTp, Packet{});
           break;
       }
       return;
     }
 
     Packet res;
-    packet.moveAll(res.data);
+    res.id = packet.next();
+    res.data = packet.next(packet.remaining());
     if (res.data.empty()) {
-      cb(Error::BlankResponse, Packet{});
+      cb_(Error::BlankResponse, res);
       return;
     }
-    res.id = res.data[0];
+
     if (res.id == UDS_RES_NEGATIVE) {
-      cb(Error::Negative, Packet{});
+      if (res.data.size() >= 2) {
+        uint8_t code = res.data[1];
+        if (code == UDS_NRES_RCRRP) {
+          // Response pending
+          do_recv();
+          return;
+        }
+      }
+      cb_(Error::Negative, res);
       return;
     }
-    if (res.id != expectedId) {
-      cb(Error::UnexpectedResponse, Packet{});
+
+    if (res.id != expectedId_) {
+      cb_(Error::UnexpectedResponse, Packet{});
       return;
     }
-    res.data.erase(std::begin(res.data));
-    cb(Error::Success, res);
+    cb_(Error::Success, res);
   });
 }
 
+void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) {
+  if (request_.active()) {
+    throw std::runtime_error("a UDS request is already in progress");
+  }
+  request_.request(data, expectedId, std::move(cb));
+}
+
 IsoTpInterface::IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp)
-    : isotp_(std::move(isotp)) {
+    : request_(std::move(isotp)) {
 
 }
 
