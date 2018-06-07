@@ -1,0 +1,21 @@
+branches:
+  only:
+  - master
+  - /release-.*/
+language: cpp
+os:
+  - linux
+  - osx
+compiler:
+  - gcc
+  - clang
+dist: trusty
+sudo: false
+addons:
+  apt:
+    packages:
+      - automake
+      - autoconf
+      - libtool
+      - pkg-config
+script: ./super-test.sh -j2 quick  # limit parallelism due to limited memory on Travis
