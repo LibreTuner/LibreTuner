@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <gsl/span>
 
 class Checksum;
 typedef std::shared_ptr<Checksum> ChecksumPtr;
@@ -37,12 +38,11 @@ public:
 
   /* Corrects the checksum for the data using modifiable sections.
    * Returns (false, errmsg) on failure and (true, "") on success. */
-  virtual std::pair<bool, std::string> correct(uint8_t *data,
-                                               size_t length) const = 0;
+  virtual std::pair<bool, std::string> correct(gsl::span<uint8_t> data) const = 0;
 
   /* Returns the computed checksum. If length is too small,
    * returns 0 and sets ok to false.*/
-  virtual uint32_t compute(uint8_t *data, size_t length,
+  virtual uint32_t compute(gsl::span<const uint8_t> data,
                            bool *ok = nullptr) const = 0;
 
 protected:
@@ -59,11 +59,10 @@ public:
   ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
       : Checksum(offset, size, target) {}
 
-  uint32_t compute(uint8_t *data, std::size_t length,
+  uint32_t compute(gsl::span<const uint8_t> data,
                    bool *ok = nullptr) const override;
 
-  std::pair<bool, std::string> correct(uint8_t *data,
-                                       std::size_t length) const override;
+  std::pair<bool, std::string> correct(gsl::span<uint8_t> data) const override;
 };
 
 /**
@@ -76,7 +75,7 @@ public:
 
   /* Corrects the checksums for the data using modifiable sections.
    * Returns (false, errmsg) on failure and (true, "") on success. */
-  std::pair<bool, std::string> correct(uint8_t *data, size_t length);
+  std::pair<bool, std::string> correct(gsl::span<uint8_t> data);
 
 private:
   std::vector<ChecksumPtr> checksums_;

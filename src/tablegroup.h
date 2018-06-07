@@ -23,6 +23,7 @@
 #include "rom.h"
 
 #include <vector>
+#include <gsl/span>
 
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
@@ -44,11 +45,10 @@ public:
 
   /* Creates a new table from data. Returns (false, error) on error and (true,
    * "") on success. */
-  std::pair<bool, std::string> set(size_t idx, const uint8_t *data,
-                                   size_t size);
+  std::pair<bool, std::string> set(size_t idx, gsl::span<const uint8_t> data);
 
-  /* Applies table modifications to data */
-  void apply(uint8_t *data, size_t length);
+  /* Applies table modifications to rom data */
+  void apply(gsl::span<uint8_t> data);
 
 private:
   RomDataPtr base_;

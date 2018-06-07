@@ -20,24 +20,24 @@
 #include "util.hpp"
 
 void Checksum::addModifiable(uint32_t offset, uint32_t size) {
-  modifiable_.push_back(std::make_pair(offset, size));
+  modifiable_.emplace_back(offset, size);
 }
 
-uint32_t ChecksumBasic::compute(uint8_t *data, std::size_t length,
+uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data,
                                 bool *ok) const {
-  if (length < offset_ + size_) {
+  if (data.size() < offset_ + size_) {
     if (ok != nullptr) {
       *ok = false;
     }
     return 0;
   }
 
-  data += offset_;
+  data = data.subspan(offset_);
 
   uint32_t sum = 0;
   // Add up the big endian int32s
-  for (int i = 0; i < size_ / 4; ++i, data += 4) {
-    sum += toBEInt32(data);
+  for (int i = 0; i < size_ / 4; ++i, data = data.subspan(4)) {
+    sum += readBE<int32_t>(data);
   }
 
   if (ok != nullptr) {
@@ -46,9 +46,8 @@ uint32_t ChecksumBasic::compute(uint8_t *data, std::size_t length,
   return sum;
 }
 
-std::pair<bool, std::string> ChecksumBasic::correct(uint8_t *data,
-                                                    std::size_t length) const {
-  if (length < offset_ + size_) {
+std::pair<bool, std::string> ChecksumBasic::correct(gsl::span<uint8_t> data) const {
+  if (data.size() < offset_ + size_) {
     return std::make_pair<bool, std::string>(
         false, "Checksum region exceeds the rom size.");
   }
@@ -57,9 +56,9 @@ std::pair<bool, std::string> ChecksumBasic::correct(uint8_t *data,
   uint32_t modifiableOffset;
 
   // Find a usable modifiable region
-  for (auto it = modifiable_.begin(); it != modifiable_.end(); ++it) {
-    if (it->second >= 4) {
-      modifiableOffset = it->first;
+  for (const auto &it : modifiable_) {
+    if (it.second >= 4) {
+      modifiableOffset = it.first;
       foundMod = true;
       break;
     }
@@ -71,16 +70,16 @@ std::pair<bool, std::string> ChecksumBasic::correct(uint8_t *data,
   }
 
   // Zero the region
-  writeBEInt32(0, data + offset_ + modifiableOffset);
+  writeBE<int32_t>(0, data.subspan(offset_ + modifiableOffset));
 
   // compute should never fail after the check above
-  uint32_t oSum = compute(data, length);
+  uint32_t oSum = compute(data);
 
   uint32_t val = target_ - oSum;
-  writeBEInt32(val, data + offset_ + modifiableOffset);
+  writeBE<int32_t>(val, data.subspan(offset_ + modifiableOffset));
 
   // Check if the correction was successful
-  if (compute(data, length) != target_) {
+  if (compute(data) != target_) {
     return std::make_pair<bool, std::string>(
         false, "Checksum does not equal target after correction");
   }
@@ -88,10 +87,9 @@ std::pair<bool, std::string> ChecksumBasic::correct(uint8_t *data,
   return std::make_pair<bool, std::string>(true, std::string());
 }
 
-std::pair<bool, std::string> ChecksumManager::correct(uint8_t *data,
-                                                      size_t length) {
+std::pair<bool, std::string> ChecksumManager::correct(gsl::span<uint8_t> data) {
   for (const ChecksumPtr &checksum : checksums_) {
-    auto res = checksum->correct(data, length);
+    auto res = checksum->correct(data);
     if (!res.first) {
       return res;
     }

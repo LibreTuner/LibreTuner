@@ -44,6 +44,10 @@
 #define UDS_RES_REQUESTDOWNLOAD 0x74
 #define UDS_RES_TRANSFERDATA 0x76
 
+/* Negative response codes */
+// requestCorrectlyReceivedResponsePending
+#define UDS_NRES_RCRRP 0x78
+
 namespace uds {
 
 enum class Error {

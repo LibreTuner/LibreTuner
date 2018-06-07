@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <string>
+#include <gsl/span>
 
 #include <QXmlStreamReader>
 
@@ -60,11 +61,11 @@ typedef std::shared_ptr<Tune> TunePtr;
 
 class TuneData {
 public:
-  TuneData(const TunePtr &tune);
+  explicit TuneData(const TunePtr &tune);
 
   /* Applies table modifications to data and computes checksums.
    * Returns false on error and sets lastError. */
-  bool apply(uint8_t *data, size_t length);
+  bool apply(gsl::span<uint8_t> data);
 
   bool valid() const { return valid_; }
 

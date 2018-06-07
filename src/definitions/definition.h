@@ -158,7 +158,7 @@ public:
 
   std::string key() const { return key_; }
 
-  int serverId() const { return serverId_; }
+  unsigned serverId() const { return serverId_; }
 
   size_t flashOffset() const { return flashOffset_; }
 
@@ -183,7 +183,7 @@ private:
   /* Security key */
   std::string key_;
   /* Server ID for ISO-TP reqeusts */
-  int serverId_;
+  unsigned serverId_;
 
   /* Flash region */
   size_t flashOffset_, flashSize_;

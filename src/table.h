@@ -24,9 +24,11 @@
 
 #include "definitions/tabledefinitions.h"
 #include "endian.h"
+#include "util.hpp"
 
 #include <cassert>
 #include <memory>
+#include <gsl/span>
 
 #include <QAbstractTableModel>
 #include <QApplication>
@@ -54,7 +56,7 @@ public:
 
   void setModified(bool modified) { modified_ = modified; }
 
-  virtual ~Table(){};
+  ~Table() override = default;
 
   /* Used to set the editable flag */
   virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -62,7 +64,7 @@ public:
                       int role = Qt::DisplayRole) const override;
 
   /* Serializes raw data. Returns false if the buffer is too small. */
-  virtual bool serialize(uint8_t *data, size_t length,
+  virtual bool serialize(gsl::span<uint8_t> data,
                          Endianness endian = ENDIAN_BIG) = 0;
 
   /* Returns the minimum buffer size for serialization */
@@ -71,15 +73,17 @@ public:
   /* Sets modified data depending on the difference with another table */
   virtual void calcDifference(const TablePtr &table) = 0;
 
+  static std::shared_ptr<Table> create(TableType tableType, DataType dataType, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data);
+
 protected:
-  Table(const TableDefinition *definition);
+  explicit Table(const TableDefinition *definition);
 
   template <typename T>
   static void readRow(std::vector<T> &data, Endianness endian,
-                      const uint8_t *raw, size_t length);
+                      gsl::span<const uint8_t> raw);
 
   template <typename T>
-  static void writeRow(std::vector<T> &data, Endianness endian, uint8_t *odata);
+  static void writeRow(std::vector<T> &data, Endianness endian, gsl::span<uint8_t> odata);
 
   template <typename T> static QString toString(T t);
 
@@ -97,13 +101,13 @@ signals:
 template <typename T> class Table1d : public Table {
 public:
   /* Constructs a new table using an array of T */
-  Table1d(const TableDefinition *definition, const T *data, size_t length)
-      : data_(data, data + length), modifiedv_(definition->sizeX()) {}
+  /*Table1d(const TableDefinition *definition, const T *data, size_t length)
+      : data_(data, data + length), modifiedv_(definition->sizeX()) {}*/
 
   /* Constructs a new table using raw data.
    * data should be at least (sizeof(T) * length) bytes large */
   Table1d(const TableDefinition *definition, Endianness endian,
-          const uint8_t *data);
+          gsl::span<const uint8_t> data);
 
   T at(int idx) const { return data_[idx]; }
 
@@ -123,7 +127,7 @@ public:
 
   void calcDifference(const TablePtr &table) override;
 
-  bool serialize(uint8_t *data, size_t length,
+  bool serialize(gsl::span<uint8_t> data,
                  Endianness endian = ENDIAN_BIG) override;
 
   size_t rawSize() override;
@@ -153,7 +157,7 @@ public:
   /* Constructs a new table using raw data.
    * data should be at least (sizeof(T) * sizeX * sizeY) bytes large */
   Table2d(const TableDefinition *definition, Endianness endian,
-          const uint8_t *data);
+          gsl::span<const uint8_t> data);
 
   T at(int x, int y) const { return data_[y][x]; }
 
@@ -171,7 +175,7 @@ public:
 
   void calcDifference(const TablePtr &table) override;
 
-  bool serialize(uint8_t *data, size_t length,
+  bool serialize(gsl::span<uint8_t> data,
                  Endianness endian = ENDIAN_BIG) override;
 
   size_t rawSize() override;
@@ -191,14 +195,18 @@ private:
 
 template <typename T>
 Table2d<T>::Table2d(const TableDefinition *definition, Endianness endian,
-                    const uint8_t *data)
+                    gsl::span<const uint8_t> data)
     : Table(definition) {
   data_.resize(definition->sizeY());
   modifiedv_.resize(definition->sizeY(),
                     std::vector<bool>(definition->sizeX(), false));
+  if (data.size() < sizeof(T) * definition->sizeX() * definition->sizeY()) {
+    throw std::out_of_range("data is too small to deserialize the table from");
+  }
+  const uint8_t *ptr = data.data();
   for (int i = 0; i < definition->sizeY(); ++i) {
-    readRow(data_[i], endian, data, definition->sizeX());
-    data += sizeof(T) * definition->sizeX();
+    readRow(data_[i], endian, gsl::make_span(ptr, definition->sizeX() * sizeof(T)));
+    ptr += sizeof(T) * definition->sizeX();
   }
 }
 
@@ -219,13 +227,13 @@ template <typename T> void Table2d<T>::calcDifference(const TablePtr &table) {
 }
 
 template <typename T>
-bool Table2d<T>::serialize(uint8_t *data, size_t length, Endianness endian) {
-  if (length < definition_->sizeX() * definition_->sizeY() * sizeof(T)) {
+bool Table2d<T>::serialize(gsl::span<uint8_t> data, Endianness endian) {
+  if (data.size() < definition_->sizeX() * definition_->sizeY() * sizeof(T)) {
     return false;
   }
   for (std::vector<T> &row : data_) {
     writeRow(row, endian, data);
-    data += definition_->sizeX() * sizeof(T);
+    data = data.subspan(definition_->sizeX() * sizeof(T));
   }
 
   return true;
@@ -302,9 +310,12 @@ bool Table2d<T>::setData(const QModelIndex &index, const QVariant &value,
 
 template <typename T>
 Table1d<T>::Table1d(const TableDefinition *definition, Endianness endian,
-                    const uint8_t *data)
+                    gsl::span<const uint8_t> data)
     : Table(definition), modifiedv_(definition->sizeX()) {
-  readRow(data_, endian, data, definition->sizeX());
+  if (data.size() < sizeof(T) * definition->sizeX()) {
+    throw std::out_of_range("the size of data is too small to read the 1d table from");
+  }
+  readRow(data_, endian, data.subspan(0, definition->sizeX() * sizeof(T)));
 }
 
 template <typename T> void Table1d<T>::calcDifference(const TablePtr &table) {
@@ -322,8 +333,8 @@ template <typename T> void Table1d<T>::calcDifference(const TablePtr &table) {
 }
 
 template <typename T>
-bool Table1d<T>::serialize(uint8_t *data, size_t length, Endianness endian) {
-  if (length < data_.size() * sizeof(T)) {
+bool Table1d<T>::serialize(gsl::span<uint8_t> data, Endianness endian) {
+  if (data.size() < data_.size() * sizeof(T)) {
     return false;
   }
   writeRow(data_, endian, data);
@@ -401,6 +412,59 @@ bool Table1d<T>::setData(const QModelIndex &index, const QVariant &value,
   set(index.column(), res);
   emit dataChanged(index, index);
   return true;
+}
+
+
+/* Table */
+template <typename T>
+void Table::readRow(std::vector<T> &data, Endianness endian,
+                    gsl::span<const uint8_t> raw) {
+  const uint8_t *ptr = raw.data();
+  const uint8_t *end = raw.data() + raw.size();
+  if (endian == ENDIAN_BIG) {
+    for (; ptr < end; ptr += sizeof(T)) {
+      data.push_back(readBE<T>(gsl::make_span(ptr, end)));
+    }
+    return;
+  }
+
+  // Little endian
+  for (; ptr < end; ptr += sizeof(T)) {
+    data.push_back(readLE<T>(gsl::make_span(ptr, end)));
+  }
+}
+
+template <typename T>
+void Table::writeRow(std::vector<T> &data, Endianness endian,
+                     gsl::span<uint8_t> odata) {
+  if (endian == ENDIAN_BIG) {
+    for (T f : data) {
+      writeBE<T>(f, odata);
+      odata = odata.subspan(sizeof(T));
+    }
+    return;
+  }
+
+  // Little endian
+  for (float f : data) {
+    writeLE<T>(f, odata);
+    odata = odata.subspan(sizeof(T));
+  }
+}
+
+template <typename T>
+QString Table::toString(T t) {
+  return QString::number(t);
+}
+
+template <typename T>
+T Table::fromVariant(const QVariant &v, bool &success) {
+  if (v.canConvert<T>()) {
+    success = true;
+    return v.value<T>();
+  }
+  success = false;
+  return T();
 }
 
 #endif // TABLE_H

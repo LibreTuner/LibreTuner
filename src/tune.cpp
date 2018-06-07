@@ -107,8 +107,7 @@ void TuneData::readTables(QXmlStreamReader &xml) {
 
     QByteArray data = QByteArray::fromBase64(xml.readElementText().toLatin1());
 
-    auto res = tables_->set(id, reinterpret_cast<const uint8_t *>(data.data()),
-                            data.size());
+    auto res = tables_->set(id, gsl::make_span(reinterpret_cast<const uint8_t*>(data.data()), data.size()));
     if (!res.first) {
       xml.raiseError(
           QString::fromStdString("Error reading table data: " + res.second));
@@ -140,7 +139,7 @@ bool TuneData::save() {
       xml.writeAttribute("id", QString::number(i));
       std::vector<uint8_t> data;
       data.resize(table->rawSize());
-      assert(table->serialize(data.data(), data.size()));
+      assert(table->serialize(data));
       xml.writeCharacters(QString(
           QByteArray(reinterpret_cast<const char *>(data.data()), data.size())
               .toBase64()));
@@ -158,12 +157,12 @@ bool TuneData::save() {
   return true;
 }
 
-bool TuneData::apply(uint8_t *data, size_t length) {
-  tables_->apply(data, length);
+bool TuneData::apply(gsl::span<uint8_t> data) {
+  tables_->apply(data);
 
   // Checksums
   std::pair<bool, std::string> res =
-      rom_->subDefinition()->checksums()->correct(data, length);
+      rom_->subDefinition()->checksums()->correct(data);
   if (!res.first) {
     lastError_ = std::string("Failed to correct checksum: ") + res.second;
     return false;
