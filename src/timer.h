@@ -21,9 +21,9 @@
 
 #include <chrono>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <thread>
-#include <functional>
 
 /**
  * @todo write docs
@@ -42,7 +42,7 @@ public:
   void start();
   /* Stops the timeout timer */
   void stop();
-  
+
   ~Timer();
 
 private:

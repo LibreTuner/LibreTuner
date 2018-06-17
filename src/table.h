@@ -27,8 +27,8 @@
 #include "util.hpp"
 
 #include <cassert>
-#include <memory>
 #include <gsl/span>
+#include <memory>
 
 #include <QAbstractTableModel>
 #include <QApplication>
@@ -59,7 +59,7 @@ public:
   ~Table() override = default;
 
   /* Used to set the editable flag */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
   QVariant headerData(int section, Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const override;
 
@@ -73,7 +73,10 @@ public:
   /* Sets modified data depending on the difference with another table */
   virtual void calcDifference(const TablePtr &table) = 0;
 
-  static std::shared_ptr<Table> create(TableType tableType, DataType dataType, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data);
+  static std::shared_ptr<Table> create(TableType tableType, DataType dataType,
+                                       const TableDefinition *def,
+                                       Endianness endian,
+                                       gsl::span<uint8_t> data);
 
 protected:
   explicit Table(const TableDefinition *definition);
@@ -83,7 +86,8 @@ protected:
                       gsl::span<const uint8_t> raw);
 
   template <typename T>
-  static void writeRow(std::vector<T> &data, Endianness endian, gsl::span<uint8_t> odata);
+  static void writeRow(std::vector<T> &data, Endianness endian,
+                       gsl::span<uint8_t> odata);
 
   template <typename T> static QString toString(T t);
 
@@ -205,7 +209,8 @@ Table2d<T>::Table2d(const TableDefinition *definition, Endianness endian,
   }
   const uint8_t *ptr = data.data();
   for (int i = 0; i < definition->sizeY(); ++i) {
-    readRow(data_[i], endian, gsl::make_span(ptr, definition->sizeX() * sizeof(T)));
+    readRow(data_[i], endian,
+            gsl::make_span(ptr, definition->sizeX() * sizeof(T)));
     ptr += sizeof(T) * definition->sizeX();
   }
 }
@@ -313,7 +318,8 @@ Table1d<T>::Table1d(const TableDefinition *definition, Endianness endian,
                     gsl::span<const uint8_t> data)
     : Table(definition), modifiedv_(definition->sizeX()) {
   if (data.size() < sizeof(T) * definition->sizeX()) {
-    throw std::out_of_range("the size of data is too small to read the 1d table from");
+    throw std::out_of_range(
+        "the size of data is too small to read the 1d table from");
   }
   readRow(data_, endian, data.subspan(0, definition->sizeX() * sizeof(T)));
 }
@@ -414,7 +420,6 @@ bool Table1d<T>::setData(const QModelIndex &index, const QVariant &value,
   return true;
 }
 
-
 /* Table */
 template <typename T>
 void Table::readRow(std::vector<T> &data, Endianness endian,
@@ -452,13 +457,11 @@ void Table::writeRow(std::vector<T> &data, Endianness endian,
   }
 }
 
-template <typename T>
-QString Table::toString(T t) {
+template <typename T> QString Table::toString(T t) {
   return QString::number(t);
 }
 
-template <typename T>
-T Table::fromVariant(const QVariant &v, bool &success) {
+template <typename T> T Table::fromVariant(const QVariant &v, bool &success) {
   if (v.canConvert<T>()) {
     success = true;
     return v.value<T>();

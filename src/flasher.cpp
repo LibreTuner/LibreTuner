@@ -35,7 +35,8 @@ Flasher::Flasher(Flasher::Callbacks *callbacks) : callbacks_(callbacks) {
 
 class MazdaT1Flasher : public Flasher {
 public:
-  MazdaT1Flasher(Flasher::Callbacks *callbacks, const std::string &key, std::shared_ptr<isotp::Protocol> isotp);
+  MazdaT1Flasher(Flasher::Callbacks *callbacks, const std::string &key,
+                 std::shared_ptr<isotp::Protocol> isotp);
 
   void flash(FlashablePtr flashable) override;
 
@@ -57,10 +58,12 @@ private:
 };
 
 MazdaT1Flasher::MazdaT1Flasher(Flasher::Callbacks *callbacks,
-                               const std::string &key, std::shared_ptr<isotp::Protocol> isotp)
-: Flasher(callbacks), key_(key), uds_(uds::Protocol::create(std::move(isotp))), auth_(std::bind(&MazdaT1Flasher::onAuthenticated, this, std::placeholders::_1, std::placeholders::_2)) {
-
-}
+                               const std::string &key,
+                               std::shared_ptr<isotp::Protocol> isotp)
+    : Flasher(callbacks), key_(key),
+      uds_(uds::Protocol::create(std::move(isotp))),
+      auth_(std::bind(&MazdaT1Flasher::onAuthenticated, this,
+                      std::placeholders::_1, std::placeholders::_2)) {}
 
 void MazdaT1Flasher::flash(FlashablePtr flashable) {
   flash_ = flashable;
@@ -81,14 +84,15 @@ void MazdaT1Flasher::onAuthenticated(bool success, const std::string &error) {
 
 void MazdaT1Flasher::do_erase() {
   std::array<uint8_t, 4> eraseRequest = {0xB1, 0x00, 0xB2, 0x00};
-  uds_->request(eraseRequest, 0xF1, [this](uds::Error error, const uds::Packet &packet) {
-    if (error != uds::Error::Success) {
-      onFail(uds::strError(error));
-      return;
-    }
+  uds_->request(eraseRequest, 0xF1,
+                [this](uds::Error error, const uds::Packet &packet) {
+                  if (error != uds::Error::Success) {
+                    onFail(uds::strError(error));
+                    return;
+                  }
 
-    do_request_download();
-  });
+                  do_request_download();
+                });
 }
 
 void MazdaT1Flasher::do_request_download() {
@@ -98,12 +102,13 @@ void MazdaT1Flasher::do_request_download() {
   writeBE<int32_t>(flash_->offset(), gsl::make_span(msg).subspan(1));
   writeBE<int32_t>(flash_->size(), gsl::make_span(msg).subspan(5));
   // Send download request
-  uds_->request(msg, UDS_RES_REQUESTDOWNLOAD, [this](uds::Error error, const uds::Packet &packet) {
-    // Start uploading
-    sent_ = 0;
-    left_ = flash_->size();
-    sendLoad();
-  });
+  uds_->request(msg, UDS_RES_REQUESTDOWNLOAD,
+                [this](uds::Error error, const uds::Packet &packet) {
+                  // Start uploading
+                  sent_ = 0;
+                  left_ = flash_->size();
+                  sendLoad();
+                });
 }
 
 void MazdaT1Flasher::sendLoad() {
@@ -117,21 +122,24 @@ void MazdaT1Flasher::sendLoad() {
   sent_ += toSend;
   left_ -= toSend;
 
-  uds_->request(data, UDS_RES_TRANSFERDATA, [this](uds::Error error, const uds::Packet &packet) {
-    if (error != uds::Error::Success) {
-      onFail(uds::strError(error));
-    }
+  uds_->request(data, UDS_RES_TRANSFERDATA,
+                [this](uds::Error error, const uds::Packet &packet) {
+                  if (error != uds::Error::Success) {
+                    onFail(uds::strError(error));
+                  }
 
-    callbacks_->onProgress(static_cast<double>(sent_) / flash_->size());
-    if (left_ == 0) {
-      callbacks_->onCompletion();
-    } else {
-      sendLoad();
-    }
-  });
+                  callbacks_->onProgress(static_cast<double>(sent_) /
+                                         flash_->size());
+                  if (left_ == 0) {
+                    callbacks_->onCompletion();
+                  } else {
+                    sendLoad();
+                  }
+                });
 }
 
-FlasherPtr Flasher::createT1(Flasher::Callbacks* callbacks, const std::string& key, std::shared_ptr<isotp::Protocol> isotp) {
+FlasherPtr Flasher::createT1(Flasher::Callbacks *callbacks,
+                             const std::string &key,
+                             std::shared_ptr<isotp::Protocol> isotp) {
   return std::make_shared<MazdaT1Flasher>(callbacks, key, isotp);
 }
-

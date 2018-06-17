@@ -75,26 +75,28 @@ TablePtr RomData::getTable(int idx) {
     return nullptr;
   }
 
-  return Table::create(def->type(), def->dataType(), def, definition_->endianness(), gsl::make_span(data_).subspan(location));
+  return Table::create(def->type(), def->dataType(), def,
+                       definition_->endianness(),
+                       gsl::make_span(data_).subspan(location));
 
   try {
     switch (def->type()) {
-      case TABLE_1D:
-        switch (def->dataType()) {
-          case TDATA_FLOAT: {
-            return std::make_shared<Table1d<float>>(
-                def, definition_->endianness(),
-                gsl::make_span(data_).subspan(location));
-          }
-        }
-      case TABLE_2D:
-        switch (def->dataType()) {
-          case TDATA_FLOAT: {
-            return std::make_shared<Table2d<float>>(
-                def, definition_->endianness(),
-                gsl::make_span(data_).subspan(location));
-          }
-        }
+    case TABLE_1D:
+      switch (def->dataType()) {
+      case TDATA_FLOAT: {
+        return std::make_shared<Table1d<float>>(
+            def, definition_->endianness(),
+            gsl::make_span(data_).subspan(location));
+      }
+      }
+    case TABLE_2D:
+      switch (def->dataType()) {
+      case TDATA_FLOAT: {
+        return std::make_shared<Table2d<float>>(
+            def, definition_->endianness(),
+            gsl::make_span(data_).subspan(location));
+      }
+      }
     }
   } catch (const std::out_of_range &err) {
     // TODO: log this

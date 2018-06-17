@@ -21,6 +21,8 @@
 
 #include "canviewer.h"
 #include "downloadwindow.h"
+#include "interfaceswindow.h"
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -32,17 +34,20 @@ class MainWindow : public QMainWindow {
 
 public:
   explicit MainWindow(QWidget *parent = 0);
-  ~MainWindow();
+  ~MainWindow() override;
 
 private slots:
   void on_actionCAN_Log_triggered();
   void on_buttonDownloadRom_clicked();
   void closeEvent(QCloseEvent *event) override;
 
+  void on_actionInterfaces_triggered();
+
 private:
   Ui::MainWindow *ui;
   CanViewer canViewer_;
   DownloadWindow *downloadWindow_;
+  InterfacesWindow interfacesWindow_;
 
 public slots:
   void updateRoms();

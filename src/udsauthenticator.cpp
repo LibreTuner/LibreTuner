@@ -23,8 +23,7 @@
 
 namespace uds {
 Authenticator::Authenticator(Callback &&callback)
-    : callback_(std::move(callback)) {
-}
+    : callback_(std::move(callback)) {}
 
 bool Authenticator::checkError(Error error) {
   if (error != Error::Success) {
@@ -34,7 +33,9 @@ bool Authenticator::checkError(Error error) {
   return true;
 }
 
-void Authenticator::auth(const std::string &key, std::shared_ptr<uds::Protocol> uds, uint8_t sessionType) {
+void Authenticator::auth(const std::string &key,
+                         std::shared_ptr<uds::Protocol> uds,
+                         uint8_t sessionType) {
   key_ = key;
   uds_ = std::move(uds);
 
@@ -42,27 +43,28 @@ void Authenticator::auth(const std::string &key, std::shared_ptr<uds::Protocol> 
 }
 
 void Authenticator::do_session(uint8_t sessionType) {
-  uds_->requestSession(sessionType, [this](Error error, uint8_t type, gsl::span<const uint8_t>) {
-    if (!checkError(error)) {
-      return;
-    }
+  uds_->requestSession(
+      sessionType, [this](Error error, uint8_t type, gsl::span<const uint8_t>) {
+        if (!checkError(error)) {
+          return;
+        }
 
-    do_request_seed();
-  });
+        do_request_seed();
+      });
 }
 
 void Authenticator::do_request_seed() {
-  uds_->requestSecuritySeed([this](Error error, uint8_t type, gsl::span<const uint8_t> seed) {
-    if (!checkError(error)) {
-      return;
-    }
+  uds_->requestSecuritySeed(
+      [this](Error error, uint8_t type, gsl::span<const uint8_t> seed) {
+        if (!checkError(error)) {
+          return;
+        }
 
-    // Generate key from seed
-    uint32_t key = generateKey(
-        0xC541A9, seed);
+        // Generate key from seed
+        uint32_t key = generateKey(0xC541A9, seed);
 
-    do_send_key(key);
-  });
+        do_send_key(key);
+      });
 }
 
 void Authenticator::do_send_key(uint32_t key) {
@@ -84,12 +86,13 @@ void Authenticator::onFail(const std::string &error) {
   callback_(false, error);
 }
 
-uint32_t Authenticator::generateKey(uint32_t parameter, gsl::span<const uint8_t> seed) {
+uint32_t Authenticator::generateKey(uint32_t parameter,
+                                    gsl::span<const uint8_t> seed) {
   std::vector<uint8_t> nseed(seed.begin(), seed.end());
   nseed.insert(nseed.end(), key_.begin(), key_.end());
 
-  // This is Mazda's key generation algorithm reverse engineered from a Mazdaspeed6 ROM.
-  // Internally, the ECU uses a timer/counter for the seed
+  // This is Mazda's key generation algorithm reverse engineered from a
+  // Mazdaspeed6 ROM. Internally, the ECU uses a timer/counter for the seed
 
   for (uint8_t c : nseed) {
     for (int r = 8; r > 0; --r) {
@@ -118,4 +121,4 @@ uint32_t Authenticator::generateKey(uint32_t parameter, gsl::span<const uint8_t>
 
   return res;
 }
-}
+} // namespace uds

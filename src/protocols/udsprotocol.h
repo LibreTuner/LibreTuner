@@ -19,11 +19,11 @@
 #ifndef UDSPROTOCOL_H
 #define UDSPROTOCOL_H
 
+#include <functional>
+#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
-#include <gsl/span>
 
 #include "isotpprotocol.h"
 
@@ -71,31 +71,38 @@ struct Packet {
 
 class Protocol {
 public:
-  using Callback = std::function<void(Error, const Packet&)>;
+  using Callback = std::function<void(Error, const Packet &)>;
 
   /* Create an interface with an ISO-TP layer */
-  static std::shared_ptr<Protocol> create(std::shared_ptr<isotp::Protocol> isotp);
+  static std::shared_ptr<Protocol>
+  create(std::shared_ptr<isotp::Protocol> isotp);
 
   /* Sends a request. May throw an exception. */
-  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) = 0;
+  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId,
+                       Callback &&cb) = 0;
 
   /* All requests may throw an exception */
   /* Sends a DiagnosticSessionControl request */
-  using RequestSessionCallback = std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
+  using RequestSessionCallback =
+      std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
   void requestSession(uint8_t type, RequestSessionCallback &&cb);
 
-  using RequestSecuritySeedCallback = std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
+  using RequestSecuritySeedCallback =
+      std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
   void requestSecuritySeed(RequestSecuritySeedCallback &&cb);
 
   using RequestSecurityKeyCallback = std::function<void(Error, uint8_t)>;
-  void requestSecurityKey(gsl::span<uint8_t> key, RequestSecurityKeyCallback &&cb);
+  void requestSecurityKey(gsl::span<uint8_t> key,
+                          RequestSecurityKeyCallback &&cb);
 
   /* ReadMemoryByAddress */
-  using RequestMemoryAddressCallback = std::function<void(Error, gsl::span<const uint8_t>)>;
-  void requestReadMemoryAddress(uint32_t address, uint16_t length, RequestMemoryAddressCallback &&cb);
+  using RequestMemoryAddressCallback =
+      std::function<void(Error, gsl::span<const uint8_t>)>;
+  void requestReadMemoryAddress(uint32_t address, uint16_t length,
+                                RequestMemoryAddressCallback &&cb);
 
   virtual ~Protocol() = default;
 };
 
-}
+} // namespace uds
 #endif // UDSPROTOCOL_H

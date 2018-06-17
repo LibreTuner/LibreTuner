@@ -20,9 +20,9 @@
 #define SOCKETHANDLER_H
 
 #include <condition_variable>
+#include <mutex>
 #include <thread>
 #include <vector>
-#include <mutex>
 
 class Socket {
 public:
@@ -56,7 +56,7 @@ private:
   /* Condition variable and mutex used for addSocket() blocking */
   std::condition_variable cv_;
   std::mutex cv_m_;
-  
+
   std::mutex mutex_;
   /* Set to true after select() returns in run() */
   bool runLooped_;

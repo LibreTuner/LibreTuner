@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>773</width>
-    <height>473</height>
+    <width>1122</width>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>LibreTuner</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabOverview">
        <attribute name="title">
@@ -46,20 +46,20 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>737</width>
-             <height>317</height>
+             <width>1080</width>
+             <height>488</height>
             </rect>
            </property>
-           <layout class="FlowLayout" name="tuneLayout"/>
+           <layout class="QGridLayout" name="tuneLayout"/>
           </widget>
          </widget>
         </item>
         <item>
-            <widget class="QPushButton" name="buttonCreateTune">
-                <property name="text">
-                <string>Create new tune</string>
-                </property>
-            </widget>
+         <widget class="QPushButton" name="buttonCreateTune">
+          <property name="text">
+           <string>Create new tune</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -84,20 +84,58 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>737</width>
-             <height>317</height>
+             <width>1080</width>
+             <height>488</height>
             </rect>
            </property>
-           <layout class="FlowLayout" name="romLayout"/>
+           <layout class="QGridLayout" name="romLayout"/>
           </widget>
          </widget>
         </item>
         <item>
-            <widget class="QPushButton" name="buttonDownloadRom">
-                <property name="text">
-                <string>Download new ROM</string>
-                </property>
-            </widget>
+         <widget class="QPushButton" name="buttonDownloadRom">
+          <property name="text">
+           <string>Download new ROM</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabLogs">
+       <attribute name="title">
+        <string>Logs</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="buttonNewLog">
+            <property name="text">
+             <string>New Log</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboLogVehicle">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListView" name="listLogs">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -110,8 +148,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>773</width>
-     <height>30</height>
+     <width>1122</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -124,6 +162,7 @@
      <string>E&amp;dit</string>
     </property>
     <addaction name="actionSettings"/>
+    <addaction name="actionInterfaces"/>
    </widget>
    <widget class="QMenu" name="menuHelp_2">
     <property name="title">
@@ -158,14 +197,12 @@
     <string>&amp;CAN Log</string>
    </property>
   </action>
+  <action name="actionInterfaces">
+   <property name="text">
+    <string>Interfaces</string>
+   </property>
+  </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>FlowLayout</class>
-   <extends>QLayout</extends>
-   <header>ui/flowlayout.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

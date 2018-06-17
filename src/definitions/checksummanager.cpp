@@ -23,8 +23,7 @@ void Checksum::addModifiable(uint32_t offset, uint32_t size) {
   modifiable_.emplace_back(offset, size);
 }
 
-uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data,
-                                bool *ok) const {
+uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
   if (data.size() < offset_ + size_) {
     if (ok != nullptr) {
       *ok = false;
@@ -46,7 +45,8 @@ uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data,
   return sum;
 }
 
-std::pair<bool, std::string> ChecksumBasic::correct(gsl::span<uint8_t> data) const {
+std::pair<bool, std::string>
+ChecksumBasic::correct(gsl::span<uint8_t> data) const {
   if (data.size() < offset_ + size_) {
     return std::make_pair<bool, std::string>(
         false, "Checksum region exceeds the rom size.");

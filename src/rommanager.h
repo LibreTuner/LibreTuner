@@ -20,17 +20,16 @@
 #define ROMMANAGER_H
 
 #include <cstdint>
+#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
-#include <gsl/span>
 
 #include <QObject>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
 #include "rom.h"
-
 
 /**
  * Manages ROM files and metadata

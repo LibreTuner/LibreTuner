@@ -36,7 +36,7 @@ class DownloadWindow;
 class DownloadWindow : public QWidget, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
-  explicit DownloadWindow(QWidget *parent = 0);
+  explicit DownloadWindow(QWidget *parent = nullptr);
   ~DownloadWindow() override;
 
   /* Download interface callbacks */

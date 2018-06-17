@@ -20,8 +20,8 @@
 #define UDSAUTHENTICATOR_H
 
 #include "protocols/udsprotocol.h"
-#include <string>
 #include <functional>
+#include <string>
 
 /**
  * Handles UDS authentication for flashing & downloading
@@ -34,10 +34,12 @@ public:
   explicit Authenticator(Callback &&callback);
 
   /* Start authentication */
-  void auth(const std::string &key, std::shared_ptr<uds::Protocol> uds, uint8_t sessionType = 0x87);
+  void auth(const std::string &key, std::shared_ptr<uds::Protocol> uds,
+            uint8_t sessionType = 0x87);
   // void start(std::shared_ptr<UdsProtocol> uds, const std::string &key);
 
   uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
+
 private:
   std::shared_ptr<uds::Protocol> uds_;
   std::string key_;
@@ -51,6 +53,6 @@ private:
 
   Callback callback_;
 };
-}
+} // namespace uds
 
 #endif // UDSAUTHENTICATOR_H

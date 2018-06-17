@@ -46,7 +46,7 @@ public:
   /* Returns the CAN log. */
   CanLog *canLog() { return &canLog_; }
 
-  ~LibreTuner();
+  ~LibreTuner() override;
 
   /* Checks if the home directory exists and if it does not,
    * creates it. */

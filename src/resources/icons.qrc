@@ -2,5 +2,7 @@
 <RCC version="1.0">
 <qresource>
     <file>icons/rom-file.png</file>
+    <file>icons/add.svg</file>
+    <file>icons/remove.svg</file>
 </qresource>
 </RCC>

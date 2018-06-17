@@ -65,3 +65,12 @@ bool DefinitionManager::load() {
 
   return true;
 }
+
+DefinitionPtr DefinitionManager::fromVin(const std::string &vin) const {
+  for (const DefinitionPtr &def : definitions_) {
+    if (def->matchVin(vin)) {
+      return def;
+    }
+  }
+  return nullptr;
+}

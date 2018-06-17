@@ -23,24 +23,20 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 #include <gsl/span>
 
 struct CanMessage {
 public:
   void setMessage(uint32_t id, gsl::span<const uint8_t> data);
-  
-  bool valid() const {
-    return messageLength_ != 0;
-  }
-  
-  void invalidate() {
-    messageLength_ = 0;
-  }
+
+  bool valid() const { return messageLength_ != 0; }
+
+  void invalidate() { messageLength_ = 0; }
 
   CanMessage();
   CanMessage(uint32_t id, gsl::span<const uint8_t> data);
@@ -89,8 +85,10 @@ public:
   virtual void send(const CanMessage &message) = 0;
 
   /* Connects a new listener */
-  std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) { return signal_->connect(std::move(listener)); }
-  
+  std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) {
+    return signal_->connect(std::move(listener));
+  }
+
   /* Returns true if the socket is ready for reading/writing */
   virtual bool valid() = 0;
 

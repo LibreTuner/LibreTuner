@@ -22,8 +22,8 @@
 #include <QFile>
 #include <QString>
 
-#include <memory>
 #include <gsl/span>
+#include <memory>
 
 #include "rommanager.h"
 

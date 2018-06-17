@@ -17,9 +17,8 @@
  */
 
 #include "sockethandler.h"
-#include <cassert>
 #include <algorithm>
-
+#include <cassert>
 
 #include <iostream>
 
@@ -45,7 +44,8 @@ void SocketHandler::addSocket(Socket *socket) {
 }
 
 void SocketHandler::removeSocket(Socket *socket) {
-  std::replace(sockets_.begin(), sockets_.end(), socket, static_cast<Socket*>(nullptr));
+  std::replace(sockets_.begin(), sockets_.end(), socket,
+               static_cast<Socket *>(nullptr));
 }
 
 void SocketHandler::initialize() {
@@ -53,8 +53,6 @@ void SocketHandler::initialize() {
   running_ = true;
   thread_ = std::thread(&SocketHandler::run, this);
 }
-
-
 
 void SocketHandler::run() {
   fd_set rdfds;
@@ -92,7 +90,7 @@ void SocketHandler::run() {
       // The timeout expired. The sets will be empty
       continue;
     }
-    
+
     for (Socket *socket : sockets_) {
       if (socket == nullptr) {
         continue;
@@ -101,9 +99,10 @@ void SocketHandler::run() {
         try {
           socket->onRead();
         } catch (const std::exception &e) {
-          //std::cerr << "Exception during Socket::onRead(): " << e.what() << std::endl;
+          // std::cerr << "Exception during Socket::onRead(): " << e.what() <<
+          // std::endl;
         } catch (...) {
-          //std::cerr << "Exception during Socket::onRead()" << std::endl;
+          // std::cerr << "Exception during Socket::onRead()" << std::endl;
         }
       }
     }

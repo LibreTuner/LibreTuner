@@ -152,7 +152,8 @@ void DownloadWindow::onCompletion(gsl::span<const uint8_t> data) {
 
 void DownloadWindow::updateProgress(float progress) {
   QMetaObject::invokeMethod(ui->progressDownload, "setValue",
-                            Qt::QueuedConnection, Q_ARG(int, (int)(progress * 100)));
+                            Qt::QueuedConnection,
+                            Q_ARG(int, (int)(progress * 100)));
 }
 
 void DownloadWindow::on_buttonContinue_clicked() {

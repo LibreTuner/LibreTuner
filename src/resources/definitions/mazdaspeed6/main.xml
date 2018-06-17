@@ -12,6 +12,10 @@
 		<serverid>7E0</serverid>
 	</transfer>
 
+	<vins>
+		<vin>JM1GG12L.........</vin>
+	</vins>
+
 	<tables>
 		<table type='1d' id='0'>
 			<name>Speed Limiter (fuel cut)</name>

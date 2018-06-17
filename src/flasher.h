@@ -55,7 +55,8 @@ public:
   virtual ~Flasher() = default;
 
   /* Creates a MazdaT1 flash interface */
-  static FlasherPtr createT1(Callbacks *callbacks, const std::string &key, std::shared_ptr<isotp::Protocol> isotp);
+  static FlasherPtr createT1(Callbacks *callbacks, const std::string &key,
+                             std::shared_ptr<isotp::Protocol> isotp);
 
   /* Flash that shit */
   virtual void flash(FlashablePtr flashable) = 0;

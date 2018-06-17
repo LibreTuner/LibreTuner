@@ -37,7 +37,8 @@ TablePtr TableGroup::get(size_t idx, bool create) {
   return table;
 }
 
-std::pair<bool, std::string> TableGroup::set(size_t idx, gsl::span<const uint8_t> data) {
+std::pair<bool, std::string> TableGroup::set(size_t idx,
+                                             gsl::span<const uint8_t> data) {
   assert(idx < tables_.size());
   assert(data.size() >= 0);
 
@@ -62,7 +63,8 @@ std::pair<bool, std::string> TableGroup::set(size_t idx, gsl::span<const uint8_t
   case TABLE_2D:
     switch (dataType) {
     case TDATA_FLOAT:
-      if (data.size() != (definition->sizeX() * definition->sizeY() * sizeof(float))) {
+      if (data.size() !=
+          (definition->sizeX() * definition->sizeY() * sizeof(float))) {
         return std::make_pair(false, "Invalid table size");
       }
       table = std::make_shared<Table2d<float>>(definition, ENDIAN_BIG, data);

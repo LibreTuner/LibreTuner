@@ -19,9 +19,10 @@
 #ifndef DEFINITION_H
 #define DEFINITION_H
 
+#include <gsl/span>
+#include <regex>
 #include <string>
 #include <unordered_map>
-#include <gsl/span>
 
 #include <QString>
 #include <QXmlStreamReader>
@@ -172,6 +173,9 @@ public:
    * if the id does not exist. */
   int axisId(const std::string &id);
 
+  /* Returns true if the supplied VIN matches the definition */
+  bool matchVin(const std::string &vin);
+
 private:
   std::string lastError_;
 
@@ -196,9 +200,11 @@ private:
   TableDefinitions tables_;
   std::unordered_map<std::string, TableAxisPtr> axes_;
   std::vector<SubDefinitionPtr> subtypes_;
+  std::vector<std::regex> vins_;
 
   void readTables(QXmlStreamReader &xml);
   void loadAxes(QXmlStreamReader &xml);
+  void loadVins(QXmlStreamReader &xml);
 };
 typedef std::shared_ptr<Definition> DefinitionPtr;
 

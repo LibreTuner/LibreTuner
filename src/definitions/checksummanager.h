@@ -20,10 +20,10 @@
 #define CHECKSUMMANAGER_H
 
 #include <cstdint>
+#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
-#include <gsl/span>
 
 class Checksum;
 typedef std::shared_ptr<Checksum> ChecksumPtr;
@@ -38,7 +38,8 @@ public:
 
   /* Corrects the checksum for the data using modifiable sections.
    * Returns (false, errmsg) on failure and (true, "") on success. */
-  virtual std::pair<bool, std::string> correct(gsl::span<uint8_t> data) const = 0;
+  virtual std::pair<bool, std::string>
+  correct(gsl::span<uint8_t> data) const = 0;
 
   /* Returns the computed checksum. If length is too small,
    * returns 0 and sets ok to false.*/

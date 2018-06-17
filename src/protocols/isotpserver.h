@@ -19,11 +19,8 @@
 #ifndef LIBRETUNER_ISOTPSERVER_H
 #define LIBRETUNER_ISOTPSERVER_H
 
-
 class IsoTpServer {
 public:
-
 };
 
-
-#endif //LIBRETUNER_ISOTPSERVER_H
+#endif // LIBRETUNER_ISOTPSERVER_H

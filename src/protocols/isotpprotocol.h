@@ -40,7 +40,7 @@ struct Options {
 class Packet {
 public:
   Packet();
-  Packet(Packet&&) = default;
+  Packet(Packet &&) = default;
   explicit Packet(gsl::span<const uint8_t> data);
 
   /* Sets the packet data and resets the pointer
@@ -60,30 +60,23 @@ public:
   /* Appends data to the packet. Does not use the pointer */
   void append(gsl::span<const uint8_t> data);
 
-  std::vector<uint8_t>::size_type size() const {
-    return data_.size();
-  }
+  std::vector<uint8_t>::size_type size() const { return data_.size(); }
 
   std::vector<uint8_t>::size_type remaining() const {
     return data_.end() - pointer_;
   }
 
-  uint8_t &operator[](int index) {
-    return data_[index];
-  }
+  uint8_t &operator[](int index) { return data_[index]; }
 
-  uint8_t operator[](int index) const {
-    return data_[index];
-  }
+  uint8_t operator[](int index) const { return data_[index]; }
 
-  bool eof() const {
-    return pointer_ == data_.end();
-  }
+  bool eof() const { return pointer_ == data_.end(); }
 
   void clear() {
     data_.clear();
     pointer_ = data_.begin();
   }
+
 private:
   std::vector<uint8_t> data_;
   std::vector<uint8_t>::iterator pointer_ = data_.begin();
@@ -102,7 +95,6 @@ enum class FCFlag {
   Wait = 1,
   Overflow = 2,
 };
-
 
 struct FlowControlFrame {
   FCFlag flag = FCFlag::Continue;
@@ -128,7 +120,7 @@ struct ConsecutiveFrame {
 };
 
 struct Frame {
-  std::array<uint8_t, 8> data {};
+  std::array<uint8_t, 8> data{};
   size_t length = 0;
 
   Frame() = default;
@@ -175,7 +167,8 @@ public:
 
   using RecvPacketCallback = std::function<void(Error error, Packet &&packet)>;
 
-  explicit Protocol(const CanInterfacePtr &can = CanInterfacePtr(), Options = Options());
+  explicit Protocol(const CanInterfacePtr &can = CanInterfacePtr(),
+                    Options = Options());
 
   void sendSingleFrame(gsl::span<uint8_t> data);
 
@@ -195,17 +188,11 @@ public:
 
   void setCan(const CanInterfacePtr &can);
 
-  const CanInterfacePtr can() {
-    return can_;
-  }
+  const CanInterfacePtr can() { return can_; }
 
-  void setOptions(const Options &options) {
-    options_ = options;
-  }
+  void setOptions(const Options &options) { options_ = options; }
 
-  const Options &options() const {
-    return options_;
-  }
+  const Options &options() const { return options_; }
 
   std::shared_ptr<ConnectionType> listen(Listener listener) {
     return signal_->connect(std::move(listener));
@@ -225,10 +212,8 @@ private:
 
 class Response {
 
+  const Packet &packet() const { return packet_; }
 
-  const Packet &packet() const {
-    return packet_;
-  }
 private:
   Packet packet_;
 };
@@ -237,9 +222,8 @@ namespace details {
 uint8_t calculate_st(std::chrono::microseconds time);
 std::chrono::microseconds calculate_time(uint8_t st);
 FrameType frame_type(const CanMessage &message);
-}
+} // namespace details
 
-} // isotp
+} // namespace isotp
 
-
-#endif //LIBRETUNER_ISOTPPROTOCOL_H
+#endif // LIBRETUNER_ISOTPPROTOCOL_H
