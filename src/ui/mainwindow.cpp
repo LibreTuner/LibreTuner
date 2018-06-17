@@ -43,7 +43,7 @@ void MainWindow::updateTunes() {
     delete child;
   }
 
-  for (TunePtr tune : TuneManager::get()->tunes()) {
+  for (const TunePtr &tune : TuneManager::get()->tunes()) {
     ui->tuneLayout->addWidget(new TuneWidget(tune));
   }
 }
@@ -54,7 +54,7 @@ void MainWindow::updateRoms() {
     delete child;
   }
 
-  for (RomPtr rom : RomManager::get()->roms()) {
+  for (const RomPtr &rom : RomManager::get()->roms()) {
     ui->romLayout->addWidget(new RomWidget(rom));
   }
 }
@@ -65,4 +65,9 @@ void MainWindow::on_actionCAN_Log_triggered() { canViewer_.show(); }
 
 void MainWindow::on_buttonDownloadRom_clicked() { downloadWindow_->show(); }
 
-void MainWindow::closeEvent(QCloseEvent *event) { canViewer_.close(); }
+void MainWindow::closeEvent(QCloseEvent *event) {
+  canViewer_.close();
+  interfacesWindow_.close();
+}
+
+void MainWindow::on_actionInterfaces_triggered() { interfacesWindow_.show(); }

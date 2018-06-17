@@ -18,9 +18,7 @@
 
 #include "timer.h"
 
-Timer::Timer(Timer::Callback &&cb) : callback_(std::move(cb)) {
-
-}
+Timer::Timer(Timer::Callback &&cb) : callback_(std::move(cb)) {}
 
 void Timer::run() {
   std::unique_lock<std::mutex> lk(cv_m_);
@@ -33,14 +31,9 @@ void Timer::run() {
   }
 }
 
-void Timer::setCallback(Timer::Callback &&cb) {
-  callback_ = std::move(cb);
-}
+void Timer::setCallback(Timer::Callback &&cb) { callback_ = std::move(cb); }
 
-Timer::~Timer()
-{
-  stop();
-}
+Timer::~Timer() { stop(); }
 
 void Timer::start() {
   stop();

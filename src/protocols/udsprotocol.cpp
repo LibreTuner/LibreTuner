@@ -19,31 +19,31 @@
 #include "udsprotocol.h"
 #include "caninterface.h"
 
+#include <array>
 #include <cassert>
 #include <utility>
-#include <array>
 
 namespace uds {
 std::string strError(Error error) {
   switch (error) {
-    case Error::Success:
-      return "success";
-    case Error::IsoTp:
-      return "ISO-TP error";
-    case Error::Timeout:
-      return "timed out";
-    case Error::BlankResponse:
-      return "received a blank response";
-    case Error::Consec:
-      return "ISO-TP consecutive index invalid in frame";
-    case Error::Negative:
-      return "negative response code received";
-    case Error::Malformed:
-      return "malformed UDS response";
-    case Error::UnexpectedResponse:
-      return "unexpected response";
-    default:
-      return "unknown";
+  case Error::Success:
+    return "success";
+  case Error::IsoTp:
+    return "ISO-TP error";
+  case Error::Timeout:
+    return "timed out";
+  case Error::BlankResponse:
+    return "received a blank response";
+  case Error::Consec:
+    return "ISO-TP consecutive index invalid in frame";
+  case Error::Negative:
+    return "negative response code received";
+  case Error::Malformed:
+    return "malformed UDS response";
+  case Error::UnexpectedResponse:
+    return "unexpected response";
+  default:
+    return "unknown";
   }
   return "you should never see this";
 }
@@ -55,9 +55,8 @@ public:
     explicit Request(std::shared_ptr<isotp::Protocol> isotp);
     void request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb);
 
-    bool active() const {
-      return active_;
-    }
+    bool active() const { return active_; }
+
   private:
     uint8_t expectedId_{};
     Callback cb_;
@@ -75,11 +74,12 @@ private:
   Request request_;
 };
 
-IsoTpInterface::Request::Request(std::shared_ptr<isotp::Protocol> isotp) : isotp_(std::move(isotp)) {
+IsoTpInterface::Request::Request(std::shared_ptr<isotp::Protocol> isotp)
+    : isotp_(std::move(isotp)) {}
 
-}
-
-void IsoTpInterface::Request::request(gsl::span<uint8_t> data, uint8_t expectedId, Protocol::Callback &&cb) {
+void IsoTpInterface::Request::request(gsl::span<uint8_t> data,
+                                      uint8_t expectedId,
+                                      Protocol::Callback &&cb) {
   expectedId_ = expectedId;
   cb_ = std::move(cb);
   do_recv();
@@ -90,15 +90,15 @@ void IsoTpInterface::Request::do_recv() {
   isotp_->recvPacketAsync([this](isotp::Error error, isotp::Packet &&packet) {
     if (error != isotp::Error::Success) {
       switch (error) {
-        case isotp::Error::Timeout:
-          cb_(Error::Timeout, Packet{});
-          break;
-        case isotp::Error::Consec:
-          cb_(Error::Consec, Packet{});
-          break;
-        default:
-          cb_(Error::IsoTp, Packet{});
-          break;
+      case isotp::Error::Timeout:
+        cb_(Error::Timeout, Packet{});
+        break;
+      case isotp::Error::Consec:
+        cb_(Error::Consec, Packet{});
+        break;
+      default:
+        cb_(Error::IsoTp, Packet{});
+        break;
       }
       return;
     }
@@ -132,7 +132,8 @@ void IsoTpInterface::Request::do_recv() {
   });
 }
 
-void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Callback &&cb) {
+void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId,
+                             Callback &&cb) {
   if (request_.active()) {
     throw std::runtime_error("a UDS request is already in progress");
   }
@@ -140,9 +141,7 @@ void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Callba
 }
 
 IsoTpInterface::IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp)
-    : request_(std::move(isotp)) {
-
-}
+    : request_(std::move(isotp)) {}
 
 std::shared_ptr<Protocol>
 Protocol::create(std::shared_ptr<isotp::Protocol> isotp) {
@@ -151,59 +150,66 @@ Protocol::create(std::shared_ptr<isotp::Protocol> isotp) {
 
 void Protocol::requestSession(uint8_t type, RequestSessionCallback &&cb) {
   std::array<uint8_t, 2> req = {UDS_REQ_SESSION, type};
-  request(req, UDS_RES_SESSION, [cb{std::move(cb)}] (Error error, const Packet &packet) {
-    if (error != Error::Success) {
-      cb(error, 0, gsl::span<uint8_t>());
-      return;
-    }
+  request(req, UDS_RES_SESSION,
+          [cb{std::move(cb)}](Error error, const Packet &packet) {
+            if (error != Error::Success) {
+              cb(error, 0, gsl::span<uint8_t>());
+              return;
+            }
 
-    if (packet.data.empty()) {
-      cb(Error::Malformed, 0, gsl::span<uint8_t>());
-      return;
-    }
+            if (packet.data.empty()) {
+              cb(Error::Malformed, 0, gsl::span<uint8_t>());
+              return;
+            }
 
-    cb(Error::Success, packet.data[0], gsl::make_span(packet.data).subspan(1));
-  });
+            cb(Error::Success, packet.data[0],
+               gsl::make_span(packet.data).subspan(1));
+          });
 }
 
 void Protocol::requestSecuritySeed(RequestSecuritySeedCallback &&cb) {
-  std::array<uint8_t, 2> req  = {UDS_REQ_SECURITY, 1};
-  return request(req, UDS_RES_SECURITY, [cb{std::move(cb)}] (Error error, const Packet &packet) {
-    if (error != Error::Success) {
-      cb(error, 0, gsl::span<uint8_t>());
-      return;
-    }
+  std::array<uint8_t, 2> req = {UDS_REQ_SECURITY, 1};
+  return request(req, UDS_RES_SECURITY,
+                 [cb{std::move(cb)}](Error error, const Packet &packet) {
+                   if (error != Error::Success) {
+                     cb(error, 0, gsl::span<uint8_t>());
+                     return;
+                   }
 
-    if (packet.data.empty()) {
-      cb(Error::Malformed, 0, gsl::span<uint8_t>());
-      return;
-    }
+                   if (packet.data.empty()) {
+                     cb(Error::Malformed, 0, gsl::span<uint8_t>());
+                     return;
+                   }
 
-    cb(Error::Success, packet.data[0], gsl::make_span(packet.data).subspan(1));
-  });
+                   cb(Error::Success, packet.data[0],
+                      gsl::make_span(packet.data).subspan(1));
+                 });
 }
 
-void Protocol::requestSecurityKey(gsl::span<uint8_t> key, RequestSecurityKeyCallback &&cb) {
+void Protocol::requestSecurityKey(gsl::span<uint8_t> key,
+                                  RequestSecurityKeyCallback &&cb) {
   std::vector<uint8_t> req(key.size() + 2);
   req[0] = UDS_REQ_SECURITY;
   req[1] = 2;
   std::copy(key.begin(), key.end(), req.begin() + 2);
-  request(req, UDS_RES_SECURITY, [cb{std::move(cb)}] (Error error, const Packet &packet) {
-    if (error != Error::Success) {
-      cb(error, 0);
-      return;
-    }
+  request(req, UDS_RES_SECURITY,
+          [cb{std::move(cb)}](Error error, const Packet &packet) {
+            if (error != Error::Success) {
+              cb(error, 0);
+              return;
+            }
 
-    if (packet.data.empty()) {
-      cb(Error::Malformed, 0);
-      return;
-    }
+            if (packet.data.empty()) {
+              cb(Error::Malformed, 0);
+              return;
+            }
 
-    cb(Error::Success, packet.data[0]);
-  });
+            cb(Error::Success, packet.data[0]);
+          });
 }
 
-void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length, RequestMemoryAddressCallback &&cb) {
+void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length,
+                                        RequestMemoryAddressCallback &&cb) {
   std::array<uint8_t, 7> req;
   req[0] = UDS_REQ_READMEM;
 
@@ -215,13 +221,14 @@ void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length, Reque
   req[5] = length >> 8;
   req[6] = length & 0xFF;
 
-  request(req, UDS_RES_READMEM, [cb{std::move(cb)}] (Error error, const Packet &packet) {
-    if (error != Error::Success) {
-      cb(error, gsl::span<uint8_t>());
-      return;
-    }
+  request(req, UDS_RES_READMEM,
+          [cb{std::move(cb)}](Error error, const Packet &packet) {
+            if (error != Error::Success) {
+              cb(error, gsl::span<uint8_t>());
+              return;
+            }
 
-    cb(Error::Success, packet.data);
-  });
+            cb(Error::Success, packet.data);
+          });
 }
-}
+} // namespace uds

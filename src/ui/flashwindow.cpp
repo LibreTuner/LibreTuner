@@ -62,9 +62,11 @@ void FlashWindow::on_buttonFlash_clicked() {
       msgBox.exec();
       return;
     }
-    unsigned  serverId = flashable_->definition()->definition()->serverId();
-    flasher_ = Flasher::createT1(
-        this, flashable_->definition()->definition()->key(), std::make_shared<isotp::Protocol>(can, isotp::Options{serverId, serverId + 8}));
+    unsigned serverId = flashable_->definition()->definition()->serverId();
+    flasher_ =
+        Flasher::createT1(this, flashable_->definition()->definition()->key(),
+                          std::make_shared<isotp::Protocol>(
+                              can, isotp::Options{serverId, serverId + 8}));
     if (!flasher_) {
       // The interface should have called the downloadError callback
       return;

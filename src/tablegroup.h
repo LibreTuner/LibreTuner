@@ -22,18 +22,18 @@
 #include "definitions/tabledefinitions.h"
 #include "rom.h"
 
-#include <vector>
 #include <gsl/span>
+#include <vector>
 
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
 
 /**
- * Handles a group of tables in a tune
+ * Handles a group of tables
  */
 class TableGroup {
 public:
-  TableGroup(const RomDataPtr &base);
+  explicit TableGroup(const RomDataPtr &base);
 
   size_t count() const { return tables_.size(); }
 

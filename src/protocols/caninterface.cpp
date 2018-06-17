@@ -47,9 +47,7 @@ CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
   setMessage(id, data);
 }
 
-CanInterface::CanInterface() : signal_(SignalType::create()) {
-  
-}
+CanInterface::CanInterface() : signal_(SignalType::create()) {}
 
 void CanInterface::send(int id, gsl::span<const uint8_t> data) {
   send(CanMessage(id, data));
@@ -78,5 +76,3 @@ std::string CanInterface::strError(CanInterface::CanError error, int err) {
   return "unknown. You should not see this. If you do, please submit a pull "
          "request";
 }*/
-
-

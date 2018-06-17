@@ -19,9 +19,9 @@
 #ifndef TUNE_H
 #define TUNE_H
 
+#include <gsl/span>
 #include <memory>
 #include <string>
-#include <gsl/span>
 
 #include <QXmlStreamReader>
 

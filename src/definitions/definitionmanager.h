@@ -45,6 +45,10 @@ public:
 
   std::string lastError() const { return lastError_; }
 
+  /* Attempts to find a definition that matches the vin.
+   * Returns nullptr if no definition exists. */
+  DefinitionPtr fromVin(const std::string &vin) const;
+
   DefinitionPtr *definitions() { return definitions_.data(); }
 
   size_t count() const { return definitions_.size(); }

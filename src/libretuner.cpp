@@ -71,6 +71,17 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     msgBox.exec();
   }
 
+  try {
+    InterfaceManager::get().load();
+  } catch (const std::exception &e) {
+    QMessageBox msgBox;
+    msgBox.setText("Could not load interface data from interfaces.xml: " +
+                   QString(e.what()));
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setWindowTitle("InterfaceManager error");
+    msgBox.exec();
+  }
+
   mainWindow_ = std::unique_ptr<MainWindow>(new MainWindow);
   mainWindow_->show();
 

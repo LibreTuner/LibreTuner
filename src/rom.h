@@ -70,7 +70,7 @@ typedef std::shared_ptr<Table> TablePtr;
 /* The object that actually stores firmware data. */
 class RomData {
 public:
-  RomData(RomPtr rom);
+  explicit RomData(RomPtr rom);
 
   /* Returns the base table from the table index */
   TablePtr getTable(int idx);

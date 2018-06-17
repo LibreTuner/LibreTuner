@@ -33,9 +33,7 @@
 
 #include "libretuner.h"
 
-SocketCanInterface::SocketCanInterface(const std::string &ifname) {
-  bind(ifname);
-}
+static std::unordered_map<std::string, std::weak_ptr<SocketCanInterface>> cache;
 
 SocketCanInterface::~SocketCanInterface() {
   if (socket_ != 0) {
@@ -59,7 +57,8 @@ void SocketCanInterface::recv(CanMessage &message) {
       message.invalidate();
       return;
     }
-    throw std::runtime_error("Failed to read from socket: " + std::string(strerror(errno)));
+    throw std::runtime_error("Failed to read from socket: " +
+                             std::string(strerror(errno)));
   }
 
   // TODO: remove EFF/RTR/ERR flags
@@ -68,7 +67,7 @@ void SocketCanInterface::recv(CanMessage &message) {
   // Add message to log
 
   if (frame.can_id == 0x7e8 || frame.can_id == 0x7e0) {
-    //LibreTuner::get()->canLog()->addMessage(message);
+    // LibreTuner::get()->canLog()->addMessage(message);
   }
 }
 
@@ -83,18 +82,22 @@ void SocketCanInterface::send(const CanMessage &message) {
   frame.can_id = message.id();
   memcpy(frame.data, message.message(), message.length());
 
-  if (int res = write(socket_, &frame, sizeof(can_frame)) != sizeof(can_frame)) {
+  if (int res =
+          write(socket_, &frame, sizeof(can_frame)) != sizeof(can_frame)) {
     if (res < 0) {
-      throw std::runtime_error("Failed to write to socket: " + std::string(strerror(errno)));
+      throw std::runtime_error("Failed to write to socket: " +
+                               std::string(strerror(errno)));
     }
-    throw std::runtime_error("Failed to write to socket: wrote fewer bytes than expected");
+    throw std::runtime_error(
+        "Failed to write to socket: wrote fewer bytes than expected");
   }
 }
 
 bool SocketCanInterface::bind(const std::string &ifname) {
   socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (socket_ == -1) {
-    throw std::runtime_error("Failed to create socket: " + std::string(strerror(errno)));
+    throw std::runtime_error("Failed to create socket: " +
+                             std::string(strerror(errno)));
   }
 
   sockaddr_can addr;
@@ -102,14 +105,16 @@ bool SocketCanInterface::bind(const std::string &ifname) {
 
   strcpy(ifr.ifr_name, ifname.c_str());
   if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0) {
-    throw std::runtime_error("Failed to find interface: " + std::string(strerror(errno)));
+    throw std::runtime_error("Failed to find interface: " +
+                             std::string(strerror(errno)));
   }
 
   addr.can_family = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
 
   if (::bind(socket_, (sockaddr *)&addr, sizeof(addr)) < 0) {
-    throw std::runtime_error("Failed to bind interface: " + std::string(strerror(errno)));
+    throw std::runtime_error("Failed to bind interface: " +
+                             std::string(strerror(errno)));
   }
 
   return true;
@@ -160,15 +165,20 @@ void SocketCanInterface::setNonblocking() {
   fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
 }
 
-std::shared_ptr<SocketCanInterface> SocketCanInterface::create() {
-  auto ptr = std::make_shared<SocketCanInterface>();
+std::shared_ptr<SocketCanInterface>
+SocketCanInterface::create(const std::string &ifname) {
+  auto res = cache.find(ifname);
+  std::shared_ptr<SocketCanInterface> ptr;
+  if (res != cache.end()) {
+    if (auto p = res->second.lock()) {
+      return p;
+    } else {
+      cache.erase(res);
+    }
+  }
+  ptr = std::make_shared<SocketCanInterface>();
+  ptr->bind(ifname);
   ptr->self_ = ptr;
+  cache.emplace(ifname, ptr);
   return ptr;
 }
-
-std::shared_ptr<SocketCanInterface> SocketCanInterface::create(const std::string &ifname) {
-  auto ptr = std::make_shared<SocketCanInterface>(ifname);
-  ptr->self_ = ptr;
-  return ptr;
-}
-

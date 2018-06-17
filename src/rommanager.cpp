@@ -23,8 +23,8 @@
 #include <QFileInfo>
 #include <cassert>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 RomManager *RomManager::get() {
   static RomManager romManager;
@@ -177,7 +177,8 @@ bool RomManager::save() {
   return true;
 }
 
-bool RomManager::addRom(const std::string &name, const DefinitionPtr &definition,
+bool RomManager::addRom(const std::string &name,
+                        const DefinitionPtr &definition,
                         gsl::span<const uint8_t> data) {
   LibreTuner::get()->checkHome();
 
@@ -190,8 +191,9 @@ bool RomManager::addRom(const std::string &name, const DefinitionPtr &definition
     } while (QFile::exists(romRoot + path));
   }
 
-  std::ofstream file((romRoot + path).toStdString(), std::fstream::out | std::fstream::binary);
-  file.write(reinterpret_cast<const char*>(data.data()), data.size());
+  std::ofstream file((romRoot + path).toStdString(),
+                     std::fstream::out | std::fstream::binary);
+  file.write(reinterpret_cast<const char *>(data.data()), data.size());
   file.close();
 
   // Determine the subtype

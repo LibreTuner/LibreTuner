@@ -66,13 +66,13 @@ private:
 };
 
 Uds23DownloadInterface::Uds23DownloadInterface(
-    DownloadInterface::Callbacks *callbacks, std::shared_ptr<isotp::Protocol> isotp,
-    const std::string &key, int size)
+    DownloadInterface::Callbacks *callbacks,
+    std::shared_ptr<isotp::Protocol> isotp, const std::string &key, int size)
     : DownloadInterface(callbacks),
-    auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this, std::placeholders::_1, std::placeholders::_2)),
+      auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this,
+                      std::placeholders::_1, std::placeholders::_2)),
       key_(key), totalSize_(size) {
   uds_ = uds::Protocol::create(std::move(isotp));
-  
 }
 
 #ifdef WITH_SOCKETCAN
@@ -83,8 +83,8 @@ DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
   assert(callbacks != nullptr);
   std::shared_ptr<SocketCanInterface> can;
   try {
-      can = SocketCanInterface::create(device);
-      can->start();
+    can = SocketCanInterface::create(device);
+    can->start();
   } catch (std::exception &e) {
     callbacks->downloadError("Could not initialize SocketCAN device \"" +
                              QString::fromStdString(device) +
@@ -92,16 +92,20 @@ DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
     return nullptr;
   }
 
-  
   switch (definition->downloadMode()) {
-    case DM_MAZDA23:
-      return std::make_shared<Uds23DownloadInterface>(
-          callbacks, std::make_shared<isotp::Protocol>(can, isotp::Options{definition->serverId(), definition->serverId() + 8, std::chrono::milliseconds(100)}), definition->key(), definition->size());
-    default:
-      callbacks->downloadError("CAN is not supported on this vehicle");
-      break;
+  case DM_MAZDA23:
+    return std::make_shared<Uds23DownloadInterface>(
+        callbacks,
+        std::make_shared<isotp::Protocol>(
+            can,
+            isotp::Options{definition->serverId(), definition->serverId() + 8,
+                           std::chrono::milliseconds(100)}),
+        definition->key(), definition->size());
+  default:
+    callbacks->downloadError("CAN is not supported on this vehicle");
+    break;
   }
-  
+
   return nullptr;
 }
 #endif
@@ -114,7 +118,8 @@ bool Uds23DownloadInterface::checkError(uds::Error error) {
   return true;
 }
 
-void Uds23DownloadInterface::onAuthenticated(bool success, const std::string &error) {
+void Uds23DownloadInterface::onAuthenticated(bool success,
+                                             const std::string &error) {
   if (!success) {
     callbacks_->downloadError(QString::fromStdString(error));
     return;
@@ -123,24 +128,25 @@ void Uds23DownloadInterface::onAuthenticated(bool success, const std::string &er
 }
 
 void Uds23DownloadInterface::do_download() {
-  uds_->requestReadMemoryAddress(downloadOffset_,
-                                 std::min<uint32_t>(downloadSize_, 0xFFE), [this](uds::Error error, gsl::span<const uint8_t> data) {
-    if (!checkError(error)) {
-      return;
-    }
+  uds_->requestReadMemoryAddress(
+      downloadOffset_, std::min<uint32_t>(downloadSize_, 0xFFE),
+      [this](uds::Error error, gsl::span<const uint8_t> data) {
+        if (!checkError(error)) {
+          return;
+        }
 
-    if (data.empty()) {
-      callbacks_->downloadError("received 0 bytes in download packet");
-    }
+        if (data.empty()) {
+          callbacks_->downloadError("received 0 bytes in download packet");
+        }
 
-    downloadData_.insert(downloadData_.end(), data.begin(), data.end());
-    downloadOffset_ += data.size();
-    downloadSize_ -= data.size();
+        downloadData_.insert(downloadData_.end(), data.begin(), data.end());
+        downloadOffset_ += data.size();
+        downloadSize_ -= data.size();
 
-    if (update_progress()) {
-      do_download();
-    }
-  });
+        if (update_progress()) {
+          do_download();
+        }
+      });
 }
 
 bool Uds23DownloadInterface::update_progress() {

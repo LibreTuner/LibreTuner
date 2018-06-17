@@ -34,6 +34,16 @@ set(libretuner_SRC
     udsauthenticator.h
     timer.cpp
     timer.h
+    datalog.cpp
+    datalog.h
+    vehicle.cpp
+    vehicle.h
+    datalink.cpp
+    datalink.h
+    interface.cpp
+    interface.h
+    interfacemanager.cpp
+    interfacemanager.h
 
     util/signal.cpp
     util/signal.h
@@ -73,6 +83,14 @@ set(libretuner_SRC
     ui/graphwidget.h
     ui/flashwindow.cpp
     ui/flashwindow.h
+    ui/interfaceswindow.cpp
+    ui/interfaceswindow.h
+    ui/addinterfacedialog.cpp
+    ui/addinterfacedialog.h
+    ui/socketcansettingsui.cpp
+    ui/socketcansettingsui.h
+    ui/settingswidget.cpp
+    ui/settingswidget.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
@@ -92,8 +110,7 @@ if (UNIX)
         protocols/socketcaninterface.cpp
         protocols/socketcaninterface.h
         os/sockethandler.cpp
-        os/sockethandler.h
-    )
+        os/sockethandler.h)
 endif (UNIX)
 
 
@@ -106,6 +123,8 @@ qt5_wrap_ui(libretuner_SRC
     ui/createtunedialog.ui
     ui/tuneeditor.ui
     ui/flashwindow.ui
+    ui/interfaceswindow.ui
+    ui/addinterfacedialog.ui
 )
 
 qt5_add_resources(libretuner_SRC

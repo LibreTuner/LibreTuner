@@ -278,8 +278,9 @@ bool SubDefinition::check(gsl::span<const uint8_t> data) {
       return false;
     }
 
-    if (std::equal(data.begin() + identifier.offset(), data.end(), identifier.data(),
-               identifier.data() + identifier.size()) != 0) {
+    if (std::equal(data.begin() + identifier.offset(), data.end(),
+                   identifier.data(),
+                   identifier.data() + identifier.size()) != 0) {
       return false;
     }
   }
@@ -379,6 +380,21 @@ void Definition::loadAxes(QXmlStreamReader &xml) {
   }
 }
 
+void Definition::loadVins(QXmlStreamReader &xml) {
+  while (xml.readNextStartElement()) {
+    if (xml.name() != "vin") {
+      xml.raiseError("Unexpected element");
+      return;
+    }
+
+    try {
+      vins_.emplace_back(xml.readElementText().trimmed().toStdString());
+    } catch (const std::regex_error &e) {
+      xml.raiseError(QStringLiteral("Could not load vin regex: ") + e.what());
+    }
+  }
+}
+
 bool Definition::loadMain(const QString &path) {
   QFile file(path);
   if (!file.open(QFile::ReadOnly)) {
@@ -470,6 +486,8 @@ bool Definition::loadMain(const QString &path) {
           foundFlashSize = true;
         }
       }
+    } else if (xml.name() == "vins") {
+      loadVins(xml);
     } else {
       xml.raiseError("Unexpected element");
     }
@@ -561,4 +579,10 @@ bool Definition::load(const QString &path) {
     }
   }
   return true;
+}
+
+bool Definition::matchVin(const std::string &vin) {
+  return std::any_of(vins_.begin(), vins_.end(), [&vin](const auto &pattern) {
+    return std::regex_match(vin, pattern);
+  });
 }

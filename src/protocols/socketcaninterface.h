@@ -21,19 +21,18 @@
 
 #include "../os/sockethandler.h"
 #include "caninterface.h"
-#include <thread>
 #include <mutex>
+#include <thread>
 
 /*
  * SocketCan interface for linux hosts
  */
 class SocketCanInterface : public CanInterface, public Socket {
 public:
-  static std::shared_ptr<SocketCanInterface> create();
   /* Creates a socket and attempts to bind to an interface.
    * Throws an error if unsuccessful */
   static std::shared_ptr<SocketCanInterface> create(const std::string &ifname);
-  
+
   SocketCanInterface(SocketCanInterface &) = delete;
   SocketCanInterface(const SocketCanInterface &) = delete;
   SocketCanInterface(SocketCanInterface &&) = delete;
@@ -41,7 +40,7 @@ public:
   ~SocketCanInterface() override;
 
   void send(const CanMessage &message) override;
-  
+
   /* Received a message and places it into message. Invalidates
    * the message if nonblocking and no data is ready to be
    * received. */
@@ -69,7 +68,6 @@ public:
 
   // These constructors should never be used directly!
   SocketCanInterface() = default;
-  explicit SocketCanInterface(const std::string &ifname);
 
 private:
   int socket_ = 0;

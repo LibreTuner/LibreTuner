@@ -52,40 +52,42 @@ template <> float Table::fromVariant<float>(const QVariant &v, bool &success) {
   return v.toFloat(&success);
 }
 
-template<template <class Type> class TemplateType>
-class TCreator {
+template <template <class Type> class TemplateType> class TCreator {
 public:
-  static std::shared_ptr<Table>
-  create(DataType dt, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data) {
+  static std::shared_ptr<Table> create(DataType dt, const TableDefinition *def,
+                                       Endianness endian,
+                                       gsl::span<uint8_t> data) {
     switch (dt) {
-      case TDATA_FLOAT:
-        return std::make_shared<TemplateType<float>>
-            (def, endian, data);
-      case TDATA_INT32:
-        return std::make_shared<TemplateType<int32_t>>(def, endian, data);
-      case TDATA_INT16:
-        return std::make_shared<TemplateType<int16_t>>(def, endian, data);
-      case TDATA_INT8:
-        return std::make_shared<TemplateType<int8_t>>(def, endian, data);
-      case TDATA_UINT8:
-        return std::make_shared<TemplateType<uint8_t>>(def, endian, data);
-      case TDATA_UINT16:
-        return std::make_shared<TemplateType<uint16_t>>(def, endian, data);
-      case TDATA_UINT32:
-        return std::make_shared<TemplateType<uint32_t>>(def, endian, data);
+    case TDATA_FLOAT:
+      return std::make_shared<TemplateType<float>>(def, endian, data);
+    case TDATA_INT32:
+      return std::make_shared<TemplateType<int32_t>>(def, endian, data);
+    case TDATA_INT16:
+      return std::make_shared<TemplateType<int16_t>>(def, endian, data);
+    case TDATA_INT8:
+      return std::make_shared<TemplateType<int8_t>>(def, endian, data);
+    case TDATA_UINT8:
+      return std::make_shared<TemplateType<uint8_t>>(def, endian, data);
+    case TDATA_UINT16:
+      return std::make_shared<TemplateType<uint16_t>>(def, endian, data);
+    case TDATA_UINT32:
+      return std::make_shared<TemplateType<uint32_t>>(def, endian, data);
     }
     return nullptr;
   }
 };
 
-std::shared_ptr<Table> Table::create(TableType tableType, DataType dataType, const TableDefinition *def, Endianness endian, gsl::span<uint8_t> data) {
-  switch(tableType) {
-    case TABLE_1D:
-      return TCreator<Table1d>::create(dataType, def, endian, data);
-    case TABLE_2D:
-      return TCreator<Table2d>::create(dataType, def, endian, data);
-    default:
-      assert(false && "unimplemented");
+std::shared_ptr<Table> Table::create(TableType tableType, DataType dataType,
+                                     const TableDefinition *def,
+                                     Endianness endian,
+                                     gsl::span<uint8_t> data) {
+  switch (tableType) {
+  case TABLE_1D:
+    return TCreator<Table1d>::create(dataType, def, endian, data);
+  case TABLE_2D:
+    return TCreator<Table2d>::create(dataType, def, endian, data);
+  default:
+    assert(false && "unimplemented");
   }
   return nullptr;
 }

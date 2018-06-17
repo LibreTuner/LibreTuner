@@ -29,7 +29,9 @@ uint8_t calculate_st(std::chrono::microseconds time) {
   }
 
   if (time >= std::chrono::milliseconds(1)) {
-    return std::min<long>(std::chrono::duration_cast<std::chrono::milliseconds>(time).count(), 127);
+    return std::min<long>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(time).count(),
+        127);
   } else {
     uint8_t count = std::max<uint8_t>(time.count() / 100, 1);
     return count + 0xF0;
@@ -58,7 +60,7 @@ FrameType frame_type(const CanMessage &message) {
   return static_cast<FrameType>(beg);
 }
 
-} // details
+} // namespace details
 
 Frame Frame::single(gsl::span<uint8_t> data) {
   Expects(data.size() <= 7);
@@ -151,6 +153,7 @@ class Sender {
 public:
   static boost::future<Error> send(Protocol &protocol, Packet &&packet);
   ~Sender();
+
 private:
   Sender(Protocol &protocol, Packet &&packet);
 
@@ -181,9 +184,7 @@ uint8_t Receiver::incConsec() {
   return consecIndex_;
 }
 
-void Receiver::timedout() {
-  error(Error::Timeout);
-}
+void Receiver::timedout() { error(Error::Timeout); }
 
 void Receiver::error(Error err) {
   timer_.stop();
@@ -192,9 +193,7 @@ void Receiver::error(Error err) {
   self_.reset();
 }
 
-void Receiver::received() {
-  error(Error::Success);
-}
+void Receiver::received() { error(Error::Success); }
 
 bool Receiver::finishRead(uint8_t amount) {
   if (amount > remaining_) {
@@ -213,7 +212,8 @@ bool Receiver::finishRead(uint8_t amount) {
 void Receiver::handleFirst(const FirstFrame &f) {
   remaining_ = f.size;
   size_t ff_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(gsl::make_span(std::begin(f.data), std::begin(f.data) + ff_length));
+  packet_.append(
+      gsl::make_span(std::begin(f.data), std::begin(f.data) + ff_length));
   state_ = State::Consecutive;
   if (finishRead(ff_length)) {
     protocol_.sendFlowFrame(FlowControlFrame());
@@ -221,7 +221,8 @@ void Receiver::handleFirst(const FirstFrame &f) {
 }
 
 void Receiver::handleSingle(const SingleFrame &f) {
-  packet_.append(gsl::make_span(std::begin(f.data), std::begin(f.data) + f.size));
+  packet_.append(
+      gsl::make_span(std::begin(f.data), std::begin(f.data) + f.size));
   received();
 }
 
@@ -241,17 +242,21 @@ void Receiver::handleConsec(const ConsecutiveFrame &f) {
     return;
   }
   size_t cf_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(gsl::make_span(std::begin(f.data), std::begin(f.data) + cf_length));
+  packet_.append(
+      gsl::make_span(std::begin(f.data), std::begin(f.data) + cf_length));
   finishRead(cf_length);
 }
 
 void Receiver::recv(Protocol &protocol, Protocol::RecvPacketCallback cb) {
-  std::shared_ptr<Receiver> receiver = std::shared_ptr<Receiver>(new Receiver(protocol, std::move(cb)));
+  std::shared_ptr<Receiver> receiver =
+      std::shared_ptr<Receiver>(new Receiver(protocol, std::move(cb)));
   receiver->self_ = receiver;
   receiver->start();
 }
 
-Receiver::Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb) : protocol_(protocol), callback_(std::move(cb)), timer_(std::bind(&Receiver::timedout, this)) {
+Receiver::Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb)
+    : protocol_(protocol), callback_(std::move(cb)),
+      timer_(std::bind(&Receiver::timedout, this)) {
   packet_.clear();
   timer_.setTimeout(protocol_.options().timeout);
 }
@@ -259,24 +264,25 @@ Receiver::Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb) : prot
 void Receiver::start() {
   connection_ = protocol_.listen([&](const Frame &f) {
     switch (state_) {
-      case State::Begin:
-        if (f.type() == FrameType::Single || f.type() == FrameType::First)
-          handleBegin(f);
-        break;
-      case State::Consecutive:
-        if (f.type() == FrameType::Consecutive) {
-          ConsecutiveFrame cf;
-          if (!f.consecutive(cf)) {
-            break;
-          }
-          handleConsec(cf);
+    case State::Begin:
+      if (f.type() == FrameType::Single || f.type() == FrameType::First)
+        handleBegin(f);
+      break;
+    case State::Consecutive:
+      if (f.type() == FrameType::Consecutive) {
+        ConsecutiveFrame cf;
+        if (!f.consecutive(cf)) {
+          break;
         }
-        break;
+        handleConsec(cf);
+      }
+      break;
     }
   });
 }
 
-Sender::Sender(Protocol &protocol, Packet &&packet) : protocol_(protocol), packet_(std::move(packet)) {
+Sender::Sender(Protocol &protocol, Packet &&packet)
+    : protocol_(protocol), packet_(std::move(packet)) {
   timer_.setTimeout(protocol.options().timeout);
 }
 
@@ -287,7 +293,8 @@ Sender::~Sender() {
 }
 
 boost::future<Error> Sender::send(Protocol &protocol, Packet &&packet) {
-  std::shared_ptr<Sender> sender = std::shared_ptr<Sender>(new Sender(protocol, std::move(packet)));
+  std::shared_ptr<Sender> sender =
+      std::shared_ptr<Sender>(new Sender(protocol, std::move(packet)));
   sender->self_ = sender;
   return sender->send();
 }
@@ -377,14 +384,14 @@ void Sender::onFlow(FlowControlFrame &frame) {
         }
         bs--;
       }
-
     }
     finish(Error::Success);
   });
 }
 
 Frame::Frame(const CanMessage &message) {
-  std::copy(message.message(), message.message() + message.length(), data.begin());
+  std::copy(message.message(), message.message() + message.length(),
+            data.begin());
   length = message.length();
 }
 
@@ -464,13 +471,9 @@ bool Frame::flow(FlowControlFrame &f) const {
   return true;
 }
 
-Packet::Packet() {
-  pointer_ = std::begin(data_);
-}
+Packet::Packet() { pointer_ = std::begin(data_); }
 
-Packet::Packet(gsl::span<const uint8_t> data) {
-  setData(data);
-}
+Packet::Packet(gsl::span<const uint8_t> data) { setData(data); }
 
 void Packet::moveAll(std::vector<uint8_t> &data) {
   data = std::move(data_);
@@ -490,16 +493,15 @@ std::vector<uint8_t> Packet::next(size_t max) {
   return std::vector<uint8_t>(begin, pointer_);
 }
 
-uint8_t Packet::next() {
-  return *(pointer_++);
-}
+uint8_t Packet::next() { return *(pointer_++); }
 
 void Packet::setData(gsl::span<const uint8_t> data) {
   data_.assign(data.begin(), data.end());
   pointer_ = std::begin(data_);
 }
 
-Protocol::Protocol(const CanInterfacePtr &can, Options options) : options_(options) {
+Protocol::Protocol(const CanInterfacePtr &can, Options options)
+    : options_(options) {
   setCan(can);
 }
 
@@ -510,7 +512,8 @@ void Protocol::setCan(const CanInterfacePtr &can) {
     return;
   }
 
-  canConnection_ = can_->connect(std::bind(&Protocol::onCan, this, std::placeholders::_1));
+  canConnection_ =
+      can_->connect(std::bind(&Protocol::onCan, this, std::placeholders::_1));
 }
 
 void Protocol::onCan(const CanMessage &message) {
@@ -522,15 +525,16 @@ void Protocol::onCan(const CanMessage &message) {
 }
 
 void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
-  send(std::move(req)).then([this, cb{std::move(cb)}] (boost::future<Error> f) mutable {
-    Error error = f.get();
-    if (error != Error::Success) {
-      cb(error, Packet());
-      return;
-    }
+  send(std::move(req))
+      .then([this, cb{std::move(cb)}](boost::future<Error> f) mutable {
+        Error error = f.get();
+        if (error != Error::Success) {
+          cb(error, Packet());
+          return;
+        }
 
-    recvPacketAsync(std::move(cb));
-  });
+        recvPacketAsync(std::move(cb));
+      });
 }
 
 void Protocol::send(const Frame &frame) {
@@ -563,18 +567,18 @@ void Protocol::recvPacketAsync(Protocol::RecvPacketCallback &&cb) {
 }
 
 std::string strError(Error error) {
-  switch(error) {
-    case Error::Success:
-      return "success";
-    case Error::Unknown:
-      return "unknown";
-    case Error::Consec:
-      return "invalid consecutive index for frame";
-    case Error::Timeout:
-      return "request timed out";
-    default:
-      return "unknown";
+  switch (error) {
+  case Error::Success:
+    return "success";
+  case Error::Unknown:
+    return "unknown";
+  case Error::Consec:
+    return "invalid consecutive index for frame";
+  case Error::Timeout:
+    return "request timed out";
+  default:
+    return "unknown";
   }
 }
 
-} // isotp
+} // namespace isotp
