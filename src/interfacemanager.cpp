@@ -76,6 +76,7 @@ void InterfaceManager::load() {
                                  .arg(xml.columnNumber())
                                  .toStdString());
   }
+  resetDefault();
 }
 
 void InterfaceManager::save() {
@@ -105,6 +106,9 @@ void InterfaceManager::save() {
 void InterfaceManager::add(const InterfaceSettingsPtr &iface) {
   assert(iface);
   settings_.emplace_back(iface);
+  if (!default_) {
+    resetDefault();
+  }
   save();
   signal_->call(settings_);
 }
@@ -113,10 +117,25 @@ void InterfaceManager::remove(const InterfaceSettingsPtr &iface) {
   assert(iface);
   settings_.erase(std::remove(settings_.begin(), settings_.end(), iface),
                   settings_.end());
+  if (default_ == iface) {
+    resetDefault();
+  }
   save();
   signal_->call(settings_);
 }
 
+void InterfaceManager::resetDefault() {
+  if (settings_.empty()) {
+    default_ = nullptr;
+    return;
+  }
+  default_ = settings_.front();
+}
+
 std::string InterfaceManager::path() {
   return (LibreTuner::get()->home() + "/interfaces.xml").toStdString();
+}
+
+InterfaceSettingsPtr InterfaceManager::defaultInterface() {
+  return default_;
 }

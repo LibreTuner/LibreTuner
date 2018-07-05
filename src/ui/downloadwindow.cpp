@@ -27,76 +27,57 @@
 
 Q_DECLARE_METATYPE(DefinitionPtr)
 
-DownloadWindow::DownloadWindow(QWidget *parent)
-    : QWidget(parent), ui(new Ui::DownloadWindow) {
+DownloadWindow::DownloadWindow(const DataLinkPtr &datalink, QWidget *parent)
+    : QWidget(parent), datalink_(datalink), ui(new Ui::DownloadWindow) {
   ui->setupUi(this);
   setWindowFlags(Qt::Window);
 
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  // Populate vehicle combo
-  ui->comboVehicle->clear();
-  DefinitionPtr *defs = DefinitionManager::get()->definitions();
-  for (int i = 0; i < DefinitionManager::get()->count(); ++i) {
-    ui->comboVehicle->addItem(QString::fromStdString(defs[i]->name()),
-                              QVariant::fromValue(defs[i]));
-  }
-
-  on_comboMode_activated(ui->comboMode->currentIndex());
+  query();
 }
 
-void DownloadWindow::on_comboMode_activated(int index) {
-  if (index == 0) {
-    // SocketCAN
-    ui->labelSocketCAN->setVisible(true);
-    ui->editSocketCAN->setVisible(true);
-  } else {
-    ui->labelSocketCAN->setVisible(false);
-    ui->editSocketCAN->setVisible(false);
+void DownloadWindow::queryError(DataLink::Error error) {
+  QMessageBox msg;
+  msg.setText("Could not query vehicle type: " + QString::fromStdString(DataLink::strError(error)));
+  msg.setWindowTitle("Query Error");
+  msg.setIcon(QMessageBox::Critical);
+  msg.exec();
+  close();
+}
+
+void DownloadWindow::vehicleQueried(VehiclePtr vehicle) {
+  ui->labelVehicle->setText("Found vehicle: " + QString::fromStdString(vehicle->name()));
+  ui->vinLineEdit->setText(QString::fromStdString(vehicle->vin()));
+  if (!vehicle->definition()) {
+    QMessageBox msg;
+    msg.setText("Unknown vehicle");
+    msg.setWindowTitle("Unknown vehicle");
+    msg.setIcon(QMessageBox::Critical);
+    msg.exec();
+    close();
+    return;
   }
+  definition_ = vehicle->definition();
+  ui->buttonContinue->setEnabled(true);
 }
 
 void DownloadWindow::start() {
-  definition_ = ui->comboVehicle->currentData().value<DefinitionPtr>();
-
   name_ = ui->lineName->text().toStdString();
-  switch (ui->comboMode->currentIndex()) {
-#ifdef WITH_SOCKETCAN
-  case 0: {
-    // SocketCAN
-    downloadInterface_ = DownloadInterface::createSocketCan(
-        this, ui->editSocketCAN->text().toStdString(), definition_);
-    if (!downloadInterface_) {
-      // The interface should have called the downloadError callback
-      return;
-    }
-
-    ui->buttonBack->setVisible(false);
-    ui->buttonContinue->setVisible(false);
-
-    downloadInterface_->download();
-
-    ui->stackedWidget->setCurrentIndex(2);
-
-    break;
+  // SocketCAN
+  downloadInterface_ = DownloadInterface::create(
+      this, datalink_, definition_);
+  if (!downloadInterface_) {
+    // The interface should have called the downloadError callback
+    return;
   }
-#endif
-#ifdef WITH_J2534
-  case 1:
-    // J2534
-    break;
-#endif
-  default: {
-    QMessageBox msgBox;
-    msgBox.setText("The mode \"" + ui->comboMode->currentText() +
-                   "\" is currently unsupported on this platform.");
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setWindowTitle("Unsupported communication mode");
-    // msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    break;
-  }
-  }
+
+  ui->buttonBack->setEnabled(false);
+  ui->buttonContinue->setEnabled(false);
+
+  downloadInterface_->download();
+
+  ui->stackedWidget->setCurrentIndex(1);
 }
 
 void DownloadWindow::mainDownloadError(const QString &error) {
@@ -110,9 +91,9 @@ void DownloadWindow::mainDownloadError(const QString &error) {
 
   downloadInterface_.reset();
 
-  ui->buttonBack->setVisible(true);
-  ui->buttonContinue->setVisible(true);
-  ui->stackedWidget->setCurrentIndex(1);
+  ui->buttonBack->setEnabled(true);
+  ui->buttonContinue->setEnabled(true);
+  ui->stackedWidget->setCurrentIndex(0);
 }
 
 void DownloadWindow::downloadError(const QString &error) {
@@ -135,7 +116,7 @@ void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
     msgBox.setWindowTitle("Download complete");
     msgBox.exec();
   }
-  hide();
+  close();
 }
 
 void DownloadWindow::onCompletion(gsl::span<const uint8_t> data) {
@@ -157,12 +138,6 @@ void DownloadWindow::updateProgress(float progress) {
 }
 
 void DownloadWindow::on_buttonContinue_clicked() {
-  if (ui->stackedWidget->currentIndex() < ui->stackedWidget->count() - 2) {
-    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
-    ui->buttonBack->setText(tr("Back"));
-    return;
-  }
-
   // Last page
   start();
 }
@@ -179,16 +154,22 @@ void DownloadWindow::on_buttonBack_clicked() {
   }
 }
 
-void DownloadWindow::closeEvent(QCloseEvent *event) {
-  ui->buttonBack->setVisible(true);
-  ui->buttonContinue->setVisible(true);
+Q_DECLARE_METATYPE(DataLink::Error)
+Q_DECLARE_METATYPE(VehiclePtr)
 
-  downloadInterface_.reset();
-}
-
-void DownloadWindow::showEvent(QShowEvent *event) {
-  ui->stackedWidget->setCurrentIndex(0);
-  ui->buttonBack->setText(tr("Cancel"));
+void DownloadWindow::query() {
+  ui->labelVehicle->setText("Querying vehicle... Please Wait");
+  ui->buttonContinue->setEnabled(false);
+  // Query vehicle
+  qRegisterMetaType<DataLink::Error>("DataLink::Error");
+  qRegisterMetaType<VehiclePtr>("VehiclePtr");
+  datalink_->queryVehicle([this](DataLink::Error error, VehiclePtr vehicle) {
+    if (error != DataLink::Error::Success) {
+      QMetaObject::invokeMethod(this, "queryError", Qt::QueuedConnection, Q_ARG(DataLink::Error, error));
+      return;
+    }
+    QMetaObject::invokeMethod(this, "vehicleQueried", Qt::QueuedConnection, Q_ARG(VehiclePtr, vehicle));
+  });
 }
 
 DownloadWindow::~DownloadWindow() { delete ui; }

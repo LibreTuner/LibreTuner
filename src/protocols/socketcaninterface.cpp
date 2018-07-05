@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <unordered_map>
 
 #include <fcntl.h>
 #include <net/if.h>

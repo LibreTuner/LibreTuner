@@ -26,6 +26,7 @@
 #include <memory>
 
 #include "rommanager.h"
+#include "datalink.h"
 
 enum DownloadMode {
   DM_NONE = 0,
@@ -58,13 +59,7 @@ public:
     virtual void onCompletion(gsl::span<const uint8_t> data) = 0;
   };
 
-#ifdef WITH_SOCKETCAN
-  /* Creates a socketcan downloader. device is the name of the socketcan
-   * interface. */
-  static std::shared_ptr<DownloadInterface>
-  createSocketCan(Callbacks *callbacks, const std::string &device,
-                  DefinitionPtr definition);
-#endif
+  static std::shared_ptr<DownloadInterface> create(Callbacks *callbacks, DataLinkPtr datalink, DefinitionPtr definition);
 
 protected:
   Callbacks *callbacks_;

@@ -16,18 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "libretuner.h"
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 #include "flowlayout.h"
 #include "romwidget.h"
 #include "tunemanager.h"
 #include "tunewidget.h"
 
+#include <QPushButton>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow),
-      downloadWindow_(new DownloadWindow(this)) {
-  ui->setupUi(this);
+    : QMainWindow(parent) {
+  resize(QSize(1100, 630));
+  setupMenu();
+
+  QTabWidget *tabs = new QTabWidget(centralWidget());
+  tabs->addTab(createOverviewTab(), "Overview");
+  tabs->addTab(createTunesTab(), "Tunes");
+  tabs->addTab(createRomsTab(), "ROMs");
+  tabs->addTab(createLogsTab(), "Logs");
+
+  setCentralWidget(tabs);
 
   connect(RomManager::get(), &RomManager::updateRoms, this,
           &MainWindow::updateRoms);
@@ -37,37 +51,119 @@ MainWindow::MainWindow(QWidget *parent)
   updateTunes();
 }
 
+QWidget *MainWindow::createLogsTab() {
+  QWidget *widget = new QWidget();
+  QVBoxLayout *layout = new QVBoxLayout();
+
+  QHBoxLayout *hlayout = new QHBoxLayout();
+  layout->addLayout(hlayout);
+
+  QPushButton *buttonNewLog = new QPushButton(tr("New Log"));
+  hlayout->addWidget(buttonNewLog);
+  comboLogVehicles_ = new QComboBox();
+  QSizePolicy policy = comboLogVehicles_->sizePolicy();
+  policy.setHorizontalPolicy(QSizePolicy::Expanding);
+  comboLogVehicles_->setSizePolicy(policy);
+  hlayout->addWidget(comboLogVehicles_);
+
+  listLogs_ = new QListView;
+  layout->addWidget(listLogs_);
+
+  widget->setLayout(layout);
+  return widget;
+}
+
+QWidget *MainWindow::createRomsTab() {
+  QWidget *widget = new QWidget();
+  QVBoxLayout *layout = new QVBoxLayout();
+
+  QScrollArea *area = new QScrollArea;
+  area->setWidgetResizable(true);
+  layout->addWidget(area);
+
+  QWidget *scrollContents = new QWidget();
+  romsLayout_ = new FlowLayout();
+  scrollContents->setLayout(romsLayout_);
+  area->setWidget(scrollContents);
+
+  QPushButton *buttonDownload = new QPushButton(tr("Download new ROM"));
+  connect(buttonDownload, &QPushButton::clicked, this, &MainWindow::on_buttonDownloadRom_clicked);
+  layout->addWidget(buttonDownload);
+
+  widget->setLayout(layout);
+  return widget;
+}
+
+QWidget *MainWindow::createTunesTab() {
+  QWidget *widget = new QWidget();
+  QVBoxLayout *layout = new QVBoxLayout();
+
+  QScrollArea *area = new QScrollArea;
+  layout->addWidget(area);
+
+  tunesLayout_ = new FlowLayout();
+  area->setLayout(tunesLayout_);
+
+  QPushButton *buttonCreateTune = new QPushButton(tr("Create new tune"));
+  layout->addWidget(buttonCreateTune);
+
+  widget->setLayout(layout);
+  return widget;
+}
+
+QWidget *MainWindow::createOverviewTab() {
+  return new QWidget();
+}
+
+void MainWindow::setupMenu() {
+  QMenuBar *menuBar = new QMenuBar;
+  QMenu *fileMenu = menuBar->addMenu(tr("&File"));
+  QMenu *editMenu = menuBar->addMenu(tr("&Edit"));
+  QMenu *helpMenu = menuBar->addMenu(tr("&Help"));
+  QMenu *viewMenu = menuBar->addMenu(tr("&View"));
+
+  QAction *logAct = viewMenu->addAction(tr("CAN Log"));
+  connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
+
+  QAction *interfacesAct = viewMenu->addAction(tr("Interfaces"));
+  connect(interfacesAct, &QAction::triggered, [this] { interfacesWindow_.show(); });
+
+  setMenuBar(menuBar);
+}
+
 void MainWindow::updateTunes() {
   QLayoutItem *child;
-  while ((child = ui->tuneLayout->takeAt(0)) != 0) {
+  while ((child = tunesLayout_->takeAt(0)) != 0) {
     delete child;
   }
 
   for (const TunePtr &tune : TuneManager::get()->tunes()) {
-    ui->tuneLayout->addWidget(new TuneWidget(tune));
+    tunesLayout_->addWidget(new TuneWidget(tune));
   }
 }
 
 void MainWindow::updateRoms() {
   QLayoutItem *child;
-  while ((child = ui->romLayout->takeAt(0)) != 0) {
+  while ((child = romsLayout_->takeAt(0)) != 0) {
     delete child;
   }
 
   for (const RomPtr &rom : RomManager::get()->roms()) {
-    ui->romLayout->addWidget(new RomWidget(rom));
+    romsLayout_->addWidget(new RomWidget(rom));
   }
 }
 
-MainWindow::~MainWindow() { delete ui; }
 
-void MainWindow::on_actionCAN_Log_triggered() { canViewer_.show(); }
-
-void MainWindow::on_buttonDownloadRom_clicked() { downloadWindow_->show(); }
+void MainWindow::on_buttonDownloadRom_clicked() {
+  DataLinkPtr link = LibreTuner::get()->getDataLink();
+  if (link) {
+    downloadWindow_ = new DownloadWindow(link, this);
+    downloadWindow_->setAttribute(Qt::WA_DeleteOnClose, true);
+    downloadWindow_->show();
+  }
+}
 
 void MainWindow::closeEvent(QCloseEvent *event) {
   canViewer_.close();
   interfacesWindow_.close();
 }
-
-void MainWindow::on_actionInterfaces_triggered() { interfacesWindow_.show(); }

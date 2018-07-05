@@ -18,9 +18,10 @@
 
 #include "vehicle.h"
 #include "definitions/definitionmanager.h"
+#include "definitions/definition.h"
 
 Vehicle::Vehicle(const std::string &name, const std::string &vin,
-                 DefinitionPtr ptr) {}
+                 DefinitionPtr ptr) : name_(name), vin_(vin), definition_(std::move(ptr)) {}
 
 struct make_shared_enabler : public Vehicle {
   template <typename... Args>

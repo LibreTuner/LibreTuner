@@ -23,8 +23,13 @@
 #include <memory>
 #include <string>
 
-#include "interface.h"
 #include "vehicle.h"
+
+class CanInterface;
+using CanInterfacePtr = std::shared_ptr<CanInterface>;
+
+class InterfaceSettings;
+using InterfaceSettingsPtr = std::shared_ptr<InterfaceSettings>;
 
 class DataLink;
 using DataLinkPtr = std::shared_ptr<DataLink>;
@@ -64,6 +69,8 @@ public:
   };
 
   virtual ~DataLink() = default;
+
+  static std::string strError(Error error);
 
   /* Creates a datalink from the interface settings. May throw an exception */
   static DataLinkPtr create(const InterfaceSettingsPtr &iface);

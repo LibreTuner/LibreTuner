@@ -21,6 +21,7 @@
 
 #include "definitions/definitionmanager.h"
 #include "protocols/canlog.h"
+#include "datalink.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
 
@@ -40,13 +41,13 @@ class LibreTuner : public QApplication {
 public:
   LibreTuner(int &argc, char *argv[]);
 
+  ~LibreTuner() override;
+
   /* Returns the global LibreTune object */
   static LibreTuner *get();
 
   /* Returns the CAN log. */
   CanLog *canLog() { return &canLog_; }
-
-  ~LibreTuner() override;
 
   /* Checks if the home directory exists and if it does not,
    * creates it. */
@@ -59,6 +60,10 @@ public:
 
   /* Open tune flasher */
   void flashTune(const TunePtr &tune);
+
+  /* Returns the default datalink. Queries the user to create one
+   * if none exist. May return nullptr */
+  DataLinkPtr getDataLink();
 
 private:
   std::unique_ptr<MainWindow> mainWindow_;

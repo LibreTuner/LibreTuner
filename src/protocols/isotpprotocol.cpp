@@ -17,7 +17,8 @@
  */
 
 #include "isotpprotocol.h"
-#include <iostream>
+#include "timer.h"
+#include "util.hpp"
 
 namespace isotp {
 namespace details {
@@ -108,8 +109,10 @@ class Receiver {
 public:
   static void recv(Protocol &protocol, Protocol::RecvPacketCallback cb);
 
-private:
+protected:
   Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb);
+
+private:
   void start();
 
   void handleFirst(const FirstFrame &f);
@@ -134,7 +137,7 @@ private:
   std::shared_ptr<Receiver> self_;
   State state_ = State::Begin;
 
-  Timer timer_;
+  TimerPtr timer_;
 
   std::shared_ptr<Protocol::ConnectionType> connection_;
 
@@ -154,9 +157,10 @@ public:
   static boost::future<Error> send(Protocol &protocol, Packet &&packet);
   ~Sender();
 
-private:
+protected:
   Sender(Protocol &protocol, Packet &&packet);
 
+private:
   boost::future<Error> send();
 
   boost::promise<Error> promise_;
@@ -165,7 +169,7 @@ private:
   Protocol &protocol_;
 
   uint8_t consecIndex_ = 0;
-  Timer timer_;
+  TimerPtr timer_;
   std::shared_ptr<Protocol::ConnectionType> connection_;
   std::thread consecThread_;
 
@@ -187,7 +191,7 @@ uint8_t Receiver::incConsec() {
 void Receiver::timedout() { error(Error::Timeout); }
 
 void Receiver::error(Error err) {
-  timer_.stop();
+  timer_->disable();
   connection_.reset();
   callback_(err, std::move(packet_));
   self_.reset();
@@ -205,7 +209,7 @@ bool Receiver::finishRead(uint8_t amount) {
     received();
     return false;
   }
-  timer_.start();
+  timer_->enable();
   return true;
 }
 
@@ -249,20 +253,21 @@ void Receiver::handleConsec(const ConsecutiveFrame &f) {
 
 void Receiver::recv(Protocol &protocol, Protocol::RecvPacketCallback cb) {
   std::shared_ptr<Receiver> receiver =
-      std::shared_ptr<Receiver>(new Receiver(protocol, std::move(cb)));
+      std::make_shared<make_shared_enabler<Receiver>>(protocol, std::move(cb));
   receiver->self_ = receiver;
   receiver->start();
 }
 
 Receiver::Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb)
-    : protocol_(protocol), callback_(std::move(cb)),
-      timer_(std::bind(&Receiver::timedout, this)) {
+    : protocol_(protocol), callback_(std::move(cb)), timer_(Timer::create(std::bind(&Receiver::timedout, this))) {
   packet_.clear();
-  timer_.setTimeout(protocol_.options().timeout);
+  timer_->setTimeout(protocol_.options().timeout);
 }
 
 void Receiver::start() {
+  timer_->enable();
   connection_ = protocol_.listen([&](const Frame &f) {
+    timer_->disable();
     switch (state_) {
     case State::Begin:
       if (f.type() == FrameType::Single || f.type() == FrameType::First)
@@ -282,8 +287,8 @@ void Receiver::start() {
 }
 
 Sender::Sender(Protocol &protocol, Packet &&packet)
-    : protocol_(protocol), packet_(std::move(packet)) {
-  timer_.setTimeout(protocol.options().timeout);
+    : protocol_(protocol), packet_(std::move(packet)), timer_(Timer::create()) {
+  timer_->setTimeout(protocol.options().timeout);
 }
 
 Sender::~Sender() {
@@ -293,8 +298,8 @@ Sender::~Sender() {
 }
 
 boost::future<Error> Sender::send(Protocol &protocol, Packet &&packet) {
-  std::shared_ptr<Sender> sender =
-      std::shared_ptr<Sender>(new Sender(protocol, std::move(packet)));
+  auto sender =
+      std::make_shared<make_shared_enabler<Sender>>(protocol, std::move(packet));
   sender->self_ = sender;
   return sender->send();
 }
@@ -322,18 +327,18 @@ boost::future<Error> Sender::send() {
 }
 
 void Sender::waitForControlFrame() {
-  timer_.setCallback([this] {
+  timer_->setCallback([this] {
     connection_.reset();
     finish(Error::Timeout);
   });
-  timer_.start();
+  timer_->enable();
 
   connection_ = protocol_.listen([this](const Frame &f) {
     FlowControlFrame fc;
     if (!f.flow(fc)) {
       return;
     }
-    timer_.stop();
+    timer_->disable();
     connection_.reset();
     onFlow(fc);
   });

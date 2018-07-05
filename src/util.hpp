@@ -149,4 +149,11 @@ static void writeLE(T t, gsl::span<uint8_t> data) {
   return util::SConverter<T, sizeof(T)>::writeLE(t, data);
 }
 
+template<class T>
+struct make_shared_enabler : public T {
+  template <typename... Args>
+  explicit make_shared_enabler(Args &&... args)
+      : T(std::forward<Args>(args)...) {}
+};
+
 #endif

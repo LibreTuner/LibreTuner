@@ -20,11 +20,11 @@
 #define LIBRETUNER_ISOTPPROTOCOL_H
 
 #include "caninterface.h"
-#include "timer.h"
 #include <gsl/gsl>
 
 // Std
 #include <chrono>
+#include <cstdint>
 
 // Boost
 #define BOOST_THREAD_PROVIDES_FUTURE

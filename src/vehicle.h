@@ -22,7 +22,8 @@
 #include <memory>
 #include <string>
 
-#include "definitions/definition.h"
+class Definition;
+using DefinitionPtr = std::shared_ptr<Definition>;
 
 class Vehicle;
 using VehiclePtr = std::shared_ptr<Vehicle>;
