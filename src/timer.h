@@ -1,6 +1,6 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2018  <copyright holder> <email>
+ * LibreTuner
+ * Copyright (C) 2018  Altenius
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,39 +24,61 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <atomic>
+#include <memory>
+
+class TimerRunLoop;
 
 /**
  * @todo write docs
  */
-class Timer {
+class Timer : public std::enable_shared_from_this<Timer> {
+  friend TimerRunLoop;
 public:
   using Callback = std::function<void()>;
+
+  static std::shared_ptr<Timer> create();
+  static std::shared_ptr<Timer> create(Callback &&cb);
+
+  void setCallback(Callback &&cb);
+  void setTimeout(std::chrono::milliseconds timeout);
+  std::chrono::milliseconds timeout() const { return timeout_; }
+  /* Starts the timeout timer */
+  void enable();
+  /* Stops the timeout timer */
+  void disable();
+
+  bool active() const;
+  bool running() const;
+
+  std::chrono::steady_clock::time_point nextTrigger() const;
+
+  ~Timer();
+
+  Timer(const Timer&) = delete;
+  Timer(Timer &&) = delete;
+
+protected:
+  bool tryTrigger();
+  void trigger();
 
   Timer() = default;
   explicit Timer(Callback &&cb);
 
-  void setCallback(Callback &&cb);
-  void setTimeout(std::chrono::milliseconds timeout) { timeout_ = timeout; }
-  std::chrono::milliseconds timeout() const { return timeout_; }
-  /* Starts the timeout timer */
-  void start();
-  /* Stops the timeout timer */
-  void stop();
-
-  ~Timer();
-
 private:
-  void run();
-
   std::chrono::milliseconds timeout_;
+
+  std::chrono::steady_clock::time_point nextTrigger_;
+
+  std::mutex mutex_;
+
   Callback callback_;
 
-  std::thread thread_;
-
-  std::condition_variable cv_;
-  std::mutex cv_m_;
-
-  bool canceled_;
+  // true if the timer is waiting
+  bool active_;
+  // true if the timer is currently being triggered
+  std::atomic<bool> running_;
 };
+using TimerPtr = std::shared_ptr<Timer>;
 
 #endif // TIMED_H

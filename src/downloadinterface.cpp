@@ -75,40 +75,31 @@ Uds23DownloadInterface::Uds23DownloadInterface(
   uds_ = uds::Protocol::create(std::move(isotp));
 }
 
-#ifdef WITH_SOCKETCAN
 std::shared_ptr<DownloadInterface>
-DownloadInterface::createSocketCan(DownloadInterface::Callbacks *callbacks,
-                                   const std::string &device,
-                                   DefinitionPtr definition) {
+DownloadInterface::create(DownloadInterface::Callbacks *callbacks, DataLinkPtr datalink, DefinitionPtr definition) {
   assert(callbacks != nullptr);
-  std::shared_ptr<SocketCanInterface> can;
-  try {
-    can = SocketCanInterface::create(device);
-    can->start();
-  } catch (std::exception &e) {
-    callbacks->downloadError("Could not initialize SocketCAN device \"" +
-                             QString::fromStdString(device) +
-                             "\": " + QString(e.what()));
-    return nullptr;
-  }
 
   switch (definition->downloadMode()) {
-  case DM_MAZDA23:
-    return std::make_shared<Uds23DownloadInterface>(
-        callbacks,
-        std::make_shared<isotp::Protocol>(
-            can,
-            isotp::Options{definition->serverId(), definition->serverId() + 8,
-                           std::chrono::milliseconds(100)}),
-        definition->key(), definition->size());
-  default:
-    callbacks->downloadError("CAN is not supported on this vehicle");
-    break;
+    case DM_MAZDA23: {
+      CanInterfacePtr can = datalink->can();
+      if (!can) {
+        callbacks->downloadError("DataLink does not support CAN protocol. Choose a different interface.");
+        break;
+      }
+      return std::make_shared<Uds23DownloadInterface>(
+          callbacks,
+          std::make_shared<isotp::Protocol>(
+              can,
+              isotp::Options{definition->serverId(), definition->serverId() + 8,
+                             std::chrono::milliseconds(100)}),
+          definition->key(), definition->size());
+    }
+    default:
+      callbacks->downloadError("Unimplemented download mode");
+      break;
   }
-
   return nullptr;
 }
-#endif
 
 bool Uds23DownloadInterface::checkError(uds::Error error) {
   if (error != uds::Error::Success) {

@@ -25,6 +25,7 @@
 
 #include "downloadinterface.h"
 #include "rommanager.h"
+#include "datalink.h"
 
 namespace Ui {
 class DownloadWindow;
@@ -36,7 +37,7 @@ class DownloadWindow;
 class DownloadWindow : public QWidget, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
-  explicit DownloadWindow(QWidget *parent = nullptr);
+  explicit DownloadWindow(const DataLinkPtr &datalink, QWidget *parent = nullptr);
   ~DownloadWindow() override;
 
   /* Download interface callbacks */
@@ -45,22 +46,24 @@ public:
   void updateProgress(float progress) override;
 
 private slots:
-  void on_comboMode_activated(int index);
   void on_buttonContinue_clicked();
   void on_buttonBack_clicked();
-  void showEvent(QShowEvent *event) override;
-  void closeEvent(QCloseEvent *event) override;
 
   void mainDownloadError(const QString &error);
   void mainOnCompletion(bool success, const QString &error);
+
+  void queryError(DataLink::Error error);
+  void vehicleQueried(VehiclePtr vehicle);
 
 private:
   Ui::DownloadWindow *ui;
   std::shared_ptr<DownloadInterface> downloadInterface_;
   std::string name_;
   DefinitionPtr definition_;
+  DataLinkPtr datalink_;
 
   void start();
+  void query();
 };
 
 #endif // DOWNLOADWINDOW_H

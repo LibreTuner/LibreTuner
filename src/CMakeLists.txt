@@ -103,7 +103,7 @@ set(libretuner_SRC
     protocols/isotpserver.cpp
     protocols/isotpserver.h
     protocols/isotpprotocol.cpp
-    protocols/isotpprotocol.h)
+    protocols/isotpprotocol.h timerrunloop.cpp timerrunloop.h datalogger.cpp datalogger.h)
 
 if (UNIX)
     set(libretuner_SRC ${libretuner_SRC}
@@ -117,7 +117,6 @@ endif (UNIX)
 # Create code from a list of Qt designer ui files.
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
 qt5_wrap_ui(libretuner_SRC
-    ui/mainwindow.ui
     ui/canviewer.ui
     ui/downloadwindow.ui
     ui/createtunedialog.ui

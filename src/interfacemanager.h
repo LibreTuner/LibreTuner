@@ -43,6 +43,9 @@ public:
   void add(const InterfaceSettingsPtr &iface);
   void remove(const InterfaceSettingsPtr &iface);
 
+  /* Returns the default interface, if one exists */
+  InterfaceSettingsPtr defaultInterface();
+
   void load();
   void save();
 
@@ -51,6 +54,10 @@ public:
 private:
   std::vector<InterfaceSettingsPtr> settings_;
   std::shared_ptr<SignalType> signal_;
+
+  InterfaceSettingsPtr default_;
+
+  void resetDefault();
 
   InterfaceManager();
 };

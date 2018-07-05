@@ -17,3 +17,27 @@
  */
 
 #include "datalog.h"
+
+bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
+  auto it = data_.find(id);
+  if (it == data_.end()) {
+    return false;
+  }
+
+  it->second.values.emplace_back(value);
+  return true;
+}
+
+bool DataLog::add(uint32_t id, double value) {
+  auto it = data_.find(id);
+  if (it == data_.end()) {
+    return false;
+  }
+
+  it->second.values.emplace_back(std::chrono::steady_clock::now(), value);
+  return true;
+}
+
+void DataLog::addData(const DataLog::DataHead &data) {
+  data_.emplace(data.id, Data{.head = data});
+}

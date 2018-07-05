@@ -23,8 +23,10 @@
 #include "tune.h"
 #include "ui/flashwindow.h"
 #include "ui/tuneeditor.h"
-
+#include "ui/addinterfacedialog.h"
 #include "tunemanager.h"
+#include "timerrunloop.h"
+
 #include <QDir>
 #include <QMessageBox>
 #include <QStandardPaths>
@@ -42,6 +44,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 #ifdef WITH_SOCKETCAN
   SocketHandler::get()->initialize();
 #endif
+  TimerRunLoop::get().startWorker();
 
   if (!DefinitionManager::get()->load()) {
     QMessageBox msgBox;
@@ -124,13 +127,11 @@ void LibreTuner::flashTune(const TunePtr &tune) {
     msgBox.exec();
     return;
   }
-  flashWindow_.reset(new FlashWindow(flash));
+  flashWindow_ = std::make_unique<FlashWindow>(flash);
   flashWindow_->show();
 }
 
 LibreTuner *LibreTuner::get() { return _global; }
-
-LibreTuner::~LibreTuner() {}
 
 void LibreTuner::checkHome() {
   QDir home(home_);
@@ -155,3 +156,31 @@ void LibreTuner::checkHome() {
     }
   }
 }
+
+DataLinkPtr LibreTuner::getDataLink() {
+  // Get the default interface
+  InterfaceSettingsPtr def = InterfaceManager::get().defaultInterface();
+  if (!def) {
+    // Ask the user to create an interface
+    AddInterfaceDialog dlg;
+    dlg.exec();
+    def = InterfaceManager::get().defaultInterface();
+    if (!def) {
+      // The user did not create one.
+      return nullptr;
+    }
+  }
+
+  try {
+    return DataLink::create(def);
+  } catch (const std::exception &e) {
+    QMessageBox msg;
+    msg.setText("Failed to create datalink from default interface: " + QString(e.what()));
+    msg.setWindowTitle("DataLink Error");
+    msg.setIcon(QMessageBox::Critical);
+    msg.exec();
+    return nullptr;
+  }
+}
+
+LibreTuner::~LibreTuner() = default;

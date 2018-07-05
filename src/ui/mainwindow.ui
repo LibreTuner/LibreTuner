@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabOverview">
        <attribute name="title">
@@ -162,7 +162,6 @@
      <string>E&amp;dit</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionInterfaces"/>
    </widget>
    <widget class="QMenu" name="menuHelp_2">
     <property name="title">
@@ -175,6 +174,7 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionCAN_Log"/>
+    <addaction name="actionInterfaces"/>
    </widget>
    <addaction name="menuHelp"/>
    <addaction name="menuSettings"/>
@@ -199,7 +199,7 @@
   </action>
   <action name="actionInterfaces">
    <property name="text">
-    <string>Interfaces</string>
+    <string>&amp;Interfaces</string>
    </property>
   </action>
  </widget>

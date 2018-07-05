@@ -17,39 +17,84 @@
  */
 
 #include "timer.h"
+#include "timerrunloop.h"
 
-Timer::Timer(Timer::Callback &&cb) : callback_(std::move(cb)) {}
+struct make_shared_enabler : public Timer {
+  template <typename... Args>
+  explicit make_shared_enabler(Args &&... args)
+      : Timer(std::forward<Args>(args)...) {}
+};
 
-void Timer::run() {
-  std::unique_lock<std::mutex> lk(cv_m_);
-  if (!cv_.wait_for(lk, timeout_, [this]() { return canceled_; })) {
-    if (!canceled_) {
-      if (callback_) {
-        callback_();
-      }
-    }
-  }
+Timer::Timer(Timer::Callback &&cb) : callback_(std::move(cb)), active_(false) {}
+
+std::chrono::steady_clock::time_point Timer::nextTrigger() const {
+  return nextTrigger_;
 }
 
 void Timer::setCallback(Timer::Callback &&cb) { callback_ = std::move(cb); }
 
-Timer::~Timer() { stop(); }
-
-void Timer::start() {
-  stop();
-
-  canceled_ = false;
-  thread_ = std::thread(&Timer::run, this);
+void Timer::setTimeout(std::chrono::milliseconds timeout) {
+  timeout_ = timeout;
+  if (active_) {
+    // Reinsert
+    enable();
+  }
 }
 
-void Timer::stop() {
-  if (thread_.joinable()) {
-    {
-      std::lock_guard<std::mutex> lk(cv_m_);
-      canceled_ = true;
-    }
+Timer::~Timer() {
+  std::lock_guard<std::mutex> lk(mutex_);
+}
 
-    cv_.notify_all();
-    thread_.join();
+void Timer::enable() {
+  std::lock_guard<std::mutex> lk(mutex_);
+  nextTrigger_ = std::chrono::steady_clock::now() + timeout_;
+  if (active_) {
+    // nextTrigger may have changed, so remove and reinsert
+    TimerRunLoop::get().removeTimer(shared_from_this());
   }
+  active_ = true;
+  TimerRunLoop::get().addTimer(shared_from_this());
+}
+
+void Timer::disable() {
+  std::lock_guard<std::mutex> lk(mutex_);
+  if (!active_) {
+    return;
+  }
+  active_ = false;
+  TimerRunLoop::get().removeTimer(shared_from_this());
+}
+
+bool Timer::active() const {
+  return active_;
+}
+
+bool Timer::running() const {
+  return running_;
+}
+
+bool Timer::tryTrigger() {
+  if (nextTrigger_ < std::chrono::steady_clock::now()) {
+    trigger();
+    return true;
+  }
+  return false;
+}
+
+void Timer::trigger() {
+  auto self = shared_from_this();
+  running_ = true;
+  if (callback_) {
+    callback_();
+  }
+  disable();
+  running_ = false;
+}
+
+TimerPtr Timer::create() {
+  return std::make_shared<make_shared_enabler>();
+}
+
+TimerPtr Timer::create(Timer::Callback &&cb) {
+  return std::make_shared<make_shared_enabler>(std::move(cb));
 }
