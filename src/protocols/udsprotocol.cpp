@@ -83,7 +83,11 @@ void IsoTpInterface::Request::request(gsl::span<uint8_t> data,
   expectedId_ = expectedId;
   cb_ = std::move(cb);
   do_recv();
-  isotp_->send(isotp::Packet(data));
+  isotp_->send(isotp::Packet(data), [this](isotp::Error error) {
+    if (error != isotp::Error::Success) {
+      cb_(Error::IsoTp, Packet());
+    }
+  });
 }
 
 void IsoTpInterface::Request::do_recv() {

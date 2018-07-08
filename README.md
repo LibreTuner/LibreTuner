@@ -23,7 +23,6 @@ Building
 ### Requirements
 * Qt5
 * CMake 2.8.11 or higher
-* Boost
 
 ### Build instructions
 

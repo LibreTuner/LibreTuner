@@ -26,11 +26,6 @@
 #include <chrono>
 #include <cstdint>
 
-// Boost
-#define BOOST_THREAD_PROVIDES_FUTURE
-#define BOOST_THREAD_PROVIDES_FUTURE_CONTINUATION
-#include <boost/thread/future.hpp>
-
 namespace isotp {
 struct Options {
   unsigned sourceId = 0x7E0, destId = 0x7E8;
@@ -166,6 +161,7 @@ public:
   using ConnectionType = SignalType::ConnectionType;
 
   using RecvPacketCallback = std::function<void(Error error, Packet &&packet)>;
+  using SendPacketCallback = std::function<void(Error error)>;
 
   explicit Protocol(const CanInterfacePtr &can = CanInterfacePtr(),
                     Options = Options());
@@ -184,7 +180,7 @@ public:
   // Sends a request and waits for a response
   void request(Packet &&req, RecvPacketCallback &&cb);
 
-  boost::future<Error> send(Packet &&packet);
+  void send(Packet &&packet, SendPacketCallback &&cb);
 
   void setCan(const CanInterfacePtr &can);
 

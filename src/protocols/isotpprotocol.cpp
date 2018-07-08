@@ -154,19 +154,18 @@ private:
 /* Used to send ISO-TP messages */
 class Sender {
 public:
-  static boost::future<Error> send(Protocol &protocol, Packet &&packet);
+  static void send(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb);
   ~Sender();
 
 protected:
-  Sender(Protocol &protocol, Packet &&packet);
+  Sender(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb);
 
 private:
-  boost::future<Error> send();
-
-  boost::promise<Error> promise_;
+  void send();
 
   Packet packet_;
   Protocol &protocol_;
+  Protocol::SendPacketCallback callback_;
 
   uint8_t consecIndex_ = 0;
   TimerPtr timer_;
@@ -286,8 +285,8 @@ void Receiver::start() {
   });
 }
 
-Sender::Sender(Protocol &protocol, Packet &&packet)
-    : protocol_(protocol), packet_(std::move(packet)), timer_(Timer::create()) {
+Sender::Sender(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb)
+    : protocol_(protocol), packet_(std::move(packet)), timer_(Timer::create()), callback_(std::move(cb)) {
   timer_->setTimeout(protocol.options().timeout);
 }
 
@@ -297,19 +296,19 @@ Sender::~Sender() {
   }
 }
 
-boost::future<Error> Sender::send(Protocol &protocol, Packet &&packet) {
+void Sender::send(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb) {
   auto sender =
-      std::make_shared<make_shared_enabler<Sender>>(protocol, std::move(packet));
+      std::make_shared<make_shared_enabler<Sender>>(protocol, std::move(packet), std::move(cb));
   sender->self_ = sender;
   return sender->send();
 }
 
 void Sender::finish(Error error) {
-  promise_.set_value(error);
+  callback_(error);
   self_.reset();
 }
 
-boost::future<Error> Sender::send() {
+void Sender::send() {
   std::shared_ptr<Sender> s = self_; // Hold the object for this scope
 
   if (packet_.size() <= 7) {
@@ -322,8 +321,6 @@ boost::future<Error> Sender::send() {
     std::vector<uint8_t> data = packet_.next(6);
     protocol_.sendFirstFrame(remaining, data);
   }
-
-  return promise_.get_future();
 }
 
 void Sender::waitForControlFrame() {
@@ -357,7 +354,7 @@ void Sender::onFlow(FlowControlFrame &frame) {
   }
   // Send consecutive frames
   if (frame.flag == FCFlag::Overflow) {
-    promise_.set_value(Error::Unknown);
+    callback_(Error::Unknown);
     return;
   }
   if (frame.flag == FCFlag::Wait) {
@@ -530,9 +527,7 @@ void Protocol::onCan(const CanMessage &message) {
 }
 
 void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
-  send(std::move(req))
-      .then([this, cb{std::move(cb)}](boost::future<Error> f) mutable {
-        Error error = f.get();
+  send(std::move(req), [this, cb{std::move(cb)}](Error error) mutable {
         if (error != Error::Success) {
           cb(error, Packet());
           return;
@@ -563,8 +558,8 @@ void Protocol::sendFlowFrame(const FlowControlFrame &fc) {
   send(Frame::flow(fc));
 }
 
-boost::future<Error> Protocol::send(Packet &&packet) {
-  return Sender::send(*this, std::move(packet));
+void Protocol::send(Packet &&packet, SendPacketCallback &&cb) {
+  return Sender::send(*this, std::move(packet), std::move(cb));
 }
 
 void Protocol::recvPacketAsync(Protocol::RecvPacketCallback &&cb) {

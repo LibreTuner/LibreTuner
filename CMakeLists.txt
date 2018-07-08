@@ -7,7 +7,6 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5DataVisualization CONFIG REQUIRED)
 find_package(Qt5Charts CONFIG REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Boost 1.40 COMPONENTS system thread REQUIRED)
 
 option(Test "Build all tests." ON)
 
