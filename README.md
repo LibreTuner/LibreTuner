@@ -24,7 +24,7 @@ Building
 * Qt5
 * CMake 2.8.11 or higher
 
-### Build instructions (Git 2.13+)
+### Build instructions
 
 `git clone https://github.com/Libretuner/LibreTuner.git`
 
