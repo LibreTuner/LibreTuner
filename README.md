@@ -24,9 +24,11 @@ Building
 * Qt5
 * CMake 2.8.11 or higher
 
-### Build instructions
+### Build instructions (Git 2.13+)
 
 `git clone https://github.com/Libretuner/LibreTuner.git`
+
+`git submodule update --init --recursive`
 
 `cd LibreTuner`
 
