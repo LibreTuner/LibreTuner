@@ -2,7 +2,7 @@ LibreTuner
 =========
 Open source tuning software for Mazda platforms
 
-[Join the Discord server](https://discord.gg/Sdh3mV)
+[Join the Discord server](https://discord.gg/QQvX2rB)
 
 
 Screenshots
