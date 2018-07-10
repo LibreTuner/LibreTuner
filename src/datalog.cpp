@@ -39,5 +39,7 @@ bool DataLog::add(uint32_t id, double value) {
 }
 
 void DataLog::addData(const DataLog::DataHead &data) {
-  data_.emplace(data.id, Data{.head = data});
+    Data d;
+    d.head = data;
+  data_.emplace(data.id, std::move(d));
 }

@@ -22,12 +22,13 @@
 #include "canviewer.h"
 #include "downloadwindow.h"
 #include "interfaceswindow.h"
+#include "styledwindow.h"
 
 #include <QMainWindow>
 #include <QLayout>
 #include <QComboBox>
 
-class MainWindow : public QMainWindow {
+class MainWindow : public StyledWindow {
   Q_OBJECT
 
 public:
@@ -42,12 +43,15 @@ private:
   DownloadWindow *downloadWindow_ = nullptr;
   InterfacesWindow interfacesWindow_;
 
+  QMainWindow *mainWindow_;
+
   QLayout *tunesLayout_;
   QLayout *romsLayout_;
   QComboBox *comboLogVehicles_;
   QListView *listLogs_;
 
   void setupMenu();
+  void setupWindow();
 
   QWidget *createOverviewTab();
   QWidget *createTunesTab();

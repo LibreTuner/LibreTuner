@@ -21,9 +21,7 @@
 
 #include <memory>
 
-#include <QFrame>
-#include <QGraphicsScene>
-#include <QGraphicsView>
+#include <QWidget>
 #include <QLabel>
 
 class QPushButton;
@@ -34,11 +32,12 @@ typedef std::shared_ptr<Rom> RomPtr;
 /**
  * Widget for the ROM list
  */
-class RomWidget : public QFrame {
+class RomWidget : public QWidget {
   Q_OBJECT
 public:
   explicit RomWidget(RomPtr rom, QWidget *parent = 0);
 
+  void paintEvent(QPaintEvent *event) override;
 private:
   QLabel *label_;
   QPushButton *deleteButton_;

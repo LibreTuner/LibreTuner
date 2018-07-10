@@ -1,8 +1,12 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-<qresource>
-    <file>icons/rom-file.png</file>
-    <file>icons/add.svg</file>
-    <file>icons/remove.svg</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>icons/rom-file.png</file>
+        <file>icons/add.svg</file>
+        <file>icons/remove.svg</file>
+        <file>icons/LibreTuner.png</file>
+        <file>icons/maximize.svg</file>
+        <file>icons/close.svg</file>
+        <file>icons/minimize.svg</file>
+        <file>icons/restore.svg</file>
+    </qresource>
 </RCC>

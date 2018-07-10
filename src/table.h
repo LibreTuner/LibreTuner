@@ -461,6 +461,10 @@ template <typename T> QString Table::toString(T t) {
   return QString::number(t);
 }
 
+template <> inline QString Table::toString<float>(float t) {
+  return QString::number(t, 'f', 2);
+}
+
 template <typename T> T Table::fromVariant(const QVariant &v, bool &success) {
   if (v.canConvert<T>()) {
     success = true;
@@ -469,5 +473,10 @@ template <typename T> T Table::fromVariant(const QVariant &v, bool &success) {
   success = false;
   return T();
 }
+
+template <> inline float Table::fromVariant<float>(const QVariant &v, bool &success) {
+  return v.toFloat(&success);
+}
+
 
 #endif // TABLE_H
