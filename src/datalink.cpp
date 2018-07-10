@@ -22,6 +22,7 @@
 #include "protocols/udsprotocol.h"
 #include "interface.h"
 
+#ifdef WITH_SOCKETCAN
 class SocketCanDataLink : public DataLink {
 public:
   explicit SocketCanDataLink(
@@ -87,13 +88,16 @@ void SocketCanDataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
 CanInterfacePtr SocketCanDataLink::can() {
   return std::static_pointer_cast<CanInterface>(socketcan_);
 }
+#endif
 
 DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
   assert(iface);
   switch (iface->type()) {
+#ifdef WITH_SOCKETCAN
   case InterfaceType::SocketCan:
     return std::make_shared<SocketCanDataLink>(
         std::static_pointer_cast<SocketCanSettings>(iface));
+#endif
   default:
     throw std::runtime_error("Unsupported protocol");
   }

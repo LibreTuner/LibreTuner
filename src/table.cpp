@@ -44,14 +44,6 @@ QVariant Table::headerData(int section, Qt::Orientation orientation,
   return QVariant();
 }
 
-template <> QString Table::toString<float>(float t) {
-  return QString::number(t, 'f', 2);
-}
-
-template <> float Table::fromVariant<float>(const QVariant &v, bool &success) {
-  return v.toFloat(&success);
-}
-
 template <template <class Type> class TemplateType> class TCreator {
 public:
   static std::shared_ptr<Table> create(DataType dt, const TableDefinition *def,

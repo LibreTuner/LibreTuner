@@ -18,6 +18,7 @@ protected:
 TEST_F(IsoTp, Short) {
   uint8_t message[] = {'t', 'e', 's', 't'};
   
+
   std::promise<CanMessage> promise;
   
   auto conn = can->connect([&promise](const CanMessage &msg) {
@@ -27,7 +28,11 @@ TEST_F(IsoTp, Short) {
   std::future<CanMessage> fut = promise.get_future();
 
   isotp::Packet packet(gsl::make_span(message, 4));
-  isotp.send(std::move(packet)).get();
+  std::promise<isotp::Error> prom;
+  isotp.send(std::move(packet), [&prom](isotp::Error error) {
+    prom.set_value(error);
+  });
+  ASSERT_EQ(prom.get_future().get(), isotp::Error::Success);
   
   std::future_status status = fut.wait_for(std::chrono::milliseconds(100));
   ASSERT_EQ(status, std::future_status::ready);
@@ -57,5 +62,9 @@ TEST_F(IsoTp, Long) {
   });
 
   isotp::Packet packet(gsl::make_span(message, 26));
-  ASSERT_EQ(isotp.send(std::move(packet)).get(), isotp::Error::Success);
+  std::promise<isotp::Error> promise;
+  isotp.send(std::move(packet), [&promise](isotp::Error error) {
+      promise.set_value(error);
+  });
+  ASSERT_EQ(promise.get_future().get(), isotp::Error::Success);
 }

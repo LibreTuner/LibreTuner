@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(LibreTuner)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -91,6 +91,10 @@ set(libretuner_SRC
     ui/socketcansettingsui.h
     ui/settingswidget.cpp
     ui/settingswidget.h
+    ui/titlebar.cpp
+    ui/titlebar.h
+    ui/styledwindow.cpp
+    ui/styledwindow.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
@@ -129,6 +133,7 @@ qt5_wrap_ui(libretuner_SRC
 qt5_add_resources(libretuner_SRC
     resources/icons.qrc
     resources/definitions.qrc
+    resources/stylesheet.qrc
 )
 
 # Separate the program into a library for testing

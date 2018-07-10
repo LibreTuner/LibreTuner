@@ -23,25 +23,30 @@
 #include "romwidget.h"
 #include "tunemanager.h"
 #include "tunewidget.h"
+#include "titlebar.h"
 
 #include <QPushButton>
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
+#include <QScrollArea>
+#include <QWindowStateChangeEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent) {
+    : StyledWindow(parent) {
   resize(QSize(1100, 630));
+
+  setupWindow();
   setupMenu();
 
-  QTabWidget *tabs = new QTabWidget(centralWidget());
+  QTabWidget *tabs = new QTabWidget();
   tabs->addTab(createOverviewTab(), "Overview");
   tabs->addTab(createTunesTab(), "Tunes");
   tabs->addTab(createRomsTab(), "ROMs");
   tabs->addTab(createLogsTab(), "Logs");
 
-  setCentralWidget(tabs);
+  mainWindow_->setCentralWidget(tabs);
 
   connect(RomManager::get(), &RomManager::updateRoms, this,
           &MainWindow::updateRoms);
@@ -50,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
   updateRoms();
   updateTunes();
 }
+
 
 QWidget *MainWindow::createLogsTab() {
   QWidget *widget = new QWidget();
@@ -73,12 +79,17 @@ QWidget *MainWindow::createLogsTab() {
   return widget;
 }
 
+
 QWidget *MainWindow::createRomsTab() {
   QWidget *widget = new QWidget();
   QVBoxLayout *layout = new QVBoxLayout();
 
   QScrollArea *area = new QScrollArea;
   area->setWidgetResizable(true);
+
+  area->setStyleSheet("QScrollArea { background: transparent; }\n"
+                      "QScrollArea > QWidget > QWidget { background: transparent; }\n"
+                      "QScrollArea > QWidget > QScrollBar { background: palette(base); }");
   layout->addWidget(area);
 
   QWidget *scrollContents = new QWidget();
@@ -94,15 +105,22 @@ QWidget *MainWindow::createRomsTab() {
   return widget;
 }
 
+
 QWidget *MainWindow::createTunesTab() {
   QWidget *widget = new QWidget();
   QVBoxLayout *layout = new QVBoxLayout();
 
   QScrollArea *area = new QScrollArea;
+  area->setWidgetResizable(true);
+  area->setStyleSheet("QScrollArea { background: transparent; }\n"
+                      "QScrollArea > QWidget > QWidget { background: transparent; }\n"
+                      "QScrollArea > QWidget > QScrollBar { background: palette(base); }");
   layout->addWidget(area);
 
+  QWidget *scrollContents = new QWidget();
   tunesLayout_ = new FlowLayout();
-  area->setLayout(tunesLayout_);
+  scrollContents->setLayout(tunesLayout_);
+  area->setWidget(scrollContents);
 
   QPushButton *buttonCreateTune = new QPushButton(tr("Create new tune"));
   layout->addWidget(buttonCreateTune);
@@ -111,9 +129,11 @@ QWidget *MainWindow::createTunesTab() {
   return widget;
 }
 
+
 QWidget *MainWindow::createOverviewTab() {
   return new QWidget();
 }
+
 
 void MainWindow::setupMenu() {
   QMenuBar *menuBar = new QMenuBar;
@@ -128,8 +148,16 @@ void MainWindow::setupMenu() {
   QAction *interfacesAct = viewMenu->addAction(tr("Interfaces"));
   connect(interfacesAct, &QAction::triggered, [this] { interfacesWindow_.show(); });
 
-  setMenuBar(menuBar);
+  mainWindow_->setMenuBar(menuBar);
 }
+
+
+void MainWindow::setupWindow()
+{
+    mainWindow_ = new QMainWindow;
+    mainLayout()->addWidget(mainWindow_);
+}
+
 
 void MainWindow::updateTunes() {
   QLayoutItem *child;
@@ -141,6 +169,7 @@ void MainWindow::updateTunes() {
     tunesLayout_->addWidget(new TuneWidget(tune));
   }
 }
+
 
 void MainWindow::updateRoms() {
   QLayoutItem *child;
@@ -162,6 +191,7 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     downloadWindow_->show();
   }
 }
+
 
 void MainWindow::closeEvent(QCloseEvent *event) {
   canViewer_.close();

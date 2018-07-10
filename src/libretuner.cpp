@@ -38,6 +38,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
   Q_INIT_RESOURCE(icons);
   Q_INIT_RESOURCE(definitions);
+  Q_INIT_RESOURCE(stylesheet);
 
   home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -89,6 +90,12 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
   mainWindow_->show();
 
   checkHome();
+
+  QFile file(":/stylesheet.qss");
+  if (file.open(QFile::ReadOnly)) {
+      setStyleSheet(file.readAll());
+      file.close();
+  }
 }
 
 void LibreTuner::editTune(const TunePtr &tune) {

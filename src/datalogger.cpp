@@ -78,7 +78,7 @@ void UdsDataLogger::setErrorCallback(UdsDataLogger::ErrorCall &&error) {
 }
 
 void UdsDataLogger::freeze() {
-  std::array<uint8_t, 2> data({0x01, 0x02});
+  std::array<uint8_t, 2> data{0x01, 0x02};
   uds_->request(data, 0x41, [this](uds::Error  error, const uds::Packet &packet) {
     if (error != uds::Error::Success) {
       throwError("could not freeze data: " + uds::strError(error));

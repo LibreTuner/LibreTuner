@@ -24,8 +24,10 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QVBoxLayout>
+#include <QStyleOption>
+#include <QPainter>
 
-RomWidget::RomWidget(RomPtr rom, QWidget *parent) : rom_(rom), QFrame(parent) {
+RomWidget::RomWidget(RomPtr rom, QWidget *parent) : rom_(rom), QWidget(parent) {
   QVBoxLayout *vlayout = new QVBoxLayout(this);
   QHBoxLayout *hlayout = new QHBoxLayout();
   QVBoxLayout *buttonLayout = new QVBoxLayout();
@@ -52,9 +54,17 @@ RomWidget::RomWidget(RomPtr rom, QWidget *parent) : rom_(rom), QFrame(parent) {
   buttonLayout->addWidget(deleteButton_);
 
   setLayout(vlayout);
+  setAutoFillBackground(true);
+}
 
-  setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-  setLineWidth(0);
+void RomWidget::paintEvent(QPaintEvent *event)
+{
+    QStyleOption opt;
+    opt.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+
+    QWidget::paintEvent(event);
 }
 
 void RomWidget::createTuneClicked() {

@@ -215,8 +215,7 @@ bool Receiver::finishRead(uint8_t amount) {
 void Receiver::handleFirst(const FirstFrame &f) {
   remaining_ = f.size;
   size_t ff_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(
-      gsl::make_span(std::begin(f.data), std::begin(f.data) + ff_length));
+  packet_.append(gsl::make_span(f.data).first(ff_length));
   state_ = State::Consecutive;
   if (finishRead(ff_length)) {
     protocol_.sendFlowFrame(FlowControlFrame());
@@ -224,8 +223,7 @@ void Receiver::handleFirst(const FirstFrame &f) {
 }
 
 void Receiver::handleSingle(const SingleFrame &f) {
-  packet_.append(
-      gsl::make_span(std::begin(f.data), std::begin(f.data) + f.size));
+  packet_.append(gsl::make_span(f.data).first(f.size));
   received();
 }
 
@@ -245,8 +243,7 @@ void Receiver::handleConsec(const ConsecutiveFrame &f) {
     return;
   }
   size_t cf_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(
-      gsl::make_span(std::begin(f.data), std::begin(f.data) + cf_length));
+  packet_.append(gsl::make_span(f.data).first(cf_length));
   finishRead(cf_length);
 }
 
