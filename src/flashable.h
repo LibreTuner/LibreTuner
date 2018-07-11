@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 enum FlashMode {
   FLASH_NONE = 0,
