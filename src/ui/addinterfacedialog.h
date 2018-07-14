@@ -23,12 +23,13 @@
 #include <memory>
 
 #include "settingswidget.h"
+#include "styledwindow.h"
 
 namespace Ui {
 class AddInterfaceDialog;
 }
 
-class AddInterfaceDialog : public QDialog {
+class AddInterfaceDialog : public StyledDialog {
   Q_OBJECT
 
 public:

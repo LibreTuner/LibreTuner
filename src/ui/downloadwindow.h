@@ -26,6 +26,7 @@
 #include "downloadinterface.h"
 #include "rommanager.h"
 #include "datalink.h"
+#include "styledwindow.h"
 
 namespace Ui {
 class DownloadWindow;
@@ -34,7 +35,7 @@ class DownloadWindow;
 /**
  * Window for downloading firmware from the ECU
  */
-class DownloadWindow : public QWidget, public DownloadInterface::Callbacks {
+class DownloadWindow : public StyledDialog, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
   explicit DownloadWindow(const DataLinkPtr &datalink, QWidget *parent = nullptr);

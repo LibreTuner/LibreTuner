@@ -28,11 +28,15 @@
 Q_DECLARE_METATYPE(DefinitionPtr)
 
 DownloadWindow::DownloadWindow(const DataLinkPtr &datalink, QWidget *parent)
-    : QWidget(parent), datalink_(datalink), ui(new Ui::DownloadWindow) {
-  ui->setupUi(this);
-  setWindowFlags(Qt::Window);
+    : StyledDialog(parent), datalink_(datalink), ui(new Ui::DownloadWindow) {
+  QWidget *main = new QWidget();
+  ui->setupUi(main);
+  mainLayout()->addWidget(main);
 
-  layout()->setSizeConstraint(QLayout::SetFixedSize);
+  connect(ui->buttonBack, &QPushButton::clicked, this, &DownloadWindow::on_buttonBack_clicked);
+  connect(ui->buttonContinue, &QPushButton::clicked, this, &DownloadWindow::on_buttonContinue_clicked);
+
+  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
 
   query();
 }

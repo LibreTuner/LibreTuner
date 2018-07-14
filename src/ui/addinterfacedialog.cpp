@@ -23,12 +23,19 @@
 #include "socketcansettingsui.h"
 
 #include <QMessageBox>
+#include <QComboBox>
 
 Q_DECLARE_METATYPE(InterfaceType)
 
 AddInterfaceDialog::AddInterfaceDialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::AddInterfaceDialog) {
-  ui->setupUi(this);
+    : StyledDialog(parent), ui(new Ui::AddInterfaceDialog) {
+  QWidget *main = new QWidget();
+  ui->setupUi(main);
+  mainLayout()->addWidget(main);
+  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
+
+  connect(ui->comboMode, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboMode_currentIndexChanged(int)));
+  connect(ui->buttonCreate, &QPushButton::clicked, this, &AddInterfaceDialog::on_buttonCreate_clicked);
 
   ui->comboMode->addItem("SocketCAN", QVariant::fromValue<InterfaceType>(
                                           InterfaceType::SocketCan));

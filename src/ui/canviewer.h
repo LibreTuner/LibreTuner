@@ -20,6 +20,7 @@
 #define CANVIEWER_H
 
 #include <QWidget>
+#include "styledwindow.h"
 
 namespace Ui {
 class CanViewer;
@@ -28,7 +29,7 @@ class CanViewer;
 class CanHandler;
 class QAbstractItemModel;
 
-class CanViewer : public QWidget {
+class CanViewer : public StyledWindow {
   Q_OBJECT
 
 public:

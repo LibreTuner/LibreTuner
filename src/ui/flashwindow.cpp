@@ -41,6 +41,10 @@ FlashWindow::FlashWindow(FlashablePtr flashable)
   ui->setupUi(main);
   mainLayout()->addWidget(main);
   mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
+
+  connect(ui->buttonCancel, &QPushButton::clicked, this, &FlashWindow::on_buttonCancel_clicked);
+  connect(ui->buttonFlash, &QPushButton::clicked, this, &FlashWindow::on_buttonFlash_clicked);
+
   setWindowFlags(Qt::Window);
 }
 

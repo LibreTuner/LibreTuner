@@ -103,6 +103,10 @@ QPushButton:pressed {
     background-color: #505050;
 }
 
+QPushButton:disabled {
+    color: #A0A0A0;
+}
+
 QAbstractScrollArea {
     border: none;
 }

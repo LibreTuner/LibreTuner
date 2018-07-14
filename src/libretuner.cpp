@@ -26,6 +26,7 @@
 #include "ui/addinterfacedialog.h"
 #include "tunemanager.h"
 #include "timerrunloop.h"
+#include "ui/styledwindow.h"
 
 #include <QDir>
 #include <QMessageBox>

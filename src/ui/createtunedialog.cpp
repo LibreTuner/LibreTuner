@@ -33,6 +33,8 @@ CreateTuneDialog::CreateTuneDialog(RomPtr base)
   ui_->setupUi(main);
   mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
 
+  connect(ui_->buttonCreate, &QPushButton::clicked, this, &CreateTuneDialog::on_buttonCreate_clicked);
+
   ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
   for (RomPtr &rom : RomManager::get()->roms()) {

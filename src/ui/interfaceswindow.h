@@ -6,6 +6,7 @@
 #include <gsl/span>
 
 #include "interfacemanager.h"
+#include "styledwindow.h"
 
 namespace Ui {
 class InterfacesWindow;
@@ -13,7 +14,7 @@ class InterfacesWindow;
 
 class SettingsWidget;
 
-class InterfacesWindow : public QWidget {
+class InterfacesWindow : public StyledWindow {
   Q_OBJECT
 
 public:
