@@ -9,51 +9,10 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <windowsx.h>
-#include <dwmapi.h>
-
-
-// Parts of this were taken from https://github.com/Moussa-Ball/BorderlessWindowQt-Modern-Gui :)
-namespace {
-
-bool maximized(HWND hwnd) {
-    WINDOWPLACEMENT placement;
-    if (!GetWindowPlacement(hwnd, &placement)) {
-        return false;
-    }
-
-    return placement.showCmd == SW_MAXIMIZE;
-}
-
-void adjust_maximized_client_rect(HWND window, RECT& rect) {
-    if (!maximized(window)) {
-        return;
-    }
-
-    auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL);
-    if (!monitor) {
-        return;
-    }
-
-    MONITORINFO monitor_info{};
-    monitor_info.cbSize = sizeof(monitor_info);
-    if (!GetMonitorInfoW(monitor, &monitor_info)) {
-        return;
-    }
-
-    rect = monitor_info.rcWork;
-}
-
-bool composition_enabled() {
-    //BOOL composition_enabled = FALSE;
-    //bool success = DwmIsCompositionEnabled(&composition_enabled) == S_OK;
-    //return composition_enabled && success;
-    return true;
-}
-
-}
 #endif
 
-StyledWindow::StyledWindow(QWidget *parent) : QWidget(parent)
+template<class T>
+StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 {
     setWindowFlag(Qt::Window);
     setObjectName("mainWindow");
@@ -67,22 +26,69 @@ StyledWindow::StyledWindow(QWidget *parent) : QWidget(parent)
 
     layout_->addWidget(titleBar_);
 
-    HWND hwnd = reinterpret_cast<HWND>(winId());
+    /*HWND hwnd = reinterpret_cast<HWND>(winId());
     SetWindowLong(hwnd, GWL_STYLE, WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
     SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
-    ShowWindow(hwnd, SW_SHOW);
+    ShowWindow(hwnd, SW_SHOW);*/
+    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
 #else
     layout_->setMargin(0);
     setWindowFlags(Qt::FramelessWindowHint);
 #endif
 
     setLayout(layout_);
+    setResizable(true);
 }
 
-#include <iostream>
+template<class T>
+void StyledWidget<T>::setResizable(bool resizable)
+{
+    resizable_ = resizable;
+    if (resizable) {
+        setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
-bool StyledWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
+        HWND hwnd = reinterpret_cast<HWND>(winId());
+        DWORD style = GetWindowLong(hwnd, GWL_STYLE);
+        SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
+#endif
+    } else {
+        setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+
+#ifdef _WIN32
+        HWND hwnd = reinterpret_cast<HWND>(winId());
+        DWORD style = GetWindowLong(hwnd, GWL_STYLE);
+        SetWindowLong(hwnd, GWL_STYLE, style & ~WS_MAXIMIZEBOX & ~WS_CAPTION);
+#endif
+    }
+}
+
+namespace {
+void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT &rect) {
+    auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL);
+    if (!monitor) {
+        return;
+    }
+
+    MONITORINFO monitor_info{};
+    monitor_info.cbSize = sizeof(monitor_info);
+    if (!GetMonitorInfoW(monitor, &monitor_info)) {
+        return;
+    }
+
+    RECT r = monitor_info.rcWork;
+    auto width = r.right - r.left;
+    auto height = r.bottom - r.top;
+    if (width > maxWidth || height > maxHeight) {
+        return;
+    }
+    rect = r;
+}
+}
+
+#ifdef _WIN32
+template<class T>
+bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
     Q_UNUSED(eventType);
     MSG *msg = static_cast<MSG*>(message);
@@ -91,7 +97,11 @@ bool StyledWindow::nativeEvent(const QByteArray &eventType, void *message, long 
     case WM_NCCALCSIZE: {
         if (msg->wParam == TRUE) {
             auto &params = *reinterpret_cast<NCCALCSIZE_PARAMS*>(msg->lParam);
-            adjust_maximized_client_rect(msg->hwnd, params.rgrc[0]);
+
+            if (IsZoomed(msg->hwnd)) {
+                // Maximized
+                fix_maximized_window(msg->hwnd, maximumWidth(), maximumHeight(), params.rgrc[0]);
+            }
         }
         *result = 0;
         return true;
@@ -178,39 +188,16 @@ bool StyledWindow::nativeEvent(const QByteArray &eventType, void *message, long 
     case WM_GETMINMAXINFO: {
         MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO*>(msg->lParam);
 
-        if (maximized(msg->hwnd)) {
-            RECT window_rect;
+        mmi->ptMinTrackSize.x = minimumWidth();
+        mmi->ptMinTrackSize.y = minimumHeight();
+        mmi->ptMaxTrackSize.x = maximumWidth();
+        mmi->ptMaxTrackSize.y = maximumHeight();
 
-            if (!GetWindowRect(msg->hwnd, &window_rect)) {
-                return false;
-            }
-
-            HMONITOR monitor = MonitorFromRect(&window_rect, MONITOR_DEFAULTTONULL);
-            if (!monitor) {
-                return false;
-            }
-
-            MONITORINFO monitor_info = {0};
-            monitor_info.cbSize = sizeof(monitor_info);
-            GetMonitorInfo(monitor, &monitor_info);
-
-            RECT work_area = monitor_info.rcWork;
-            RECT monitor_rect = monitor_info.rcMonitor;
-
-            mmi->ptMaxPosition.x = abs(work_area.left - monitor_rect.left);
-            mmi->ptMaxPosition.y = abs(work_area.top - monitor_rect.top);
-
-            mmi->ptMaxSize.x = abs(work_area.right - work_area.left);
-            mmi->ptMaxSize.y = abs(work_area.bottom - work_area.top);
-            mmi->ptMaxTrackSize.x = mmi->ptMaxSize.x;
-            mmi->ptMaxTrackSize.y = mmi->ptMaxSize.y;
-
-            *result = 1;
-            return true;
-        }
-
+        *result = 1;
+        return true;
         break;
     }
+
 
     case WM_SIZE: {
         RECT winrect;
@@ -220,7 +207,9 @@ bool StyledWindow::nativeEvent(const QByteArray &eventType, void *message, long 
         wp.length = sizeof(WINDOWPLACEMENT);
         GetWindowPlacement(msg->hwnd, &wp);
         if (wp.showCmd == SW_MAXIMIZE) {
-            SetWindowPos(reinterpret_cast<HWND>(winId()), nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+
+            //SetWindowPos(reinterpret_cast<HWND>(winId()), nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+
         }
         break;
     }
@@ -228,13 +217,30 @@ bool StyledWindow::nativeEvent(const QByteArray &eventType, void *message, long 
     return QWidget::nativeEvent(eventType, message, result);
 }
 
-void StyledWindow::changeEvent(QEvent *e)
+template<class T>
+void StyledWidget<T>::changeEvent(QEvent *e)
 {
     if (e->type() == QEvent::WindowStateChange) {
         QWindowStateChangeEvent *ev = static_cast<QWindowStateChangeEvent*>(e);
+        if ((windowState() && Qt::WindowMaximized) && !resizable_) {
+            setWindowState(Qt::WindowNoState);
+        }
         titleBar_->setMaximized(!(ev->oldState() & Qt::WindowMaximized) && (windowState() & Qt::WindowMaximized));
     }
 
     QWidget::changeEvent(e);
 }
 #endif
+
+
+StyledWindow::StyledWindow(QWidget *parent) : StyledWidget<QWidget>(parent)
+{
+
+}
+
+StyledDialog::StyledDialog(QWidget *parent) : StyledWidget<QDialog>(parent)
+{
+    titleBar_->setMaximizable(false);
+    titleBar_->setMinimizable(false);
+    setResizable(false);
+}

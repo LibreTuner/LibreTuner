@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "flasher.h"
+#include "styledwindow.h"
 
 namespace Ui {
 class FlashWindow;
@@ -38,7 +39,7 @@ typedef std::shared_ptr<Flasher> FlasherPtr;
 /**
  * @todo write docs
  */
-class FlashWindow : public QWidget, public Flasher::Callbacks {
+class FlashWindow : public StyledDialog, public Flasher::Callbacks {
   Q_OBJECT
 public:
   FlashWindow(FlashablePtr flashable);

@@ -37,10 +37,11 @@ FlashWindow::FlashWindow(FlashablePtr flashable)
   assert(flashable);
   assert(flashable->valid());
 
-  ui->setupUi(this);
+  QWidget *main = new QWidget;
+  ui->setupUi(main);
+  mainLayout()->addWidget(main);
+  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
   setWindowFlags(Qt::Window);
-
-  layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 void FlashWindow::on_buttonCancel_clicked() { close(); }

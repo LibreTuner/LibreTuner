@@ -28,18 +28,14 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     title_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->setContentsMargins(5, 0, 0, 0);
 
-    QPushButton *minimize = new QPushButton();
-    layout->addWidget(minimize);
-    minimize->setIcon(QIcon(":/icons/minimize.svg"));
-    minimize->setIconSize(QSize(12, 12));
-    minimize->setFixedSize(50, 30);
-    minimize->setFlat(true);
-    connect(minimize, &QPushButton::clicked, [this]() {
-#ifdef _WIN32
-        ShowWindow(reinterpret_cast<HWND>(window_->winId()), SW_MINIMIZE);
-#else
-        window_->showMinimized();
-#endif
+    minimize_ = new QPushButton();
+    layout->addWidget(minimize_);
+    minimize_->setIcon(QIcon(":/icons/minimize.svg"));
+    minimize_->setIconSize(QSize(12, 12));
+    minimize_->setFixedSize(50, 30);
+    minimize_->setFlat(true);
+    connect(minimize_, &QPushButton::clicked, [this]() {
+        window_->setWindowState(Qt::WindowMinimized);
     });
 
     maximize_ = new QPushButton();
@@ -63,20 +59,19 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
        window_->setWindowState(Qt::WindowNoState);
     });
 
-    QPushButton *close = new QPushButton();
-    layout->addWidget(close);
-    close->setIcon(QIcon(":/icons/close.svg"));
-    close->setIconSize(QSize(12, 12));
-    close->setFixedSize(50, 30);
-    close->setFlat(true);
-    connect(close, &QPushButton::clicked, [this]() {
+    close_ = new QPushButton();
+    layout->addWidget(close_);
+    close_->setObjectName("close");
+    close_->setIcon(QIcon(":/icons/close.svg"));
+    close_->setIconSize(QSize(12, 12));
+    close_->setFixedSize(50, 30);
+    close_->setFlat(true);
+    connect(close_, &QPushButton::clicked, [this]() {
         window_->close();
     });
 
     setLayout(layout);
     setAutoFillBackground(true);
-
-    //setMaximized(true);
 }
 
 void TitleBar::paintEvent(QPaintEvent *event)
@@ -89,6 +84,17 @@ void TitleBar::paintEvent(QPaintEvent *event)
     QWidget::paintEvent(event);
 }
 
+void TitleBar::setMinimizable(bool minimizable)
+{
+    minimize_->setVisible(minimizable);
+}
+
+void TitleBar::setMaximizable(bool maximizable)
+{
+    maximize_->setVisible(maximizable);
+    maximizable_ = maximizable;
+}
+
 void TitleBar::setTitle(const QString &title)
 {
     title_->setText(title);
@@ -96,13 +102,17 @@ void TitleBar::setTitle(const QString &title)
 
 void TitleBar::setMaximized(bool maximized)
 {
-    restore_->setVisible(maximized);
-    maximize_->setVisible(!maximized);
+    if (restore_)
+        restore_->setVisible(maximized);
+    if (maximize_ && maximizable_)
+        maximize_->setVisible(!maximized);
 
     if (maximized) {
-        maximize_->setAttribute(Qt::WA_UnderMouse, false);
+        if (maximize_)
+            maximize_->setAttribute(Qt::WA_UnderMouse, false);
     } else {
-        restore_->setAttribute(Qt::WA_UnderMouse, false);
+        if (restore_)
+            restore_->setAttribute(Qt::WA_UnderMouse, false);
     }
 }
 

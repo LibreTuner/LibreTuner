@@ -21,13 +21,19 @@
 
 #include "rommanager.h"
 #include <QMessageBox>
+#include <QStyledItemDelegate>
 #include <tunemanager.h>
 
 Q_DECLARE_METATYPE(RomPtr)
 
 CreateTuneDialog::CreateTuneDialog(RomPtr base)
     : ui_(new Ui::CreateTuneDialog) {
-  ui_->setupUi(this);
+  QWidget *main = new QWidget();
+  mainLayout()->addWidget(main);
+  ui_->setupUi(main);
+  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
+
+  ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
   for (RomPtr &rom : RomManager::get()->roms()) {
     ui_->comboBase->addItem(QString::fromStdString(rom->name()),

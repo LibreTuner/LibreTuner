@@ -41,6 +41,9 @@ MainWindow::MainWindow(QWidget *parent)
   setupMenu();
 
   QTabWidget *tabs = new QTabWidget();
+  tabs->setDocumentMode(true);
+  tabs->tabBar()->setDrawBase(false);
+  tabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   tabs->addTab(createOverviewTab(), "Overview");
   tabs->addTab(createTunesTab(), "Tunes");
   tabs->addTab(createRomsTab(), "ROMs");

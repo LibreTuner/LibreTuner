@@ -288,6 +288,9 @@ QVariant Table2d<T>::data(const QModelIndex &index, int role) const {
                    (definition_->max() - definition_->min());
     return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
   }
+  if (role == Qt::ForegroundRole) {
+      return QColor::fromRgb(0, 0, 0);
+  }
 
   if (role != Qt::DisplayRole && role != Qt::EditRole) {
     return QVariant();
@@ -376,6 +379,13 @@ QVariant Table1d<T>::data(const QModelIndex &index, int role) const {
       font.setWeight(QFont::Normal);
     }
     return font;
+  }
+  if (role == Qt::ForegroundRole) {
+      if (data_.size() == 1) {
+          // TODO: replace this with a check of the background color
+          return QVariant();
+      }
+      return QColor::fromRgb(0, 0, 0);
   }
 
   if (role == Qt::BackgroundColorRole) {

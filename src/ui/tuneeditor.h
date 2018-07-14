@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include "styledwindow.h"
+
 namespace Ui {
 class TuneEditor;
 }
@@ -37,7 +39,7 @@ typedef std::shared_ptr<Table> TablePtr;
 /**
  * Tune editor window
  */
-class TuneEditor : public QMainWindow {
+class TuneEditor : public StyledWindow {
   Q_OBJECT
 public:
   TuneEditor(TuneDataPtr tune, QWidget *parent = 0);

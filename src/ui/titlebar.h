@@ -15,6 +15,9 @@ public:
     void paintEvent(QPaintEvent *event) override;
 
     QLabel *title_;
+
+    void setMinimizable(bool minimizable);
+    void setMaximizable(bool maximizable);
 signals:
 
 public slots:
@@ -26,6 +29,10 @@ private:
 
     QPushButton *restore_;
     QPushButton *maximize_;
+    QPushButton *close_;
+    QPushButton *minimize_;
+
+    bool maximizable_ = true;
 };
 
 #endif // TITLEBAR_H

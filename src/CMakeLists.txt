@@ -109,13 +109,13 @@ set(libretuner_SRC
     protocols/isotpprotocol.cpp
     protocols/isotpprotocol.h timerrunloop.cpp timerrunloop.h datalogger.cpp datalogger.h)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
         protocols/socketcaninterface.cpp
         protocols/socketcaninterface.h
         os/sockethandler.cpp
         os/sockethandler.h)
-endif (UNIX)
+endif ()
 
 
 # Create code from a list of Qt designer ui files.
@@ -144,9 +144,9 @@ target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Ch
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_SOCKETCAN=1)
-endif (UNIX)
+endif ()
 
 if (WIN32)
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)

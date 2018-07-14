@@ -21,6 +21,8 @@
 
 #include <QDialog>
 
+#include "styledwindow.h"
+
 #include <memory>
 
 namespace Ui {
@@ -33,7 +35,7 @@ typedef std::shared_ptr<Rom> RomPtr;
 /**
  * @todo write docs
  */
-class CreateTuneDialog : public QDialog {
+class CreateTuneDialog : public StyledDialog {
   Q_OBJECT
 public:
   CreateTuneDialog(RomPtr base = nullptr);

@@ -8,5 +8,6 @@
         <file>icons/close.svg</file>
         <file>icons/minimize.svg</file>
         <file>icons/restore.svg</file>
+        <file>icons/drop-down-arrow.svg</file>
     </qresource>
 </RCC>

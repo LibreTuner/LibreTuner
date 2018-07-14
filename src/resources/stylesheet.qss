@@ -5,6 +5,10 @@ QWidget {
     selection-background-color: darkblue;
 }
 
+QLabel {
+    background: none;
+}
+
 QWidget#mainWindow {
     background: #000487;
 }
@@ -17,8 +21,16 @@ TitleBar > QPushButton:hover {
     background-color: #404040;
 }
 
+TitleBar > QPushButton#close:hover {
+    background-color: #840000;
+}
+
 TitleBar > QPushButton:pressed {
     background-color: #505050;
+}
+
+TitleBar > QPushButton#close:pressed {
+    background-color: #a00000;
 }
 
 TitleBar > QPushButton:flat {
@@ -26,9 +38,8 @@ TitleBar > QPushButton:flat {
 }
 
 RomWidget {
-    background: none;
-    border: 3px solid #505050;
-    border-radius: 4px;
+    background: #303030;
+    border: 1px solid #505050;
 }
 
 QMenuBar::item {
@@ -45,32 +56,43 @@ QMenuBar::item:pressed {
     background: #505050;
 }
 
-QTabWidget:pane {
-    border-top: 2px solid #353535;
+QTabWidget {
+    border: none;
+}
+
+QTabWidget::pane {
+    border: 0;
+}
+
+QTabWidget::tab-bar {
+    left: 0;
+}
+
+QTabWidget QStackedWidget > QWidget {
+    background: #202020;
 }
 
 QTabBar::tab {
     background: #404040;
-    border: 2px solid #404040;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    border: none;
     min-width: 18ex;
     padding: 2px;
+    min-height: 20px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
     background: #505050;
-    border-color: #505050;
 }
 
-QTabBar::tab:!selected {
-    margin-top: 2px;
+QTabBar::tab:selected {
+    background: #202020;
 }
 
 QPushButton {
     background-color: #303030;
     border: none;
-    padding: 6;
+    padding: 1px 4px 1px 4px;
+    min-height: 20px;
 }
 
 QPushButton:hover {
@@ -79,4 +101,154 @@ QPushButton:hover {
 
 QPushButton:pressed {
     background-color: #505050;
+}
+
+QAbstractScrollArea {
+    border: none;
+}
+
+QLineEdit, QTextEdit {
+    border: 1px solid #505050;
+    min-height: 20px;
+}
+
+QLineEdit:hover, QLineEdit:focus, QTextEdit:hover, QTextEdit:focus {
+    border-color: #0455d8;
+}
+
+QComboBox {
+    border: 1px solid #505050;
+    padding: 1px 18px 1px 3px;
+    min-height: 20px;
+    min-width: 6em;
+}
+
+QComboBox:hover, QComboBox:on {
+    background-color: #505050;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 1px;
+    border-left-color: #505050;
+    border-left-style: solid;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/drop-down-arrow.svg);
+    width: 10px;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #505050;
+    selection-background-color: #303030;
+    selection-color: #EEEEEE;
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: 20px;
+}
+
+QTableView QTableCornerButton::section {
+    border: none;
+    background-color: #303030;
+}
+
+QTableView QTableCornerButton::section:hover {
+    background-color: #505050;
+}
+
+QTableView QTableCornerButton::section:pressed {
+        background-color: #007ACC;
+        border: none;
+}
+
+QHeaderView::section {
+    background-color: #303030;
+    color: white;
+    padding: 6px;
+    border: none;
+}
+
+QHeaderView::section:hover {
+    background-color: #404040;
+}
+
+QScrollBar {
+    border: none;
+    background: #404040;
+}
+
+QScrollBar:horizontal {
+    height: 15px;
+    margin: 0px 20px 0px 20px;
+}
+
+QScrollBar:vertical {
+    width: 15px;
+    margin: 20px 0px 20px 0px;
+}
+
+QScrollBar::handle {
+    background: #606060;
+    border: none;
+    margin: 2px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 20px;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 20px;
+}
+
+QScrollBar::add-line {
+    border: none;
+    background: #404040;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:horizontal {
+    width: 20px;
+    subcontrol-position: right;
+}
+
+QScrollBar::add-line:vertical {
+    height: 20px;
+    subcontrol-position: bottom;
+}
+
+QScrollBar:sub-line {
+    border: none;
+    background: #404040;
+    subcontrol-origin: margin;
+}
+
+QScrollBar:sub-line:horizontal {
+    width: 20px;
+    subcontrol-position: left;
+}
+
+QScrollBar:sub-line:vertical {
+    height: 20px;
+    subcontrol-position: top;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: #404040;
+}
+
+QScrollBar:left-arrow, QScrollBar::right-arrow {
+    width: 6px;
+    height: 6px;
+    background: #606060;
+}
+
+QScrollBar:up-arrow, QScrollBar::down-arrow {
+    width: 6px;
+    height: 6px;
+    background: #606060;
 }
