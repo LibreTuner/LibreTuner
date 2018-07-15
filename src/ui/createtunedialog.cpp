@@ -28,12 +28,7 @@ Q_DECLARE_METATYPE(RomPtr)
 
 CreateTuneDialog::CreateTuneDialog(RomPtr base)
     : ui_(new Ui::CreateTuneDialog) {
-  QWidget *main = new QWidget();
-  mainLayout()->addWidget(main);
-  ui_->setupUi(main);
-  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
-
-  connect(ui_->buttonCreate, &QPushButton::clicked, this, &CreateTuneDialog::on_buttonCreate_clicked);
+  ui_->setupUi(this);
 
   ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 

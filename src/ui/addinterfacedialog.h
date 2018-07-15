@@ -29,7 +29,7 @@ namespace Ui {
 class AddInterfaceDialog;
 }
 
-class AddInterfaceDialog : public StyledDialog {
+class AddInterfaceDialog : public QDialog {
   Q_OBJECT
 
 public:

@@ -28,7 +28,7 @@
 #include <QLayout>
 #include <QComboBox>
 
-class MainWindow : public StyledWindow {
+class MainWindow : public QMainWindow {
   Q_OBJECT
 
 public:
@@ -43,15 +43,12 @@ private:
   DownloadWindow *downloadWindow_ = nullptr;
   InterfacesWindow interfacesWindow_;
 
-  QMainWindow *mainWindow_;
-
   QLayout *tunesLayout_;
   QLayout *romsLayout_;
   QComboBox *comboLogVehicles_;
   QListView *listLogs_;
 
   void setupMenu();
-  void setupWindow();
 
   QWidget *createOverviewTab();
   QWidget *createTunesTab();

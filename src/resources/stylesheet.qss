@@ -9,6 +9,10 @@ QLabel {
     background: none;
 }
 
+QLabel#labelError {
+    color: red;
+}
+
 QWidget#mainWindow {
     background: #000487;
 }

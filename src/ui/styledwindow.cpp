@@ -19,25 +19,21 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
     layout_ = new QVBoxLayout;
     layout_->setSpacing(0);
 
-#ifdef _WIN32
-    layout_->setMargin(1);
+//#ifdef _WIN32
+    /*layout_->setMargin(1);
     titleBar_ = new TitleBar(this);
     titleBar_->setTitle("Test");
 
     layout_->addWidget(titleBar_);
 
-    /*HWND hwnd = reinterpret_cast<HWND>(winId());
-    SetWindowLong(hwnd, GWL_STYLE, WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
-    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
-    ShowWindow(hwnd, SW_SHOW);*/
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
-#else
+    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);*/
+//#else
     layout_->setMargin(0);
-    setWindowFlags(Qt::FramelessWindowHint);
-#endif
+    //setWindowFlags(Qt::FramelessWindowHint);
+//#endif
 
     setLayout(layout_);
-    setResizable(true);
+    //setResizable(true);
 }
 
 template<class T>
@@ -87,7 +83,7 @@ void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT &rect) 
 }
 
 #ifdef _WIN32
-template<class T>
+/*template<class T>
 bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
     Q_UNUSED(eventType);
@@ -229,7 +225,7 @@ void StyledWidget<T>::changeEvent(QEvent *e)
     }
 
     QWidget::changeEvent(e);
-}
+}*/
 #endif
 
 
@@ -240,7 +236,7 @@ StyledWindow::StyledWindow(QWidget *parent) : StyledWidget<QWidget>(parent)
 
 StyledDialog::StyledDialog(QWidget *parent) : StyledWidget<QDialog>(parent)
 {
-    titleBar_->setMaximizable(false);
-    titleBar_->setMinimizable(false);
-    setResizable(false);
+    //titleBar_->setMaximizable(false);
+    //titleBar_->setMinimizable(false);
+    //setResizable(false);
 }

@@ -34,10 +34,9 @@
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : StyledWindow(parent) {
+    : QMainWindow(parent) {
   resize(QSize(1100, 630));
 
-  setupWindow();
   setupMenu();
 
   QTabWidget *tabs = new QTabWidget();
@@ -49,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
   tabs->addTab(createRomsTab(), "ROMs");
   tabs->addTab(createLogsTab(), "Logs");
 
-  mainWindow_->setCentralWidget(tabs);
+  setCentralWidget(tabs);
 
   connect(RomManager::get(), &RomManager::updateRoms, this,
           &MainWindow::updateRoms);
@@ -150,17 +149,8 @@ void MainWindow::setupMenu() {
 
   QAction *interfacesAct = viewMenu->addAction(tr("Interfaces"));
   connect(interfacesAct, &QAction::triggered, [this] { interfacesWindow_.show(); });
-
-  mainWindow_->setMenuBar(menuBar);
+  setMenuBar(menuBar);
 }
-
-
-void MainWindow::setupWindow()
-{
-    mainWindow_ = new QMainWindow;
-    mainLayout()->addWidget(mainWindow_);
-}
-
 
 void MainWindow::updateTunes() {
   QLayoutItem *child;

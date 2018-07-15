@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>169</width>
-    <height>103</height>
+    <height>129</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,9 +17,12 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>LibreTuner - Add Interface</string>
   </property>
   <layout class="QVBoxLayout" name="layout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="mainLayout">
      <property name="spacing">
@@ -78,6 +81,13 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelError">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="buttonCreate">

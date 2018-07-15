@@ -14,7 +14,7 @@ class InterfacesWindow;
 
 class SettingsWidget;
 
-class InterfacesWindow : public StyledWindow {
+class InterfacesWindow : public QWidget {
   Q_OBJECT
 
 public:

@@ -31,21 +31,15 @@
 
 #include <QMessageBox>
 #include <QString>
+#include <QStyledItemDelegate>
 
 FlashWindow::FlashWindow(FlashablePtr flashable)
     : ui(new Ui::FlashWindow), flashable_(flashable) {
   assert(flashable);
   assert(flashable->valid());
 
-  QWidget *main = new QWidget;
-  ui->setupUi(main);
-  mainLayout()->addWidget(main);
-  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
-
-  connect(ui->buttonCancel, &QPushButton::clicked, this, &FlashWindow::on_buttonCancel_clicked);
-  connect(ui->buttonFlash, &QPushButton::clicked, this, &FlashWindow::on_buttonFlash_clicked);
-
-  setWindowFlags(Qt::Window);
+  ui->setupUi(this);
+  ui->comboMode->setItemDelegate(new QStyledItemDelegate());
 }
 
 void FlashWindow::on_buttonCancel_clicked() { close(); }

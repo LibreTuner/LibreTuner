@@ -35,7 +35,7 @@ class DownloadWindow;
 /**
  * Window for downloading firmware from the ECU
  */
-class DownloadWindow : public StyledDialog, public DownloadInterface::Callbacks {
+class DownloadWindow : public QDialog, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
   explicit DownloadWindow(const DataLinkPtr &datalink, QWidget *parent = nullptr);

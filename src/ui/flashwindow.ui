@@ -2,16 +2,19 @@
 <ui version="4.0">
  <class>FlashWindow</class>
  <widget class="QWidget" name="FlashWindow">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
-    <height>244</height>
+    <width>264</width>
+    <height>207</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,6 +23,9 @@
    <string>Flash ROM</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
@@ -130,7 +136,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="sizeConstraint">
-      <enum>QLayout::SetMinimumSize</enum>
+      <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>
       <widget class="QPushButton" name="buttonCancel">

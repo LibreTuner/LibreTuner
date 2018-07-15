@@ -9,10 +9,8 @@
 Q_DECLARE_METATYPE(InterfaceSettingsPtr);
 
 InterfacesWindow::InterfacesWindow(QWidget *parent)
-    : StyledWindow(parent), ui(new Ui::InterfacesWindow) {
-  QWidget *main = new QWidget;
-  ui->setupUi(main);
-  mainLayout()->addWidget(main);
+    : QWidget(parent), ui(new Ui::InterfacesWindow) {
+  ui->setupUi(this);
   setWindowFlags(Qt::Window);
   conn_ = InterfaceManager::get().connect(std::bind(
       &InterfacesWindow::interfacesChanged, this, std::placeholders::_1));

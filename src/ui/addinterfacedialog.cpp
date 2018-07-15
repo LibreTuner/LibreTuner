@@ -24,18 +24,16 @@
 
 #include <QMessageBox>
 #include <QComboBox>
+#include <QStyledItemDelegate>
 
 Q_DECLARE_METATYPE(InterfaceType)
 
 AddInterfaceDialog::AddInterfaceDialog(QWidget *parent)
-    : StyledDialog(parent), ui(new Ui::AddInterfaceDialog) {
-  QWidget *main = new QWidget();
-  ui->setupUi(main);
-  mainLayout()->addWidget(main);
-  mainLayout()->setSizeConstraint(QLayout::SetFixedSize);
+    : QDialog(parent), ui(new Ui::AddInterfaceDialog) {
+  ui->setupUi(this);
 
-  connect(ui->comboMode, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboMode_currentIndexChanged(int)));
-  connect(ui->buttonCreate, &QPushButton::clicked, this, &AddInterfaceDialog::on_buttonCreate_clicked);
+  ui->comboMode->setItemDelegate(new QStyledItemDelegate());
+  ui->labelError->setVisible(false);
 
   ui->comboMode->addItem("SocketCAN", QVariant::fromValue<InterfaceType>(
                                           InterfaceType::SocketCan));
@@ -65,9 +63,10 @@ void AddInterfaceDialog::on_comboMode_currentIndexChanged(int index) {
       ui->comboMode->itemData(index).value<InterfaceType>());
   replaceSettings(std::move(iface));
   if (!customSettings_) {
-    QMessageBox msg;
-    msg.setText("The selected interface is not supported on this platform");
-    msg.exec();
+    ui->labelError->setText("The selected interface is not supported on this platform");
+    ui->labelError->setVisible(true);
+  } else {
+    ui->labelError->setVisible(false);
   }
 }
 

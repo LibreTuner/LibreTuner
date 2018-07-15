@@ -6,7 +6,6 @@
 #include <type_traits>
 
 class TitleBar;
-
 /* A window with custom borders and a title bar on supported platforms */
 
 template<class T>
@@ -22,8 +21,8 @@ public:
     void setResizable(bool resizable);
 
 #ifdef _WIN32
-  bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-  void changeEvent(QEvent *e) override;
+  //bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+  //void changeEvent(QEvent *e) override;
 #endif
 signals:
 
@@ -31,7 +30,7 @@ public slots:
 
 protected:
 #ifdef _WIN32
-  TitleBar *titleBar_;
+  //TitleBar *titleBar_;
 #endif
   QLayout *layout_;
 
