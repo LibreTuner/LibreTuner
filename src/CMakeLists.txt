@@ -156,6 +156,7 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 if (WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
 endif (WIN32)
 

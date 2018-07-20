@@ -48,7 +48,7 @@ RomWidget {
 
 QMenuBar::item {
     spacing: 3px;
-    padding: 1px 4px;
+    padding: 1px 0.7em;
     background: transparent;
 }
 
@@ -79,9 +79,9 @@ QTabWidget QStackedWidget > QWidget {
 QTabBar::tab {
     background: #404040;
     border: none;
-    min-width: 18ex;
-    padding: 2px;
-    min-height: 20px;
+    min-width: 3em;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+    min-height: 0.5em;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
@@ -95,8 +95,8 @@ QTabBar::tab:selected {
 QPushButton {
     background-color: #303030;
     border: none;
-    padding: 1px 4px 1px 4px;
-    min-height: 20px;
+    padding: 0.1em 0.6em 0.1em 0.6em;
+    min-height: 1.2em;
 }
 
 QPushButton:hover {
@@ -117,7 +117,7 @@ QAbstractScrollArea {
 
 QLineEdit, QTextEdit {
     border: 1px solid #505050;
-    min-height: 20px;
+    min-height: 1.2em;
 }
 
 QLineEdit:hover, QLineEdit:focus, QTextEdit:hover, QTextEdit:focus {
@@ -126,8 +126,8 @@ QLineEdit:hover, QLineEdit:focus, QTextEdit:hover, QTextEdit:focus {
 
 QComboBox {
     border: 1px solid #505050;
-    padding: 1px 18px 1px 3px;
-    min-height: 20px;
+    padding: 1px 0.6em 1px 0.3em;
+    min-height: 1.2em;
     min-width: 6em;
 }
 
@@ -138,7 +138,7 @@ QComboBox:hover, QComboBox:on {
 QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;
-    width: 15px;
+    width: 1em;
     border-left-width: 1px;
     border-left-color: #505050;
     border-left-style: solid;
@@ -146,7 +146,7 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
     image: url(:/icons/drop-down-arrow.svg);
-    width: 10px;
+    width: 0.7em;
 }
 
 QComboBox QAbstractItemView {
@@ -156,7 +156,7 @@ QComboBox QAbstractItemView {
 }
 
 QComboBox QAbstractItemView::item {
-    min-height: 20px;
+    min-height: 1.2em;
 }
 
 QTableView QTableCornerButton::section {
@@ -176,7 +176,7 @@ QTableView QTableCornerButton::section:pressed {
 QHeaderView::section {
     background-color: #303030;
     color: white;
-    padding: 6px;
+    padding: 0.4em;
     border: none;
 }
 
@@ -190,13 +190,13 @@ QScrollBar {
 }
 
 QScrollBar:horizontal {
-    height: 15px;
-    margin: 0px 20px 0px 20px;
+    height: 0.7em;
+    margin: 0px 1.2em 0px 1.2em;
 }
 
 QScrollBar:vertical {
-    width: 15px;
-    margin: 20px 0px 20px 0px;
+    width: 0.7em;
+    margin: 1.2em 0px 20px 1.2em;
 }
 
 QScrollBar::handle {
@@ -206,11 +206,11 @@ QScrollBar::handle {
 }
 
 QScrollBar::handle:horizontal {
-    min-width: 20px;
+    min-width: 1.2em;
 }
 
 QScrollBar::handle:vertical {
-    min-height: 20px;
+    min-height: 1.2em;
 }
 
 QScrollBar::add-line {
@@ -220,12 +220,12 @@ QScrollBar::add-line {
 }
 
 QScrollBar::add-line:horizontal {
-    width: 20px;
+    width: 1.2em;
     subcontrol-position: right;
 }
 
 QScrollBar::add-line:vertical {
-    height: 20px;
+    height: 1.2em;
     subcontrol-position: bottom;
 }
 
@@ -236,12 +236,12 @@ QScrollBar:sub-line {
 }
 
 QScrollBar:sub-line:horizontal {
-    width: 20px;
+    width: 1.2em;
     subcontrol-position: left;
 }
 
 QScrollBar:sub-line:vertical {
-    height: 20px;
+    height: 1.2em;
     subcontrol-position: top;
 }
 
@@ -250,14 +250,14 @@ QScrollBar::add-page, QScrollBar::sub-page {
 }
 
 QScrollBar:left-arrow, QScrollBar::right-arrow {
-    width: 6px;
-    height: 6px;
+    width: 0.5em;
+    height: 0.5em;
     background: #606060;
 }
 
 QScrollBar:up-arrow, QScrollBar::down-arrow {
-    width: 6px;
-    height: 6px;
+    width: 0.5em;
+    height: 0.5em;
     background: #606060;
 }
 
