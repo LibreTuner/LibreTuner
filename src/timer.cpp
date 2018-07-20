@@ -42,7 +42,7 @@ void Timer::setTimeout(std::chrono::milliseconds timeout) {
 }
 
 Timer::~Timer() {
-  std::lock_guard<std::mutex> lk(mutex_);
+  // std::lock_guard<std::mutex> lk(mutex_);
 }
 
 void Timer::enable() {
@@ -82,7 +82,9 @@ bool Timer::tryTrigger() {
 }
 
 void Timer::trigger() {
+  // Keep the timer alive
   auto self = shared_from_this();
+
   running_ = true;
   if (callback_) {
     callback_();
@@ -92,9 +94,9 @@ void Timer::trigger() {
 }
 
 TimerPtr Timer::create() {
-  return std::make_shared<make_shared_enabler>();
+  return std::make_shared<Timer>();
 }
 
 TimerPtr Timer::create(Timer::Callback &&cb) {
-  return std::make_shared<make_shared_enabler>(std::move(cb));
+  return std::make_shared<Timer>(std::move(cb));
 }

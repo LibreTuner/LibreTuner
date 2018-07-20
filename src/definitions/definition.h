@@ -32,6 +32,7 @@
 #include "endian.h"
 #include "flasher.h"
 #include "tabledefinitions.h"
+#include "piddefinitions.h"
 
 class Definition;
 
@@ -117,6 +118,11 @@ private:
 typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 typedef std::weak_ptr<SubDefinition> SubDefinitionWeakPtr;
 
+enum class LogMode {
+    None,
+    Uds,
+};
+
 /**
  * An ECU definition
  */
@@ -151,9 +157,13 @@ public:
 
   TableDefinitions *tables() { return &tables_; }
 
+  PidDefinitions &pids() { return pids_; }
+
   Endianness endianness() const { return endianness_; }
 
   DownloadMode downloadMode() const { return downloadMode_; }
+
+  LogMode logMode() const { return logMode_; }
 
   FlashMode flashMode() const { return flashMode_; }
 
@@ -184,6 +194,7 @@ private:
 
   DownloadMode downloadMode_;
   FlashMode flashMode_;
+  LogMode logMode_ = LogMode::None;
   /* Security key */
   std::string key_;
   /* Server ID for ISO-TP reqeusts */
@@ -198,6 +209,7 @@ private:
   uint32_t size_;
 
   TableDefinitions tables_;
+  PidDefinitions pids_;
   std::unordered_map<std::string, TableAxisPtr> axes_;
   std::vector<SubDefinitionPtr> subtypes_;
   std::vector<std::regex> vins_;
@@ -205,6 +217,7 @@ private:
   void readTables(QXmlStreamReader &xml);
   void loadAxes(QXmlStreamReader &xml);
   void loadVins(QXmlStreamReader &xml);
+  void loadPids(QXmlStreamReader &xml);
 };
 typedef std::shared_ptr<Definition> DefinitionPtr;
 

@@ -41,7 +41,7 @@ public:
 
   void send(const CanMessage &message) override;
 
-  /* Received a message and places it into message. Invalidates
+  /* Receives a message and places it into message. Invalidates
    * the message if nonblocking and no data is ready to be
    * received. */
   void recv(CanMessage &message);

@@ -31,6 +31,9 @@ using CanInterfacePtr = std::shared_ptr<CanInterface>;
 class InterfaceSettings;
 using InterfaceSettingsPtr = std::shared_ptr<InterfaceSettings>;
 
+class DataLogger;
+using DataLoggerPtr = std::shared_ptr<DataLogger>;
+
 class DataLink;
 using DataLinkPtr = std::shared_ptr<DataLink>;
 
@@ -81,7 +84,7 @@ public:
 
   /* If CAN is supported, returns a CAN protocol. Else, returns
    * nullptr */
-  virtual CanInterfacePtr can() { return nullptr; };
+  virtual CanInterfacePtr can() { return nullptr; }
 
 protected:
   // Supported protocols

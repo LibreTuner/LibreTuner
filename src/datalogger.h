@@ -25,14 +25,37 @@
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
+#include "exprtk.hpp"
 
 enum class PidType {
   Queried,
 };
 
-struct PID {
-  DataLog::DataHead data;
-  uint16_t code;
+class Pid {
+public:
+  Pid(uint32_t id, uint16_t code, const std::string &formula);
+  Pid(Pid&&);
+  Pid(const Pid&) = delete;
+
+  void setX(uint8_t x) {x_ = x;}
+  void setY(uint8_t y) {y_ = y;}
+  void setZ(uint8_t z) {z_ = z;}
+
+  double evaluate() const;
+  uint32_t id() const {return id_;}
+
+  uint16_t code() const {return code_;}
+
+private:
+  std::string formula_;
+  uint32_t id_;
+  uint16_t code_;
+
+  exprtk::expression<double> expression_;
+  exprtk::symbol_table<double> symbol_table_;
+  exprtk::parser<double> parser_;
+  // allow for up to three bytes of information
+  double x_, y_, z_;
 };
 
 class DataLogger;
@@ -46,6 +69,12 @@ public:
 
   virtual void enable() =0;
   virtual void disable() =0;
+  /* Returns true if the logger is running */
+  virtual bool running() const =0;
+
+  virtual void addPid(Pid &&pid) =0;
+
+  virtual void addPid(uint32_t id, uint16_t code, const std::string &formula);
 
 protected:
   DataLogPtr log_;
@@ -60,12 +89,15 @@ public:
 
   using ErrorCall = std::function<void(const std::string &error)>;
 
-  void addPid(const PID &pid);
+  void addPid(Pid &&pid) override;
 
-  PID *nextPid();
+  Pid *nextPid();
 
   void enable() override;
   void disable() override;
+  bool running() const override {
+      return running_;
+  }
 
   void processNext();
 
@@ -78,7 +110,7 @@ private:
   std::chrono::steady_clock::time_point freeze_time_;
 
   std::shared_ptr<uds::Protocol> uds_;
-  std::vector<PID> pids_;
+  std::vector<Pid> pids_;
 
   std::mutex mutex_;
   bool running_ = false;

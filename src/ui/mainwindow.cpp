@@ -68,6 +68,8 @@ QWidget *MainWindow::createLogsTab() {
 
   QPushButton *buttonNewLog = new QPushButton(tr("New Log"));
   hlayout->addWidget(buttonNewLog);
+  connect(buttonNewLog, &QPushButton::clicked, this, &MainWindow::newLogClicked);
+
   comboLogVehicles_ = new QComboBox();
   QSizePolicy policy = comboLogVehicles_->sizePolicy();
   policy.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -183,6 +185,11 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     downloadWindow_->setAttribute(Qt::WA_DeleteOnClose, true);
     downloadWindow_->show();
   }
+}
+
+void MainWindow::newLogClicked()
+{
+    loggerWindow_.show();
 }
 
 

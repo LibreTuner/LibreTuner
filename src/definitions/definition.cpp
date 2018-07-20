@@ -18,6 +18,7 @@
 
 #include "definition.h"
 #include "tabledefinitions.h"
+#include "piddefinitions.h"
 
 #include <QDir>
 
@@ -395,6 +396,48 @@ void Definition::loadVins(QXmlStreamReader &xml) {
   }
 }
 
+void Definition::loadPids(QXmlStreamReader &xml) {
+    while (xml.readNextStartElement()) {
+        if (xml.name() != "pid") {
+            xml.raiseError("Unexpected element");
+            return;
+        }
+
+        PidDefinition pid;
+        QXmlStreamAttributes attributes = xml.attributes();
+        if (!attributes.hasAttribute("id")) {
+            xml.raiseError("Could not load PID: no id attribute");
+            return;
+        }
+        bool ok;
+        pid.id = attributes.value("id").toUInt(&ok);
+        if (!ok) {
+            xml.raiseError("Could not load PID: id attribute is not an integer");
+            return;
+        }
+
+        while (xml.readNextStartElement()) {
+            if (xml.name() == "name") {
+                pid.name = xml.readElementText().toStdString();
+            } else if (xml.name() == "description") {
+                pid.description = xml.readElementText().toStdString();
+            } else if (xml.name() == "formula") {
+                pid.formula = xml.readElementText().toStdString();
+            } else if (xml.name() == "unit") {
+                pid.unit = xml.readElementText().toStdString();
+            } else if (xml.name() == "code") {
+                pid.code = xml.readElementText().toUInt(&ok, 16);
+                if (!ok) {
+                    xml.raiseError("Could not load PID: code is not an integer");
+                    return;
+                }
+            }
+        }
+
+        pids_.add(std::move(pid));
+    }
+}
+
 bool Definition::loadMain(const QString &path) {
   QFile file(path);
   if (!file.open(QFile::ReadOnly)) {
@@ -488,6 +531,15 @@ bool Definition::loadMain(const QString &path) {
       }
     } else if (xml.name() == "vins") {
       loadVins(xml);
+    } else if (xml.name() == "pids") {
+      loadPids(xml);
+    } else if (xml.name() == "logmode") {
+        QString sMode = xml.readElementText().toLower();
+        if (sMode == "uds") {
+            logMode_ = LogMode::Uds;
+        } else {
+            xml.raiseError("Unknown log mode");
+        }
     } else {
       xml.raiseError("Unexpected element");
     }

@@ -20,6 +20,7 @@
 #include "protocols/isotpprotocol.h"
 #include "protocols/socketcaninterface.h"
 #include "protocols/udsprotocol.h"
+#include "datalogger.h"
 #include "interface.h"
 
 #ifdef WITH_SOCKETCAN
@@ -86,7 +87,7 @@ void SocketCanDataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
 }
 
 CanInterfacePtr SocketCanDataLink::can() {
-  return std::static_pointer_cast<CanInterface>(socketcan_);
+    return std::static_pointer_cast<CanInterface>(socketcan_);
 }
 #endif
 

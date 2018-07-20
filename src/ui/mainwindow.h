@@ -23,6 +23,7 @@
 #include "downloadwindow.h"
 #include "interfaceswindow.h"
 #include "styledwindow.h"
+#include "dataloggerwindow.h"
 
 #include <QMainWindow>
 #include <QLayout>
@@ -36,12 +37,14 @@ public:
 
 private slots:
   void on_buttonDownloadRom_clicked();
+  void newLogClicked();
   void closeEvent(QCloseEvent *event) override;
 
 private:
   CanViewer canViewer_;
   DownloadWindow *downloadWindow_ = nullptr;
   InterfacesWindow interfacesWindow_;
+  DataLoggerWindow loggerWindow_;
 
   QLayout *tunesLayout_;
   QLayout *romsLayout_;

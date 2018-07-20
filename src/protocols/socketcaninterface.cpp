@@ -64,12 +64,6 @@ void SocketCanInterface::recv(CanMessage &message) {
 
   // TODO: remove EFF/RTR/ERR flags
   message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
-
-  // Add message to log
-
-  if (frame.can_id == 0x7e8 || frame.can_id == 0x7e0) {
-    // LibreTuner::get()->canLog()->addMessage(message);
-  }
 }
 
 void SocketCanInterface::send(const CanMessage &message) {
@@ -101,7 +95,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
                              std::string(strerror(errno)));
   }
 
-  sockaddr_can addr;
+  sockaddr_can addr = {0};
   ifreq ifr;
 
   strcpy(ifr.ifr_name, ifname.c_str());

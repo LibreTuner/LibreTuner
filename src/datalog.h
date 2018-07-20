@@ -37,6 +37,7 @@ public:
   struct DataHead {
     std::string name;
     std::string description;
+    std::string formula;
     uint32_t id;
     DataUnit unit;
   };

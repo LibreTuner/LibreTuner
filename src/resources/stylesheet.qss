@@ -260,3 +260,7 @@ QScrollBar:up-arrow, QScrollBar::down-arrow {
     height: 6px;
     background: #606060;
 }
+
+QListWidget {
+    border: 1px solid #505050;
+}

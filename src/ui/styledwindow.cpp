@@ -14,8 +14,8 @@
 template<class T>
 StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 {
-    setWindowFlag(Qt::Window);
-    setObjectName("mainWindow");
+    T::setWindowFlag(Qt::Window);
+    T::setObjectName("mainWindow");
     layout_ = new QVBoxLayout;
     layout_->setSpacing(0);
 
@@ -32,7 +32,7 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
     //setWindowFlags(Qt::FramelessWindowHint);
 //#endif
 
-    setLayout(layout_);
+    T::setLayout(layout_);
     //setResizable(true);
 }
 
@@ -41,7 +41,7 @@ void StyledWidget<T>::setResizable(bool resizable)
 {
     resizable_ = resizable;
     if (resizable) {
-        setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
+        T::setWindowFlags(T::windowFlags() | Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
         HWND hwnd = reinterpret_cast<HWND>(winId());
@@ -49,7 +49,7 @@ void StyledWidget<T>::setResizable(bool resizable)
         SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
 #endif
     } else {
-        setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+        T::setWindowFlags(T::windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
         HWND hwnd = reinterpret_cast<HWND>(winId());
@@ -59,6 +59,7 @@ void StyledWidget<T>::setResizable(bool resizable)
     }
 }
 
+#ifdef _WIN32
 namespace {
 void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT &rect) {
     auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL);
@@ -81,6 +82,7 @@ void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT &rect) 
     rect = r;
 }
 }
+#endif
 
 #ifdef _WIN32
 /*template<class T>

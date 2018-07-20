@@ -28,6 +28,12 @@ using DefinitionPtr = std::shared_ptr<Definition>;
 class Vehicle;
 using VehiclePtr = std::shared_ptr<Vehicle>;
 
+class DataLogger;
+using DataLoggerPtr = std::shared_ptr<DataLogger>;
+
+class DataLink;
+using DataLinkPtr = std::shared_ptr<DataLink>;
+
 class VinInfo {
 public:
 private:
@@ -38,6 +44,8 @@ public:
   Vehicle(const std::string &name, const std::string &vin, DefinitionPtr ptr);
   Vehicle() = default;
 
+  virtual ~Vehicle();
+
   std::string name() const { return name_; }
 
   std::string vin() const { return vin_; }
@@ -47,10 +55,14 @@ public:
 
   static VehiclePtr fromVin(const std::string &vin);
 
+  /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
+     nullptr if a logger could not be created. */
+  DataLoggerPtr logger(const DataLinkPtr &datalink);
+
 private:
   std::string name_;
   std::string vin_;
-  DefinitionPtr definition_ = nullptr;
+  DefinitionPtr definition_;
 };
 
 #endif // LIBRETUNER_VEHICLE_H

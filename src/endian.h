@@ -19,6 +19,7 @@
 #ifndef ENDIANNESS_H
 #define ENDIANNESS_H
 
+// TODO: make this an enum class
 enum Endianness {
   ENDIAN_BIG,
   ENDIAN_LITTLE,

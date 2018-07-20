@@ -44,6 +44,9 @@ set(libretuner_SRC
     interface.h
     interfacemanager.cpp
     interfacemanager.h
+    exprtk.hpp
+    logger.cpp
+    logger.h
 
     util/signal.cpp
     util/signal.h
@@ -58,6 +61,8 @@ set(libretuner_SRC
     definitions/tabledefinitions.h
     definitions/checksummanager.cpp
     definitions/checksummanager.h
+    definitions/piddefinitions.cpp
+    definitions/piddefinitions.h
 
     ui/mainwindow.cpp
     ui/mainwindow.h
@@ -95,6 +100,8 @@ set(libretuner_SRC
     ui/titlebar.h
     ui/styledwindow.cpp
     ui/styledwindow.h
+    ui/dataloggerwindow.cpp
+    ui/dataloggerwindow.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h

@@ -58,12 +58,12 @@ public:
   Timer(const Timer&) = delete;
   Timer(Timer &&) = delete;
 
+  Timer() = default;
+  explicit Timer(Callback &&cb);
+
 protected:
   bool tryTrigger();
   void trigger();
-
-  Timer() = default;
-  explicit Timer(Callback &&cb);
 
 private:
   std::chrono::milliseconds timeout_;
