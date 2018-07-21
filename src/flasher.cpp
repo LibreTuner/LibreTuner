@@ -35,7 +35,7 @@ Flasher::Flasher(Flasher::Callbacks *callbacks) : callbacks_(callbacks) {
 
 class MazdaT1Flasher : public Flasher {
 public:
-  MazdaT1Flasher(Flasher::Callbacks *callbacks, const std::string &key,
+  MazdaT1Flasher(Flasher::Callbacks *callbacks, std::string key,
                  std::shared_ptr<isotp::Protocol> isotp);
 
   void flash(FlashablePtr flashable) override;
@@ -58,9 +58,9 @@ private:
 };
 
 MazdaT1Flasher::MazdaT1Flasher(Flasher::Callbacks *callbacks,
-                               const std::string &key,
+                               std::string key,
                                std::shared_ptr<isotp::Protocol> isotp)
-    : Flasher(callbacks), key_(key),
+    : Flasher(callbacks), key_(std::move(key)),
       uds_(uds::Protocol::create(std::move(isotp))),
       auth_(std::bind(&MazdaT1Flasher::onAuthenticated, this,
                       std::placeholders::_1, std::placeholders::_2)) {}
@@ -97,7 +97,7 @@ void MazdaT1Flasher::do_erase() {
 
 void MazdaT1Flasher::do_request_download() {
   // Send address...size
-  std::array<uint8_t, 9> msg;
+  std::array<uint8_t, 9> msg{};
   msg[0] = UDS_REQ_REQUESTDOWNLOAD;
   writeBE<int32_t>(flash_->offset(), gsl::make_span(msg).subspan(1));
   writeBE<int32_t>(flash_->size(), gsl::make_span(msg).subspan(5));

@@ -29,10 +29,10 @@
 
 #include <cassert>
 
-TuneWidget::TuneWidget(TunePtr tune, QWidget *parent)
+TuneWidget::TuneWidget(const TunePtr& tune, QWidget *parent)
     : QFrame(parent), tune_(tune) {
   assert(tune);
-  QVBoxLayout *vlayout = new QVBoxLayout(this);
+  auto *vlayout = new QVBoxLayout(this);
 
   QLabel *title = new QLabel(QString::fromStdString(tune->name()), this);
   title->setAlignment(Qt::AlignCenter);

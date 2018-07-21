@@ -24,11 +24,12 @@
 #include "protocols/socketcaninterface.h"
 
 #include <QMessageBox>
+#include <utility>
 
 Q_DECLARE_METATYPE(DefinitionPtr)
 
-DownloadWindow::DownloadWindow(const DataLinkPtr &datalink, QWidget *parent)
-    : QDialog(parent), datalink_(datalink), ui(new Ui::DownloadWindow) {
+DownloadWindow::DownloadWindow(DataLinkPtr datalink, QWidget *parent)
+    : QDialog(parent), datalink_(std::move(datalink)), ui(new Ui::DownloadWindow) {
   ui->setupUi(this);
 
   query();
@@ -43,7 +44,7 @@ void DownloadWindow::queryError(DataLink::Error error) {
   close();
 }
 
-void DownloadWindow::vehicleQueried(VehiclePtr vehicle) {
+void DownloadWindow::vehicleQueried(const VehiclePtr& vehicle) {
   ui->labelVehicle->setText("Found vehicle: " + QString::fromStdString(vehicle->name()));
   ui->vinLineEdit->setText(QString::fromStdString(vehicle->vin()));
   if (!vehicle->definition()) {

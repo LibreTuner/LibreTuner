@@ -118,7 +118,7 @@ TableDefinition::TableDefinition(Definition *definition)
 
 TableDefinition::TableDefinition() : definition_(nullptr) {}
 
-bool TableDefinition::load(QXmlStreamReader &xml, Definition *def) {
+bool TableDefinition::load(QXmlStreamReader &xml, Definition * /*def*/) {
   QXmlStreamAttributes attributes = xml.attributes();
   if (!attributes.hasAttribute("type")) {
     xml.raiseError("No type attribute defined");

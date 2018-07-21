@@ -33,10 +33,10 @@ uint8_t calculate_st(std::chrono::microseconds time) {
     return std::min<long>(
         std::chrono::duration_cast<std::chrono::milliseconds>(time).count(),
         127);
-  } else {
+  } 
     uint8_t count = std::max<uint8_t>(time.count() / 100, 1);
     return count + 0xF0;
-  }
+  
 }
 
 std::chrono::microseconds calculate_time(uint8_t st) {
@@ -133,7 +133,7 @@ private:
   Protocol::RecvPacketCallback callback_;
   uint8_t consecIndex_ = 0;
   // Remaining amount of bytes to be read
-  uint16_t remaining_;
+  uint16_t remaining_{};
   std::shared_ptr<Receiver> self_;
   State state_ = State::Begin;
 
@@ -228,8 +228,8 @@ void Receiver::handleSingle(const SingleFrame &f) {
 }
 
 void Receiver::handleBegin(const Frame &f) {
-  FirstFrame ff;
-  SingleFrame sf;
+  FirstFrame ff{};
+  SingleFrame sf{};
   if (f.first(ff)) {
     handleFirst(ff);
   } else if (f.single(sf)) {
@@ -271,7 +271,7 @@ void Receiver::start() {
       break;
     case State::Consecutive:
       if (f.type() == FrameType::Consecutive) {
-        ConsecutiveFrame cf;
+        ConsecutiveFrame cf{};
         if (!f.consecutive(cf)) {
           break;
         }

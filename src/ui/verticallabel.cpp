@@ -39,10 +39,10 @@ void VerticalLabel::paintEvent(QPaintEvent *) {
 
 QSize VerticalLabel::minimumSizeHint() const {
   QSize s = QLabel::minimumSizeHint();
-  return QSize(s.height(), s.width());
+  return {s.height(), s.width()};
 }
 
 QSize VerticalLabel::sizeHint() const {
   QSize s = QLabel::sizeHint();
-  return QSize(s.height(), s.width());
+  return {s.height(), s.width()};
 }

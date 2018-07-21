@@ -26,7 +26,7 @@
 
 Q_DECLARE_METATYPE(RomPtr)
 
-CreateTuneDialog::CreateTuneDialog(RomPtr base)
+CreateTuneDialog::CreateTuneDialog(const RomPtr& base)
     : ui_(new Ui::CreateTuneDialog) {
   ui_->setupUi(this);
 

@@ -29,7 +29,7 @@ DefinitionManager *DefinitionManager::get() {
   return &definitionmanager;
 }
 
-DefinitionManager::DefinitionManager() {}
+DefinitionManager::DefinitionManager() = default;
 
 DefinitionPtr DefinitionManager::getDefinition(const std::string &id) {
   for (auto it = definitions_.begin(); it != definitions_.end(); ++it) {

@@ -54,7 +54,7 @@ public:
 
   /* Creates a new tune with base 'base'. Returns the new tune.
    * If the tune could not be created, returns nullptr and sets lastError */
-  TunePtr createTune(RomPtr base, const std::string &name);
+  TunePtr createTune(const RomPtr& base, const std::string &name);
 
 private:
   TuneManager();

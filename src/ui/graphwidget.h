@@ -35,10 +35,10 @@ typedef std::shared_ptr<Table> TablePtr;
  */
 class GraphWidget : public QWidget {
 public:
-  explicit GraphWidget(QWidget *parent = 0);
+  explicit GraphWidget(QWidget *parent = nullptr);
 
 public slots:
-  void tableChanged(TablePtr table);
+  void tableChanged(const TablePtr &table);
 
 private:
   TablePtr table_;

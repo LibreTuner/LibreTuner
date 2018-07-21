@@ -25,7 +25,7 @@
 
 SettingsWidget::SettingsWidget(QWidget *parent) : QWidget(parent) {
   layout_ = new QFormLayout;
-  QVBoxLayout *vlayout = new QVBoxLayout;
+  auto *vlayout = new QVBoxLayout;
   vlayout->setMargin(0);
   vlayout->addLayout(layout_);
 

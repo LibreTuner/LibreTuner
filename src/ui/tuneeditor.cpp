@@ -33,7 +33,7 @@
 #include <QMessageBox>
 #include <QTreeWidget>
 
-TuneEditor::TuneEditor(TuneDataPtr tune, QWidget *parent)
+TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
   assert(tune);
 
@@ -77,10 +77,10 @@ TuneEditor::TuneEditor(TuneDataPtr tune, QWidget *parent)
         break;
       }
 
-      categories_.push_back(std::make_pair(def->category(), par));
+      categories_.emplace_back(def->category(), par);
     }
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(par);
+    auto *item = new QTreeWidgetItem(par);
     item->setText(0, QString::fromStdString(def->name()));
     item->setData(0, Qt::UserRole, QVariant(i));
   }
@@ -89,7 +89,7 @@ TuneEditor::TuneEditor(TuneDataPtr tune, QWidget *parent)
 }
 
 void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
-                                             int column) {
+                                             int  /*column*/) {
   QVariant data = item->data(0, Qt::UserRole);
   bool ok;
   int index = data.toInt(&ok);

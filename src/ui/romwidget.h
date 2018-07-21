@@ -35,7 +35,7 @@ typedef std::shared_ptr<Rom> RomPtr;
 class RomWidget : public QWidget {
   Q_OBJECT
 public:
-  explicit RomWidget(RomPtr rom, QWidget *parent = 0);
+  explicit RomWidget(const RomPtr& rom, QWidget *parent = 0);
 
   void paintEvent(QPaintEvent *event) override;
 private:

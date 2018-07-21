@@ -31,6 +31,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <memory>
 
 static LibreTuner *_global;
 
@@ -87,7 +88,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     msgBox.exec();
   }
 
-  mainWindow_ = std::unique_ptr<MainWindow>(new MainWindow);
+  mainWindow_ = std::make_unique<MainWindow>();
   mainWindow_->show();
 
   checkHome();
@@ -110,7 +111,7 @@ void LibreTuner::editTune(const TunePtr &tune) {
     msgBox.exec();
     return;
   }
-  tuneEditor_.reset(new TuneEditor(data));
+  tuneEditor_ = std::make_unique<TuneEditor>(data);
   tuneEditor_->show();
 }
 

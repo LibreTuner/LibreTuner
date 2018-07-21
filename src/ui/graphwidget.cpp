@@ -35,12 +35,11 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
   chartView_->setVisible(false);
   container_->setVisible(false);
 
-  QHBoxLayout *hLayout = new QHBoxLayout(this);
+  auto *hLayout = new QHBoxLayout(this);
   hLayout->addWidget(container_);
   hLayout->addWidget(chartView_);
 
-  series3d_.setDrawMode(
-      QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
+  series3d_.setDrawMode(QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
   surface_->addSeries(&series3d_);
   surface_->setHorizontalAspectRatio(1.0);
 
@@ -56,14 +55,14 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
 
 #include <iostream>
 
-void GraphWidget::tableChanged(TablePtr table) {
+void GraphWidget::tableChanged(const TablePtr& table) {
   table_ = table;
   if (table == nullptr) {
     return;
   }
 
   if (table->type() == TABLE_2D) {
-    QtDataVisualization::QItemModelSurfaceDataProxy *modelProxy =
+    auto *modelProxy =
         new QtDataVisualization::QItemModelSurfaceDataProxy(table.get());
     modelProxy->setUseModelCategories(true);
     // modelProxy->setAutoColumnCategories(false);
@@ -88,7 +87,7 @@ void GraphWidget::tableChanged(TablePtr table) {
     chartView_->setVisible(false);
     container_->setVisible(true);
   } else if (table->type() == TABLE_1D && table->definition()->axisX()) {
-    QLineSeries *series = new QLineSeries;
+    auto *series = new QLineSeries;
     for (int x = 0; x < table->definition()->sizeX(); ++x) {
       series->append(table->definition()->axisX()->label(x),
                      table->data(table->index(0, x))

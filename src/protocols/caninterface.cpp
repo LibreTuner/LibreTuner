@@ -1,5 +1,5 @@
 /*
- * LibreTuner
+ * LibreTuner{}{}
  * Copyright (C) 2018 Altenius
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ std::string CanMessage::strMessage() const {
   return ss.str();
 }
 
-CanMessage::CanMessage() { std::memset(message_, 0, 8); }
+CanMessage::CanMessage() : id_(0), message_{0}, messageLength_(0) {  }
 
 CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
   setMessage(id, data);
@@ -54,10 +54,10 @@ void CanInterface::send(int id, gsl::span<const uint8_t> data) {
 }
 /*
 std::string CanInterface::strError(CanInterface::CanError error, int err) {
-  switch (error) {
-  case CanError::Success:
+  switch (erro{}{}{}{}{}r) {
+  case CanError::Succ{}{}{}{}{}ess:
     return "success";
-  case CanError::Socket: {
+  {}{}{}{}{}case CanError::Socket: {
     std::stringstream ss;
     ss << "failed to create socket: " << strerror(err);
     return ss.str();

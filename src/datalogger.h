@@ -55,7 +55,7 @@ private:
   exprtk::symbol_table<double> symbol_table_;
   exprtk::parser<double> parser_;
   // allow for up to three bytes of information
-  double x_, y_, z_;
+  double x_{}, y_{}, z_{};
 };
 
 class DataLogger;
@@ -83,7 +83,7 @@ protected:
 
 class UdsDataLogger : public DataLogger {
 public:
-  explicit UdsDataLogger(const std::shared_ptr<uds::Protocol> &uds = std::shared_ptr<uds::Protocol>());
+  explicit UdsDataLogger(std::shared_ptr<uds::Protocol> uds = std::shared_ptr<uds::Protocol>());
   UdsDataLogger(const UdsDataLogger&) = delete;
   UdsDataLogger(UdsDataLogger&&) = delete;
 

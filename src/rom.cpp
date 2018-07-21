@@ -25,7 +25,7 @@
 
 #include <QFile>
 
-RomData::RomData(RomPtr rom) : rom_(rom) {
+RomData::RomData(const RomPtr& rom) : rom_(rom) {
   assert(rom);
   definition_ = DefinitionManager::get()->getDefinition(rom->definitionId());
   if (!definition_) {

@@ -27,10 +27,10 @@
 #include <QStyleOption>
 #include <QPainter>
 
-RomWidget::RomWidget(RomPtr rom, QWidget *parent) : rom_(rom), QWidget(parent) {
-  QVBoxLayout *vlayout = new QVBoxLayout(this);
-  QHBoxLayout *hlayout = new QHBoxLayout();
-  QVBoxLayout *buttonLayout = new QVBoxLayout();
+RomWidget::RomWidget(const RomPtr& rom, QWidget *parent) : rom_(rom), QWidget(parent) {
+  auto *vlayout = new QVBoxLayout(this);
+  auto *hlayout = new QHBoxLayout();
+  auto *buttonLayout = new QVBoxLayout();
 
   label_ = new QLabel(QString::fromStdString(rom->name()), this);
   label_->setAlignment(Qt::AlignCenter);

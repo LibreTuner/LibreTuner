@@ -47,6 +47,10 @@ set(libretuner_SRC
     exprtk.hpp
     logger.cpp
     logger.h
+    timerrunloop.cpp
+    timerrunloop.h
+    datalogger.cpp
+    datalogger.h
 
     util/signal.cpp
     util/signal.h
@@ -114,7 +118,7 @@ set(libretuner_SRC
     protocols/isotpserver.cpp
     protocols/isotpserver.h
     protocols/isotpprotocol.cpp
-    protocols/isotpprotocol.h timerrunloop.cpp timerrunloop.h datalogger.cpp datalogger.h)
+    protocols/isotpprotocol.h)
 
 if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
@@ -122,6 +126,14 @@ if (UNIX AND NOT APPLE)
         protocols/socketcaninterface.h
         os/sockethandler.cpp
         os/sockethandler.h)
+endif ()
+
+if (WIN32)
+    set(libretuner_SRC ${libretuner_SRC}
+        j2534/j2534.cpp
+        j2534/j2534.h
+        j2534/j2534manager.cpp
+        j2534/j2534manager.h)
 endif ()
 
 

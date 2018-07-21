@@ -24,7 +24,7 @@
 
 #include <cassert>
 
-Flashable::Flashable(TuneDataPtr tune) {
+Flashable::Flashable(const TuneDataPtr& tune) {
   assert(tune);
   RomDataPtr rom = tune->romData();
   assert(rom);

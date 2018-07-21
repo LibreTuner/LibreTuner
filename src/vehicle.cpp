@@ -17,6 +17,8 @@
  */
 
 #include "vehicle.h"
+
+#include <utility>
 #include "definitions/definitionmanager.h"
 #include "definitions/definition.h"
 #include "protocols/isotpprotocol.h"
@@ -24,13 +26,11 @@
 #include "datalink.h"
 #include "datalogger.h"
 
-Vehicle::Vehicle(const std::string &name, const std::string &vin,
-                 DefinitionPtr ptr) : name_(name), vin_(vin), definition_(std::move(ptr)) {}
+Vehicle::Vehicle(std::string name, std::string vin,
+                 DefinitionPtr ptr) : name_(std::move(name)), vin_(std::move(vin)), definition_(std::move(ptr)) {}
 
 Vehicle::~Vehicle()
-{
-
-}
+= default;
 
 struct make_shared_enabler : public Vehicle {
   template <typename... Args>
@@ -41,7 +41,7 @@ struct make_shared_enabler : public Vehicle {
 VehiclePtr Vehicle::fromVin(const std::string &vin) {
   DefinitionPtr def = DefinitionManager::get()->fromVin(vin);
   if (def) {
-    return std::make_shared<Vehicle>(def->name(), vin, def);
+    return std::make_shared<Vehicle>(def->name(), vin, std::move(def));
   }
   return std::make_shared<Vehicle>(vin, vin, nullptr);
 }

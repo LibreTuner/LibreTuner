@@ -27,9 +27,9 @@ TuneManager *TuneManager::get() {
   return &manager;
 }
 
-TuneManager::TuneManager() {}
+TuneManager::TuneManager() = default;
 
-TunePtr TuneManager::createTune(RomPtr base, const std::string &name) {
+TunePtr TuneManager::createTune(const RomPtr& base, const std::string &name) {
   assert(base);
 
   LibreTuner::get()->checkHome();
@@ -127,7 +127,7 @@ bool TuneManager::save() {
   xml.writeStartDocument();
   xml.writeDTD("<!DOCTYPE tunes>");
   xml.writeStartElement("tunes");
-  for (const TunePtr tune : tunes_) {
+  for (const TunePtr& tune : tunes_) {
     xml.writeStartElement("tune");
     xml.writeTextElement("name", QString::fromStdString(tune->name()));
     xml.writeTextElement("path", QString::fromStdString(tune->path()));

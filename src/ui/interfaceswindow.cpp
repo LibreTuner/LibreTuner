@@ -58,7 +58,7 @@ void InterfacesWindow::interfacesChanged(
 }
 
 void InterfacesWindow::on_listInterfaces_currentItemChanged(
-    QListWidgetItem *current, QListWidgetItem *previous) {
+    QListWidgetItem *current, QListWidgetItem * /*previous*/) {
   if (current == nullptr) {
     replaceSettings(nullptr);
     return;

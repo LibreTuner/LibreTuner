@@ -33,7 +33,7 @@ typedef std::shared_ptr<Tune> TunePtr;
 class TuneWidget : public QFrame {
   Q_OBJECT
 public:
-  TuneWidget(TunePtr tune, QWidget *parent = 0);
+  TuneWidget(const TunePtr &tune, QWidget *parent = 0);
 
 private:
   TunePtr tune_;

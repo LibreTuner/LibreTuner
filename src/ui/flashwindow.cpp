@@ -33,7 +33,7 @@
 #include <QString>
 #include <QStyledItemDelegate>
 
-FlashWindow::FlashWindow(FlashablePtr flashable)
+FlashWindow::FlashWindow(const FlashablePtr& flashable)
     : ui(new Ui::FlashWindow), flashable_(flashable) {
   assert(flashable);
   assert(flashable->valid());

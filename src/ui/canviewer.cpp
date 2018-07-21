@@ -37,7 +37,7 @@ CanViewer::CanViewer(QWidget *parent) : StyledWindow(parent), ui(new Ui::CanView
 
 CanViewer::~CanViewer() { delete ui; }
 
-void CanViewer::rowsInserted(const QModelIndex &parent, int first, int last) {
+void CanViewer::rowsInserted(const QModelIndex & /*parent*/, int  /*first*/, int  /*last*/) {
   if (ui->autoScroll->isChecked()) {
     ui->logView->scrollToBottom();
   }

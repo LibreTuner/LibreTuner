@@ -17,10 +17,10 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent)
 {
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
-    QHBoxLayout *hlayout = new QHBoxLayout;
+    auto *hlayout = new QHBoxLayout;
     setLayout(hlayout);
 
-    QVBoxLayout *pidLayout = new QVBoxLayout;
+    auto *pidLayout = new QVBoxLayout;
     hlayout->addLayout(pidLayout);
 
     QLabel *pidLabel = new QLabel("Available PIDs");
@@ -29,10 +29,10 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent)
     pidList_ = new QListWidget;
     pidLayout->addWidget(pidList_);
 
-    QVBoxLayout *logLayout = new QVBoxLayout;
+    auto *logLayout = new QVBoxLayout;
     hlayout->addLayout(logLayout);
     logOutput_ = new QTreeWidget;
-    logLayout->addLayout(logLayout);
+    logLayout->addWidget(logOutput_);
 
     buttonLog_ = new QPushButton("Start logging");
     logLayout->addWidget(buttonLog_);
@@ -73,7 +73,7 @@ void DataLoggerWindow::showEvent(QShowEvent *event)
     event->accept();
 }
 
-void DataLoggerWindow::hideEvent(QHideEvent *event)
+void DataLoggerWindow::hideEvent(QHideEvent * /*event*/)
 {
     // TODO: ask to save log
     pidList_->clear();
@@ -114,9 +114,10 @@ void DataLoggerWindow::queried()
         if (!pid.valid) {
             continue;
         }
-        QListWidgetItem *item = new QListWidgetItem;
+        auto *item = new QListWidgetItem;
         item->setText(QString::fromStdString(pid.name));
         item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.id));
+        item->setFlags(Qt::ItemIsUserCheckable);
         pidList_->addItem(item);
         logger_->addPid(pid.id, pid.code, pid.formula);
     }

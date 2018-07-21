@@ -41,7 +41,7 @@ private:
 
 class Vehicle {
 public:
-  Vehicle(const std::string &name, const std::string &vin, DefinitionPtr ptr);
+  Vehicle(std::string name, std::string vin, DefinitionPtr ptr);
   Vehicle() = default;
 
   virtual ~Vehicle();

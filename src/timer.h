@@ -66,7 +66,7 @@ protected:
   void trigger();
 
 private:
-  std::chrono::milliseconds timeout_;
+  std::chrono::milliseconds timeout_{};
 
   std::chrono::steady_clock::time_point nextTrigger_;
 
@@ -77,7 +77,7 @@ private:
   // true if the timer is waiting
   bool active_;
   // true if the timer is currently being triggered
-  std::atomic<bool> running_;
+  std::atomic<bool> running_{};
 };
 using TimerPtr = std::shared_ptr<Timer>;
 

@@ -42,7 +42,7 @@ typedef std::shared_ptr<Flasher> FlasherPtr;
 class FlashWindow : public QDialog, public Flasher::Callbacks {
   Q_OBJECT
 public:
-  FlashWindow(FlashablePtr flashable);
+  FlashWindow(const FlashablePtr &flashable);
 
   void onCompletion() override;
   void onError(const std::string &error) override;

@@ -18,7 +18,7 @@ struct PidDefinition {
 class PidDefinitions
 {
 public:
-    PidDefinitions();
+    PidDefinitions() = default;
 
     void add(PidDefinition &&pid);
 

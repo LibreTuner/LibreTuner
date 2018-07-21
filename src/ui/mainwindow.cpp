@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   setupMenu();
 
-  QTabWidget *tabs = new QTabWidget();
+  auto *tabs = new QTabWidget();
   tabs->setDocumentMode(true);
   tabs->tabBar()->setDrawBase(false);
   tabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -61,9 +61,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 QWidget *MainWindow::createLogsTab() {
   QWidget *widget = new QWidget();
-  QVBoxLayout *layout = new QVBoxLayout();
+  auto *layout = new QVBoxLayout();
 
-  QHBoxLayout *hlayout = new QHBoxLayout();
+  auto *hlayout = new QHBoxLayout();
   layout->addLayout(hlayout);
 
   QPushButton *buttonNewLog = new QPushButton(tr("New Log"));
@@ -86,9 +86,9 @@ QWidget *MainWindow::createLogsTab() {
 
 QWidget *MainWindow::createRomsTab() {
   QWidget *widget = new QWidget();
-  QVBoxLayout *layout = new QVBoxLayout();
+  auto *layout = new QVBoxLayout();
 
-  QScrollArea *area = new QScrollArea;
+  auto *area = new QScrollArea;
   area->setWidgetResizable(true);
 
   area->setStyleSheet("QScrollArea { background: transparent; }\n"
@@ -112,9 +112,9 @@ QWidget *MainWindow::createRomsTab() {
 
 QWidget *MainWindow::createTunesTab() {
   QWidget *widget = new QWidget();
-  QVBoxLayout *layout = new QVBoxLayout();
+  auto *layout = new QVBoxLayout();
 
-  QScrollArea *area = new QScrollArea;
+  auto *area = new QScrollArea;
   area->setWidgetResizable(true);
   area->setStyleSheet("QScrollArea { background: transparent; }\n"
                       "QScrollArea > QWidget > QWidget { background: transparent; }\n"
@@ -140,7 +140,7 @@ QWidget *MainWindow::createOverviewTab() {
 
 
 void MainWindow::setupMenu() {
-  QMenuBar *menuBar = new QMenuBar;
+  auto *menuBar = new QMenuBar;
   QMenu *fileMenu = menuBar->addMenu(tr("&File"));
   QMenu *editMenu = menuBar->addMenu(tr("&Edit"));
   QMenu *helpMenu = menuBar->addMenu(tr("&Help"));
@@ -156,7 +156,7 @@ void MainWindow::setupMenu() {
 
 void MainWindow::updateTunes() {
   QLayoutItem *child;
-  while ((child = tunesLayout_->takeAt(0)) != 0) {
+  while ((child = tunesLayout_->takeAt(0)) != nullptr) {
     delete child;
   }
 
@@ -168,7 +168,7 @@ void MainWindow::updateTunes() {
 
 void MainWindow::updateRoms() {
   QLayoutItem *child;
-  while ((child = romsLayout_->takeAt(0)) != 0) {
+  while ((child = romsLayout_->takeAt(0)) != nullptr) {
     delete child;
   }
 
@@ -193,7 +193,7 @@ void MainWindow::newLogClicked()
 }
 
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::closeEvent(QCloseEvent * /*event*/) {
   canViewer_.close();
   interfacesWindow_.close();
 }

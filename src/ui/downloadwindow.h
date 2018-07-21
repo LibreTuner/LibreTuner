@@ -38,7 +38,7 @@ class DownloadWindow;
 class DownloadWindow : public QDialog, public DownloadInterface::Callbacks {
   Q_OBJECT
 public:
-  explicit DownloadWindow(const DataLinkPtr &datalink, QWidget *parent = nullptr);
+  explicit DownloadWindow(DataLinkPtr datalink, QWidget *parent = nullptr);
   ~DownloadWindow() override;
 
   /* Download interface callbacks */
@@ -54,7 +54,7 @@ private slots:
   void mainOnCompletion(bool success, const QString &error);
 
   void queryError(DataLink::Error error);
-  void vehicleQueried(VehiclePtr vehicle);
+  void vehicleQueried(const VehiclePtr &vehicle);
 
 private:
   Ui::DownloadWindow *ui;

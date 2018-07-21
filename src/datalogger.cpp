@@ -19,6 +19,8 @@
 #include "datalogger.h"
 #include "logger.h"
 
+#include <utility>
+
 void DataLogger::setLog(const DataLogPtr &log) {
     log_ = log;
 }
@@ -28,7 +30,7 @@ void DataLogger::addPid(uint32_t id, uint16_t code, const std::string &formula)
     addPid(Pid(id, code, formula));
 }
 
-UdsDataLogger::UdsDataLogger(const std::shared_ptr<uds::Protocol> &uds) : uds_(uds) {
+UdsDataLogger::UdsDataLogger(std::shared_ptr<uds::Protocol> uds) : uds_(std::move(uds)) {
 
 }
 

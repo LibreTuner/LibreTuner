@@ -7,7 +7,7 @@
 #include <QWindowStateChangeEvent>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #include <windowsx.h>
 #endif
 

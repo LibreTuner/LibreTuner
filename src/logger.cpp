@@ -2,9 +2,7 @@
 #include <iostream>
 
 Logger::Logger()
-{
-
-}
+= default;
 
 void Logger::log(Logger::Mode mode, const std::string &message)
 {

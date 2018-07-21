@@ -8,12 +8,12 @@
 #include <QApplication>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
 {
-    QHBoxLayout *layout = new QHBoxLayout;
+    auto *layout = new QHBoxLayout;
     layout->setSpacing(0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setFixedHeight(30);

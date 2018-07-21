@@ -42,7 +42,7 @@ typedef std::shared_ptr<Table> TablePtr;
 class TuneEditor : public QMainWindow {
   Q_OBJECT
 public:
-  TuneEditor(TuneDataPtr tune, QWidget *parent = 0);
+  TuneEditor(const TuneDataPtr &tune, QWidget *parent = 0);
 
   void closeEvent(QCloseEvent *event) override;
 

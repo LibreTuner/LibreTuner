@@ -59,7 +59,7 @@ public:
     virtual void onCompletion(gsl::span<const uint8_t> data) = 0;
   };
 
-  static std::shared_ptr<DownloadInterface> create(Callbacks *callbacks, DataLinkPtr datalink, DefinitionPtr definition);
+  static std::shared_ptr<DownloadInterface> create(Callbacks *callbacks, const DataLinkPtr &datalink, const DefinitionPtr &definition);
 
 protected:
   Callbacks *callbacks_;

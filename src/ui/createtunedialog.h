@@ -38,7 +38,7 @@ typedef std::shared_ptr<Rom> RomPtr;
 class CreateTuneDialog : public QDialog {
   Q_OBJECT
 public:
-  CreateTuneDialog(RomPtr base = nullptr);
+  CreateTuneDialog(const RomPtr &base = nullptr);
 
   ~CreateTuneDialog();
 

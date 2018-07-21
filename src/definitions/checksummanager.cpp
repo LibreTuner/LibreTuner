@@ -99,8 +99,8 @@ std::pair<bool, std::string> ChecksumManager::correct(gsl::span<uint8_t> data) {
 
 ChecksumBasic *ChecksumManager::addBasic(uint32_t offset, uint32_t size,
                                          uint32_t target) {
-  ChecksumPtr checksum = std::make_shared<ChecksumBasic>(offset, size, target);
+  std::shared_ptr<ChecksumBasic> checksum = std::make_shared<ChecksumBasic>(offset, size, target);
 
-  checksums_.push_back(checksum);
-  return reinterpret_cast<ChecksumBasic *>(checksum.get());
+  checksums_.push_back(std::static_pointer_cast<Checksum>(checksum));
+  return checksum.get();
 }

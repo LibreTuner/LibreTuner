@@ -214,7 +214,7 @@ void Protocol::requestSecurityKey(gsl::span<uint8_t> key,
 
 void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length,
                                         RequestMemoryAddressCallback &&cb) {
-  std::array<uint8_t, 7> req;
+  std::array<uint8_t, 7> req{};
   req[0] = UDS_REQ_READMEM;
 
   req[1] = (address & 0xFF000000) >> 24;

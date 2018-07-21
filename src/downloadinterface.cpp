@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 #include <vector>
 
 #ifdef WITH_SOCKETCAN
@@ -38,7 +39,7 @@ class Uds23DownloadInterface : public DownloadInterface {
 public:
   Uds23DownloadInterface(DownloadInterface::Callbacks *callbacks,
                          std::shared_ptr<isotp::Protocol> isotp,
-                         const std::string &key, int size);
+                         std::string key, int size);
   void download() override;
 
   /* UdsAuthenticator Callback */
@@ -67,16 +68,16 @@ private:
 
 Uds23DownloadInterface::Uds23DownloadInterface(
     DownloadInterface::Callbacks *callbacks,
-    std::shared_ptr<isotp::Protocol> isotp, const std::string &key, int size)
+    std::shared_ptr<isotp::Protocol> isotp, std::string key, int size)
     : DownloadInterface(callbacks),
       auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this,
                       std::placeholders::_1, std::placeholders::_2)),
-      key_(key), totalSize_(size) {
+      key_(std::move(key)), totalSize_(size) {
   uds_ = uds::Protocol::create(std::move(isotp));
 }
 
 std::shared_ptr<DownloadInterface>
-DownloadInterface::create(DownloadInterface::Callbacks *callbacks, DataLinkPtr datalink, DefinitionPtr definition) {
+DownloadInterface::create(DownloadInterface::Callbacks *callbacks, const DataLinkPtr& datalink, const DefinitionPtr& definition) {
   assert(callbacks != nullptr);
 
   switch (definition->downloadMode()) {
