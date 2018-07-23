@@ -37,10 +37,10 @@ public:
     // Returns true if the interface's library has been loaded
     bool initialized() const;
 
-    std::string name() const { return info.name_; }
+    std::string name() const { return info_.name; }
 
     // Returns the protocols supported by the J2534 interface
-    DataLinkProtocol protocols() const { return info.protocols; }
+    DataLinkProtocol protocols() const { return info_.protocols; }
 
     // Creates a J2534 interface. Must be initialized with init() before use.
     static J2534Ptr create(J2534Info &&info);
