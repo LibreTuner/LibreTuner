@@ -17,8 +17,14 @@ public:
     // Returns the singleton
     static J2534Manager &get();
 
+    void init();
+
     // Empties the vector of discovered interfaces and repopulates.
     void rediscover();
+
+    const std::vector<const J2534Ptr> &interfaces() const {
+        return interfaces_;
+    }
 
 private:
     std::vector<J2534Ptr> interfaces_;
