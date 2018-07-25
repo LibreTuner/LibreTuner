@@ -89,6 +89,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
   }
 
   mainWindow_ = std::make_unique<MainWindow>();
+  mainWindow_->setWindowIcon(QIcon(":/icons/LibreTuner.png"));
   mainWindow_->show();
 
   checkHome();

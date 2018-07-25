@@ -22,7 +22,7 @@ public:
     // Empties the vector of discovered interfaces and repopulates.
     void rediscover();
 
-    const std::vector<const J2534Ptr> &interfaces() const {
+    const std::vector<J2534Ptr> &interfaces() const {
         return interfaces_;
     }
 

@@ -64,7 +64,7 @@ void J2534Manager::rediscover()
 
         DWORD keyType;
         keySize = sizeof(keyValue);
-        if (RegQueryValueEx(hKeyDevice, "Name", nullptr, &keyType, keyValue, &keySize) != ERROR_SUCCESS) {
+        if (RegQueryValueEx(hKeyDevice, "Name", nullptr, &keyType, reinterpret_cast<uint8_t*>(keyValue), &keySize) != ERROR_SUCCESS) {
             RegCloseKey(hKeyDevice);
             RegCloseKey(hKeyPassthrough);
             throw std::runtime_error("Error querying passthrough device name");
@@ -73,7 +73,7 @@ void J2534Manager::rediscover()
         info.name = keyValue;
 
         keySize = sizeof(keyValue);
-        if (RegQueryValueEx(hKeyDevice, "FunctionLibrary", nullptr, &keyType, keyValue, &keySize) != ERROR_SUCCESS) {
+        if (RegQueryValueEx(hKeyDevice, "FunctionLibrary", nullptr, &keyType, reinterpret_cast<uint8_t*>(keyValue), &keySize) != ERROR_SUCCESS) {
             RegCloseKey(hKeyDevice);
             RegCloseKey(hKeyPassthrough);
             throw std::runtime_error("Error querying passthrough device function library");
@@ -83,9 +83,10 @@ void J2534Manager::rediscover()
 
         // Check for CAN support
         DWORD can;
-        if (RegQueryValueEx(hKeyDevice, "CAN", nullptr, &keyType, &can, sizeof(DWORD)) == ERROR_SUCCESS) {
+        keySize = sizeof(DWORD);
+        if (RegQueryValueEx(hKeyDevice, "CAN", nullptr, &keyType, reinterpret_cast<uint8_t*>(&can), &keySize) == ERROR_SUCCESS) {
             if (can) {
-                info.protocols |= DataLinkProtocol::Can;
+                info.protocols = info.protocols | DataLinkProtocol::Can;
             }
         }
 
