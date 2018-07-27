@@ -3,35 +3,59 @@
 #include <cassert>
 
 #include <Windows.h>
+namespace j2534 {
 
 void J2534::init()
 {
     load();
 }
 
-J2534Device J2534::open(char *port)
+Device J2534::open(char *port)
 {
     assert(initialized());
 
-    unsigned long deviceId;
+    uint32_t deviceId;
     long res;
     if ((res = PassThruOpen(port, &deviceId)) != 0) {
         if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
             // Return an invalid device. Don't throw an exception,
             // because the absence of a device is not an exceptional error
-            return J2534Device();
+            return Device();
         }
         throw std::runtime_error(lastError());
     }
-    return J2534Device(shared_from_this(), deviceId);
+    return Device(shared_from_this(), deviceId);
 }
 
-void J2534::close(unsigned int device)
+void J2534::close(uint32_t device)
 {
     assert(initialized());
 
     long res;
     if ((res = PassThruClose(device)) != 0) {
+        throw std::runtime_error(lastError());
+    }
+}
+
+Channel J2534::connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate)
+{
+    assert(initialized());
+
+    long res;
+    uint32_t channel;
+    if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags, baudrate, &channel)) != 0) {
+        throw std::runtime_error(lastError());
+    }
+
+    return Channel(shared_from_this(), channel);
+}
+
+void J2534::disconnect(uint32_t channel)
+{
+    assert(initialized());
+
+    long res;
+    if ((res = PassThruDisconnect(channel)) != 0) {
         throw std::runtime_error(lastError());
     }
 }
@@ -43,7 +67,7 @@ std::string J2534::lastError()
     return std::string(msg);
 }
 
-J2534Ptr J2534::create(J2534Info &&info)
+J2534Ptr J2534::create(Info &&info)
 {
     return std::make_shared<J2534>(std::move(info));
 }
@@ -75,6 +99,9 @@ void J2534::load()
     PassThruStartPeriodicMsg = static_cast<PassThruStartPeriodicMsg_t>(getProc("PassThruStartPeriodicMsg"));
     PassThruStopPeriodicMsg = static_cast<PassThruStopPeriodicMsg_t>(getProc("PassThruStopPeriodicMsg"));
     PassThruSetProgrammingVoltage = static_cast<PassThruSetProgrammingVoltage_t>(getProc("PassThruSetProgrammingVoltage"));
+
+    // If all exports were found (no exceptions were thrown), we can set loaded_ to true
+    loaded_ = true;
 }
 
 void *J2534::getProc(const char *proc)
@@ -87,12 +114,39 @@ void *J2534::getProc(const char *proc)
     return func;
 }
 
-J2534Device::J2534Device(J2534Device &&dev)
+Device::Device(const J2534Ptr &j2534, uint32_t device) : j2534_(j2534), device_(device)
+{
+
+}
+
+Device::~Device()
+{
+    close();
+}
+
+void Device::close()
+{
+    if (valid()) {
+        j2534_->close(device_);
+        j2534_.reset();
+    }
+}
+
+Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate)
+{
+    assert(valid());
+
+    return j2534_->connect(device_, protocol, flags, baudrate);
+}
+
+Device::Device(Device &&dev)
 {
     device_ = dev.device_;
     j2534_ = std::move(dev.j2534_);
 }
 
-J2534Channel::J2534Channel(J2534Channel &&chann) : j2534_(std::move(chann.j2534_)), channel_(chann.channel_)
+Channel::Channel(Channel &&chann) : j2534_(std::move(chann.j2534_)), channel_(chann.channel_)
 {
+}
+
 }

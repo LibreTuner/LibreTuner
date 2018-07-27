@@ -4,8 +4,10 @@
 #include <memory>
 #include <vector>
 
+namespace j2534 {
 class J2534;
 using J2534Ptr = std::shared_ptr<J2534>;
+}
 
 class J2534Manager
 {
@@ -22,12 +24,12 @@ public:
     // Empties the vector of discovered interfaces and repopulates.
     void rediscover();
 
-    const std::vector<J2534Ptr> &interfaces() const {
+    const std::vector<j2534::J2534Ptr> &interfaces() const {
         return interfaces_;
     }
 
 private:
-    std::vector<J2534Ptr> interfaces_;
+    std::vector<j2534::J2534Ptr> interfaces_;
 };
 
 #endif // J2534MANAGER_H

@@ -87,3 +87,20 @@ void InterfacesWindow::replaceSettings(std::unique_ptr<SettingsWidget> widget) {
 void InterfacesWindow::on_buttonApply_clicked() {
   InterfaceManager::get().save();
 }
+
+Qt::ItemFlags InterfacesModel::flags(const QModelIndex &index) const
+{
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+QModelIndex InterfacesModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (parent.isValid()) {
+        parent.
+    }
+}
+
+QModelIndex InterfacesModel::parent(const QModelIndex &child) const
+{
+    return child.parent();
+}

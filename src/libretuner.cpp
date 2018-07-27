@@ -17,8 +17,6 @@
  */
 
 #include "libretuner.h"
-#include "os/sockethandler.h"
-#include "protocols/socketcaninterface.h"
 #include "rommanager.h"
 #include "tune.h"
 #include "ui/flashwindow.h"
@@ -27,6 +25,15 @@
 #include "tunemanager.h"
 #include "timerrunloop.h"
 #include "ui/styledwindow.h"
+
+#ifdef WITH_SOCKETCAN
+#include "os/sockethandler.h"
+#include "protocols/socketcaninterface.h"
+#endif
+
+#ifdef WITH_J2534
+#include "j2534/j2534manager.h"
+#endif
 
 #include <QDir>
 #include <QMessageBox>
@@ -46,6 +53,17 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
 #ifdef WITH_SOCKETCAN
   SocketHandler::get()->initialize();
+#endif
+#ifdef WITH_J2534
+  try {
+    J2534Manager::get().init();
+  } catch (const std::exception &e) {
+      QMessageBox msgBox;
+      msgBox.setText("Could not initialize J2534Manager: " + QString(e.what()));
+      msgBox.setIcon(QMessageBox::Warning);
+      msgBox.setWindowTitle("J2534Manager error");
+      msgBox.exec();
+  }
 #endif
   TimerRunLoop::get().startWorker();
 

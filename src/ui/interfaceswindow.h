@@ -2,6 +2,7 @@
 #define INTERFACESWINDOW_H
 
 #include <QListWidgetItem>
+#include <QAbstractItemModel>
 #include <QWidget>
 #include <gsl/span>
 
@@ -13,6 +14,20 @@ class InterfacesWindow;
 }
 
 class SettingsWidget;
+
+class InterfacesModel : public QAbstractItemModel {
+public:
+
+
+    // QAbstractItemModel interface
+public:
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+    virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    virtual QModelIndex parent(const QModelIndex &child) const override;
+    virtual int rowCount(const QModelIndex &parent) const override;
+    virtual int columnCount(const QModelIndex &parent) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+};
 
 class InterfacesWindow : public QWidget {
   Q_OBJECT

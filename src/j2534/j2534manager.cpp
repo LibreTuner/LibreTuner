@@ -1,11 +1,10 @@
 #include "j2534manager.h"
 #include "j2534.h"
 
-#include <windows.h>
+#include <Windows.h>
 
 J2534Manager::J2534Manager()
 {
-    rediscover();
 }
 
 J2534Manager &J2534Manager::get()
@@ -16,7 +15,7 @@ J2534Manager &J2534Manager::get()
 
 void J2534Manager::init()
 {
-
+    rediscover();
 }
 
 void J2534Manager::rediscover()
@@ -31,8 +30,13 @@ void J2534Manager::rediscover()
     }
 
     HKEY hKeyPassthrough;
-    if (RegOpenKeyEx(hKeySoftware, "PassThruSupport.04.04", 0, KEY_READ, &hKeyPassthrough) != ERROR_SUCCESS) {
+    LSTATUS res;
+    if ((res = RegOpenKeyEx(hKeySoftware, "PassThruSupport.04.04", 0, KEY_READ, &hKeyPassthrough)) != ERROR_SUCCESS) {
         RegCloseKey(hKeySoftware);
+        if (res == ERROR_FILE_NOT_FOUND) {
+            // If this entry does not exist, then no PassThru interfaces are installed
+            return;
+        }
         throw std::runtime_error("Could not open HKEY_LOCAL_MACHINE\\Software\\PassThruSupport.04.04 for reading");
     }
 
@@ -42,7 +46,6 @@ void J2534Manager::rediscover()
     char keyValue[255];
     DWORD keySize;
     DWORD dwIndex = 0;
-    LSTATUS res;
     do {
         keySize = sizeof(keyValue);
         res = RegEnumKeyEx(hKeyPassthrough, dwIndex++, keyValue, &keySize, nullptr, nullptr, nullptr, nullptr);
@@ -60,7 +63,7 @@ void J2534Manager::rediscover()
             throw std::runtime_error("Error while opening passthrough device entry");
         }
 
-        J2534Info info;
+        j2534::Info info;
 
         DWORD keyType;
         keySize = sizeof(keyValue);
@@ -90,7 +93,7 @@ void J2534Manager::rediscover()
             }
         }
 
-        interfaces_.push_back(J2534::create(std::move(info)));
+        interfaces_.push_back(j2534::J2534::create(std::move(info)));
 
         RegCloseKey(hKeyDevice);
     } while (res == ERROR_SUCCESS);
