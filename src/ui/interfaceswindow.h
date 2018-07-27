@@ -48,6 +48,7 @@ private:
   Ui::InterfacesWindow *ui;
   std::shared_ptr<InterfaceManager::ConnType> conn_;
   std::unique_ptr<SettingsWidget> settings_;
+  InterfacesModel model_;
 
   void replaceSettings(std::unique_ptr<SettingsWidget> widget);
 

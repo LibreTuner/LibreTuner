@@ -22,7 +22,7 @@ public:
     void init();
 
     // Empties the vector of discovered interfaces and repopulates.
-    void rediscover();
+    void load_interfaces();
 
     const std::vector<j2534::J2534Ptr> &interfaces() const {
         return interfaces_;

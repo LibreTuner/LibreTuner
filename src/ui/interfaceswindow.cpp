@@ -11,6 +11,7 @@ Q_DECLARE_METATYPE(InterfaceSettingsPtr);
 InterfacesWindow::InterfacesWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::InterfacesWindow) {
   ui->setupUi(this);
+  ui->listInterfaces->setModel(&model_);
   setWindowFlags(Qt::Window);
   conn_ = InterfaceManager::get().connect(std::bind(
       &InterfacesWindow::interfacesChanged, this, std::placeholders::_1));
@@ -25,7 +26,7 @@ void InterfacesWindow::on_buttonAdd_clicked() {
 }
 
 void InterfacesWindow::on_buttonRemove_clicked() {
-  QListWidgetItem *item = ui->listInterfaces->currentItem();
+  QListWidgetItem *item = nullptr;//ui->listInterfaces->currentItem();
   if (item == nullptr) {
     return;
   }
@@ -46,14 +47,14 @@ void InterfacesWindow::on_buttonRemove_clicked() {
 
 void InterfacesWindow::interfacesChanged(
     gsl::span<const InterfaceSettingsPtr> interfaces) {
-  ui->listInterfaces->clear();
+  //ui->listInterfaces->clear();
 
   for (const auto &iface : interfaces) {
-    QListWidgetItem *item =
-        new QListWidgetItem(QString::fromStdString(iface->name()));
-    item->setData(Qt::UserRole,
-                  QVariant::fromValue<InterfaceSettingsPtr>(iface));
-    ui->listInterfaces->addItem(item);
+    //QListWidgetItem *item =
+    //    new QListWidgetItem(QString::fromStdString(iface->name()));
+    //item->setData(Qt::UserRole,
+    //              QVariant::fromValue<InterfaceSettingsPtr>(iface));
+    //ui->listInterfaces->addItem(item);
   }
 }
 
@@ -96,11 +97,82 @@ Qt::ItemFlags InterfacesModel::flags(const QModelIndex &index) const
 QModelIndex InterfacesModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid()) {
-        parent.
+        // We store the type index as the pointer
+        return createIndex(row, column, reinterpret_cast<void*>(parent.row() + 1));
     }
+
+    if (row > 1 || column != 0) {
+        return QModelIndex();
+    }
+    return createIndex(row, column, reinterpret_cast<void*>(0));
 }
 
 QModelIndex InterfacesModel::parent(const QModelIndex &child) const
 {
-    return child.parent();
+    int ind = reinterpret_cast<int>(child.internalPointer());
+    if (ind != 0) {
+        return createIndex(ind - 1, 0, nullptr);
+    }
+    return QModelIndex();
+}
+
+#include <iostream>
+int InterfacesModel::rowCount(const QModelIndex &parent) const
+{
+    if (!parent.isValid()) {
+        // Root
+        return 2;
+    }
+    QModelIndex p = parent.parent();
+    if (p.isValid()) {
+        int row = p.row();
+        if (row == 0) {
+            // Manual
+            return InterfaceManager::get().settings().size();
+        } else if (row == 1) {
+            // Auto-detect
+            return 0;
+        }
+        return 0;
+    }
+
+    return 0;
+}
+
+int InterfacesModel::columnCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+QVariant InterfacesModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid()) {
+        return QVariant();
+    }
+
+    if (role != Qt::DisplayRole) {
+        return QVariant();
+    }
+
+    if (index.column() != 0) {
+        return QVariant();
+    }
+
+    QModelIndex parent = index.parent();
+    if (!parent.isValid()) {
+        int row = index.row();
+        if (row == 0) {
+            return "Manually added";
+        } else if (row == 1) {
+            return "Autodetected";
+        }
+        return QVariant();
+    }
+    if (parent.row() == 0) {
+        auto settings = InterfaceManager::get().settings();
+        if (settings.size() > index.row()) {
+            return QString::fromStdString(settings.at(index.row())->name());
+        }
+    }
+    return QVariant();
 }

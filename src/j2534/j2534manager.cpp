@@ -20,6 +20,10 @@ void J2534Manager::init()
 
 void J2534Manager::rediscover()
 {
+    // This function need optimized. Clearing the interfaces and loading them is bad because:
+    // 1. Unecessarily loading the DLL twice
+    // 2. Existing devices keep a reference to the J2534 interface, so it will not be destructed
+    //    and two copies will exist
     interfaces_.clear();
     // Ugly C code incoming
 
