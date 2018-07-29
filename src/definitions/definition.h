@@ -194,6 +194,7 @@ private:
 
   DownloadMode downloadMode_;
   FlashMode flashMode_;
+  uint32_t baudrate_ = 500000;
   LogMode logMode_ = LogMode::None;
   /* Security key */
   std::string key_;

@@ -533,6 +533,11 @@ bool Definition::loadMain(const QString &path) {
       loadVins(xml);
     } else if (xml.name() == "pids") {
       loadPids(xml);
+    } else if (xml.name() == "baudrate") {
+        baudrate_ = xml.readElementText().toUInt(&ok);
+        if(!ok) {
+            xml.raiseError("Invalid baudrate: not a number");
+        }
     } else if (xml.name() == "logmode") {
         QString sMode = xml.readElementText().toLower();
         if (sMode == "uds") {

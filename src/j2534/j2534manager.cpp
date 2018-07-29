@@ -15,10 +15,10 @@ J2534Manager &J2534Manager::get()
 
 void J2534Manager::init()
 {
-    rediscover();
+    load_interfaces();
 }
 
-void J2534Manager::rediscover()
+void J2534Manager::load_interfaces()
 {
     // This function need optimized. Clearing the interfaces and loading them is bad because:
     // 1. Unecessarily loading the DLL twice

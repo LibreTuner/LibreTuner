@@ -133,7 +133,9 @@ if (WIN32)
         j2534/j2534.cpp
         j2534/j2534.h
         j2534/j2534manager.cpp
-        j2534/j2534manager.h)
+        j2534/j2534manager.h
+        j2534/j2534caninterface.cpp
+        j2534/j2534caninterface.h)
 endif ()
 
 

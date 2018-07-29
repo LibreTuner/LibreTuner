@@ -32,6 +32,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent)
     auto *logLayout = new QVBoxLayout;
     hlayout->addLayout(logLayout);
     logOutput_ = new QTreeWidget;
+    logOutput_->setHeaderHidden(true);
     logLayout->addWidget(logOutput_);
 
     buttonLog_ = new QPushButton("Start logging");
