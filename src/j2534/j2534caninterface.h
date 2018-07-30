@@ -2,6 +2,8 @@
 #define J2534CANINTERFACE_H
 
 #include <memory>
+#include <thread>
+#include <atomic>
 
 #include "protocols/caninterface.h"
 #include "j2534.h"
@@ -17,6 +19,8 @@ public:
 
     Can(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
 
+    virtual ~Can() override;
+
     // CanInterface interface
 public:
     virtual void send(const CanMessage &message) override;
@@ -25,6 +29,8 @@ public:
 
 private:
     j2534::Channel channel_;
+    std::thread recvThread_;
+    std::atomic<bool> closed_;
 };
 
 }

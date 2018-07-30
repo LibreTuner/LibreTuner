@@ -99,7 +99,15 @@ public:
     Channel(const Channel&) = delete;
     Channel(Channel&& chann);
 
+    /* Reads `pNumMsgs` messages or until the timeout expires. If timeout is 0,
+     * reads the buffer and returns immediately. Sets pNumMsgs to the amount of messages
+       actually read. Refer to the j2534 spec for more information. */
     void readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+
+    /* Writes the array of `pMsg` (size `pNumMsgs`) until timeout expires. Is timeout is 0,
+     * queues as many transmit messages as possible and returns immediately. Sets pNumMsgs to
+       the amount of messages sent. Refer to the j2534 spec for more information. */
+    void writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
     /* Disconnects the channel from the j2534 device. The object
      * is in an invalid state after calling this method */
@@ -147,6 +155,7 @@ private:
     uint32_t device_;
 };
 
+// TODO: Synchronize this all into one thread! (IMPORTANT!!!)
 class J2534 : public std::enable_shared_from_this<J2534>
 {
 public:
@@ -167,6 +176,7 @@ public:
     uint32_t connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate);
 
     void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+    void writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
     // Disconnects a logical communication channel
     void disconnect(uint32_t channel);

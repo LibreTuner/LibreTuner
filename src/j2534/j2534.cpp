@@ -58,6 +58,14 @@ void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, u
     }
 }
 
+void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
+{
+    int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
+    if (res != 0) {
+        throw std::runtime_error(lastError());
+    }
+}
+
 void J2534::disconnect(uint32_t channel)
 {
     assert(initialized());
@@ -161,6 +169,12 @@ void Channel::readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
 {
     assert(valid());
     j2534_->readMsgs(channel_, pMsg, pNumMsgs, timeout);
+}
+
+void Channel::writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
+{
+    assert(valid());
+    j2534_->writeMsgs(channel_, pMsg, pNumMsgs, timeout);
 }
 
 }
