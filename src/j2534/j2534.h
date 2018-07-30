@@ -32,20 +32,20 @@ struct PASSTHRU_MSG {
     unsigned char Data[4128]; /* message payload or data */
 };
 
-using PassThruOpen_t = long (*) (void*, uint32_t*);
-using PassThruClose_t = long (*) (uint32_t);
-using PassThruConnect_t = long (*) (uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
-using PassThruDisconnect_t = long (*) (uint32_t);
-using PassThruReadMsgs_t = long (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruWriteMsgs_t = long (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruStartPeriodicMsg_t = long (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruStopPeriodicMsg_t = long (*) (uint32_t, uint32_t);
-using PassThruStartMsgFilter_t = long (*) (uint32_t, uint32_t, PASSTHRU_MSG*, PASSTHRU_MSG*, PASSTHRU_MSG*, uint32_t*);
-using PassThruStopMsgFilter_t = long (*) (uint32_t, uint32_t);
-using PassThruSetProgrammingVoltage_t = long (*) (uint32_t, uint32_t);
-using PassThruReadVersion_t = long (*) (char*, char*, char*);
-using PassThruGetLastError_t = long (*) (char*);
-using PassThruIoctl_t = long (*) (uint32_t, uint32_t, void*, void*);
+using PassThruOpen_t = int32_t (*) (void*, uint32_t*);
+using PassThruClose_t = int32_t (*) (uint32_t);
+using PassThruConnect_t = int32_t (*) (uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
+using PassThruDisconnect_t = int32_t (*) (uint32_t);
+using PassThruReadMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
+using PassThruWriteMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
+using PassThruStartPeriodicMsg_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
+using PassThruStopPeriodicMsg_t = int32_t (*) (uint32_t, uint32_t);
+using PassThruStartMsgFilter_t = int32_t (*) (uint32_t, uint32_t, PASSTHRU_MSG*, PASSTHRU_MSG*, PASSTHRU_MSG*, uint32_t*);
+using PassThruStopMsgFilter_t = int32_t (*) (uint32_t, uint32_t);
+using PassThruSetProgrammingVoltage_t = int32_t (*) (uint32_t, uint32_t);
+using PassThruReadVersion_t = int32_t (*) (char*, char*, char*);
+using PassThruGetLastError_t = int32_t (*) (char*);
+using PassThruIoctl_t = int32_t (*) (uint32_t, uint32_t, void*, void*);
 
 
 class J2534;
@@ -86,11 +86,11 @@ enum class Ioctl {
     BecomeMaster = 0x8003,
 };
 
+class Device;
+using DevicePtr = std::shared_ptr<Device>;
+
 class Channel {
 public:
-    // This should only be constructed internally.
-    // Use J2534Device::connect
-    Channel(const J2534Ptr &j2534, uint32_t channel) : j2534_(j2534), channel_(channel) {}
     // Creates an invalid device
     Channel() = default;
 
@@ -99,18 +99,25 @@ public:
     Channel(const Channel&) = delete;
     Channel(Channel&& chann);
 
+    void readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+
     /* Disconnects the channel from the j2534 device. The object
      * is in an invalid state after calling this method */
     void disconnect();
 
     bool valid() const { return !!j2534_; }
 
+    // This should only be constructed internally.
+    // Use J2534Device::connect
+    Channel(const J2534Ptr &j2534, const DevicePtr &device, uint32_t channel) : j2534_(j2534), device_(device), channel_(channel) {}
+
 private:
     J2534Ptr j2534_;
+    DevicePtr device_;
     uint32_t channel_;
 };
 
-class Device {
+class Device : public std::enable_shared_from_this<Device> {
 public:
     // This object should never be contructed by the client. Use
     // J2534::open instaed
@@ -133,6 +140,8 @@ public:
 
     bool valid() const { return !!j2534_; }
 
+    uint32_t handle() const { return device_; }
+
 private:
     J2534Ptr j2534_;
     uint32_t device_;
@@ -149,13 +158,15 @@ public:
 
     // Opens a J2534 device. If no device is connected, returns an invalid device
     // check J2534Device::valid()
-    Device open(char *port = nullptr);
+    DevicePtr open(char *port = nullptr);
 
     // Closes a  J2534 device
     void close(uint32_t device);
 
     // see Device::connect
-    Channel connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate);
+    uint32_t connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate);
+
+    void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
     // Disconnects a logical communication channel
     void disconnect(uint32_t channel);

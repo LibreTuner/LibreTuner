@@ -13,9 +13,9 @@ class Can : public CanInterface
 {
 public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
-    std::shared_ptr<Can> create(j2534::Device &device, uint32_t baudrate = 500000);
+    std::shared_ptr<Can> create(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
 
-    Can(j2534::Device &device, uint32_t baudrate = 500000);
+    Can(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
 
     // CanInterface interface
 public:

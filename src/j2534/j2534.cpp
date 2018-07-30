@@ -10,7 +10,7 @@ void J2534::init()
     load();
 }
 
-Device J2534::open(char *port)
+DevicePtr J2534::open(char *port)
 {
     assert(initialized());
 
@@ -20,11 +20,11 @@ Device J2534::open(char *port)
         if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
             // Return an invalid device. Don't throw an exception,
             // because the absence of a device is not an exceptional error
-            return Device();
+            return std::make_shared<Device>();
         }
         throw std::runtime_error(lastError());
     }
-    return Device(shared_from_this(), deviceId);
+    return std::make_shared<Device>(shared_from_this(), deviceId);
 }
 
 void J2534::close(uint32_t device)
@@ -37,7 +37,7 @@ void J2534::close(uint32_t device)
     }
 }
 
-Channel J2534::connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate)
+uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate)
 {
     assert(initialized());
 
@@ -47,7 +47,15 @@ Channel J2534::connect(uint32_t device, Protocol protocol, uint32_t flags, uint3
         throw std::runtime_error(lastError());
     }
 
-    return Channel(shared_from_this(), channel);
+    return channel;
+}
+
+void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
+{
+    int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
+    if (res != 0) {
+        throw std::runtime_error(lastError());
+    }
 }
 
 void J2534::disconnect(uint32_t channel)
@@ -136,7 +144,7 @@ Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate)
 {
     assert(valid());
 
-    return j2534_->connect(device_, protocol, flags, baudrate);
+    return Channel(j2534_, shared_from_this(), j2534_->connect(device_, protocol, flags, baudrate));
 }
 
 Device::Device(Device &&dev)
@@ -147,6 +155,12 @@ Device::Device(Device &&dev)
 
 Channel::Channel(Channel &&chann) : j2534_(std::move(chann.j2534_)), channel_(chann.channel_)
 {
+}
+
+void Channel::readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
+{
+    assert(valid());
+    j2534_->readMsgs(channel_, pMsg, pNumMsgs, timeout);
 }
 
 }
