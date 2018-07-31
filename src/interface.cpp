@@ -65,6 +65,7 @@ InterfaceSettingsPtr InterfaceSettings::create(InterfaceType type) {
   case InterfaceType::SocketCan:
     return std::make_shared<SocketCanSettings>();
   case InterfaceType::J2534:
+    return std::make_shared<J2534Settings>();
   default:
     return nullptr;
   }
@@ -82,4 +83,19 @@ void SocketCanSettings::loadCustom(QXmlStreamReader &xml) {
   if (xml.name() == "interface") {
     scInterface_ = xml.readElementText().toStdString();
   }
+}
+
+void J2534Settings::setInterface(const j2534::J2534Ptr &j2534)
+{
+    j2534_ = j2534;
+}
+
+void J2534Settings::saveCustom(QXmlStreamWriter &xml)
+{
+
+}
+
+void J2534Settings::loadCustom(QXmlStreamReader &xml)
+{
+
 }

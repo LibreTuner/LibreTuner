@@ -14,8 +14,8 @@ InterfacesWindow::InterfacesWindow(QWidget *parent)
   ui->listInterfaces->setModel(&model_);
   setWindowFlags(Qt::Window);
   conn_ = InterfaceManager::get().connect(std::bind(
-      &InterfacesWindow::interfacesChanged, this, std::placeholders::_1));
-  interfacesChanged(InterfaceManager::get().settings());
+      &InterfacesWindow::interfacesChanged, this));
+  interfacesChanged();
 }
 
 InterfacesWindow::~InterfacesWindow() { delete ui; }
@@ -45,11 +45,10 @@ void InterfacesWindow::on_buttonRemove_clicked() {
   }
 }
 
-void InterfacesWindow::interfacesChanged(
-    gsl::span<const InterfaceSettingsPtr> interfaces) {
+void InterfacesWindow::interfacesChanged() {
   //ui->listInterfaces->clear();
 
-  for (const auto &iface : interfaces) {
+  for (const auto &iface : InterfaceManager::get().settings()) {
     //QListWidgetItem *item =
     //    new QListWidgetItem(QString::fromStdString(iface->name()));
     //item->setData(Qt::UserRole,
@@ -107,6 +106,7 @@ QModelIndex InterfacesModel::index(int row, int column, const QModelIndex &paren
     return createIndex(row, column, reinterpret_cast<void*>(0));
 }
 
+
 QModelIndex InterfacesModel::parent(const QModelIndex &child) const
 {
     int ind = reinterpret_cast<int>(child.internalPointer());
@@ -116,7 +116,7 @@ QModelIndex InterfacesModel::parent(const QModelIndex &child) const
     return QModelIndex();
 }
 
-#include <iostream>
+
 int InterfacesModel::rowCount(const QModelIndex &parent) const
 {
     if (!parent.isValid()) {
@@ -125,17 +125,17 @@ int InterfacesModel::rowCount(const QModelIndex &parent) const
     }
     QModelIndex p = parent.parent();
     if (p.isValid()) {
-        int row = p.row();
-        if (row == 0) {
-            // Manual
-            return InterfaceManager::get().settings().size();
-        } else if (row == 1) {
-            // Auto-detect
-            return 0;
-        }
         return 0;
     }
 
+    int row = parent.row();
+    if (row == 0) {
+        // Manual
+        return InterfaceManager::get().settings().size();
+    } else if (row == 1) {
+        // Auto-detect
+        return InterfaceManager::get().autosettings().size();
+    }
     return 0;
 }
 
@@ -172,6 +172,11 @@ QVariant InterfacesModel::data(const QModelIndex &index, int role) const
         auto settings = InterfaceManager::get().settings();
         if (settings.size() > index.row()) {
             return QString::fromStdString(settings.at(index.row())->name());
+        }
+    } else if (parent.row() == 1) {
+        const auto &interfaces = InterfaceManager::get().autosettings();
+        if (interfaces.size() > index.row()) {
+            return QString::fromStdString(interfaces[index.row()]->name());
         }
     }
     return QVariant();

@@ -26,9 +26,21 @@
 #include <functional>
 #include <gsl/span>
 
+class InterfaceList {
+public:
+    // Adds an interface to the manually added list
+    void addManual(const InterfaceSettingsPtr &iface);
+    // Removed an interface from the manually added list
+    void removeManual(const InterfaceSettingsPtr &iface);
+
+private:
+    std::vector<InterfaceSettingsPtr> manualSettings_;
+    std::vector<InterfaceSettingsPtr> autoDetectSettings_;
+};
+
 class InterfaceManager {
 public:
-  using ChangeCall = std::function<void(gsl::span<const InterfaceSettingsPtr>)>;
+  using ChangeCall = std::function<void()>;
   using SignalType = Signal<ChangeCall>;
   using ConnType = SignalType::ConnectionType;
 
@@ -39,9 +51,13 @@ public:
   }
 
   gsl::span<const InterfaceSettingsPtr> settings();
+  std::vector<InterfaceSettingsPtr> &autosettings();
 
   void add(const InterfaceSettingsPtr &iface);
   void remove(const InterfaceSettingsPtr &iface);
+
+  void addAuto(const InterfaceSettingsPtr &iface);
+  void clearAuto();
 
   /* Returns the default interface, if one exists */
   InterfaceSettingsPtr defaultInterface();
@@ -53,6 +69,7 @@ public:
 
 private:
   std::vector<InterfaceSettingsPtr> settings_;
+  std::vector<InterfaceSettingsPtr> autosettings_;
   std::shared_ptr<SignalType> signal_;
 
   InterfaceSettingsPtr default_;

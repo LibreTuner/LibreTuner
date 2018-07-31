@@ -19,180 +19,187 @@
 #include "j2534.h"
 
 #include <cassert>
+#include <sstream>
 
 #include <Windows.h>
 namespace j2534 {
 
-void J2534::init()
-{
-    load();
-}
+void J2534::init() { load(); }
 
-DevicePtr J2534::open(char *port)
-{
-    assert(initialized());
+DevicePtr J2534::open(char *port) {
+  assert(initialized());
 
-    uint32_t deviceId;
-    long res;
-    if ((res = PassThruOpen(port, &deviceId)) != 0) {
-        if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
-            // Return an invalid device. Don't throw an exception,
-            // because the absence of a device is not an exceptional error
-            return std::make_shared<Device>();
-        }
-        throw std::runtime_error(lastError());
+  uint32_t deviceId;
+  long res;
+  if ((res = PassThruOpen(port, &deviceId)) != 0) {
+    if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
+      // Return nullptr. Don't throw an exception,
+      // because the absence of a device is not an exceptional error
+      return nullptr;
     }
-    return std::make_shared<Device>(shared_from_this(), deviceId);
+    throw std::runtime_error(lastError());
+  }
+  return std::make_shared<Device>(shared_from_this(), deviceId);
 }
 
-void J2534::close(uint32_t device)
-{
-    assert(initialized());
+void J2534::close(uint32_t device) {
+  assert(initialized());
 
-    long res;
-    if ((res = PassThruClose(device)) != 0) {
-        throw std::runtime_error(lastError());
-    }
+  long res;
+  if ((res = PassThruClose(device)) != 0) {
+    throw std::runtime_error(lastError());
+  }
 }
 
-uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate)
-{
-    assert(initialized());
+uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
+                        uint32_t baudrate) {
+  assert(initialized());
 
-    long res;
-    uint32_t channel;
-    if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags, baudrate, &channel)) != 0) {
-        throw std::runtime_error(lastError());
-    }
+  long res;
+  uint32_t channel;
+  if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags,
+                             baudrate, &channel)) != 0) {
+    throw std::runtime_error(lastError());
+  }
 
-    return channel;
+  return channel;
 }
 
-void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
-{
-    int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
-    if (res != 0) {
-        throw std::runtime_error(lastError());
-    }
+void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                     uint32_t timeout) {
+  int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
+  if (res != 0) {
+    throw std::runtime_error(lastError());
+  }
 }
 
-void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
-{
-    int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
-    if (res != 0) {
-        throw std::runtime_error(lastError());
-    }
+void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                      uint32_t timeout) {
+  int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
+  if (res != 0) {
+    throw std::runtime_error(lastError());
+  }
 }
 
-void J2534::disconnect(uint32_t channel)
-{
-    assert(initialized());
+void J2534::disconnect(uint32_t channel) {
+  assert(initialized());
 
-    long res;
-    if ((res = PassThruDisconnect(channel)) != 0) {
-        throw std::runtime_error(lastError());
-    }
+  long res;
+  if ((res = PassThruDisconnect(channel)) != 0) {
+    throw std::runtime_error(lastError());
+  }
 }
 
-std::string J2534::lastError()
-{
-    char msg[80];
-    PassThruGetLastError(msg);
-    return std::string(msg);
+std::string J2534::lastError() {
+  char msg[80];
+  PassThruGetLastError(msg);
+  return std::string(msg);
 }
 
-J2534Ptr J2534::create(Info &&info)
-{
-    return std::make_shared<J2534>(std::move(info));
+J2534Ptr J2534::create(Info &&info) {
+  return std::make_shared<J2534>(std::move(info));
 }
 
-J2534::~J2534()
-{
-    if (hDll_) {
-        CloseHandle(hDll_);
-    }
+J2534::~J2534() {
+  if (hDll_) {
+    CloseHandle(hDll_);
+  }
 }
 
-void J2534::load()
-{
-    if (!(hDll_ = LoadLibrary(info_.name.c_str()))) {
-        throw std::runtime_error("Failed to load library " + info_.name);
-    }
+void J2534::load() {
+  if ((hDll_ = LoadLibrary(info_.functionLibrary.c_str())) == nullptr) {
+    std::stringstream ss;
+    ss << std::hex << GetLastError();
+    throw std::runtime_error("Failed to load library " + info_.functionLibrary +
+                             ": 0x" + ss.str());
+  }
 
-    PassThruOpen = static_cast<PassThruOpen_t>(getProc("PassThruOpen"));
-    PassThruClose = static_cast<PassThruClose_t>(getProc("PassThruClose"));
-    PassThruConnect = static_cast<PassThruConnect_t>(getProc("PassThruConnect"));
-    PassThruDisconnect = static_cast<PassThruDisconnect_t>(getProc("PassThruDisconnect"));
-    PassThruIoctl = static_cast<PassThruIoctl_t>(getProc("PassThruIoct"));
-    PassThruReadVersion = static_cast<PassThruReadVersion_t>(getProc("PassThruReadVersion"));
-    PassThruGetLastError = static_cast<PassThruGetLastError_t>(getProc("PassThruGetLastError"));
-    PassThruReadMsgs = static_cast<PassThruReadMsgs_t>(getProc("PassThruReadMsgs"));
-    PassThruStartMsgFilter = static_cast<PassThruStartMsgFilter_t>(getProc("PassThruStartMsgFilter"));
-    PassThruStopMsgFilter = static_cast<PassThruStopMsgFilter_t>(getProc("PassThruStopMsgFilter"));
-    PassThruWriteMsgs = static_cast<PassThruWriteMsgs_t>(getProc("PassThruWriteMsgs"));
-    PassThruStartPeriodicMsg = static_cast<PassThruStartPeriodicMsg_t>(getProc("PassThruStartPeriodicMsg"));
-    PassThruStopPeriodicMsg = static_cast<PassThruStopPeriodicMsg_t>(getProc("PassThruStopPeriodicMsg"));
-    PassThruSetProgrammingVoltage = static_cast<PassThruSetProgrammingVoltage_t>(getProc("PassThruSetProgrammingVoltage"));
+  PassThruOpen = reinterpret_cast<PassThruOpen_t>(getProc("PassThruOpen"));
+  PassThruClose = reinterpret_cast<PassThruClose_t>(getProc("PassThruClose"));
+  PassThruConnect =
+      reinterpret_cast<PassThruConnect_t>(getProc("PassThruConnect"));
+  PassThruDisconnect =
+      reinterpret_cast<PassThruDisconnect_t>(getProc("PassThruDisconnect"));
+  PassThruIoctl = reinterpret_cast<PassThruIoctl_t>(getProc("PassThruIoctl"));
+  PassThruReadVersion =
+      reinterpret_cast<PassThruReadVersion_t>(getProc("PassThruReadVersion"));
+  PassThruGetLastError =
+      reinterpret_cast<PassThruGetLastError_t>(getProc("PassThruGetLastError"));
+  PassThruReadMsgs =
+      reinterpret_cast<PassThruReadMsgs_t>(getProc("PassThruReadMsgs"));
+  PassThruStartMsgFilter = reinterpret_cast<PassThruStartMsgFilter_t>(
+      getProc("PassThruStartMsgFilter"));
+  PassThruStopMsgFilter = reinterpret_cast<PassThruStopMsgFilter_t>(
+      getProc("PassThruStopMsgFilter"));
+  PassThruWriteMsgs =
+      reinterpret_cast<PassThruWriteMsgs_t>(getProc("PassThruWriteMsgs"));
+  PassThruStartPeriodicMsg = reinterpret_cast<PassThruStartPeriodicMsg_t>(
+      getProc("PassThruStartPeriodicMsg"));
+  PassThruStopPeriodicMsg = reinterpret_cast<PassThruStopPeriodicMsg_t>(
+      getProc("PassThruStopPeriodicMsg"));
+  PassThruSetProgrammingVoltage =
+      reinterpret_cast<PassThruSetProgrammingVoltage_t>(
+          getProc("PassThruSetProgrammingVoltage"));
 
-    // If all exports were found (no exceptions were thrown), we can set loaded_ to true
-    loaded_ = true;
+  // If all exports were found (no exceptions were thrown), we can set loaded_
+  // to true
+  loaded_ = true;
 }
 
-void *J2534::getProc(const char *proc)
-{
-    assert(hDll_);
-    void *func = static_cast<void*>(GetProcAddress(hDll_, proc));
-    if (!func) {
-        throw std::runtime_error("Failed to get procedure from dll: " + std::string(proc));
-    }
-    return func;
+void *J2534::getProc(const char *proc) {
+  assert(hDll_);
+  void *func = reinterpret_cast<void *>(
+      GetProcAddress(reinterpret_cast<HMODULE>(hDll_), proc));
+  if (!func) {
+    throw std::runtime_error("Failed to get procedure from dll: " +
+                             std::string(proc));
+  }
+  return func;
 }
 
-Device::Device(const J2534Ptr &j2534, uint32_t device) : j2534_(j2534), device_(device)
-{
+Device::Device(const J2534Ptr &j2534, uint32_t device)
+    : j2534_(j2534), device_(device) {}
 
+Device::~Device() { close(); }
+
+void Device::close() {
+  if (valid()) {
+    j2534_->close(device_);
+    j2534_.reset();
+  }
 }
 
-Device::~Device()
-{
-    close();
+Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate) {
+  assert(valid());
+
+  return Channel(j2534_, shared_from_this(),
+                 j2534_->connect(device_, protocol, flags, baudrate));
 }
 
-void Device::close()
-{
-    if (valid()) {
-        j2534_->close(device_);
-        j2534_.reset();
-    }
+Device::Device(Device &&dev) {
+  device_ = dev.device_;
+  j2534_ = std::move(dev.j2534_);
 }
 
-Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate)
-{
-    assert(valid());
-
-    return Channel(j2534_, shared_from_this(), j2534_->connect(device_, protocol, flags, baudrate));
+Channel::~Channel() {
+  if (valid()) {
+    j2534_->disconnect(channel_);
+  }
 }
 
-Device::Device(Device &&dev)
-{
-    device_ = dev.device_;
-    j2534_ = std::move(dev.j2534_);
+Channel::Channel(Channel &&chann)
+    : j2534_(std::move(chann.j2534_)), channel_(chann.channel_) {}
+
+void Channel::readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                       uint32_t timeout) {
+  assert(valid());
+  j2534_->readMsgs(channel_, pMsg, pNumMsgs, timeout);
 }
 
-Channel::Channel(Channel &&chann) : j2534_(std::move(chann.j2534_)), channel_(chann.channel_)
-{
+void Channel::writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                        uint32_t timeout) {
+  assert(valid());
+  j2534_->writeMsgs(channel_, pMsg, pNumMsgs, timeout);
 }
 
-void Channel::readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
-{
-    assert(valid());
-    j2534_->readMsgs(channel_, pMsg, pNumMsgs, timeout);
-}
-
-void Channel::writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout)
-{
-    assert(valid());
-    j2534_->writeMsgs(channel_, pMsg, pNumMsgs, timeout);
-}
-
-}
+} // namespace j2534

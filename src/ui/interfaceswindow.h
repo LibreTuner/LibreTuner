@@ -52,7 +52,7 @@ private:
 
   void replaceSettings(std::unique_ptr<SettingsWidget> widget);
 
-  void interfacesChanged(gsl::span<const InterfaceSettingsPtr> interfaces);
+  void interfacesChanged();
 };
 
 #endif // INTERFACESWINDOW_H

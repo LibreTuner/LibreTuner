@@ -150,14 +150,14 @@ void UdsDataLogger::disable() {
 
 Pid::Pid(uint32_t id, uint16_t code, const std::string &formula) : id_(id), code_(code), formula_(formula)
 {
-    symbol_table_.add_variable("X", x_);
+    /*symbol_table_.add_variable("X", x_);
     symbol_table_.add_variable("Y", y_);
     symbol_table_.add_variable("Z", z_);
 
     expression_.register_symbol_table(symbol_table_);
     if (!parser_.compile(formula, expression_)) {
         throw std::runtime_error("expression could not compile.");
-    }
+    }*/
 }
 
 Pid::Pid(Pid &&pid)
@@ -166,17 +166,17 @@ Pid::Pid(Pid &&pid)
     formula_ = std::move(pid.formula_);
     code_ = pid.code_;
 
-    symbol_table_.add_variable("X", x_);
+    /*symbol_table_.add_variable("X", x_);
     symbol_table_.add_variable("Y", y_);
     symbol_table_.add_variable("Z", z_);
 
     expression_.register_symbol_table(symbol_table_);
     if (!parser_.compile(formula_, expression_)) {
         throw std::runtime_error("expression could not compile.");
-    }
+    }*/
 }
 
 double Pid::evaluate() const
 {
-    return expression_.value();
+    return 0;//expression_.value();
 }

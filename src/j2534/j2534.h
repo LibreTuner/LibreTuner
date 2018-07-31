@@ -24,8 +24,6 @@
 
 #include "datalink.h"
 
-#include <Windows.h>
-
 namespace j2534 {
 
 struct Info {
@@ -183,8 +181,7 @@ public:
     // Returns true if the interface's library has been loaded
     bool initialized() const { return loaded_; }
 
-    // Opens a J2534 device. If no device is connected, returns an invalid device
-    // check J2534Device::valid()
+    // Opens a J2534 device. If no device is connected, returns nullptr
     DevicePtr open(char *port = nullptr);
 
     // Closes a  J2534 device
@@ -216,7 +213,7 @@ public:
 private:
     Info info_;
 
-    HINSTANCE hDll_ = nullptr;
+    void* hDll_ = nullptr;
 
     bool loaded_ = false;
 

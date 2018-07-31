@@ -35,8 +35,8 @@ public:
 
   ~Connection() { disconnect(); }
 
-  template <typename... Args> typename Func::result_type call(Args... args) {
-    return func_(std::forward<Args...>(args...));
+  template <typename... Args> typename Func::result_type call(Args ...args) {
+    return func_(std::forward<Args>(args)...);
   }
 
   void disconnect() {
@@ -72,10 +72,10 @@ public:
   }
 
   /* Calls all connections */
-  template <typename... Args> void call(Args... args) {
+  template <typename... Args> void call(Args ...args) {
     for (const auto &conn : connections) {
       if (auto sptr = conn.lock()) {
-        sptr->call(std::forward<Args...>(args...));
+        sptr->call(std::forward<Args>(args)...);
       }
     }
   }

@@ -102,8 +102,8 @@ set(libretuner_SRC
     ui/settingswidget.h
     ui/titlebar.cpp
     ui/titlebar.h
-    ui/styledwindow.cpp
-    ui/styledwindow.h
+    #ui/styledwindow.cpp
+    #ui/styledwindow.h
     ui/dataloggerwindow.cpp
     ui/dataloggerwindow.h
 
@@ -170,7 +170,8 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 if (WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
 endif (WIN32)
 

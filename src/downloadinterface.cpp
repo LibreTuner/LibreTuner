@@ -82,7 +82,7 @@ DownloadInterface::create(DownloadInterface::Callbacks *callbacks, const DataLin
 
   switch (definition->downloadMode()) {
     case DM_MAZDA23: {
-      CanInterfacePtr can = datalink->can();
+      CanInterfacePtr can = datalink->can(definition->baudrate());
       if (!can) {
         callbacks->downloadError("DataLink does not support CAN protocol. Choose a different interface.");
         break;

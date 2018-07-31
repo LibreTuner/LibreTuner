@@ -24,10 +24,10 @@
 
 #include <QAbstractItemModel>
 
-CanViewer::CanViewer(QWidget *parent) : StyledWindow(parent), ui(new Ui::CanViewer) {
-  QWidget *main = new QWidget;
-  mainLayout()->addWidget(main);
-  ui->setupUi(main);
+CanViewer::CanViewer(QWidget *parent) : QWidget(parent), ui(new Ui::CanViewer) {
+  //QWidget *main = new QWidget;
+  //mainLayout()->addWidget(main);
+  ui->setupUi(this);
 
   logModel_ = LibreTuner::get()->canLog();
   ui->logView->setModel(logModel_);

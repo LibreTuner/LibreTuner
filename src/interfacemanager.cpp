@@ -27,7 +27,12 @@ InterfaceManager &InterfaceManager::get() {
 InterfaceManager::InterfaceManager() : signal_(SignalType::create()) {}
 
 gsl::span<const InterfaceSettingsPtr> InterfaceManager::settings() {
-  return settings_;
+    return settings_;
+}
+
+std::vector<InterfaceSettingsPtr> &InterfaceManager::autosettings()
+{
+    return autosettings_;
 }
 
 void InterfaceManager::load() {
@@ -110,7 +115,7 @@ void InterfaceManager::add(const InterfaceSettingsPtr &iface) {
     resetDefault();
   }
   save();
-  signal_->call(settings_);
+  signal_->call();
 }
 
 void InterfaceManager::remove(const InterfaceSettingsPtr &iface) {
@@ -121,11 +126,31 @@ void InterfaceManager::remove(const InterfaceSettingsPtr &iface) {
     resetDefault();
   }
   save();
-  signal_->call(settings_);
+  signal_->call();
+}
+
+void InterfaceManager::addAuto(const InterfaceSettingsPtr &iface)
+{
+    autosettings_.emplace_back(iface);
+    if (!default_) {
+        resetDefault();
+    }
+    signal_->call();
+}
+
+void InterfaceManager::clearAuto()
+{
+    autosettings_.clear();
+    resetDefault();
+    signal_->call();
 }
 
 void InterfaceManager::resetDefault() {
   if (settings_.empty()) {
+    if (!autosettings_.empty()) {
+        default_ = autosettings_.front();
+        return;
+    }
     default_ = nullptr;
     return;
   }
@@ -138,4 +163,14 @@ std::string InterfaceManager::path() {
 
 InterfaceSettingsPtr InterfaceManager::defaultInterface() {
   return default_;
+}
+
+void InterfaceList::addManual(const InterfaceSettingsPtr &iface)
+{
+    manualSettings_.emplace_back(iface);
+}
+
+void InterfaceList::removeManual(const InterfaceSettingsPtr &iface)
+{
+    manualSettings_.erase(std::remove(manualSettings_.begin(), manualSettings_.end(), iface), manualSettings_.end());
 }

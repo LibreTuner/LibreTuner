@@ -31,13 +31,13 @@
 #include "downloadinterface.h"
 #include "endian.h"
 #include "flasher.h"
-#include "tabledefinitions.h"
 #include "piddefinitions.h"
+#include "tabledefinitions.h"
 
 class Definition;
 
 /* Subtype definition. Includes the table locations */
-// Subtype is a misnomer, but it's too late to change
+// Subtype is a misnomer, but it's too late to change (or is it?)
 class SubDefinition {
 public:
   explicit SubDefinition(Definition *definition);
@@ -119,8 +119,8 @@ typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 typedef std::weak_ptr<SubDefinition> SubDefinitionWeakPtr;
 
 enum class LogMode {
-    None,
-    Uds,
+  None,
+  Uds,
 };
 
 /**
@@ -170,6 +170,8 @@ public:
   std::string key() const { return key_; }
 
   unsigned serverId() const { return serverId_; }
+
+  uint32_t baudrate() const { return baudrate_; }
 
   size_t flashOffset() const { return flashOffset_; }
 

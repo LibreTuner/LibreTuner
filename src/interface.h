@@ -42,6 +42,8 @@ public:
 
   static InterfaceType type(std::string name);
 
+  InterfaceSettings(InterfaceType type) : type_(type) {};
+
   /* Creates an interface for the specified type. Returns
    * nullptr if the type is not supported */
   static InterfaceSettingsPtr create(InterfaceType type);
@@ -51,6 +53,8 @@ public:
   std::string name() { return name_; }
 
   void setName(const std::string &name) { name_ = name; }
+
+  virtual ~InterfaceSettings() = default;
 
 protected:
   virtual void saveCustom(QXmlStreamWriter &xml) = 0;
@@ -66,6 +70,7 @@ class SocketCanSettings : public InterfaceSettings {
 public:
   void setInterface(const std::string &interface);
   std::string interface() { return scInterface_; }
+  SocketCanSettings() : InterfaceSettings(InterfaceType::SocketCan) {}
 
 protected:
   void saveCustom(QXmlStreamWriter &xml) override;
@@ -74,6 +79,25 @@ protected:
 
 private:
   std::string scInterface_;
+};
+
+namespace j2534 {
+class J2534;
+using J2534Ptr = std::shared_ptr<J2534>;
+}
+
+class J2534Settings : public InterfaceSettings {
+public:
+    void setInterface(const j2534::J2534Ptr &j2534);
+    j2534::J2534Ptr interface() const  { return j2534_; }
+    J2534Settings() : InterfaceSettings(InterfaceType::J2534) {}
+
+protected:
+    void saveCustom(QXmlStreamWriter &xml) override;
+    void loadCustom(QXmlStreamReader &xml) override;
+
+private:
+    j2534::J2534Ptr j2534_;
 };
 
 #endif // LIBRETUNER_INTERFACE_H

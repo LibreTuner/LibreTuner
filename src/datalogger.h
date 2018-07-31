@@ -25,7 +25,7 @@
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
-#include "exprtk.hpp"
+//#include "exprtk.hpp"
 
 enum class PidType {
   Queried,
@@ -51,9 +51,9 @@ private:
   uint32_t id_;
   uint16_t code_;
 
-  exprtk::expression<double> expression_;
-  exprtk::symbol_table<double> symbol_table_;
-  exprtk::parser<double> parser_;
+  //exprtk::expression<double> expression_;
+  //exprtk::symbol_table<double> symbol_table_;
+  //exprtk::parser<double> parser_;
   // allow for up to three bytes of information
   double x_{}, y_{}, z_{};
 };

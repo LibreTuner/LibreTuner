@@ -18,7 +18,9 @@
 
 #include "j2534manager.h"
 #include "j2534.h"
-
+#include "logger.h"
+#include "interfacemanager.h"
+#include "interface.h"
 #include <Windows.h>
 
 J2534Manager::J2534Manager()
@@ -43,6 +45,7 @@ void J2534Manager::load_interfaces()
     // 2. Existing devices keep a reference to the J2534 interface, so it will not be destructed
     //    and two copies will exist
     interfaces_.clear();
+    InterfaceManager::get().clearAuto();
     // Ugly C code incoming
 
     // Search HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04 for connected interfaces
@@ -51,8 +54,20 @@ void J2534Manager::load_interfaces()
         throw std::runtime_error("Could not open HKEY_LOCAL_MACHINE\\Software for reading");
     }
 
-    HKEY hKeyPassthrough;
     LSTATUS res;
+    /*HKEY hKeyWow;
+    if ((res = RegOpenKeyEx(hKeySoftware, "WOW6432Node", 0, KEY_READ, &hKeyWow)) != ERROR_SUCCESS) {
+        RegCloseKey(hKeySoftware);
+        if (res == ERROR_FILE_NOT_FOUND) {
+            // If this entry does not exist, then no PassThru interfaces are installed
+            return;
+        }
+
+        throw std::runtime_error("Could not open HKEY_LOCAL_MACHINE\\Software\\WOW6432Node for reading");
+    }
+    RegCloseKey(hKeySoftware);*/
+
+    HKEY hKeyPassthrough;
     if ((res = RegOpenKeyEx(hKeySoftware, "PassThruSupport.04.04", 0, KEY_READ, &hKeyPassthrough)) != ERROR_SUCCESS) {
         RegCloseKey(hKeySoftware);
         if (res == ERROR_FILE_NOT_FOUND) {
@@ -115,7 +130,15 @@ void J2534Manager::load_interfaces()
             }
         }
 
-        interfaces_.push_back(j2534::J2534::create(std::move(info)));
+        Logger::info("Detected J2534 DLL: " + info.name);
+        auto j2534 = j2534::J2534::create(std::move(info));
+        /* Create the autodetect setting */
+        auto settings = std::static_pointer_cast<J2534Settings>(InterfaceSettings::create(InterfaceType::J2534));
+        settings->setInterface(j2534);
+        settings->setName(j2534->name());
+        InterfaceManager::get().addAuto(settings);
+
+        interfaces_.push_back(std::move(j2534));
 
         RegCloseKey(hKeyDevice);
     } while (res == ERROR_SUCCESS);
