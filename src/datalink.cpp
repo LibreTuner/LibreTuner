@@ -123,6 +123,9 @@ J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
   if ((protocols_ & DataLinkProtocol::Can) == DataLinkProtocol::Can) {
     defaultProtocol_ = DataLinkProtocol::Can;
   }
+  if (!checkDevice()) {
+      throw std::runtime_error("Failed to create j2534 device. Is one connected?");
+  }
 }
 
 void J2534DataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
