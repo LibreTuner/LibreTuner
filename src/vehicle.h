@@ -25,44 +25,35 @@
 class Definition;
 using DefinitionPtr = std::shared_ptr<Definition>;
 
-class Vehicle;
-using VehiclePtr = std::shared_ptr<Vehicle>;
-
 class DataLogger;
 using DataLoggerPtr = std::shared_ptr<DataLogger>;
 
 class DataLink;
 using DataLinkPtr = std::shared_ptr<DataLink>;
 
-class VinInfo {
-public:
-private:
+struct Vehicle {
+  std::string name;
+  std::string vin;
+  DefinitionPtr definition;
+
+  bool valid() const { return !vin.empty(); }
+
+  static Vehicle fromVin(const std::string &vin);
 };
 
-class Vehicle {
+// VehicleLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
+class VehicleLink {
 public:
-  Vehicle(std::string name, std::string vin, DefinitionPtr ptr);
-  Vehicle() = default;
+    VehicleLink(const Vehicle &vehicle, const DataLinkPtr &link) : vehicle_(vehicle), datalink_(link) {}
+    VehicleLink(Vehicle &&vehicle, const DataLinkPtr &link) : vehicle_(std::move(vehicle)), datalink_(link) {}
 
-  virtual ~Vehicle();
-
-  std::string name() const { return name_; }
-
-  std::string vin() const { return vin_; }
-
-  // This function may return nullptr if the definition is undetermined
-  DefinitionPtr definition() const { return definition_; }
-
-  static VehiclePtr fromVin(const std::string &vin);
-
-  /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
-     nullptr if a logger could not be created. */
-  DataLoggerPtr logger(const DataLinkPtr &datalink);
+    /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
+       nullptr if a logger could not be created. */
+    DataLoggerPtr logger();
 
 private:
-  std::string name_;
-  std::string vin_;
-  DefinitionPtr definition_;
+    DataLinkPtr datalink_;
+    Vehicle vehicle_;
 };
 
 #endif // LIBRETUNER_VEHICLE_H

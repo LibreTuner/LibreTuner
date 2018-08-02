@@ -54,7 +54,7 @@ private slots:
   void mainOnCompletion(bool success, const QString &error);
 
   void queryError(DataLink::Error error);
-  void vehicleQueried(const VehiclePtr &vehicle);
+  void vehicleQueried(const Vehicle &vehicle);
 
 private:
   Ui::DownloadWindow *ui;

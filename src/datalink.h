@@ -25,29 +25,6 @@
 
 #include "vehicle.h"
 
-/* A structure to use with the datalink. Required for creating
- * most interfaces */
-struct DataLinkOptions {
-public:
-  // CAN protocol baudrate
-  uint32_t can_baudrate;
-  struct {
-    uint16_t server_id;
-    uint16_t response_id;
-  } isotp;
-
-  // Sets the ISO-TP server and response ids
-  void setIsotpId(uint16_t server, uint16_t resp);
-
-  // Sets ids based on the standard format (reponse id = server + 8)
-  void setIsotpId(uint16_t server) { setIsotpId(server, server + 8); }
-};
-
-void DataLinkOptions::setIsotpId(uint16_t server, uint16_t resp) {
-  isotp.server_id = server;
-  isotp.response_id = resp;
-}
-
 class CanInterface;
 using CanInterfacePtr = std::shared_ptr<CanInterface>;
 
@@ -101,7 +78,7 @@ public:
   /* Creates a datalink from the interface settings. May throw an exception */
   static DataLinkPtr create(const InterfaceSettingsPtr &iface);
 
-  using QueryVehicleCallback = std::function<void(Error error, VehiclePtr &&)>;
+  using QueryVehicleCallback = std::function<void(Error error, Vehicle &&)>;
   // Attempts to query the vehicle
   virtual void queryVehicle(QueryVehicleCallback &&cb) = 0;
 
@@ -117,20 +94,6 @@ protected:
   // Supported protocols
   DataLinkProtocol protocols_ = DataLinkProtocol::None;
   DataLinkProtocol defaultProtocol_ = DataLinkProtocol::None;
-};
-
-// VehicleLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
-class VehicleLink {
-public:
-  VehicleLink(const DataLinkOptions &options = DataLinkOptions())
-      : options_(options) {}
-
-  void setOptions(const DataLinkOptions &options) { options_ = options; }
-
-  const DataLinkOptions &options() const { return options_; }
-
-private:
-  DataLinkOptions options_;
 };
 
 #endif // LIBRETUNER_DATALINK_H

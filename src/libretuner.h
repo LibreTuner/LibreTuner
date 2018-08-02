@@ -34,6 +34,8 @@ class TuneEditor;
 class Tune;
 typedef std::shared_ptr<Tune> TunePtr;
 
+class VehicleLink;
+
 class FlashWindow;
 
 class LibreTuner : public QApplication {
@@ -64,6 +66,12 @@ public:
   /* Returns the default datalink. Queries the user to create one
    * if none exist. May return nullptr */
   DataLinkPtr getDataLink();
+
+  using QueryVehicleCallback = std::function<void(std::unique_ptr<VehicleLink> link)>;
+
+  /* Queries for an attached vehicle and returns a vehicle link through the callback.
+     the returned link may be nullptr if no datalink is attached. */
+  void queryVehicleLink(QueryVehicleCallback &&cb);
 
 private:
   std::unique_ptr<MainWindow> mainWindow_;

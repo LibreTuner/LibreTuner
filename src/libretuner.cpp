@@ -211,4 +211,14 @@ DataLinkPtr LibreTuner::getDataLink() {
   }
 }
 
+void LibreTuner::queryVehicleLink(LibreTuner::QueryVehicleCallback &&cb)
+{
+    DataLinkPtr dl = getDataLink();
+    if (!dl) {
+        cb(nullptr);
+    }
+
+
+}
+
 LibreTuner::~LibreTuner() = default;

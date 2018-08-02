@@ -64,7 +64,7 @@ private:
 
     DataLinkPtr link_;
     DefinitionPtr definition_;
-    VehiclePtr vehicle_;
+    Vehicle vehicle_;
 };
 
 #endif // DATALOGGERWINDOW_H

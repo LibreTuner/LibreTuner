@@ -34,15 +34,15 @@ void query_can(const std::shared_ptr<CanInterface> &can,
           [cb{std::move(cb)}](uds::Error error, const uds::Packet &packet) {
             if (error != uds::Error::Success) {
               if (error == uds::Error::Timeout) {
-                cb(DataLink::Error::Timeout, nullptr);
+                cb(DataLink::Error::Timeout, Vehicle());
                 return;
               }
-              cb(DataLink::Error::Protocol, nullptr);
+              cb(DataLink::Error::Protocol, Vehicle());
               return;
             }
 
             if (packet.data.empty()) {
-              cb(DataLink::Error::InvalidResponse, nullptr);
+              cb(DataLink::Error::InvalidResponse, Vehicle());
               return;
             }
 
@@ -55,7 +55,7 @@ void query_can(const std::shared_ptr<CanInterface> &can,
             }
 
             if (data.size() != 17) {
-              cb(DataLink::Error::InvalidResponse, nullptr);
+              cb(DataLink::Error::InvalidResponse, Vehicle());
               return;
             }
 
