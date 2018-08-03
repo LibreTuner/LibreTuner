@@ -30,17 +30,12 @@
 #include "protocols/socketcaninterface.h"
 #endif
 
-DownloadInterface::DownloadInterface(DownloadInterface::Callbacks *callbacks)
-    : callbacks_(callbacks) {
-  assert(callbacks_ != nullptr);
-}
-
 class Uds23DownloadInterface : public DownloadInterface {
 public:
-  Uds23DownloadInterface(DownloadInterface::Callbacks *callbacks,
-                         std::shared_ptr<isotp::Protocol> isotp,
-                         std::string key, int size);
+  Uds23DownloadInterface(std::shared_ptr<isotp::Protocol> isotp,
+                         std::string key, uint32_t size);
   void download() override;
+  virtual gsl::span<const uint8_t> data();
 
   /* UdsAuthenticator Callback */
   void onAuthenticated(bool success, const std::string &error);
@@ -64,47 +59,24 @@ private:
   bool checkError(uds::Error error);
   void do_download();
   bool update_progress();
+
 };
 
-Uds23DownloadInterface::Uds23DownloadInterface(
-    DownloadInterface::Callbacks *callbacks,
-    std::shared_ptr<isotp::Protocol> isotp, std::string key, int size)
-    : DownloadInterface(callbacks),
-      auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this,
+Uds23DownloadInterface::Uds23DownloadInterface(std::shared_ptr<isotp::Protocol> isotp, std::string key, uint32_t size)
+    : auth_(std::bind(&Uds23DownloadInterface::onAuthenticated, this,
                       std::placeholders::_1, std::placeholders::_2)),
       key_(std::move(key)), totalSize_(size) {
   uds_ = uds::Protocol::create(std::move(isotp));
 }
 
-std::shared_ptr<DownloadInterface>
-DownloadInterface::create(DownloadInterface::Callbacks *callbacks, const DataLinkPtr& datalink, const DefinitionPtr& definition) {
-  assert(callbacks != nullptr);
-
-  switch (definition->downloadMode()) {
-    case DM_MAZDA23: {
-      CanInterfacePtr can = datalink->can(definition->baudrate());
-      if (!can) {
-        callbacks->downloadError("DataLink does not support CAN protocol. Choose a different interface.");
-        break;
-      }
-      return std::make_shared<Uds23DownloadInterface>(
-          callbacks,
-          std::make_shared<isotp::Protocol>(
-              can,
-              isotp::Options{definition->serverId(), definition->serverId() + 8,
-                             std::chrono::milliseconds(100)}),
-          definition->key(), definition->size());
-    }
-    default:
-      callbacks->downloadError("Unimplemented download mode");
-      break;
-  }
-  return nullptr;
+std::unique_ptr<DownloadInterface> DownloadInterface::createM23(const std::shared_ptr<isotp::Protocol> &isotp, const std::string &key, uint32_t size)
+{
+    return std::make_unique<Uds23DownloadInterface>(isotp, key, size);
 }
 
 bool Uds23DownloadInterface::checkError(uds::Error error) {
   if (error != uds::Error::Success) {
-    callbacks_->downloadError(QString::fromStdString(uds::strError(error)));
+    notifyError(uds::strError(error));
     return false;
   }
   return true;
@@ -113,7 +85,7 @@ bool Uds23DownloadInterface::checkError(uds::Error error) {
 void Uds23DownloadInterface::onAuthenticated(bool success,
                                              const std::string &error) {
   if (!success) {
-    callbacks_->downloadError(QString::fromStdString(error));
+    notifyError(error);
     return;
   }
   do_download();
@@ -128,7 +100,7 @@ void Uds23DownloadInterface::do_download() {
         }
 
         if (data.empty()) {
-          callbacks_->downloadError("received 0 bytes in download packet");
+          notifyError("received 0 bytes in download packet");
         }
 
         downloadData_.insert(downloadData_.end(), data.begin(), data.end());
@@ -142,9 +114,9 @@ void Uds23DownloadInterface::do_download() {
 }
 
 bool Uds23DownloadInterface::update_progress() {
-  callbacks_->updateProgress((1.0f - ((float)downloadSize_ / totalSize_)));
+  notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
   if (downloadSize_ == 0) {
-    callbacks_->onCompletion(downloadData_);
+    notifyComplete();
     return false;
   }
   return true;
@@ -154,4 +126,9 @@ void Uds23DownloadInterface::download() {
   downloadOffset_ = 0;
   downloadSize_ = totalSize_;
   auth_.auth(key_, uds_);
+}
+
+gsl::span<const uint8_t> Uds23DownloadInterface::data()
+{
+    return downloadData_;
 }

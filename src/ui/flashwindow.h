@@ -34,19 +34,21 @@ class Flashable;
 typedef std::shared_ptr<Flashable> FlashablePtr;
 
 class Flasher;
-typedef std::shared_ptr<Flasher> FlasherPtr;
+using FlasherPtr = std::shared_ptr<Flasher>;
 
 /**
  * @todo write docs
  */
-class FlashWindow : public QDialog, public Flasher::Callbacks {
+class FlashWindow : public QDialog {
   Q_OBJECT
 public:
-  FlashWindow(const FlashablePtr &flashable);
+  FlashWindow(std::shared_ptr<Flasher> flasher_, const FlashablePtr &flashable);
 
-  void onCompletion() override;
-  void onError(const std::string &error) override;
-  void onProgress(double percent) override;
+  virtual ~FlashWindow() = default;
+
+  void onCompletion();
+  void onError(const std::string &error);
+  void onProgress(float percent);
 
 private slots:
   void on_buttonCancel_clicked();

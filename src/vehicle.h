@@ -31,6 +31,19 @@ using DataLoggerPtr = std::shared_ptr<DataLogger>;
 class DataLink;
 using DataLinkPtr = std::shared_ptr<DataLink>;
 
+class DownloadInterface;
+using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
+
+class Flasher;
+using FlasherPtr = std::shared_ptr<Flasher>;
+
+namespace isotp {
+class Protocol;
+}
+
+class CanInterface;
+using CanInterfacePtr = std::shared_ptr<CanInterface>;
+
 struct Vehicle {
   std::string name;
   std::string vin;
@@ -49,11 +62,26 @@ public:
 
     /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
        nullptr if a logger could not be created. */
-    DataLoggerPtr logger();
+    DataLoggerPtr logger() const;
 
+    /* Returns a usable download interface for the link, if one exists. May return nullptr. */
+    DownloadInterfacePtr downloader() const;
+
+    /* Returns a flash interface for flashing, if one exists. May return nullptr. */
+    FlasherPtr flasher() const;
+
+    /* Returns an ISO-TP interface. May return nullptr if the vehicle/datalink
+     * does not support it */
+    std::shared_ptr<isotp::Protocol> isotp() const;
+
+    /* Returns a CAN interface. May return nullptr if the vehicle/data
+     * does not support CAN */
+    CanInterfacePtr can() const;
+
+    const Vehicle &vehicle() const { return vehicle_; }
 private:
-    DataLinkPtr datalink_;
     Vehicle vehicle_;
+    DataLinkPtr datalink_;
 };
 
 #endif // LIBRETUNER_VEHICLE_H

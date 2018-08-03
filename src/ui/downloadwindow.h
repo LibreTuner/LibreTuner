@@ -35,16 +35,16 @@ class DownloadWindow;
 /**
  * Window for downloading firmware from the ECU
  */
-class DownloadWindow : public QDialog, public DownloadInterface::Callbacks {
+class DownloadWindow : public QDialog {
   Q_OBJECT
 public:
-  explicit DownloadWindow(DataLinkPtr datalink, QWidget *parent = nullptr);
+  explicit DownloadWindow(const DownloadInterfacePtr &downloader, const Vehicle &vehicle, QWidget *parent = nullptr);
   ~DownloadWindow() override;
 
   /* Download interface callbacks */
-  void downloadError(const QString &error) override;
-  void onCompletion(gsl::span<const uint8_t> data) override;
-  void updateProgress(float progress) override;
+  void downloadError(const QString &error);
+  void onCompletion();
+  void updateProgress(float progress);
 
 private slots:
   void on_buttonContinue_clicked();
@@ -53,18 +53,13 @@ private slots:
   void mainDownloadError(const QString &error);
   void mainOnCompletion(bool success, const QString &error);
 
-  void queryError(DataLink::Error error);
-  void vehicleQueried(const Vehicle &vehicle);
-
 private:
   Ui::DownloadWindow *ui;
   std::shared_ptr<DownloadInterface> downloadInterface_;
   std::string name_;
   DefinitionPtr definition_;
-  DataLinkPtr datalink_;
 
   void start();
-  void query();
 };
 
 #endif // DOWNLOADWINDOW_H

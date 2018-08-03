@@ -28,8 +28,8 @@
 
 class QListWidget;
 
-class DataLink;
-using DataLinkPtr = std::shared_ptr<DataLink>;
+class VehicleLink;
+using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
 class DataLogger;
 using DataLoggerPtr = std::shared_ptr<DataLogger>;
@@ -41,7 +41,8 @@ class DataLoggerWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DataLoggerWindow(QWidget *parent = nullptr);
+    explicit DataLoggerWindow(const DataLogPtr &log, const DataLoggerPtr &logger, DefinitionPtr definition, QWidget *parent = nullptr);
+    virtual ~DataLoggerWindow() = default;
 
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
@@ -49,22 +50,17 @@ public:
 signals:
 
 public slots:
-    /* Called when the vehicle definition has been queried */
-    void queried();
-
     /* Callback for the start/stop button */
     void buttonClicked();
 
 private:
     DataLogPtr log_;
     DataLoggerPtr logger_;
+    DefinitionPtr definition_;
+
     QListWidget *pidList_;
     QTreeWidget *logOutput_;
     QPushButton *buttonLog_;
-
-    DataLinkPtr link_;
-    DefinitionPtr definition_;
-    Vehicle vehicle_;
 };
 
 #endif // DATALOGGERWINDOW_H

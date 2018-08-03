@@ -27,6 +27,7 @@
 
 #include "rommanager.h"
 #include "datalink.h"
+#include "asyncroutine.h"
 
 enum DownloadMode {
   DM_NONE = 0,
@@ -35,7 +36,7 @@ enum DownloadMode {
 
 class CanInterface;
 
-class DownloadInterface {
+class DownloadInterface : public AsyncRoutine {
 public:
   enum Type {
     TYPE_CAN,
@@ -48,23 +49,11 @@ public:
    * Signals onError if an error occurs. */
   virtual void download() = 0;
 
-  class Callbacks {
-  public:
-    /* Signals an update in progress. progress is a value between 0 and 100 */
-    virtual void updateProgress(float progress) = 0;
+  /* Returns the downloaded data */
+  virtual gsl::span<const uint8_t> data() =0;
 
-    virtual void downloadError(const QString &error) = 0;
-
-    /* Called when the ROM has finished downloading. */
-    virtual void onCompletion(gsl::span<const uint8_t> data) = 0;
-  };
-
-  static std::shared_ptr<DownloadInterface> create(Callbacks *callbacks, const DataLinkPtr &datalink, const DefinitionPtr &definition);
-
-protected:
-  Callbacks *callbacks_;
-
-  explicit DownloadInterface(Callbacks *callbacks);
+  static std::unique_ptr<DownloadInterface> createM23(const std::shared_ptr<isotp::Protocol> &isotp, const std::string &key, uint32_t size);
 };
+
 
 #endif // DOWNLOADINTERFACE_H

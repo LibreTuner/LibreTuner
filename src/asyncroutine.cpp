@@ -16,38 +16,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FLASHER_H
-#define FLASHER_H
-
-#include <memory>
-#include <string>
-
-#include "flashable.h"
-#include "protocols/isotpprotocol.h"
 #include "asyncroutine.h"
-
-class Flasher;
-typedef std::shared_ptr<Flasher> FlasherPtr;
-
-class CanInterface;
-typedef std::shared_ptr<CanInterface> CanInterfacePtr;
-
-class Flashable;
-typedef std::shared_ptr<Flashable> FlashablePtr;
-
-/**
- * An interface for flashing ROMs
- */
-class Flasher : public AsyncRoutine {
-public:
-  virtual ~Flasher() = default;
-
-  /* Creates a MazdaT1 flash interface */
-  static FlasherPtr createT1(const std::string &key,
-                             std::shared_ptr<isotp::Protocol> isotp);
-
-  /* Flash that shit */
-  virtual void flash(FlashablePtr flashable) = 0;
-};
-
-#endif // FLASHER_H

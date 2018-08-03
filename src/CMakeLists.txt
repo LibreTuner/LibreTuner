@@ -51,6 +51,8 @@ set(libretuner_SRC
     timerrunloop.h
     datalogger.cpp
     datalogger.h
+    asyncroutine.cpp
+    asyncroutine.h
 
     util/signal.cpp
     util/signal.h

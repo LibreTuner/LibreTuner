@@ -22,53 +22,25 @@
 #include "definitions/definition.h"
 #include "definitions/definitionmanager.h"
 #include "protocols/socketcaninterface.h"
+#include "vehicle.h"
 
 #include <QMessageBox>
 #include <utility>
 
 Q_DECLARE_METATYPE(DefinitionPtr)
 
-DownloadWindow::DownloadWindow(DataLinkPtr datalink, QWidget *parent)
-    : QDialog(parent), datalink_(std::move(datalink)), ui(new Ui::DownloadWindow) {
+DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Vehicle &vehicle, QWidget *parent)
+    : QDialog(parent), ui(new Ui::DownloadWindow), downloadInterface_(downloader), definition_(vehicle.definition) {
   ui->setupUi(this);
 
-  query();
-}
-
-void DownloadWindow::queryError(DataLink::Error error) {
-  QMessageBox msg;
-  msg.setText("Could not query vehicle type: " + QString::fromStdString(DataLink::strError(error)));
-  msg.setWindowTitle("Query Error");
-  msg.setIcon(QMessageBox::Critical);
-  msg.exec();
-  close();
-}
-
-void DownloadWindow::vehicleQueried(const VehiclePtr& vehicle) {
-  ui->labelVehicle->setText("Found vehicle: " + QString::fromStdString(vehicle->name()));
-  ui->vinLineEdit->setText(QString::fromStdString(vehicle->vin()));
-  if (!vehicle->definition()) {
-    QMessageBox msg;
-    msg.setText("Unknown vehicle");
-    msg.setWindowTitle("Unknown vehicle");
-    msg.setIcon(QMessageBox::Critical);
-    msg.exec();
-    close();
-    return;
-  }
-  definition_ = vehicle->definition();
-  ui->buttonContinue->setEnabled(true);
+  ui->labelVehicle->setText(QString::fromStdString(definition_->name()));
+  ui->vinLabel->setText(QString::fromStdString(vehicle.vin));
 }
 
 void DownloadWindow::start() {
-  name_ = ui->lineName->text().toStdString();
-  // SocketCAN
-  downloadInterface_ = DownloadInterface::create(
-      this, datalink_, definition_);
-  if (!downloadInterface_) {
-    // The interface should have called the downloadError callback
-    return;
-  }
+  downloadInterface_->setCompleteCallback([this] { onCompletion(); });
+  downloadInterface_->setErrorCallback([this] (const std::string &error) { downloadError(QString::fromStdString(error)); });
+  downloadInterface_->setProgressCallback([this] (float progress) { updateProgress(progress); });
 
   ui->buttonBack->setEnabled(false);
   ui->buttonContinue->setEnabled(false);
@@ -117,8 +89,8 @@ void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
   close();
 }
 
-void DownloadWindow::onCompletion(gsl::span<const uint8_t> data) {
-  if (!RomManager::get()->addRom(name_, definition_, data)) {
+void DownloadWindow::onCompletion() {
+  if (!RomManager::get()->addRom(name_, definition_, downloadInterface_->data())) {
     QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
                               Q_ARG(bool, false),
                               Q_ARG(QString, RomManager::get()->lastError()));
@@ -132,7 +104,7 @@ void DownloadWindow::onCompletion(gsl::span<const uint8_t> data) {
 void DownloadWindow::updateProgress(float progress) {
   QMetaObject::invokeMethod(ui->progressDownload, "setValue",
                             Qt::QueuedConnection,
-                            Q_ARG(int, (int)(progress * 100)));
+                            Q_ARG(int, static_cast<int>(progress * 100)));
 }
 
 void DownloadWindow::on_buttonContinue_clicked() {
@@ -153,21 +125,5 @@ void DownloadWindow::on_buttonBack_clicked() {
 }
 
 Q_DECLARE_METATYPE(DataLink::Error)
-Q_DECLARE_METATYPE(VehiclePtr)
-
-void DownloadWindow::query() {
-  ui->labelVehicle->setText("Querying vehicle... Please Wait");
-  ui->buttonContinue->setEnabled(false);
-  // Query vehicle
-  qRegisterMetaType<DataLink::Error>("DataLink::Error");
-  qRegisterMetaType<VehiclePtr>("VehiclePtr");
-  datalink_->queryVehicle([this](DataLink::Error error, VehiclePtr vehicle) {
-    if (error != DataLink::Error::Success) {
-      QMetaObject::invokeMethod(this, "queryError", Qt::QueuedConnection, Q_ARG(DataLink::Error, error));
-      return;
-    }
-    QMetaObject::invokeMethod(this, "vehicleQueried", Qt::QueuedConnection, Q_ARG(VehiclePtr, vehicle));
-  });
-}
 
 DownloadWindow::~DownloadWindow() { delete ui; }

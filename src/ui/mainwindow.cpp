@@ -19,6 +19,8 @@
 #include "libretuner.h"
 #include "mainwindow.h"
 
+#include "datalog.h"
+
 #include "flowlayout.h"
 #include "romwidget.h"
 #include "tunemanager.h"
@@ -31,6 +33,9 @@
 #include <QAction>
 #include <QScrollArea>
 #include <QWindowStateChangeEvent>
+#include <QMessageBox>
+
+#include <future>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -179,17 +184,32 @@ void MainWindow::updateRoms() {
 
 
 void MainWindow::on_buttonDownloadRom_clicked() {
-  DataLinkPtr link = LibreTuner::get()->getDataLink();
-  if (link) {
-    downloadWindow_ = new DownloadWindow(link, this);
-    downloadWindow_->setAttribute(Qt::WA_DeleteOnClose, true);
-    downloadWindow_->show();
-  }
+    if (downloadWindow_) {
+        delete downloadWindow_;
+    }
+
+    if (const auto &link = LibreTuner::get()->getVehicleLink()) {
+        DownloadInterfacePtr di = link->downloader();
+        downloadWindow_ = new DownloadWindow(di, link->vehicle(), this);
+        downloadWindow_->show();
+    }
 }
 
 void MainWindow::newLogClicked()
 {
-    loggerWindow_.show();
+    VehicleLinkPtr link = LibreTuner::get()->getVehicleLink();
+    if (!link) {
+        return;
+    }
+
+    DataLoggerPtr logger = link->logger();
+    if (!logger) {
+        QMessageBox(QMessageBox::Critical, "Logger error", "Failed to create a usable datalogger. The datalink may not support the needed protocol or there is no log mode set in the definition file.").exec();
+        return;
+    }
+    DataLogPtr log = std::make_shared<DataLog>();
+    loggerWindow_ = std::make_unique<DataLoggerWindow>(log, logger, link->vehicle().definition);
+    loggerWindow_->show();
 }
 
 

@@ -23,79 +23,30 @@
 #include "flashable.h"
 #include "flasher.h"
 
-#ifdef WITH_SOCKETCAN
-#include "protocols/socketcaninterface.h"
-#endif
-
 #include <cassert>
 
 #include <QMessageBox>
 #include <QString>
 #include <QStyledItemDelegate>
 
-FlashWindow::FlashWindow(const FlashablePtr& flashable)
-    : ui(new Ui::FlashWindow), flashable_(flashable) {
+FlashWindow::FlashWindow(std::shared_ptr<Flasher> flasher, const FlashablePtr& flashable)
+    : ui(new Ui::FlashWindow), flashable_(flashable), flasher_(std::move(flasher)) {
   assert(flashable);
+  assert(flasher_);
   assert(flashable->valid());
 
   ui->setupUi(this);
   ui->comboMode->setItemDelegate(new QStyledItemDelegate());
+
+  flasher_->setCompleteCallback([this] { onCompletion(); });
+  flasher_->setErrorCallback([this](const std::string &error) { onError(error); });
+  flasher_->setProgressCallback([this](float progress) { onProgress(progress); });
 }
 
 void FlashWindow::on_buttonCancel_clicked() { close(); }
 
 void FlashWindow::on_buttonFlash_clicked() {
-  switch (ui->comboMode->currentIndex()) {
-#ifdef WITH_SOCKETCAN
-  case 0: {
-    // SocketCAN
-    std::shared_ptr<SocketCanInterface> can;
-    try {
-      can = SocketCanInterface::create(ui->editSocketCAN->text().toStdString());
-    } catch (const std::exception &e) {
-      QMessageBox msgBox;
-      msgBox.setWindowTitle("SocketCan error");
-      msgBox.setText("Could not bind socketcan interface: " +
-                     QString(e.what()));
-      msgBox.setIcon(QMessageBox::Critical);
-      msgBox.exec();
-      return;
-    }
-    unsigned serverId = flashable_->definition()->definition()->serverId();
-    flasher_ =
-        Flasher::createT1(this, flashable_->definition()->definition()->key(),
-                          std::make_shared<isotp::Protocol>(
-                              can, isotp::Options{serverId, serverId + 8}));
-    if (!flasher_) {
-      // The interface should have called the downloadError callback
-      return;
-    }
-
     flasher_->flash(flashable_);
-    can->start();
-
-    ui->stackedWidget->setCurrentIndex(1);
-    ui->progressBar->setValue(0);
-
-    break;
-  }
-#endif
-#ifdef WITH_J2534
-  case 1:
-    // J2534
-    break;
-#endif
-  default: {
-    QMessageBox msgBox;
-    msgBox.setText("The mode \"" + ui->comboMode->currentText() +
-                   "\" is currently unsupported on this platform.");
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setWindowTitle("Unsupported communication mode");
-    // msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    break;
-  }
-  }
 }
 
 void FlashWindow::mainCompletion() {
@@ -128,7 +79,7 @@ void FlashWindow::onError(const std::string &error) {
                             Q_ARG(QString, QString::fromStdString(error)));
 }
 
-void FlashWindow::onProgress(double percent) {
+void FlashWindow::onProgress(float percent) {
   QMetaObject::invokeMethod(ui->progressBar, "setValue", Qt::QueuedConnection,
-                            Q_ARG(int, (int)(percent * 100)));
+                            Q_ARG(int, static_cast<int>(percent * 100)));
 }

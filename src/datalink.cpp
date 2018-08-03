@@ -133,7 +133,7 @@ void J2534DataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
   if (auto c = can(500000)) {
     query_can(c, std::move(cb));
   } else {
-    cb(Error::NoConnection, nullptr);
+    cb(Error::NoConnection, Vehicle());
   }
 }
 

@@ -44,7 +44,7 @@ private:
   CanViewer canViewer_;
   DownloadWindow *downloadWindow_ = nullptr;
   InterfacesWindow interfacesWindow_;
-  DataLoggerWindow loggerWindow_;
+  std::unique_ptr<DataLoggerWindow> loggerWindow_;
 
   QLayout *tunesLayout_;
   QLayout *romsLayout_;

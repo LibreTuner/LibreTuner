@@ -25,6 +25,7 @@
 #include "tunemanager.h"
 #include "timerrunloop.h"
 #include "ui/styledwindow.h"
+#include "vehicle.h"
 
 #ifdef WITH_SOCKETCAN
 #include "os/sockethandler.h"
@@ -39,6 +40,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <memory>
+#include <future>
 
 static LibreTuner *_global;
 
@@ -155,8 +157,16 @@ void LibreTuner::flashTune(const TunePtr &tune) {
     msgBox.exec();
     return;
   }
-  flashWindow_ = std::make_unique<FlashWindow>(flash);
-  flashWindow_->show();
+
+  if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
+    FlasherPtr flasher = link->flasher();
+    if (!flasher) {
+        QMessageBox(QMessageBox::Critical, "Flash failure", "Failed to get a valid flash interface for the vehicle link. Is a flash mode set in the definition file and does the datalink support it?").exec();
+        return;
+    }
+    flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), flash);
+    flashWindow_->show();
+  }
 }
 
 LibreTuner *LibreTuner::get() { return _global; }
@@ -211,14 +221,49 @@ DataLinkPtr LibreTuner::getDataLink() {
   }
 }
 
+std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
+{
+    DataLinkPtr dl = getDataLink();
+    if (!dl) {
+        QMessageBox(QMessageBox::Warning, "No datalink", "No datalink devices are connected so a vehicle can not be queried").exec();
+        return nullptr;
+    }
+
+    QMessageBox msg(QMessageBox::Information, "Querying vehicle", "Searching for a connected vehicle...");
+    msg.show();
+
+    std::promise<DataLink::Error> promise;
+    std::unique_ptr<VehicleLink> link;
+    dl->queryVehicle([&promise, &link, dl](DataLink::Error error, Vehicle &&v) {
+        if (!v.valid() || error != DataLink::Error::Success) {
+            promise.set_value(error);
+            return;
+        }
+        link = std::make_unique<VehicleLink>(std::move(v), dl);
+        promise.set_value(error);
+    });
+    DataLink::Error error = promise.get_future().get();
+    msg.hide();
+    if (error != DataLink::Error::Success) {
+        QMessageBox(QMessageBox::Critical, "Query error", "A vehicle could not be queried. Is the device connected and ECU active?").exec();
+        return nullptr;
+    }
+    return link;
+}
+
 void LibreTuner::queryVehicleLink(LibreTuner::QueryVehicleCallback &&cb)
 {
     DataLinkPtr dl = getDataLink();
     if (!dl) {
-        cb(nullptr);
+        cb(DataLink::Error::NoConnection, nullptr);
     }
 
-
+    dl->queryVehicle([dl, cb{std::move(cb)}](DataLink::Error error, Vehicle &&v) {
+        if (!v.valid() || error != DataLink::Error::Success) {
+            cb(error, nullptr);
+        }
+        cb(error, std::make_unique<VehicleLink>(std::move(v), dl));
+    });
 }
 
 LibreTuner::~LibreTuner() = default;

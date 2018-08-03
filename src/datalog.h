@@ -51,7 +51,7 @@ public:
     return creationTime_;
   }
 
-  VehiclePtr vehicle() const { return vehicle_; }
+  const Vehicle &vehicle() const { return vehicle_; }
 
   /* adds a point to a dataset. Returns false if the dataset
    * with the specified id does not exist. */
@@ -64,7 +64,7 @@ public:
 
 private:
   std::chrono::system_clock::time_point creationTime_;
-  VehiclePtr vehicle_;
+  Vehicle vehicle_;
 
   std::unordered_map<uint32_t, Data> data_;
 };
