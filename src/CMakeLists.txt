@@ -44,7 +44,6 @@ set(libretuner_SRC
     interface.h
     interfacemanager.cpp
     interfacemanager.h
-    exprtk.hpp
     logger.cpp
     logger.h
     timerrunloop.cpp
