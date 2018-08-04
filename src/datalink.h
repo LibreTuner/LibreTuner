@@ -23,7 +23,9 @@
 #include <memory>
 #include <string>
 
-#include "vehicle.h"
+class Vehicle;
+class VehicleLink;
+using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
 class CanInterface;
 using CanInterfacePtr = std::shared_ptr<CanInterface>;

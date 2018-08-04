@@ -17,6 +17,7 @@
  */
 
 #include "j2534caninterface.h"
+#include "logger.h"
 
 #include <algorithm>
 
@@ -34,6 +35,7 @@ Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(
 
 Can::~Can()
 {
+    Logger::debug("Destructing J2534 CAN interface");
     if (recvThread_.joinable()) {
         closed_ = true;
         recvThread_.join();
@@ -83,7 +85,11 @@ void Can::start()
         while (!closed_) {
             pNumMsgs = sizeof(msgs);
             // Give a timeout of 1000ms. In the future, this could be configured (TODO)
-            channel_.readMsgs(msgs, pNumMsgs, 1000);
+            try {
+                channel_.readMsgs(msgs, pNumMsgs, 1000);
+            } catch (const std::exception &ex) {
+                Logger::critical("readMsgs error: " + std::string(ex.what()));
+            }
             for (unsigned int i = 0; i < pNumMsgs; ++i) {
                 // Read the CAN ID
                 if (msgs[i].DataSize < 4) {

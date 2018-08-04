@@ -18,6 +18,7 @@
 
 #include "udsprotocol.h"
 #include "caninterface.h"
+#include "logger.h"
 
 #include <array>
 #include <cassert>
@@ -48,7 +49,7 @@ std::string strError(Error error) {
   return "you should never see this";
 }
 
-class IsoTpInterface : public Protocol {
+class IsoTpInterface : public Protocol, public std::enable_shared_from_this<IsoTpInterface> {
 public:
   class Request {
   public:
@@ -72,6 +73,7 @@ public:
 
 private:
   Request request_;
+  std::shared_ptr<IsoTpInterface> self_;
 };
 
 IsoTpInterface::Request::Request(std::shared_ptr<isotp::Protocol> isotp)
@@ -141,7 +143,11 @@ void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId,
   if (request_.active()) {
     throw std::runtime_error("a UDS request is already in progress");
   }
-  request_.request(data, expectedId, std::move(cb));
+  self_ = shared_from_this();
+  request_.request(data, expectedId, [this, cb{std::move(cb)}] (Error error, const Packet &p) {
+      self_.reset();
+      cb(error, p);
+  });
 }
 
 IsoTpInterface::IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp)
@@ -233,6 +239,7 @@ void Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length,
             }
 
             cb(Error::Success, packet.data);
-          });
+  });
 }
+
 } // namespace uds

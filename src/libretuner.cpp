@@ -25,6 +25,7 @@
 #include "tunemanager.h"
 #include "timerrunloop.h"
 #include "ui/styledwindow.h"
+#include "logger.h"
 #include "vehicle.h"
 
 #ifdef WITH_SOCKETCAN
@@ -232,17 +233,25 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
     QMessageBox msg(QMessageBox::Information, "Querying vehicle", "Searching for a connected vehicle...");
     msg.show();
 
+    Logger::debug("Starting vehicle query");
+
     std::promise<DataLink::Error> promise;
     std::unique_ptr<VehicleLink> link;
-    dl->queryVehicle([&promise, &link, dl](DataLink::Error error, Vehicle &&v) {
+    dl->queryVehicle([&promise, &link, &dl](DataLink::Error error, Vehicle &&v) {
+        Logger::debug("Got query response");
         if (!v.valid() || error != DataLink::Error::Success) {
+            Logger::debug("Setting query error");
             promise.set_value(error);
+            Logger::debug("Set query error");
             return;
         }
         link = std::make_unique<VehicleLink>(std::move(v), dl);
+        Logger::debug("Setting query response");
         promise.set_value(error);
     });
+    Logger::debug("Waiting for query completion");
     DataLink::Error error = promise.get_future().get();
+    Logger::debug("Query completed");
     msg.hide();
     if (error != DataLink::Error::Success) {
         QMessageBox(QMessageBox::Critical, "Query error", "A vehicle could not be queried. Is the device connected and ECU active?").exec();

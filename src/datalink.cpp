@@ -23,17 +23,21 @@
 #include "protocols/isotpprotocol.h"
 #include "protocols/socketcaninterface.h"
 #include "protocols/udsprotocol.h"
+#include "logger.h"
+#include "vehicle.h"
 
 void query_can(const std::shared_ptr<CanInterface> &can,
                DataLink::QueryVehicleCallback &&cb) {
   // Query the VIN
   std::array<uint8_t, 2> request{0x09, 0x02};
-  uds::Protocol::create(std::make_shared<isotp::Protocol>(can))
-      ->request(
+  Logger::debug("Sending UDS query");
+  std::shared_ptr<uds::Protocol> up = uds::Protocol::create(std::make_shared<isotp::Protocol>(can));
+  up->request(
           request, 0x49,
           [cb{std::move(cb)}](uds::Error error, const uds::Packet &packet) {
             if (error != uds::Error::Success) {
               if (error == uds::Error::Timeout) {
+                Logger::debug("Request timed out");
                 cb(DataLink::Error::Timeout, Vehicle());
                 return;
               }
@@ -100,6 +104,7 @@ CanInterfacePtr SocketCanDataLink::can(uint32_t baudrate) {
 class J2534DataLink : public DataLink {
 public:
   explicit J2534DataLink(const std::shared_ptr<J2534Settings> &settings);
+  virtual ~J2534DataLink() override = default;
 
   void queryVehicle(QueryVehicleCallback &&cb) override;
 
@@ -159,13 +164,13 @@ DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
   switch (iface->type()) {
 #ifdef WITH_SOCKETCAN
   case InterfaceType::SocketCan:
-    return std::make_shared<SocketCanDataLink>(
-        std::static_pointer_cast<SocketCanSettings>(iface));
+    return std::static_pointer_cast<DataLink>(std::make_shared<SocketCanDataLink>(
+        std::static_pointer_cast<SocketCanSettings>(iface)));
 #endif
 #ifdef WITH_J2534
   case InterfaceType::J2534:
-    return std::make_shared<J2534DataLink>(
-        std::static_pointer_cast<J2534Settings>(iface));
+    return std::static_pointer_cast<DataLink>(std::make_shared<J2534DataLink>(
+        std::static_pointer_cast<J2534Settings>(iface)));
 #endif
   default:
     throw std::runtime_error("Unsupported protocol");

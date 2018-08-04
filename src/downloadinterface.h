@@ -54,6 +54,7 @@ public:
 
   static std::unique_ptr<DownloadInterface> createM23(const std::shared_ptr<isotp::Protocol> &isotp, const std::string &key, uint32_t size);
 };
+using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
 
 #endif // DOWNLOADINTERFACE_H

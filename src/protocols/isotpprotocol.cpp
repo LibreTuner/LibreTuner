@@ -19,6 +19,7 @@
 #include "isotpprotocol.h"
 #include "timer.h"
 #include "util.hpp"
+#include "logger.h"
 
 namespace isotp {
 namespace details {
@@ -306,8 +307,8 @@ void Sender::finish(Error error) {
 }
 
 void Sender::send() {
+    try {
   std::shared_ptr<Sender> s = self_; // Hold the object for this scope
-
   if (packet_.size() <= 7) {
     std::vector<uint8_t> data = packet_.next(7);
     protocol_.sendSingleFrame(data);
@@ -318,6 +319,9 @@ void Sender::send() {
     std::vector<uint8_t> data = packet_.next(6);
     protocol_.sendFirstFrame(remaining, data);
   }
+    } catch (const std::exception &e) {
+        Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
+    }
 }
 
 void Sender::waitForControlFrame() {
@@ -366,6 +370,7 @@ void Sender::onFlow(FlowControlFrame &frame) {
   }
 
   consecThread_ = std::thread([this, frame] {
+    try {
     uint8_t bs = frame.blockSize;
     while (!packet_.eof()) {
       if (frame.separationTime.count() != 0)
@@ -385,6 +390,10 @@ void Sender::onFlow(FlowControlFrame &frame) {
       }
     }
     finish(Error::Success);
+      } catch (const std::exception &e) {
+          Logger::critical("Error in isotp consecutive thread: " + std::string(e.what()));
+          finish(Error::Unknown);
+      }
   });
 }
 
@@ -524,6 +533,7 @@ void Protocol::onCan(const CanMessage &message) {
 }
 
 void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
+    try {
   send(std::move(req), [this, cb{std::move(cb)}](Error error) mutable {
         if (error != Error::Success) {
           cb(error, Packet());
@@ -532,6 +542,10 @@ void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
 
         recvPacketAsync(std::move(cb));
       });
+    } catch (const std::exception &e) {
+        Logger::critical("Error while sending ISO-TP request: " + std::string(e.what()));
+        //cb(Error::Unknown, Packet());
+    }
 }
 
 void Protocol::send(const Frame &frame) {

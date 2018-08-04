@@ -17,11 +17,12 @@
  */
 
 #include "j2534.h"
+#include "logger.h"
 
 #include <cassert>
 #include <sstream>
 
-#include <Windows.h>
+#include <windows.h>
 namespace j2534 {
 
 void J2534::init() { load(); }
@@ -37,6 +38,7 @@ DevicePtr J2534::open(char *port) {
       // because the absence of a device is not an exceptional error
       return nullptr;
     }
+    Logger::warning("PassThruOpen failed");
     throw std::runtime_error(lastError());
   }
   return std::make_shared<Device>(shared_from_this(), deviceId);
@@ -59,6 +61,7 @@ uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
   uint32_t channel;
   if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags,
                              baudrate, &channel)) != 0) {
+    Logger::warning("PassThruConnect failed");
     throw std::runtime_error(lastError());
   }
 
@@ -69,6 +72,7 @@ void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
                      uint32_t timeout) {
   int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
   if (res != 0) {
+    Logger::warning("PassThruReadMsgs failed");
     throw std::runtime_error(lastError());
   }
 }
@@ -77,6 +81,7 @@ void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
                       uint32_t timeout) {
   int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
   if (res != 0) {
+    Logger::warning("PassThruWriteMsgs failed");
     throw std::runtime_error(lastError());
   }
 }
@@ -160,7 +165,10 @@ void *J2534::getProc(const char *proc) {
 Device::Device(const J2534Ptr &j2534, uint32_t device)
     : j2534_(j2534), device_(device) {}
 
-Device::~Device() { close(); }
+Device::~Device() {
+    Logger::debug("Destructing J2534 device");
+    close();
+}
 
 void Device::close() {
   if (valid()) {
