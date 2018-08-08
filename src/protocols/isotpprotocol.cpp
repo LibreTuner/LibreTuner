@@ -302,16 +302,18 @@ void Sender::send(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallb
 }
 
 void Sender::finish(Error error) {
+    Logger::debug("Calling callback");
   callback_(error);
   self_.reset();
 }
 
 void Sender::send() {
+    std::shared_ptr<Sender> s = self_; // Hold the object for this scope
     try {
-  std::shared_ptr<Sender> s = self_; // Hold the object for this scope
   if (packet_.size() <= 7) {
     std::vector<uint8_t> data = packet_.next(7);
     protocol_.sendSingleFrame(data);
+    Logger::info("Sent single frame");
     finish(Error::Success);
   } else {
     waitForControlFrame();
@@ -319,7 +321,7 @@ void Sender::send() {
     std::vector<uint8_t> data = packet_.next(6);
     protocol_.sendFirstFrame(remaining, data);
   }
-    } catch (const std::exception &e) {
+   } catch (const std::exception &e) {
         Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
     }
 }
@@ -510,7 +512,12 @@ void Packet::setData(gsl::span<const uint8_t> data) {
 
 Protocol::Protocol(const CanInterfacePtr &can, Options options)
     : options_(options) {
-  setCan(can);
+    setCan(can);
+}
+
+Protocol::~Protocol()
+{
+    Logger::debug("Destructed protocol");
 }
 
 void Protocol::setCan(const CanInterfacePtr &can) {
@@ -539,7 +546,6 @@ void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
           cb(error, Packet());
           return;
         }
-
         recvPacketAsync(std::move(cb));
       });
     } catch (const std::exception &e) {

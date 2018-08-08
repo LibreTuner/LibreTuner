@@ -97,7 +97,7 @@ std::shared_ptr<isotp::Protocol> VehicleLink::isotp() const
         return nullptr;
     }
     if (const auto &c = can()) {
-        return std::make_shared<isotp::Protocol>(c, isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 1, std::chrono::milliseconds{100}});
+        return std::make_shared<isotp::Protocol>(c, isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 8, std::chrono::milliseconds{100}});
     }
     return nullptr;
 }

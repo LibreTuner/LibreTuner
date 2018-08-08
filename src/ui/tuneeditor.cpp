@@ -42,6 +42,10 @@ TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
   ui->labelAxisX->setVisible(false);
   ui->labelAxisY->setVisible(false);
 
+
+  ui->tableEdit->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  ui->tableEdit->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
   connect(this, &TuneEditor::tableChanged, ui->graphWidget,
           &GraphWidget::tableChanged);
 

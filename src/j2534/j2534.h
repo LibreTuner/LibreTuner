@@ -24,6 +24,54 @@
 
 #include "datalink.h"
 
+/////////////////////////
+// PassThruConnect flags
+/////////////////////////
+
+#define CAN_29BIT_ID						0x00000100
+#define ISO9141_NO_CHECKSUM					0x00000200
+#define CAN_ID_BOTH							0x00000800
+#define ISO9141_K_LINE_ONLY					0x00001000
+#define SNIFF_MODE							0x10000000 // OP2.0: listens to a bus (e.g. CAN) without acknowledging
+
+
+//////////////////
+// RxStatus flags
+//////////////////
+
+#define TX_MSG_TYPE							0x00000001
+#define START_OF_MESSAGE					0x00000002
+#define ISO15765_FIRST_FRAME				0x00000002
+#define RX_BREAK							0x00000004
+#define TX_DONE								0x00000008
+#define ISO15765_PADDING_ERROR				0x00000010
+#define ISO15765_EXT_ADDR					0x00000080
+#define ISO15765_ADDR_TYPE					0x00000080
+//#define CAN_29BIT_ID						0x00000100 // (already defined above)
+
+//////////////////
+// TxStatus flags
+//////////////////
+
+#define ISO15765_FRAME_PAD					0x00000040
+//#define ISO15765_ADDR_TYPE				0x00000080 // (already defined above)
+//#define CAN_29BIT_ID						0x00000100 // (already defined above)
+#define WAIT_P3_MIN_ONLY					0x00000200
+#define SW_CAN_HV_TX						0x00000400 // OP2.0: Not supported
+#define SCI_MODE							0x00400000 // OP2.0: Not supported
+#define SCI_TX_VOLTAGE						0x00800000 // OP2.0: Not supported
+
+
+////////////////
+// Filter types
+////////////////
+
+#define PASS_FILTER							0x00000001
+#define BLOCK_FILTER						0x00000002
+#define FLOW_CONTROL_FILTER					0x00000003
+
+
+
 namespace j2534 {
 
 struct Info {
@@ -54,9 +102,9 @@ using PassThruConnect_t = int32_t (*) (uint32_t, uint32_t, uint32_t, uint32_t, u
 using PassThruDisconnect_t = int32_t (*) (uint32_t);
 using PassThruReadMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
 using PassThruWriteMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruStartPeriodicMsg_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
+using PassThruStartPeriodicMsg_t = int32_t (*) (uint32_t, const PASSTHRU_MSG*, uint32_t*, uint32_t);
 using PassThruStopPeriodicMsg_t = int32_t (*) (uint32_t, uint32_t);
-using PassThruStartMsgFilter_t = int32_t (*) (uint32_t, uint32_t, PASSTHRU_MSG*, PASSTHRU_MSG*, PASSTHRU_MSG*, uint32_t*);
+using PassThruStartMsgFilter_t = int32_t (*) (uint32_t, uint32_t, const PASSTHRU_MSG*, const PASSTHRU_MSG*, const PASSTHRU_MSG*, uint32_t*);
 using PassThruStopMsgFilter_t = int32_t (*) (uint32_t, uint32_t);
 using PassThruSetProgrammingVoltage_t = int32_t (*) (uint32_t, uint32_t);
 using PassThruReadVersion_t = int32_t (*) (char*, char*, char*);
@@ -125,6 +173,9 @@ public:
        the amount of messages sent. Refer to the j2534 spec for more information. */
     void writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
+    void startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg,
+                        const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
+
     /* Disconnects the channel from the j2534 device. The object
      * is in an invalid state after calling this method */
     void disconnect();
@@ -192,6 +243,9 @@ public:
 
     void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
     void writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+    void startMsgFilter(uint32_t channel,
+                        uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg,
+                        const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
 
     // Disconnects a logical communication channel
     void disconnect(uint32_t channel);

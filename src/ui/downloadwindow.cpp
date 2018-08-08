@@ -34,7 +34,7 @@ DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Veh
   ui->setupUi(this);
 
   ui->labelVehicle->setText(QString::fromStdString(definition_->name()));
-  ui->vinLabel->setText(QString::fromStdString(vehicle.vin));
+  ui->vinLineEdit->setText(QString::fromStdString(vehicle.vin));
 }
 
 void DownloadWindow::start() {
@@ -59,7 +59,7 @@ void DownloadWindow::mainDownloadError(const QString &error) {
   // msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.exec();
 
-  downloadInterface_.reset();
+  //downloadInterface_.reset();
 
   ui->buttonBack->setEnabled(true);
   ui->buttonContinue->setEnabled(true);
@@ -69,7 +69,7 @@ void DownloadWindow::mainDownloadError(const QString &error) {
 void DownloadWindow::downloadError(const QString &error) {
   QMetaObject::invokeMethod(this, "mainDownloadError", Qt::QueuedConnection,
                             Q_ARG(QString, error));
-  downloadInterface_.reset();
+  //downloadInterface_.reset();
 }
 
 void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
@@ -90,7 +90,7 @@ void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
 }
 
 void DownloadWindow::onCompletion() {
-  if (!RomManager::get()->addRom(name_, definition_, downloadInterface_->data())) {
+  if (!RomManager::get()->addRom(ui->lineName->text().toStdString(), definition_, downloadInterface_->data())) {
     QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
                               Q_ARG(bool, false),
                               Q_ARG(QString, RomManager::get()->lastError()));
@@ -98,7 +98,7 @@ void DownloadWindow::onCompletion() {
     QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
                               Q_ARG(bool, true), Q_ARG(QString, QString()));
   }
-  downloadInterface_.reset();
+  // downloadInterface_.reset();
 }
 
 void DownloadWindow::updateProgress(float progress) {

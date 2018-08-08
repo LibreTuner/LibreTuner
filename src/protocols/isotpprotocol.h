@@ -165,6 +165,7 @@ public:
 
   explicit Protocol(const CanInterfacePtr &can = CanInterfacePtr(),
                     Options = Options());
+  ~Protocol();
 
   void sendSingleFrame(gsl::span<uint8_t> data);
 

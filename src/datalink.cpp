@@ -145,6 +145,7 @@ void J2534DataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
 CanInterfacePtr J2534DataLink::can(uint32_t baudrate) {
   if (!can_ && checkDevice()) {
     can_ = j2534::Can::create(device_, baudrate);
+    can_->start();
   }
   return can_;
 }

@@ -9,5 +9,10 @@
         <file>icons/minimize.svg</file>
         <file>icons/restore.svg</file>
         <file>icons/drop-down-arrow.svg</file>
+        <file>icons/branch-closed.png</file>
+        <file>icons/branch-end.png</file>
+        <file>icons/branch-more.png</file>
+        <file>icons/branch-open.png</file>
+        <file>icons/vline.png</file>
     </qresource>
 </RCC>

@@ -17,6 +17,7 @@
  */
 
 #include "udsauthenticator.h"
+#include "logger.h"
 
 #include <cassert>
 #include <sstream>
@@ -43,6 +44,7 @@ void Authenticator::auth(const std::string &key,
 }
 
 void Authenticator::do_session(uint8_t sessionType) {
+    Logger::debug("[AUTH] sending session request");
   uds_->requestSession(
       sessionType, [this](Error error, uint8_t type, gsl::span<const uint8_t>) {
         if (!checkError(error)) {
@@ -54,6 +56,7 @@ void Authenticator::do_session(uint8_t sessionType) {
 }
 
 void Authenticator::do_request_seed() {
+    Logger::debug("[AUTH] Sending seed request");
   uds_->requestSecuritySeed(
       [this](Error error, uint8_t type, gsl::span<const uint8_t> seed) {
         if (!checkError(error)) {
@@ -68,6 +71,7 @@ void Authenticator::do_request_seed() {
 }
 
 void Authenticator::do_send_key(uint32_t key) {
+    Logger::debug("[AUTH] Sending key request");
   uint8_t kData[3];
   kData[0] = key & 0xFF;
   kData[1] = (key & 0xFF00) >> 8;
@@ -92,7 +96,7 @@ uint32_t Authenticator::generateKey(uint32_t parameter,
   nseed.insert(nseed.end(), key_.begin(), key_.end());
 
   // This is Mazda's key generation algorithm reverse engineered from a
-  // Mazdaspeed6 ROM. Internally, the ECU uses a timer/counter for the seed
+  // Mazda 6 MPS ROM. Internally, the ECU uses a timer/counter for the seed generation
 
   for (uint8_t c : nseed) {
     for (int r = 8; r > 0; --r) {

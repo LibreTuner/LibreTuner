@@ -86,6 +86,9 @@ public:
     return signal;
   }
 
+  /* Returns the amount of registered connections */
+  size_t count() const;
+
 private:
   friend ConnectionType;
 
@@ -103,5 +106,17 @@ private:
 
   std::weak_ptr<Signal<Func>> self_;
 };
+
+template<typename Func>
+size_t Signal<Func>::count() const
+{
+    size_t c = 0;
+    std::for_each(connections.begin(), connections.end(), [&c] (const std::weak_ptr<ConnectionType> &con) {
+        if (con) {
+            c++;
+        }
+    });
+    return c;
+}
 
 #endif // SIGNAL_H

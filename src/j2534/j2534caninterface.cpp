@@ -20,6 +20,7 @@
 #include "logger.h"
 
 #include <algorithm>
+#include <sstream>
 
 namespace j2534 {
 
@@ -28,14 +29,30 @@ std::shared_ptr<Can> Can::create(const DevicePtr &device, uint32_t baudrate)
     return std::make_shared<Can>(device, baudrate);
 }
 
-Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(Protocol::CAN, 0, baudrate))
+Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(Protocol::CAN, CAN_ID_BOTH, baudrate))
 {
+    Logger::debug("Opened J2534 CAN Interface with baudrate " + std::to_string(baudrate));
+    // Setup the filter
+    PASSTHRU_MSG msgMask {};
+    msgMask.ProtocolID = static_cast<uint32_t>(Protocol::CAN);
+    msgMask.RxStatus = 0;
+    msgMask.TxFlags = 0; //ISO15765_FRAME_PAD;
+    msgMask.Timestamp = 0;
+    msgMask.DataSize = 5;
+    msgMask.ExtraDataIndex = 0;
+    msgMask.Data[0] = 0;
+    msgMask.Data[1] = 0;
+    msgMask.Data[2] = 0;
+    msgMask.Data[3] = 0;
+    msgMask.Data[4] = 0;
+    PASSTHRU_MSG msgPattern = msgMask;
 
+    uint32_t msgId;
+    channel_.startMsgFilter(PASS_FILTER, &msgMask, &msgPattern, nullptr, msgId);
 }
 
 Can::~Can()
 {
-    Logger::debug("Destructing J2534 CAN interface");
     if (recvThread_.joinable()) {
         closed_ = true;
         recvThread_.join();
@@ -52,9 +69,9 @@ void Can::send(const CanMessage &message)
 
     // Add the CAN ID
     uint32_t id = message.id();
-    msg.Data[0] = id & 0xFF000000;
-    msg.Data[1] = id & 0xFF0000;
-    msg.Data[2] = id & 0xFF00;
+    msg.Data[0] = (id & 0xFF000000) >> 24;
+    msg.Data[1] = (id & 0xFF0000) >> 16;
+    msg.Data[2] = (id & 0xFF00) >> 8;
     msg.Data[3] = id & 0xFF;
     std::copy(message.message(), message.message() + message.length(), msg.Data + 4);
     // Message length + CAN ID length
@@ -82,8 +99,16 @@ void Can::start()
     recvThread_ = std::thread([this]() {
         PASSTHRU_MSG msgs[16];
         uint32_t pNumMsgs;
+
         while (!closed_) {
-            pNumMsgs = sizeof(msgs);
+            while (signal_->count() == 0) {
+                // TODO: Use interrupt instead of polling
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+            std::for_each(msgs, msgs + 16, [](PASSTHRU_MSG &msg) {
+                msg.ProtocolID = static_cast<uint32_t>(Protocol::CAN);
+            });
+            pNumMsgs = 16;
             // Give a timeout of 1000ms. In the future, this could be configured (TODO)
             try {
                 channel_.readMsgs(msgs, pNumMsgs, 1000);
@@ -91,13 +116,15 @@ void Can::start()
                 Logger::critical("readMsgs error: " + std::string(ex.what()));
             }
             for (unsigned int i = 0; i < pNumMsgs; ++i) {
+                PASSTHRU_MSG &msg = msgs[i];
                 // Read the CAN ID
                 if (msgs[i].DataSize < 4) {
                     // The message does not fit the CAN ID
                     continue;
                 }
-                uint32_t id = (msgs[i].Data[0] << 24) | (msgs[i].Data[1] << 16) | (msgs[i].Data[2] << 8) | (msgs[i].Data[3]);
-                signal_->call(CanMessage(id, gsl::make_span<uint8_t>(msgs[i].Data + 4, msgs[i].DataSize - 4)));
+                uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) | (msg.Data[2] << 8) | (msg.Data[3]);
+                CanMessage canMsg(id, gsl::make_span<uint8_t>(msgs[i].Data + 4, msgs[i].DataSize - 4));
+                signal_->call(std::move(canMsg));
             }
         }
     });

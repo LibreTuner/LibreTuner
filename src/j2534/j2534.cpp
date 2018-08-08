@@ -41,6 +41,7 @@ DevicePtr J2534::open(char *port) {
     Logger::warning("PassThruOpen failed");
     throw std::runtime_error(lastError());
   }
+  Logger::debug("Opened j2534 device " + std::to_string(deviceId));
   return std::make_shared<Device>(shared_from_this(), deviceId);
 }
 
@@ -59,11 +60,13 @@ uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
 
   long res;
   uint32_t channel;
+  Logger::debug("PassThruConnect(" + std::to_string(device) + ", " + std::to_string(static_cast<uint32_t>(protocol)) + ", " + std::to_string(flags) + ", " + std::to_string(baudrate) + ")");
   if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags,
                              baudrate, &channel)) != 0) {
     Logger::warning("PassThruConnect failed");
     throw std::runtime_error(lastError());
   }
+  Logger::debug("Connected j2534 channel " + std::to_string(channel));
 
   return channel;
 }
@@ -84,6 +87,15 @@ void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
     Logger::warning("PassThruWriteMsgs failed");
     throw std::runtime_error(lastError());
   }
+}
+
+void J2534::startMsgFilter(uint32_t channel, uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg, const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID)
+{
+    int32_t res = PassThruStartMsgFilter(channel, type, pMaskMsg, pPatternMsg, pFlowControlMsg, &pMsgID);
+    if (res != 0) {
+        Logger::warning("PassThruStartMsgFilter failed");
+        throw std::runtime_error(lastError());
+    }
 }
 
 void J2534::disconnect(uint32_t channel) {
@@ -208,6 +220,12 @@ void Channel::writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
                         uint32_t timeout) {
   assert(valid());
   j2534_->writeMsgs(channel_, pMsg, pNumMsgs, timeout);
+}
+
+void Channel::startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg, const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID)
+{
+    assert(valid());
+    j2534_->startMsgFilter(channel_, type, pMaskMsg, pPatternMsg, pFlowControlMsg, pMsgID);
 }
 
 } // namespace j2534

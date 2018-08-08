@@ -20,6 +20,7 @@
 #include "definitions/definition.h"
 #include "protocols/udsprotocol.h"
 #include "udsauthenticator.h"
+#include "logger.h"
 
 #include <algorithm>
 #include <cassert>
@@ -76,6 +77,7 @@ std::unique_ptr<DownloadInterface> DownloadInterface::createM23(const std::share
 
 bool Uds23DownloadInterface::checkError(uds::Error error) {
   if (error != uds::Error::Success) {
+    Logger::critical("Download error: " + uds::strError(error));
     notifyError(uds::strError(error));
     return false;
   }
@@ -116,9 +118,11 @@ void Uds23DownloadInterface::do_download() {
 bool Uds23DownloadInterface::update_progress() {
   notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
   if (downloadSize_ == 0) {
+    Logger::info("Download complete");
     notifyComplete();
     return false;
   }
+
   return true;
 }
 

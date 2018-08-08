@@ -3,6 +3,7 @@ QWidget {
     border-color: #505050;
     color: #EEEEEE;
     selection-background-color: darkblue;
+    font: 8pt "Verdana";
 }
 
 QLabel {
@@ -160,7 +161,7 @@ QComboBox QAbstractItemView::item {
 }
 
 QTableView QTableCornerButton::section {
-    border: none;
+    border: 0px;
     background-color: #303030;
 }
 
@@ -176,7 +177,7 @@ QTableView QTableCornerButton::section:pressed {
 QHeaderView::section {
     background-color: #303030;
     color: white;
-    padding: 0.4em;
+    padding: 0.4em 1em 0.4em 1em;
     border: none;
 }
 
@@ -264,3 +265,29 @@ QScrollBar:up-arrow, QScrollBar::down-arrow {
 QListWidget {
     border: 1px solid #505050;
 }
+
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(:/icons/vline.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(:/icons/branch-more.png) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(:/icons/branch-end.png) 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(:/icons/branch-closed.png);
+        color: red;
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(:/icons/branch-open.png);
+}
+
