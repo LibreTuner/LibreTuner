@@ -60,7 +60,7 @@ public:
 };
 
 class CanInterface;
-typedef std::shared_ptr<CanInterface> CanInterfacePtr;
+// typedef std::unique_ptr<CanInterface> CanInterfacePtr;
 
 /* Abstract CAN interface */
 class CanInterface {

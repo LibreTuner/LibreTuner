@@ -163,7 +163,7 @@ public:
   using RecvPacketCallback = std::function<void(Error error, Packet &&packet)>;
   using SendPacketCallback = std::function<void(Error error)>;
 
-  explicit Protocol(const CanInterfacePtr &can = CanInterfacePtr(),
+  explicit Protocol(std::unique_ptr<CanInterface> &&can = std::unique_ptr<CanInterface>(),
                     Options = Options());
   ~Protocol();
 
@@ -183,9 +183,10 @@ public:
 
   void send(Packet &&packet, SendPacketCallback &&cb);
 
-  void setCan(const CanInterfacePtr &can);
+  void setCan(std::unique_ptr<CanInterface> &&can);
 
-  const CanInterfacePtr can() { return can_; }
+  // May return nullptr
+  CanInterface *can() { return can_.get(); }
 
   void setOptions(const Options &options) { options_ = options; }
 
@@ -197,7 +198,7 @@ public:
 
 private:
   std::shared_ptr<SignalType> signal_ = SignalType::create();
-  CanInterfacePtr can_;
+  std::unique_ptr<CanInterface> can_;
   std::shared_ptr<CanInterface::SignalType::ConnectionType> canConnection_;
   Options options_;
 

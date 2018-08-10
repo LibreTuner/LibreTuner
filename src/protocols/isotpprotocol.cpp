@@ -510,7 +510,7 @@ void Packet::setData(gsl::span<const uint8_t> data) {
   pointer_ = std::begin(data_);
 }
 
-Protocol::Protocol(const CanInterfacePtr &can, Options options)
+Protocol::Protocol(std::unique_ptr<CanInterface> &&can, Options options)
     : options_(options) {
     setCan(can);
 }
@@ -520,7 +520,7 @@ Protocol::~Protocol()
     Logger::debug("Destructed protocol");
 }
 
-void Protocol::setCan(const CanInterfacePtr &can) {
+void Protocol::setCan(std::unique_ptr<CanInterface> &&can) {
   can_ = can;
   if (!can) {
     canConnection_.reset();
