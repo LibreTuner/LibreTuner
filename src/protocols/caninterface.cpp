@@ -47,32 +47,9 @@ CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
   setMessage(id, data);
 }
 
-CanInterface::CanInterface() : signal_(SignalType::create()) {}
+//CanInterface::CanInterface() : signal_(SignalType::create()) {}
+CanInterface::CanInterface() {}
 
 void CanInterface::send(int id, gsl::span<const uint8_t> data) {
   send(CanMessage(id, data));
 }
-/*
-std::string CanInterface::strError(CanInterface::CanError error, int err) {
-  switch (erro{}{}{}{}{}r) {
-  case CanError::Succ{}{}{}{}{}ess:
-    return "success";
-  {}{}{}{}{}case CanError::Socket: {
-    std::stringstream ss;
-    ss << "failed to create socket: " << strerror(err);
-    return ss.str();
-  }
-  case CanError::Read: {
-    std::stringstream ss;
-    ss << "failed to read: " << strerror(err);
-    return ss.str();
-  }
-  case CanError::Write:
-    return "failed to transmit message";
-  default:
-    break;
-  }
-
-  return "unknown. You should not see this. If you do, please submit a pull "
-         "request";
-}*/

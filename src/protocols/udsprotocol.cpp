@@ -67,7 +67,7 @@ public:
     void do_recv();
   };
 
-  explicit IsoTpInterface(std::shared_ptr<isotp::Protocol> isotp);
+  explicit IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp);
 
   void request(gsl::span<uint8_t>, uint8_t expectedId, Callback &&cb) override;
 

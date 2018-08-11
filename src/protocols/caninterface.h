@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include <gsl/span>
 
@@ -72,8 +73,8 @@ public:
     Write,
   };
 
-  using Listener = std::function<void(const CanMessage &message)>;
-  using SignalType = Signal<Listener>;
+  //using Listener = std::function<void(const CanMessage &message)>;
+  //using SignalType = Signal<Listener>;
 
   CanInterface();
   virtual ~CanInterface() = default;
@@ -84,10 +85,13 @@ public:
 
   virtual void send(const CanMessage &message) = 0;
 
+  // Returns false if no message was received and the timeout expired.
+  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout);
+
   /* Connects a new listener */
-  std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) {
+  /*std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) {
     return signal_->connect(std::move(listener));
-  }
+  }*/
 
   /* Returns true if the socket is ready for reading/writing */
   virtual bool valid() = 0;
@@ -97,7 +101,7 @@ public:
   virtual void start() = 0;
 
 protected:
-  std::shared_ptr<SignalType> signal_;
+  //std::shared_ptr<SignalType> signal_;
   CanError lastError_;
   int lastErrno_;
 };

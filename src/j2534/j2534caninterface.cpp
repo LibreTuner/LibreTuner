@@ -53,10 +53,10 @@ Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(
 
 Can::~Can()
 {
-    if (recvThread_.joinable()) {
+    /*if (recvThread_.joinable()) {
         closed_ = true;
         recvThread_.join();
-    }
+    }*/
 }
 
 void Can::send(const CanMessage &message)
@@ -85,6 +85,32 @@ void Can::send(const CanMessage &message)
     }
 }
 
+bool Can::recv(CanMessage &message, std::chrono::milliseconds timeout)
+{
+    assert(valid());
+
+    auto start = std::chrono::system_clock::now();
+
+    while (true) {
+        PASSTHRU_MSG msg{};
+        msg.ProtocolID = static_cast<uint32_t>(Protocol::CAN);
+
+        uint32_t pNumMsgs = 1;
+        channel_.readMsgs(&msg, pNumMsgs, timeout.count());
+        if ((std::chrono::system_clock::now() - start) >= timeout) {
+            return false;
+        }
+
+        if (msg.DataSize < 4) {
+            // The message does not fit the CAN ID
+            continue;
+        }
+        uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) | (msg.Data[2] << 8) | (msg.Data[3]);
+        message.setMessage(id, gsl::make_span<uint8_t>(msg.Data + 4, msg.DataSize - 4));
+        return true;
+    }
+}
+
 bool Can::valid()
 {
     return channel_.valid();
@@ -92,6 +118,7 @@ bool Can::valid()
 
 void Can::start()
 {
+    /*
     assert(!recvThread_.joinable());
     closed_ = false;
 
@@ -127,7 +154,7 @@ void Can::start()
                 signal_->call(std::move(canMsg));
             }
         }
-    });
+    });*/
 }
 
 

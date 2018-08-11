@@ -42,13 +42,15 @@ public:
     // CanInterface interface
 public:
     virtual void send(const CanMessage &message) override;
+    // Returns true if a message was received before the timeout
+    virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
     virtual bool valid() override;
     virtual void start() override;
 
 private:
     j2534::Channel channel_;
-    std::thread recvThread_;
-    std::atomic<bool> closed_;
+    //std::thread recvThread_;
+    //std::atomic<bool> closed_;
 };
 
 }

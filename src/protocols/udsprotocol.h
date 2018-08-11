@@ -74,8 +74,8 @@ public:
   using Callback = std::function<void(Error, const Packet &)>;
 
   /* Create an interface with an ISO-TP layer */
-  static std::shared_ptr<Protocol>
-  create(std::shared_ptr<isotp::Protocol> isotp);
+  static std::unique_ptr<Protocol>
+  create(std::unique_ptr<isotp::Protocol> &&isotp);
 
   /* Sends a request. May throw an exception. */
   virtual void request(gsl::span<uint8_t> data, uint8_t expectedId,

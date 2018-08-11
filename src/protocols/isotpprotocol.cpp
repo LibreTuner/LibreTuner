@@ -104,102 +104,21 @@ Frame Frame::flow(const FlowControlFrame &frame) {
   return f;
 }
 
-/* Used to receive ISO-TP messages */
-// TODO: fix race conditions
-class Receiver {
-public:
-  static void recv(Protocol &protocol, Protocol::RecvPacketCallback cb);
-
-protected:
-  Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb);
-
-private:
-  void start();
-
-  void handleFirst(const FirstFrame &f);
-
-  void handleSingle(const SingleFrame &f);
-
-  void handleBegin(const Frame &f);
-
-  void handleConsec(const ConsecutiveFrame &f);
-
-  enum class State {
-    Begin, // Waiting for a Single or First frame
-    Consecutive,
-  };
-
-  Packet packet_;
-  Protocol &protocol_;
-  Protocol::RecvPacketCallback callback_;
-  uint8_t consecIndex_ = 0;
-  // Remaining amount of bytes to be read
-  uint16_t remaining_{};
-  std::shared_ptr<Receiver> self_;
-  State state_ = State::Begin;
-
-  TimerPtr timer_;
-
-  std::shared_ptr<Protocol::ConnectionType> connection_;
-
-  void error(Error err);
-  void received();
-  // returns true if waiting on more data
-  bool finishRead(uint8_t amount);
-  void timedout();
-
-  /* Increment the consecutive index, circling from 15 to 0 */
-  uint8_t incConsec();
-};
-
-/* Used to send ISO-TP messages */
-class Sender {
-public:
-  static void send(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb);
-  ~Sender();
-
-protected:
-  Sender(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb);
-
-private:
-  void send();
-
-  Packet packet_;
-  Protocol &protocol_;
-  Protocol::SendPacketCallback callback_;
-
-  uint8_t consecIndex_ = 0;
-  TimerPtr timer_;
-  std::shared_ptr<Protocol::ConnectionType> connection_;
-  std::thread consecThread_;
-
-  void waitForControlFrame();
-  void onFlow(FlowControlFrame &frame);
-  uint8_t incrementConsec();
-  void finish(Error error);
-
-  std::shared_ptr<Sender> self_;
-};
-
-uint8_t Receiver::incConsec() {
+uint8_t Protocol::incConsec() {
   if (++consecIndex_ == 16) {
     consecIndex_ = 0;
   }
   return consecIndex_;
 }
 
-void Receiver::timedout() { error(Error::Timeout); }
-
-void Receiver::error(Error err) {
+void Protocol::error(Error err) {
   timer_->disable();
-  connection_.reset();
   callback_(err, std::move(packet_));
-  self_.reset();
 }
 
-void Receiver::received() { error(Error::Success); }
+void Protocol::received() { error(Error::Success); }
 
-bool Receiver::finishRead(uint8_t amount) {
+bool Protocol::finishRead(uint8_t amount) {
   if (amount > remaining_) {
     error(Error::Unknown);
     return false;
@@ -213,7 +132,7 @@ bool Receiver::finishRead(uint8_t amount) {
   return true;
 }
 
-void Receiver::handleFirst(const FirstFrame &f) {
+void Protocol::handleFirst(const FirstFrame &f) {
   remaining_ = f.size;
   size_t ff_length = std::min<size_t>(f.data_length, remaining_);
   packet_.append(gsl::make_span(f.data).first(ff_length));
@@ -223,12 +142,12 @@ void Receiver::handleFirst(const FirstFrame &f) {
   }
 }
 
-void Receiver::handleSingle(const SingleFrame &f) {
+void Protocol::handleSingle(const SingleFrame &f) {
   packet_.append(gsl::make_span(f.data).first(f.size));
   received();
 }
 
-void Receiver::handleBegin(const Frame &f) {
+void Protocol::handleBegin(const Frame &f) {
   FirstFrame ff{};
   SingleFrame sf{};
   if (f.first(ff)) {
@@ -238,7 +157,7 @@ void Receiver::handleBegin(const Frame &f) {
   }
 }
 
-void Receiver::handleConsec(const ConsecutiveFrame &f) {
+void Protocol::handleConsec(const ConsecutiveFrame &f) {
   if (f.index != incConsec()) {
     error(Error::Consec);
     return;
@@ -248,20 +167,12 @@ void Receiver::handleConsec(const ConsecutiveFrame &f) {
   finishRead(cf_length);
 }
 
-void Receiver::recv(Protocol &protocol, Protocol::RecvPacketCallback cb) {
+void Protocol::recv(Protocol::RecvPacketCallback cb) {
   std::shared_ptr<Receiver> receiver =
       std::make_shared<make_shared_enabler<Receiver>>(protocol, std::move(cb));
-  receiver->self_ = receiver;
-  receiver->start();
 }
 
-Receiver::Receiver(Protocol &protocol, Protocol::RecvPacketCallback &&cb)
-    : protocol_(protocol), callback_(std::move(cb)), timer_(Timer::create(std::bind(&Receiver::timedout, this))) {
-  packet_.clear();
-  timer_->setTimeout(protocol_.options().timeout);
-}
-
-void Receiver::start() {
+void Protocol::start() {
   timer_->enable();
   connection_ = protocol_.listen([&](const Frame &f) {
     timer_->disable();
@@ -283,65 +194,47 @@ void Receiver::start() {
   });
 }
 
-Sender::Sender(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb)
-    : protocol_(protocol), packet_(std::move(packet)), timer_(Timer::create()), callback_(std::move(cb)) {
-  timer_->setTimeout(protocol.options().timeout);
-}
 
-Sender::~Sender() {
-  if (consecThread_.joinable()) {
-    consecThread_.detach();
-  }
-}
-
-void Sender::send(Protocol &protocol, Packet &&packet, Protocol::SendPacketCallback &&cb) {
-  auto sender =
-      std::make_shared<make_shared_enabler<Sender>>(protocol, std::move(packet), std::move(cb));
-  sender->self_ = sender;
-  return sender->send();
-}
-
-void Sender::finish(Error error) {
+void Protocol::notifySendResult(Error error) {
     Logger::debug("Calling callback");
-  callback_(error);
-  self_.reset();
+    callback_(error);
 }
 
-void Sender::send() {
-    std::shared_ptr<Sender> s = self_; // Hold the object for this scope
-    try {
-  if (packet_.size() <= 7) {
-    std::vector<uint8_t> data = packet_.next(7);
-    protocol_.sendSingleFrame(data);
-    Logger::info("Sent single frame");
-    finish(Error::Success);
-  } else {
-    waitForControlFrame();
-    auto remaining = packet_.remaining();
-    std::vector<uint8_t> data = packet_.next(6);
-    protocol_.sendFirstFrame(remaining, data);
-  }
-   } catch (const std::exception &e) {
-        Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
+bool Protocol::recvFrame(Frame &frame)
+{
+    while (true) {
+        CanMessage msg;
+        if (!can_->recv(msg, options_.timeout)) {
+            return false;
+        }
+
+        if (msg.length() == 0 || msg.id() != options_.destId) {
+          continue;
+        }
+        frame = Frame(msg);
+        return true;
     }
 }
 
-void Sender::waitForControlFrame() {
-  timer_->setCallback([this] {
-    connection_.reset();
-    finish(Error::Timeout);
-  });
-  timer_->enable();
+void Protocol::waitForControlFrame() {
+    timer_->setCallback([this] {
+        notifySendResult(Error::Timeout);
+    });
+    timer_->enable();
 
-  connection_ = protocol_.listen([this](const Frame &f) {
+    Frame frame;
+
+    if (!recvFrame(frame)) {
+      // TIMED OUT
+      return;
+    }
+
     FlowControlFrame fc;
-    if (!f.flow(fc)) {
+    if (!frame.flow(fc)) {
       return;
     }
     timer_->disable();
-    connection_.reset();
     onFlow(fc);
-  });
 }
 
 uint8_t Sender::incrementConsec() {
@@ -351,7 +244,7 @@ uint8_t Sender::incrementConsec() {
   return consecIndex_;
 }
 
-void Sender::onFlow(FlowControlFrame &frame) {
+void Protocol::onFlow(FlowControlFrame &frame) {
   if (consecThread_.joinable()) {
     consecThread_.join();
   }
@@ -391,10 +284,10 @@ void Sender::onFlow(FlowControlFrame &frame) {
         bs--;
       }
     }
-    finish(Error::Success);
+    notifySendResult(Error::Success);
       } catch (const std::exception &e) {
           Logger::critical("Error in isotp consecutive thread: " + std::string(e.what()));
-          finish(Error::Unknown);
+          notifySendResult(Error::Unknown);
       }
   });
 }
@@ -512,7 +405,7 @@ void Packet::setData(gsl::span<const uint8_t> data) {
 
 Protocol::Protocol(std::unique_ptr<CanInterface> &&can, Options options)
     : options_(options) {
-    setCan(can);
+    setCan(std::move(can));
 }
 
 Protocol::~Protocol()
@@ -521,22 +414,7 @@ Protocol::~Protocol()
 }
 
 void Protocol::setCan(std::unique_ptr<CanInterface> &&can) {
-  can_ = can;
-  if (!can) {
-    canConnection_.reset();
-    return;
-  }
-
-  canConnection_ =
-      can_->connect(std::bind(&Protocol::onCan, this, std::placeholders::_1));
-}
-
-void Protocol::onCan(const CanMessage &message) {
-  if (message.length() == 0 || message.id() != options().destId) {
-    return;
-  }
-
-  signal_->call(Frame(message));
+  can_ = std::move(can);
 }
 
 void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
@@ -576,7 +454,21 @@ void Protocol::sendFlowFrame(const FlowControlFrame &fc) {
 }
 
 void Protocol::send(Packet &&packet, SendPacketCallback &&cb) {
-  return Sender::send(*this, std::move(packet), std::move(cb));
+    try {
+      if (packet.size() <= 7) {
+          std::vector<uint8_t> data = packet.next(7);
+          sendSingleFrame(data);
+          Logger::info("Sent single frame");
+          notifySendResult(Error::Success);
+      } else {
+          waitForControlFrame();
+          auto remaining = packet.remaining();
+          std::vector<uint8_t> data = packet.next(6);
+          sendFirstFrame(remaining, data);
+      }
+     } catch (const std::exception &e) {
+          Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
+      }
 }
 
 void Protocol::recvPacketAsync(Protocol::RecvPacketCallback &&cb) {

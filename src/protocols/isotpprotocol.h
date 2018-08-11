@@ -20,6 +20,7 @@
 #define LIBRETUNER_ISOTPPROTOCOL_H
 
 #include "caninterface.h"
+#include "timer.h"
 #include <gsl/gsl>
 
 // Std
@@ -156,10 +157,6 @@ std::string strError(Error error);
 
 class Protocol {
 public:
-  using Listener = std::function<void(const Frame &)>;
-  using SignalType = Signal<Listener>;
-  using ConnectionType = SignalType::ConnectionType;
-
   using RecvPacketCallback = std::function<void(Error error, Packet &&packet)>;
   using SendPacketCallback = std::function<void(Error error)>;
 
@@ -178,6 +175,8 @@ public:
 
   void recvPacketAsync(RecvPacketCallback &&cb);
 
+  void recv(RecvPacketCallback &&cb);
+
   // Sends a request and waits for a response
   void request(Packet &&req, RecvPacketCallback &&cb);
 
@@ -192,24 +191,37 @@ public:
 
   const Options &options() const { return options_; }
 
-  std::shared_ptr<ConnectionType> listen(Listener listener) {
-    return signal_->connect(std::move(listener));
-  }
-
 private:
-  std::shared_ptr<SignalType> signal_ = SignalType::create();
   std::unique_ptr<CanInterface> can_;
-  std::shared_ptr<CanInterface::SignalType::ConnectionType> canConnection_;
   Options options_;
+  TimerPtr timer_;
+  uint8_t consecIndex_;
+  SendPacketCallback sendCallback_;
+  RecvPacketCallback recvCallback_;
+  Packet packet_;
+  unsigned remaining_;
 
   /* Sends a frame to the CAN interface */
   void send(const Frame &frame);
 
-  void onCan(const CanMessage &message);
+  // Sending
+  void waitForControlFrame();
+  void onFlow(FlowControlFrame &frame);
+  uint8_t incrementConsec();
+  void notifySendResult(Error error);
+
+  // Receiving
+  void handleFirst(const FirstFrame &f);
+  void handleSingle(const SingleFrame &f);
+  void handleBegin(const Frame &f);
+  void handleConsec(const ConsecutiveFrame &f);
+
+  uint8_t incConsec();
+
+  bool recvFrame(Frame &frame);
 };
 
 class Response {
-
   const Packet &packet() const { return packet_; }
 
 private:
