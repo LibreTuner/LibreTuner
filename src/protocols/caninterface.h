@@ -61,7 +61,6 @@ public:
 };
 
 class CanInterface;
-// typedef std::unique_ptr<CanInterface> CanInterfacePtr;
 
 /* Abstract CAN interface */
 class CanInterface {
@@ -72,9 +71,6 @@ public:
     Read,   // Read error. err will be set
     Write,
   };
-
-  //using Listener = std::function<void(const CanMessage &message)>;
-  //using SignalType = Signal<Listener>;
 
   CanInterface();
   virtual ~CanInterface() = default;
@@ -87,11 +83,6 @@ public:
 
   // Returns false if no message was received and the timeout expired.
   virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) =0;
-
-  /* Connects a new listener */
-  /*std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) {
-    return signal_->connect(std::move(listener));
-  }*/
 
   /* Returns true if the socket is ready for reading/writing */
   virtual bool valid() = 0;

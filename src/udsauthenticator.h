@@ -32,7 +32,6 @@ public:
   /* Start authentication */
   void auth(const std::string &key, uds::Protocol &uds,
             uint8_t sessionType = 0x87);
-  // void start(std::shared_ptr<UdsProtocol> uds, const std::string &key);
 
   uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
 

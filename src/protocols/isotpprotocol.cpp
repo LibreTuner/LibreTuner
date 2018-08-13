@@ -490,25 +490,4 @@ void Protocol::sendFlowFrame(const FlowControlFrame &fc) {
   send(Frame::flow(fc));
 }
 
-
-/*
-std::string strError(Error error) {
-  switch (error) {
-  case Error::Success:
-    return "success";
-  case Error::Unknown:
-    return "unknown";
-  case Error::Consec:
-    return "invalid consecutive index for frame";
-  case Error::Timeout:
-    return "request timed out";
-  case Error::Unexpected:
-      return "unexpected packet";
-  case Error::Abort:
-      return "remote requested abort";
-  default:
-    return "unknown";
-  }
-}*/
-
 } // namespace isotp
