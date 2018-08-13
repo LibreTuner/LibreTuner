@@ -75,6 +75,11 @@
 
 namespace j2534 {
 
+class Error : public std::runtime_error {
+public:
+    Error(const std::string &message) : std::runtime_error(message) {}
+};
+
 struct Info {
     std::string name;
     // Supported protocols

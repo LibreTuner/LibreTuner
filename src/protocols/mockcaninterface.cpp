@@ -19,5 +19,10 @@
 #include "mockcaninterface.h"
 
 void MockCanInterface::send(const CanMessage &message) {
-  signal_->call(message);
+    //signal_->call(message);
+}
+
+bool MockCanInterface::recv(CanMessage &message, std::chrono::milliseconds timeout)
+{
+    return false;
 }

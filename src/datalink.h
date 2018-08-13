@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-class Vehicle;
+struct Vehicle;
 class VehicleLink;
 using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
@@ -63,34 +63,22 @@ inline DataLinkProtocol operator&(DataLinkProtocol lhs, DataLinkProtocol rhs) {
 /* Abstract DataLink interface (SocketCAN, J2534, ...) */
 class DataLink {
 public:
-  enum class Error {
-    Success,
-    NoConnection,
-    Protocol, // Protocol-level error
-    NoProtocols,
-    Timeout,
-    InvalidResponse,
-    Unknown,
-  };
 
-  virtual ~DataLink() = default;
-
-  static std::string strError(Error error);
+  virtual ~DataLink();
 
   /* Creates a datalink from the interface settings. May throw an exception */
   static DataLinkPtr create(const InterfaceSettingsPtr &iface);
 
-  using QueryVehicleCallback = std::function<void(Error error, Vehicle &&)>;
   // Attempts to query the vehicle
-  virtual void queryVehicle(QueryVehicleCallback &&cb) = 0;
+  virtual Vehicle queryVehicle() = 0;
 
   /* If CAN is supported, returns a CAN protocol. Else, returns
    * nullptr */
-  virtual CanInterfacePtr can(uint32_t baudrate) { return nullptr; }
+  virtual std::unique_ptr<CanInterface> can(uint32_t baudrate);
 
   /* Returns an ISO-TP protocol if supported. Else, returns
    * nullptr. By default, creates an ISO-TP interface from can() */
-  virtual std::shared_ptr<isotp::Protocol> isotp() { return nullptr; }
+  virtual std::unique_ptr<isotp::Protocol> isotp();
 
 protected:
   // Supported protocols

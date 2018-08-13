@@ -26,48 +26,37 @@
 #include "logger.h"
 #include "vehicle.h"
 
-void query_can(const std::shared_ptr<CanInterface> &can,
-               DataLink::QueryVehicleCallback &&cb) {
-  // Query the VIN
-  std::array<uint8_t, 2> request{0x09, 0x02};
-  Logger::debug("Sending UDS query");
-  std::shared_ptr<uds::Protocol> up = uds::Protocol::create(std::make_shared<isotp::Protocol>(can));
-  up->request(
-          request, 0x49,
-          [cb{std::move(cb)}](uds::Error error, const uds::Packet &packet) {
-            if (error != uds::Error::Success) {
-              if (error == uds::Error::Timeout) {
-                Logger::debug("Request timed out");
-                cb(DataLink::Error::Timeout, Vehicle());
-                return;
-              }
-              cb(DataLink::Error::Protocol, Vehicle());
-              return;
-            }
+Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
+    // Query the VIN
+    std::array<uint8_t, 2> request{0x09, 0x02};
+    Logger::debug("Sending UDS query");
+    std::unique_ptr<uds::Protocol> up = std::make_unique<uds::IsoTpInterface>(std::make_unique<isotp::Protocol>(std::move(can)));
 
-            if (packet.data.empty()) {
-              cb(DataLink::Error::InvalidResponse, Vehicle());
-              return;
-            }
+    uds::Packet packet;
+    up->request(request, 0x49, packet);
 
-            std::vector<uint8_t> data = packet.data;
+    if (packet.data.empty()) {
+        throw std::runtime_error("empty uds response while querying VIN");
+    }
 
-            data.erase(data.begin());
-            if (data.size() == 18) {
-              // Mazda's weird shit?
-              data.erase(data.begin());
-            }
+    std::vector<uint8_t> data = std::move(packet.data);
 
-            if (data.size() != 17) {
-              cb(DataLink::Error::InvalidResponse, Vehicle());
-              return;
-            }
+    data.erase(data.begin());
+    if (data.size() == 18) {
+        // Mazda's weird shit?
+        data.erase(data.begin());
+    }
 
-            std::string vin(reinterpret_cast<const char *>(data.data()),
-                            data.size());
-            cb(DataLink::Error::Success, Vehicle::fromVin(vin));
-          });
+    if (data.size() != 17) {
+        throw std::runtime_error("invalid VIN length");
+    }
+
+    std::string vin(reinterpret_cast<const char *>(data.data()),
+                    data.size());
+    return Vehicle::fromVin(vin);
 }
+
+
 
 #ifdef WITH_SOCKETCAN
 class SocketCanDataLink : public DataLink {
@@ -75,9 +64,9 @@ public:
   explicit SocketCanDataLink(
       const std::shared_ptr<SocketCanSettings> &settings);
 
-  void queryVehicle(QueryVehicleCallback &&cb) override;
+  Vehicle queryVehicle() override;
 
-  CanInterfacePtr can(uint32_t baudrate) override;
+  std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
 
 private:
   std::shared_ptr<SocketCanInterface> socketcan_;
@@ -91,8 +80,8 @@ SocketCanDataLink::SocketCanDataLink(
   socketcan_->start();
 }
 
-void SocketCanDataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
-  query_can(socketcan_, std::move(cb));
+Vehicle SocketCanDataLink::queryVehicle() {
+  return query_can(socketcan_, std::move(cb));
 }
 
 CanInterfacePtr SocketCanDataLink::can(uint32_t baudrate) {
@@ -100,26 +89,30 @@ CanInterfacePtr SocketCanDataLink::can(uint32_t baudrate) {
 }
 #endif
 
+
+
 #ifdef WITH_J2534
 class J2534DataLink : public DataLink {
 public:
   explicit J2534DataLink(const std::shared_ptr<J2534Settings> &settings);
   virtual ~J2534DataLink() override = default;
 
-  void queryVehicle(QueryVehicleCallback &&cb) override;
+  Vehicle queryVehicle() override;
 
-  CanInterfacePtr can(uint32_t baudrate) override;
+  std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
 
   bool checkDevice();
 
 private:
   j2534::J2534Ptr j2534_;
-  std::shared_ptr<j2534::Can> can_;
+  //std::unique_ptr<j2534::Can> can_;
   j2534::DevicePtr device_;
 };
 
+
+
 J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
-  assert(settings->interface());
+  Expects(settings->interface());
   j2534_ = settings->interface();
   if (!j2534_->initialized()) {
     j2534_->init();
@@ -129,29 +122,33 @@ J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
     defaultProtocol_ = DataLinkProtocol::Can;
   }
   if (!checkDevice()) {
-      throw std::runtime_error("Failed to create j2534 device. Is one connected?");
+      throw std::runtime_error("failed to create j2534 device. Is one connected?");
   }
 }
 
-void J2534DataLink::queryVehicle(DataLink::QueryVehicleCallback &&cb) {
+
+
+Vehicle J2534DataLink::queryVehicle() {
   // 500000 Hz is a good guess
   if (auto c = can(500000)) {
-    query_can(c, std::move(cb));
-  } else {
-    cb(Error::NoConnection, Vehicle());
+    return query_can(std::move(c));
   }
+  return Vehicle();
 }
 
-CanInterfacePtr J2534DataLink::can(uint32_t baudrate) {
-  if (!can_ && checkDevice()) {
-    can_ = j2534::Can::create(device_, baudrate);
-    can_->start();
+
+
+std::unique_ptr<CanInterface> J2534DataLink::can(uint32_t baudrate) {
+  if (!checkDevice()) {
+    return nullptr;
   }
-  return can_;
+  return std::make_unique<j2534::Can>(device_, baudrate);
 }
+
+
 
 bool J2534DataLink::checkDevice() {
-  assert(j2534_);
+  Expects(j2534_);
   if (device_) {
     return true;
   }
@@ -160,8 +157,13 @@ bool J2534DataLink::checkDevice() {
 }
 #endif
 
+DataLink::~DataLink()
+{
+
+}
+
 DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
-  assert(iface);
+  Expects(iface);
   switch (iface->type()) {
 #ifdef WITH_SOCKETCAN
   case InterfaceType::SocketCan:
@@ -174,27 +176,16 @@ DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
         std::static_pointer_cast<J2534Settings>(iface)));
 #endif
   default:
-    throw std::runtime_error("Unsupported protocol");
+    throw std::runtime_error("unsupported protocol");
   }
 }
 
-std::string DataLink::strError(DataLink::Error error) {
-  switch (error) {
-  case Error::Success:
-    return "success";
-  case Error::Protocol:
-    return "protocol-level error";
-  case Error::InvalidResponse:
-    return "invalid response";
-  case Error::Timeout:
-    return "timed out. Is the device connected?";
-  case Error::Unknown:
-    return "unknown";
-  case Error::NoConnection:
-    return "no connection";
-  case Error::NoProtocols:
-    return "no usable protocols";
-  default:
-    return "unknown";
-  }
+std::unique_ptr<CanInterface> DataLink::can(uint32_t baudrate)
+{
+    return nullptr;
+}
+
+std::unique_ptr<isotp::Protocol> DataLink::isotp()
+{
+    return nullptr;
 }

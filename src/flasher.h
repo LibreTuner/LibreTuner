@@ -23,7 +23,8 @@
 #include <string>
 
 #include "flashable.h"
-#include "protocols/isotpprotocol.h"
+#include "protocols/udsprotocol.h"
+#include "udsauthenticator.h"
 #include "asyncroutine.h"
 
 class Flasher;
@@ -35,6 +36,8 @@ typedef std::shared_ptr<CanInterface> CanInterfacePtr;
 class Flashable;
 typedef std::shared_ptr<Flashable> FlashablePtr;
 
+
+
 /**
  * An interface for flashing ROMs
  */
@@ -42,12 +45,30 @@ class Flasher : public AsyncRoutine {
 public:
   virtual ~Flasher() = default;
 
-  /* Creates a MazdaT1 flash interface */
-  static FlasherPtr createT1(const std::string &key,
-                             std::shared_ptr<isotp::Protocol> isotp);
-
   /* Flash that shit */
   virtual void flash(FlashablePtr flashable) = 0;
+};
+
+
+
+class MazdaT1Flasher : public Flasher {
+public:
+  MazdaT1Flasher(std::string key,
+                 std::unique_ptr<uds::Protocol> &&uds);
+
+  void flash(FlashablePtr flashable) override;
+
+private:
+  std::unique_ptr<uds::Protocol> uds_;
+  FlashablePtr flash_;
+  uds::Authenticator auth_;
+  std::string key_;
+
+  size_t left_{}, sent_{};
+
+  void sendLoad();
+  void do_erase();
+  void do_request_download();
 };
 
 #endif // FLASHER_H

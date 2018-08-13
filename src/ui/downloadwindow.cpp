@@ -38,16 +38,18 @@ DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Veh
 }
 
 void DownloadWindow::start() {
-  downloadInterface_->setCompleteCallback([this] { onCompletion(); });
-  downloadInterface_->setErrorCallback([this] (const std::string &error) { downloadError(QString::fromStdString(error)); });
   downloadInterface_->setProgressCallback([this] (float progress) { updateProgress(progress); });
 
   ui->buttonBack->setEnabled(false);
   ui->buttonContinue->setEnabled(false);
 
-  downloadInterface_->download();
-
   ui->stackedWidget->setCurrentIndex(1);
+  try {
+    downloadInterface_->download();
+    onCompletion();
+  } catch (const std::exception &e) {
+    downloadError(QString(e.what()));
+  }
 }
 
 void DownloadWindow::mainDownloadError(const QString &error) {
@@ -123,7 +125,5 @@ void DownloadWindow::on_buttonBack_clicked() {
     ui->buttonBack->setText(tr("Cancel"));
   }
 }
-
-Q_DECLARE_METATYPE(DataLink::Error)
 
 DownloadWindow::~DownloadWindow() { delete ui; }

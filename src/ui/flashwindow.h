@@ -42,7 +42,7 @@ using FlasherPtr = std::shared_ptr<Flasher>;
 class FlashWindow : public QDialog {
   Q_OBJECT
 public:
-  FlashWindow(std::shared_ptr<Flasher> flasher_, const FlashablePtr &flashable);
+  FlashWindow(std::unique_ptr<Flasher> &&flasher_, const FlashablePtr &flashable);
 
   virtual ~FlashWindow() = default;
 
@@ -59,7 +59,7 @@ private slots:
 private:
   Ui::FlashWindow *ui;
   FlashablePtr flashable_;
-  FlasherPtr flasher_;
+  std::unique_ptr<Flasher> flasher_;
 };
 
 #endif // FLASHWINDOW_H

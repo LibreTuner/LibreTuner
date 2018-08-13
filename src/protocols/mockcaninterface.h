@@ -40,6 +40,9 @@ public:
    * Fires the signal.
    */
   virtual void send(const CanMessage &message) override;
+
+
+  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
 };
 
 #endif // MOCKCANINTERFACE_H

@@ -202,13 +202,13 @@ void MainWindow::newLogClicked()
         return;
     }
 
-    DataLoggerPtr logger = link->logger();
+    std::unique_ptr<DataLogger> logger = link->logger();
     if (!logger) {
         QMessageBox(QMessageBox::Critical, "Logger error", "Failed to create a usable datalogger. The datalink may not support the needed protocol or there is no log mode set in the definition file.").exec();
         return;
     }
     DataLogPtr log = std::make_shared<DataLog>();
-    loggerWindow_ = std::make_unique<DataLoggerWindow>(log, logger, link->vehicle().definition);
+    loggerWindow_ = std::make_unique<DataLoggerWindow>(log, std::move(logger), link->vehicle().definition);
     loggerWindow_->show();
 }
 

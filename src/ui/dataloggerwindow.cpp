@@ -31,7 +31,7 @@
 #include "datalogger.h"
 #include "definitions/definition.h"
 
-DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, const DataLoggerPtr &logger, DefinitionPtr definition, QWidget *parent) : log_(log), logger_(logger), definition_(definition), QWidget(parent)
+DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent) : log_(log), logger_(std::move(logger)), definition_(definition), QWidget(parent)
 {
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
@@ -57,6 +57,8 @@ DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, const DataLoggerPtr &l
     logLayout->addWidget(buttonLog_);
     connect(buttonLog_, &QPushButton::clicked, this, &DataLoggerWindow::buttonClicked);
 }
+
+DataLoggerWindow::~DataLoggerWindow() = default;
 
 void DataLoggerWindow::showEvent(QShowEvent *event)
 {

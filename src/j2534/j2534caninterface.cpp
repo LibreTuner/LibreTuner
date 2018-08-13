@@ -24,11 +24,6 @@
 
 namespace j2534 {
 
-std::shared_ptr<Can> Can::create(const DevicePtr &device, uint32_t baudrate)
-{
-    return std::make_shared<Can>(device, baudrate);
-}
-
 Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(Protocol::CAN, CAN_ID_BOTH, baudrate))
 {
     Logger::debug("Opened J2534 CAN Interface with baudrate " + std::to_string(baudrate));
@@ -53,10 +48,6 @@ Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(
 
 Can::~Can()
 {
-    /*if (recvThread_.joinable()) {
-        closed_ = true;
-        recvThread_.join();
-    }*/
 }
 
 void Can::send(const CanMessage &message)

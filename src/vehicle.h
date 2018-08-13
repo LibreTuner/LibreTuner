@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 
+
 class Definition;
 using DefinitionPtr = std::shared_ptr<Definition>;
 
@@ -38,6 +39,10 @@ class Flasher;
 using FlasherPtr = std::shared_ptr<Flasher>;
 
 namespace isotp {
+class Protocol;
+}
+
+namespace uds {
 class Protocol;
 }
 
@@ -62,21 +67,25 @@ public:
 
     /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
        nullptr if a logger could not be created. */
-    DataLoggerPtr logger() const;
+    std::unique_ptr<DataLogger> logger() const;
 
     /* Returns a usable download interface for the link, if one exists. May return nullptr. */
-    DownloadInterfacePtr downloader() const;
+    std::unique_ptr<DownloadInterface> downloader() const;
 
     /* Returns a flash interface for flashing, if one exists. May return nullptr. */
-    FlasherPtr flasher() const;
+    std::unique_ptr<Flasher> flasher() const;
+
+    /* Returns a UDS interface. May return nullptr if the vehicle/datalink
+     * does not support it */
+    std::unique_ptr<uds::Protocol> uds() const;
 
     /* Returns an ISO-TP interface. May return nullptr if the vehicle/datalink
      * does not support it */
-    std::shared_ptr<isotp::Protocol> isotp() const;
+    std::unique_ptr<isotp::Protocol> isotp() const;
 
     /* Returns a CAN interface. May return nullptr if the vehicle/data
      * does not support CAN */
-    CanInterfacePtr can() const;
+    std::unique_ptr<CanInterface> can() const;
 
     const Vehicle &vehicle() const { return vehicle_; }
 private:

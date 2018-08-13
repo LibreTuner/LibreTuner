@@ -70,11 +70,9 @@ public:
   /* Returns a vehicle link queried with the default datalink */
   std::unique_ptr<VehicleLink> getVehicleLink();
 
-  using QueryVehicleCallback = std::function<void(DataLink::Error error, std::unique_ptr<VehicleLink> link)>;
-
-  /* Queries for an attached vehicle and returns a vehicle link through the callback.
-     the returned link may be nullptr if no datalink is attached. */
-  void queryVehicleLink(QueryVehicleCallback &&cb);
+  /* Queries for an attached vehicle and returns a vehicle link.
+     The returned link may be nullptr if no datalink is attached. */
+  std::unique_ptr<VehicleLink> queryVehicleLink();
 
 private:
   std::unique_ptr<MainWindow> mainWindow_;

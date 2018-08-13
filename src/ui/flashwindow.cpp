@@ -29,24 +29,27 @@
 #include <QString>
 #include <QStyledItemDelegate>
 
-FlashWindow::FlashWindow(std::shared_ptr<Flasher> flasher, const FlashablePtr& flashable)
+FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher, const FlashablePtr& flashable)
     : ui(new Ui::FlashWindow), flashable_(flashable), flasher_(std::move(flasher)) {
-  assert(flashable);
-  assert(flasher_);
-  assert(flashable->valid());
+  Expects(flashable);
+  Expects(flasher_);
+  Expects(flashable->valid());
 
   ui->setupUi(this);
   ui->comboMode->setItemDelegate(new QStyledItemDelegate());
 
-  flasher_->setCompleteCallback([this] { onCompletion(); });
-  flasher_->setErrorCallback([this](const std::string &error) { onError(error); });
   flasher_->setProgressCallback([this](float progress) { onProgress(progress); });
 }
 
 void FlashWindow::on_buttonCancel_clicked() { close(); }
 
 void FlashWindow::on_buttonFlash_clicked() {
-    flasher_->flash(flashable_);
+    try {
+        flasher_->flash(flashable_);
+        onCompletion();
+    } catch (const std::exception &e) {
+        onError(e.what());
+    }
 }
 
 void FlashWindow::mainCompletion() {

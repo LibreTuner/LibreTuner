@@ -59,7 +59,6 @@ private:
 };
 
 class DataLogger;
-using DataLoggerPtr = std::shared_ptr<DataLogger>;
 
 class DataLogger {
 public:
@@ -83,7 +82,7 @@ protected:
 
 class UdsDataLogger : public DataLogger {
 public:
-  explicit UdsDataLogger(std::shared_ptr<uds::Protocol> uds = std::shared_ptr<uds::Protocol>());
+  explicit UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds);
   UdsDataLogger(const UdsDataLogger&) = delete;
   UdsDataLogger(UdsDataLogger&&) = delete;
 
@@ -109,7 +108,7 @@ private:
 
   std::chrono::steady_clock::time_point freeze_time_;
 
-  std::shared_ptr<uds::Protocol> uds_;
+  std::unique_ptr<uds::Protocol> uds_;
   std::vector<Pid> pids_;
 
   std::mutex mutex_;

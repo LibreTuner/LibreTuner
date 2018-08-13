@@ -37,6 +37,7 @@ class Packet {
 public:
   Packet();
   Packet(Packet &&) = default;
+  isotp::Packet &operator=(Packet &&packet);
   explicit Packet(gsl::span<const uint8_t> data);
 
   /* Sets the packet data and resets the pointer
@@ -146,20 +147,10 @@ struct Frame {
   bool flow(FlowControlFrame &f) const;
 };
 
-enum class Error {
-  Success,
-  Timeout,
-  Consec, // Consecutive id mismatch
-  Unknown,
-};
 
-std::string strError(Error error);
 
 class Protocol {
 public:
-  using RecvPacketCallback = std::function<void(Error error, Packet &&packet)>;
-  using SendPacketCallback = std::function<void(Error error)>;
-
   explicit Protocol(std::unique_ptr<CanInterface> &&can = std::unique_ptr<CanInterface>(),
                     Options = Options());
   ~Protocol();
@@ -173,14 +164,12 @@ public:
   // Sends a flow control frame
   void sendFlowFrame(const FlowControlFrame &frame);
 
-  void recvPacketAsync(RecvPacketCallback &&cb);
-
-  void recv(RecvPacketCallback &&cb);
+  void recv(Packet &result);
 
   // Sends a request and waits for a response
-  void request(Packet &&req, RecvPacketCallback &&cb);
+  void request(Packet &&req, Packet &result);
 
-  void send(Packet &&packet, SendPacketCallback &&cb);
+  void send(Packet &&packet);
 
   void setCan(std::unique_ptr<CanInterface> &&can);
 
@@ -194,39 +183,23 @@ public:
 private:
   std::unique_ptr<CanInterface> can_;
   Options options_;
-  TimerPtr timer_;
   uint8_t consecIndex_;
-  SendPacketCallback sendCallback_;
-  RecvPacketCallback recvCallback_;
   Packet packet_;
-  unsigned remaining_;
 
   /* Sends a frame to the CAN interface */
   void send(const Frame &frame);
 
   // Sending
-  void waitForControlFrame();
-  void onFlow(FlowControlFrame &frame);
+  void sendConsecutiveFrames();
+  void recvFlowControlFrame(FlowControlFrame &frame);
   uint8_t incrementConsec();
-  void notifySendResult(Error error);
 
   // Receiving
-  void handleFirst(const FirstFrame &f);
-  void handleSingle(const SingleFrame &f);
-  void handleBegin(const Frame &f);
-  void handleConsec(const ConsecutiveFrame &f);
-
-  uint8_t incConsec();
+  void recvConsecutiveFrames(Packet &result, int remaining);
 
   bool recvFrame(Frame &frame);
 };
 
-class Response {
-  const Packet &packet() const { return packet_; }
-
-private:
-  Packet packet_;
-};
 
 namespace details {
 uint8_t calculate_st(std::chrono::microseconds time);

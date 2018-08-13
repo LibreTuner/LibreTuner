@@ -30,7 +30,7 @@ void DataLogger::addPid(uint32_t id, uint16_t code, const std::string &formula)
     addPid(Pid(id, code, formula));
 }
 
-UdsDataLogger::UdsDataLogger(std::shared_ptr<uds::Protocol> uds) : uds_(std::move(uds)) {
+UdsDataLogger::UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds) : uds_(std::move(uds)) {
 
 }
 
@@ -72,7 +72,7 @@ void UdsDataLogger::processNext() {
     data.emplace_back(pid->code() >> 8);
   }
   data.emplace_back(pid->code() & 0xFF);
-  uds_->request(data, 0x41, [this, pid](uds::Error error, const uds::Packet &packet) {
+  /*uds_->request(data, 0x41, [this, pid](uds::Error error, const uds::Packet &packet) {
     if (error != uds::Error::Success) {
       throwError("could not query data: " + uds::strError(error));
       return;
@@ -104,7 +104,7 @@ void UdsDataLogger::processNext() {
     }
 
     processNext();
-  });
+  });*/
 }
 
 void UdsDataLogger::setErrorCallback(UdsDataLogger::ErrorCall &&error) {

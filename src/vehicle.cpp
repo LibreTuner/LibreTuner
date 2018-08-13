@@ -36,7 +36,9 @@ Vehicle Vehicle::fromVin(const std::string &vin) {
   return Vehicle{vin, vin, nullptr};
 }
 
-DataLoggerPtr VehicleLink::logger() const
+
+
+std::unique_ptr<DataLogger> VehicleLink::logger() const
 {
     assert(datalink_);
     if (!vehicle_.definition) {
@@ -45,9 +47,8 @@ DataLoggerPtr VehicleLink::logger() const
 
     switch (vehicle_.definition->logMode()) {
     case LogMode::Uds: {
-        if (const auto &interface = isotp()) {
-            std::shared_ptr<uds::Protocol> uds = uds::Protocol::create(interface);
-            return std::static_pointer_cast<DataLogger>(std::make_shared<UdsDataLogger>(std::move(uds)));
+        if (auto interface = uds()) {
+            return std::make_unique<UdsDataLogger>(std::move(interface));
         }
         return nullptr;
     }
@@ -56,7 +57,9 @@ DataLoggerPtr VehicleLink::logger() const
     }
 }
 
-DownloadInterfacePtr VehicleLink::downloader() const
+
+
+std::unique_ptr<DownloadInterface> VehicleLink::downloader() const
 {
     assert(datalink_);
     if (!vehicle_.definition) {
@@ -65,15 +68,17 @@ DownloadInterfacePtr VehicleLink::downloader() const
 
     switch (vehicle_.definition->downloadMode()) {
     case DM_MAZDA23:
-        if (const auto &interface = isotp()) {
-            return DownloadInterface::createM23(interface, vehicle_.definition->key(), vehicle_.definition->size());
+        if (auto interface = uds()) {
+            return std::make_unique<Uds23DownloadInterface>(std::move(interface), vehicle_.definition->key(), vehicle_.definition->size());
         }
     default:
         return nullptr;
     }
 }
 
-FlasherPtr VehicleLink::flasher() const
+
+
+std::unique_ptr<Flasher> VehicleLink::flasher() const
 {
     assert(datalink_);
     if (!vehicle_.definition) {
@@ -81,8 +86,8 @@ FlasherPtr VehicleLink::flasher() const
     }
     switch (vehicle_.definition->flashMode()) {
     case FLASH_T1:
-        if (const auto &interface = isotp()) {
-            return Flasher::createT1(vehicle_.definition->key(), interface);
+        if (auto interface = uds()) {
+            return std::make_unique<MazdaT1Flasher>(vehicle_.definition->key(), std::move(interface));
         }
     default:
         return nullptr;
@@ -90,19 +95,38 @@ FlasherPtr VehicleLink::flasher() const
     return nullptr;
 }
 
-std::shared_ptr<isotp::Protocol> VehicleLink::isotp() const
+
+
+std::unique_ptr<uds::Protocol> VehicleLink::uds() const
 {
     assert(datalink_);
     if (!vehicle_.definition) {
         return nullptr;
     }
-    if (const auto &c = can()) {
-        return std::make_shared<isotp::Protocol>(c, isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 8, std::chrono::milliseconds{100}});
+
+    if (auto interface = isotp()) {
+        return std::make_unique<uds::IsoTpInterface>(std::move(interface));
     }
     return nullptr;
 }
 
-CanInterfacePtr VehicleLink::can() const
+
+
+std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const
+{
+    assert(datalink_);
+    if (!vehicle_.definition) {
+        return nullptr;
+    }
+    if (auto c = can()) {
+        return std::make_unique<isotp::Protocol>(std::move(c), isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 8, std::chrono::milliseconds{100}});
+    }
+    return nullptr;
+}
+
+
+
+std::unique_ptr<CanInterface> VehicleLink::can() const
 {
     assert(datalink_);
     if (!vehicle_.definition) {

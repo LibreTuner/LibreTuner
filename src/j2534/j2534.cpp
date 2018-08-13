@@ -39,7 +39,7 @@ DevicePtr J2534::open(char *port) {
       return nullptr;
     }
     Logger::warning("PassThruOpen failed");
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
   Logger::debug("Opened j2534 device " + std::to_string(deviceId));
   return std::make_shared<Device>(shared_from_this(), deviceId);
@@ -50,7 +50,7 @@ void J2534::close(uint32_t device) {
 
   long res;
   if ((res = PassThruClose(device)) != 0) {
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
 }
 
@@ -64,7 +64,7 @@ uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
   if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags,
                              baudrate, &channel)) != 0) {
     Logger::warning("PassThruConnect failed");
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
   Logger::debug("Connected j2534 channel " + std::to_string(channel));
 
@@ -76,7 +76,7 @@ void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
   int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
   if (res != 0) {
     Logger::warning("PassThruReadMsgs failed");
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
 }
 
@@ -85,7 +85,7 @@ void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
   int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
   if (res != 0) {
     Logger::warning("PassThruWriteMsgs failed");
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
 }
 
@@ -94,7 +94,7 @@ void J2534::startMsgFilter(uint32_t channel, uint32_t type, const PASSTHRU_MSG *
     int32_t res = PassThruStartMsgFilter(channel, type, pMaskMsg, pPatternMsg, pFlowControlMsg, &pMsgID);
     if (res != 0) {
         Logger::warning("PassThruStartMsgFilter failed");
-        throw std::runtime_error(lastError());
+        throw Error(lastError());
     }
 }
 
@@ -103,7 +103,7 @@ void J2534::disconnect(uint32_t channel) {
 
   long res;
   if ((res = PassThruDisconnect(channel)) != 0) {
-    throw std::runtime_error(lastError());
+    throw Error(lastError());
   }
 }
 
@@ -127,7 +127,7 @@ void J2534::load() {
   if ((hDll_ = LoadLibrary(info_.functionLibrary.c_str())) == nullptr) {
     std::stringstream ss;
     ss << std::hex << GetLastError();
-    throw std::runtime_error("Failed to load library " + info_.functionLibrary +
+    throw Error("Failed to load library " + info_.functionLibrary +
                              ": 0x" + ss.str());
   }
 
@@ -168,7 +168,7 @@ void *J2534::getProc(const char *proc) {
   void *func = reinterpret_cast<void *>(
       GetProcAddress(reinterpret_cast<HMODULE>(hDll_), proc));
   if (!func) {
-    throw std::runtime_error("Failed to get procedure from dll: " +
+    throw Error("Failed to get procedure from dll: " +
                              std::string(proc));
   }
   return func;

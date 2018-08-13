@@ -50,20 +50,6 @@
 
 namespace uds {
 
-enum class Error {
-  Success,
-  Consec, // ISO-TP consecutive frame error
-  IsoTp,
-  Timeout,
-  BlankResponse,
-  Negative,
-  UnexpectedResponse,
-  Malformed,
-  Unknown,
-};
-
-std::string strError(Error error);
-
 struct Packet {
   uint8_t id;
   std::vector<uint8_t> data;
@@ -71,37 +57,33 @@ struct Packet {
 
 class Protocol {
 public:
-  using Callback = std::function<void(Error, const Packet &)>;
-
-  /* Create an interface with an ISO-TP layer */
-  static std::unique_ptr<Protocol>
-  create(std::unique_ptr<isotp::Protocol> &&isotp);
-
   /* Sends a request. May throw an exception. */
-  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId,
-                       Callback &&cb) = 0;
+  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) = 0;
 
   /* All requests may throw an exception */
-  /* Sends a DiagnosticSessionControl request */
-  using RequestSessionCallback =
-      std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
-  void requestSession(uint8_t type, RequestSessionCallback &&cb);
+  /* Sends a DiagnosticSessionControl request. Returns parameter record. */
+  std::vector<uint8_t> requestSession(uint8_t type);
 
-  using RequestSecuritySeedCallback =
-      std::function<void(Error, uint8_t, gsl::span<const uint8_t>)>;
-  void requestSecuritySeed(RequestSecuritySeedCallback &&cb);
+  std::vector<uint8_t> requestSecuritySeed();
 
-  using RequestSecurityKeyCallback = std::function<void(Error, uint8_t)>;
-  void requestSecurityKey(gsl::span<uint8_t> key,
-                          RequestSecurityKeyCallback &&cb);
+  void requestSecurityKey(gsl::span<uint8_t> key);
 
   /* ReadMemoryByAddress */
-  using RequestMemoryAddressCallback =
-      std::function<void(Error, gsl::span<const uint8_t>)>;
-  void requestReadMemoryAddress(uint32_t address, uint16_t length,
-                                RequestMemoryAddressCallback &&cb);
+  std::vector<uint8_t> requestReadMemoryAddress(uint32_t address, uint16_t length);
 
   virtual ~Protocol() = default;
+};
+
+
+
+class IsoTpInterface : public Protocol {
+public:
+  explicit IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp);
+
+  void request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) override;
+
+private:
+  std::unique_ptr<isotp::Protocol> isotp_;
 };
 
 } // namespace uds

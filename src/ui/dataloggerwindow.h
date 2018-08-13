@@ -22,17 +22,18 @@
 #include <QWidget>
 #include <QTreeWidget>
 #include <QPushButton>
-#include "vehicle.h"
 
 #include <memory>
+
+#include "datalogger.h"
 
 class QListWidget;
 
 class VehicleLink;
 using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
-class DataLogger;
-using DataLoggerPtr = std::shared_ptr<DataLogger>;
+class Definition;
+using DefinitionPtr = std::shared_ptr<Definition>;
 
 class DataLog;
 using DataLogPtr = std::shared_ptr<DataLog>;
@@ -41,8 +42,8 @@ class DataLoggerWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DataLoggerWindow(const DataLogPtr &log, const DataLoggerPtr &logger, DefinitionPtr definition, QWidget *parent = nullptr);
-    virtual ~DataLoggerWindow() = default;
+    explicit DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent = nullptr);
+    virtual ~DataLoggerWindow();
 
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
@@ -55,7 +56,7 @@ public slots:
 
 private:
     DataLogPtr log_;
-    DataLoggerPtr logger_;
+    std::unique_ptr<DataLogger> logger_;
     DefinitionPtr definition_;
 
     QListWidget *pidList_;

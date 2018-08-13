@@ -86,7 +86,7 @@ public:
   virtual void send(const CanMessage &message) = 0;
 
   // Returns false if no message was received and the timeout expired.
-  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout);
+  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) =0;
 
   /* Connects a new listener */
   /*std::shared_ptr<SignalType::ConnectionType> connect(Listener listener) {

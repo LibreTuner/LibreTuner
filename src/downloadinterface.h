@@ -25,9 +25,8 @@
 #include <gsl/span>
 #include <memory>
 
-#include "rommanager.h"
-#include "datalink.h"
 #include "asyncroutine.h"
+#include "udsauthenticator.h"
 
 enum DownloadMode {
   DM_NONE = 0,
@@ -51,10 +50,37 @@ public:
 
   /* Returns the downloaded data */
   virtual gsl::span<const uint8_t> data() =0;
-
-  static std::unique_ptr<DownloadInterface> createM23(const std::shared_ptr<isotp::Protocol> &isotp, const std::string &key, uint32_t size);
 };
 using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
+
+
+class Uds23DownloadInterface : public DownloadInterface {
+public:
+  Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds,
+                         std::string key, uint32_t size);
+
+  void download() override;
+  virtual gsl::span<const uint8_t> data();
+
+private:
+  uds::Authenticator auth_;
+
+  std::unique_ptr<uds::Protocol> uds_;
+
+  std::string key_;
+
+  /* Next memory location to be read from */
+  size_t downloadOffset_{};
+  /* Amount of data left to be transfered */
+  size_t downloadSize_{};
+  /* Total size to be transfered. Used for progress updates */
+  size_t totalSize_;
+
+  std::vector<uint8_t> downloadData_;
+
+  bool update_progress();
+
+};
 
 #endif // DOWNLOADINTERFACE_H

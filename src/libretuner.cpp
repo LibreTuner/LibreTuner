@@ -160,7 +160,7 @@ void LibreTuner::flashTune(const TunePtr &tune) {
   }
 
   if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
-    FlasherPtr flasher = link->flasher();
+    std::unique_ptr<Flasher> flasher = link->flasher();
     if (!flasher) {
         QMessageBox(QMessageBox::Critical, "Flash failure", "Failed to get a valid flash interface for the vehicle link. Is a flash mode set in the definition file and does the datalink support it?").exec();
         return;
@@ -224,55 +224,33 @@ DataLinkPtr LibreTuner::getDataLink() {
 
 std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
 {
-    DataLinkPtr dl = getDataLink();
-    if (!dl) {
-        QMessageBox(QMessageBox::Warning, "No datalink", "No datalink devices are connected so a vehicle can not be queried").exec();
-        return nullptr;
-    }
-
     QMessageBox msg(QMessageBox::Information, "Querying vehicle", "Searching for a connected vehicle...");
     msg.show();
 
-    Logger::debug("Starting vehicle query");
-
-    std::promise<DataLink::Error> promise;
-    std::unique_ptr<VehicleLink> link;
-    dl->queryVehicle([&promise, &link, &dl](DataLink::Error error, Vehicle &&v) {
-        Logger::debug("Got query response");
-        if (!v.valid() || error != DataLink::Error::Success) {
-            Logger::debug("Setting query error");
-            promise.set_value(error);
-            Logger::debug("Set query error");
-            return;
-        }
-        link = std::make_unique<VehicleLink>(std::move(v), dl);
-        Logger::debug("Setting query response");
-        promise.set_value(error);
-    });
-    Logger::debug("Waiting for query completion");
-    DataLink::Error error = promise.get_future().get();
-    Logger::debug("Query completed");
+    std::unique_ptr<VehicleLink> link = queryVehicleLink();
     msg.hide();
-    if (error != DataLink::Error::Success) {
+
+    if (!link) {
         QMessageBox(QMessageBox::Critical, "Query error", "A vehicle could not be queried. Is the device connected and ECU active?").exec();
         return nullptr;
     }
+
     return link;
 }
 
-void LibreTuner::queryVehicleLink(LibreTuner::QueryVehicleCallback &&cb)
+std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
 {
     DataLinkPtr dl = getDataLink();
     if (!dl) {
-        cb(DataLink::Error::NoConnection, nullptr);
+        return nullptr;
     }
 
-    dl->queryVehicle([dl, cb{std::move(cb)}](DataLink::Error error, Vehicle &&v) {
-        if (!v.valid() || error != DataLink::Error::Success) {
-            cb(error, nullptr);
-        }
-        cb(error, std::make_unique<VehicleLink>(std::move(v), dl));
-    });
+    Logger::debug("Starting vehicle query");
+    Vehicle v = dl->queryVehicle();
+    if (!v.valid()) {
+        return nullptr;
+    }
+    return std::make_unique<VehicleLink>(std::move(v), dl);
 }
 
 LibreTuner::~LibreTuner() = default;

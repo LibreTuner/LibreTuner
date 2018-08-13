@@ -33,8 +33,6 @@ class Can : public CanInterface
 {
 public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
-    static std::shared_ptr<Can> create(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
-
     Can(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
 
     virtual ~Can() override;
@@ -49,8 +47,6 @@ public:
 
 private:
     j2534::Channel channel_;
-    //std::thread recvThread_;
-    //std::atomic<bool> closed_;
 };
 
 }

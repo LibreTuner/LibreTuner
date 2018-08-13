@@ -64,6 +64,8 @@ FrameType frame_type(const CanMessage &message) {
 
 } // namespace details
 
+
+
 Frame Frame::single(gsl::span<uint8_t> data) {
   Expects(data.size() <= 7);
   Frame f;
@@ -72,6 +74,8 @@ Frame Frame::single(gsl::span<uint8_t> data) {
   std::copy(data.begin(), data.end(), f.data.begin() + 1);
   return f;
 }
+
+
 
 Frame Frame::first(uint16_t size, gsl::span<uint8_t, 6> data) {
   Frame f;
@@ -82,6 +86,8 @@ Frame Frame::first(uint16_t size, gsl::span<uint8_t, 6> data) {
   std::copy(data.begin(), data.end(), f.data.begin() + 2);
   return f;
 }
+
+
 
 Frame Frame::consecutive(uint8_t index, gsl::span<uint8_t> data) {
   Expects(data.size() <= 7);
@@ -95,6 +101,8 @@ Frame Frame::consecutive(uint8_t index, gsl::span<uint8_t> data) {
   return f;
 }
 
+
+
 Frame Frame::flow(const FlowControlFrame &frame) {
   Frame f;
   f.data[0] = 0x30 | static_cast<uint8_t>(frame.flag);
@@ -104,101 +112,7 @@ Frame Frame::flow(const FlowControlFrame &frame) {
   return f;
 }
 
-uint8_t Protocol::incConsec() {
-  if (++consecIndex_ == 16) {
-    consecIndex_ = 0;
-  }
-  return consecIndex_;
-}
 
-void Protocol::error(Error err) {
-  timer_->disable();
-  callback_(err, std::move(packet_));
-}
-
-void Protocol::received() { error(Error::Success); }
-
-bool Protocol::finishRead(uint8_t amount) {
-  if (amount > remaining_) {
-    error(Error::Unknown);
-    return false;
-  }
-  remaining_ -= amount;
-  if (remaining_ == 0) {
-    received();
-    return false;
-  }
-  timer_->enable();
-  return true;
-}
-
-void Protocol::handleFirst(const FirstFrame &f) {
-  remaining_ = f.size;
-  size_t ff_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(gsl::make_span(f.data).first(ff_length));
-  state_ = State::Consecutive;
-  if (finishRead(ff_length)) {
-    protocol_.sendFlowFrame(FlowControlFrame());
-  }
-}
-
-void Protocol::handleSingle(const SingleFrame &f) {
-  packet_.append(gsl::make_span(f.data).first(f.size));
-  received();
-}
-
-void Protocol::handleBegin(const Frame &f) {
-  FirstFrame ff{};
-  SingleFrame sf{};
-  if (f.first(ff)) {
-    handleFirst(ff);
-  } else if (f.single(sf)) {
-    handleSingle(sf);
-  }
-}
-
-void Protocol::handleConsec(const ConsecutiveFrame &f) {
-  if (f.index != incConsec()) {
-    error(Error::Consec);
-    return;
-  }
-  size_t cf_length = std::min<size_t>(f.data_length, remaining_);
-  packet_.append(gsl::make_span(f.data).first(cf_length));
-  finishRead(cf_length);
-}
-
-void Protocol::recv(Protocol::RecvPacketCallback cb) {
-  std::shared_ptr<Receiver> receiver =
-      std::make_shared<make_shared_enabler<Receiver>>(protocol, std::move(cb));
-}
-
-void Protocol::start() {
-  timer_->enable();
-  connection_ = protocol_.listen([&](const Frame &f) {
-    timer_->disable();
-    switch (state_) {
-    case State::Begin:
-      if (f.type() == FrameType::Single || f.type() == FrameType::First)
-        handleBegin(f);
-      break;
-    case State::Consecutive:
-      if (f.type() == FrameType::Consecutive) {
-        ConsecutiveFrame cf{};
-        if (!f.consecutive(cf)) {
-          break;
-        }
-        handleConsec(cf);
-      }
-      break;
-    }
-  });
-}
-
-
-void Protocol::notifySendResult(Error error) {
-    Logger::debug("Calling callback");
-    callback_(error);
-}
 
 bool Protocol::recvFrame(Frame &frame)
 {
@@ -216,87 +130,77 @@ bool Protocol::recvFrame(Frame &frame)
     }
 }
 
-void Protocol::waitForControlFrame() {
-    timer_->setCallback([this] {
-        notifySendResult(Error::Timeout);
-    });
-    timer_->enable();
 
+
+void Protocol::recvFlowControlFrame(FlowControlFrame &fc) {
     Frame frame;
-
     if (!recvFrame(frame)) {
-      // TIMED OUT
-      return;
+        throw std::runtime_error("timed out");
     }
 
-    FlowControlFrame fc;
     if (!frame.flow(fc)) {
-      return;
+        // Unexpected
+        throw std::runtime_error("unexpected frame is not a flow control frame");
     }
-    timer_->disable();
-    onFlow(fc);
 }
 
-uint8_t Sender::incrementConsec() {
+
+
+uint8_t Protocol::incrementConsec() {
   if (++consecIndex_ == 16) {
     consecIndex_ = 0;
   }
   return consecIndex_;
 }
 
-void Protocol::onFlow(FlowControlFrame &frame) {
-  if (consecThread_.joinable()) {
-    consecThread_.join();
-  }
-  // Send consecutive frames
-  if (frame.flag == FCFlag::Overflow) {
-    callback_(Error::Unknown);
-    return;
-  }
-  if (frame.flag == FCFlag::Wait) {
-    waitForControlFrame();
-    return;
-  }
 
-  consecIndex_ = 0;
 
-  if (frame.separationTime.count() == 0) {
-    frame.separationTime = std::chrono::microseconds(100);
-  }
-
-  consecThread_ = std::thread([this, frame] {
-    try {
-    uint8_t bs = frame.blockSize;
+void Protocol::sendConsecutiveFrames()
+{
     while (!packet_.eof()) {
-      if (frame.separationTime.count() != 0)
-        std::this_thread::sleep_for(frame.separationTime);
-      std::vector<uint8_t> data = packet_.next(7);
-      protocol_.sendConsecutiveFrame(incrementConsec(), data);
+        // Receive flow control
+        FlowControlFrame fc;
+        recvFlowControlFrame(fc);
 
-      if (bs > 0) {
-        if (bs == 1) {
-          if (!packet_.eof()) {
-            waitForControlFrame();
-            return;
-          }
-          break;
+        if (fc.flag == FCFlag::Overflow) {
+            // Abort
+            throw std::runtime_error("flow control frame requested abort");
         }
-        bs--;
-      }
+
+        if (fc.flag == FCFlag::Wait) {
+            // Wait for another control frame
+            continue;
+        }
+
+        consecIndex_ = 0;
+        if (fc.separationTime.count() == 0) {
+            // Avoid sending frames too quickly
+            fc.separationTime = std::chrono::microseconds(100);
+        }
+
+        while (!packet_.eof()) {
+            std::this_thread::sleep_for(fc.separationTime);
+            sendConsecutiveFrame(incrementConsec(), packet_.next(7));
+
+            if (fc.blockSize > 0) {
+                if (fc.blockSize == 1) {
+                    break;
+                }
+                fc.blockSize--;
+            }
+        }
     }
-    notifySendResult(Error::Success);
-      } catch (const std::exception &e) {
-          Logger::critical("Error in isotp consecutive thread: " + std::string(e.what()));
-          notifySendResult(Error::Unknown);
-      }
-  });
 }
+
+
 
 Frame::Frame(const CanMessage &message) {
   std::copy(message.message(), message.message() + message.length(),
             data.begin());
   length = message.length();
 }
+
+
 
 FrameType Frame::type() const {
   if (length == 0) {
@@ -309,6 +213,8 @@ FrameType Frame::type() const {
   }
   return static_cast<FrameType>(beg);
 }
+
+
 
 bool Frame::single(SingleFrame &f) const {
   if (type() != FrameType::Single) {
@@ -326,6 +232,8 @@ bool Frame::single(SingleFrame &f) const {
   return true;
 }
 
+
+
 bool Frame::first(FirstFrame &f) const {
   if (type() != FrameType::First) {
     return false;
@@ -342,6 +250,8 @@ bool Frame::first(FirstFrame &f) const {
   return true;
 }
 
+
+
 bool Frame::consecutive(ConsecutiveFrame &f) const {
   if (type() != FrameType::Consecutive) {
     return false;
@@ -352,6 +262,8 @@ bool Frame::consecutive(ConsecutiveFrame &f) const {
   std::copy(data.begin() + 1, data.begin() + length, f.data.begin());
   return true;
 }
+
+
 
 bool Frame::flow(FlowControlFrame &f) const {
   if (type() != FrameType::Flow) {
@@ -374,20 +286,39 @@ bool Frame::flow(FlowControlFrame &f) const {
   return true;
 }
 
+
+
 Packet::Packet() { pointer_ = std::begin(data_); }
 
+
+
+Packet &Packet::operator=(Packet &&packet)
+{
+    pointer_ = std::move(packet.pointer_);
+    data_ = std::move(packet.data_);
+    return *this;
+}
+
+
+
 Packet::Packet(gsl::span<const uint8_t> data) { setData(data); }
+
+
 
 void Packet::moveAll(std::vector<uint8_t> &data) {
   data = std::move(data_);
   pointer_ = std::begin(data_);
 }
 
+
+
 void Packet::append(gsl::span<const uint8_t> data) {
   auto pOffset = std::distance(std::begin(data_), pointer_);
   data_.insert(data_.end(), data.begin(), data.end());
   pointer_ = std::begin(data_) + pOffset;
 }
+
+
 
 std::vector<uint8_t> Packet::next(size_t max) {
   size_t amount = std::min<size_t>(std::end(data_) - pointer_, max);
@@ -396,85 +327,171 @@ std::vector<uint8_t> Packet::next(size_t max) {
   return std::vector<uint8_t>(begin, pointer_);
 }
 
+
+
 uint8_t Packet::next() { return *(pointer_++); }
+
+
 
 void Packet::setData(gsl::span<const uint8_t> data) {
   data_.assign(data.begin(), data.end());
   pointer_ = std::begin(data_);
 }
 
+
+
 Protocol::Protocol(std::unique_ptr<CanInterface> &&can, Options options)
     : options_(options) {
     setCan(std::move(can));
 }
+
+
 
 Protocol::~Protocol()
 {
     Logger::debug("Destructed protocol");
 }
 
+
+
 void Protocol::setCan(std::unique_ptr<CanInterface> &&can) {
   can_ = std::move(can);
 }
 
-void Protocol::request(Packet &&req, Protocol::RecvPacketCallback &&cb) {
-    try {
-  send(std::move(req), [this, cb{std::move(cb)}](Error error) mutable {
-        if (error != Error::Success) {
-          cb(error, Packet());
-          return;
+
+
+void Protocol::request(Packet &&req, Packet &result) {
+    send(std::move(req));
+    // Receive
+    return recv(result);
+}
+
+
+
+void Protocol::recv(Packet &result) {
+    // Wait for a single or first frame
+    auto tStart = std::chrono::steady_clock::now();
+    Frame frame;
+    while (recvFrame(frame)) {
+        if (frame.type() == FrameType::Single) {
+            SingleFrame sf;
+            if (!frame.single(sf)) {
+                // Malformed
+                throw std::runtime_error("malformed single frame");
+            }
+            result.setData(gsl::make_span(sf.data).first(sf.size));
+            // Received
+            return;
         }
-        recvPacketAsync(std::move(cb));
-      });
+        if (frame.type() == FrameType::First) {
+            FirstFrame ff;
+            if (!frame.first(ff)) {
+                throw std::runtime_error("malformed first frame");
+            }
+            result.append(gsl::make_span(ff.data).first(ff.data_length));
+            FlowControlFrame fc;
+            sendFlowFrame(fc);
+            // Start receiving consec packets
+            recvConsecutiveFrames(result, ff.size - ff.data_length);
+        }
+        if (std::chrono::steady_clock::now() - tStart >= options_.timeout) {
+            throw std::runtime_error("recv timed out");
+        }
+    }
+
+    // recvFrame timed out
+    throw std::runtime_error("recv timed out");
+}
+
+
+
+void Protocol::recvConsecutiveFrames(Packet &result, int remaining)
+{
+    auto tStart = std::chrono::steady_clock::now();
+    Frame frame;
+    consecIndex_ = 0;
+    while (recvFrame(frame)) {
+        if (frame.type() == FrameType::Consecutive) {
+            ConsecutiveFrame cf;
+            if (!frame.consecutive(cf)) {
+                throw std::runtime_error("malformed consecutive frame");
+            }
+
+            if (cf.index != incrementConsec()) {
+                throw std::runtime_error("mismatched consecutive frame index");
+            }
+
+            result.append(gsl::make_span(cf.data).first(cf.data_length));
+            remaining -= cf.data_length;
+            if (remaining <= 0) {
+                // Finished
+                return;
+            }
+        }
+
+        if (std::chrono::steady_clock::now() - tStart >= options_.timeout) {
+            throw std::runtime_error("recvConsecutiveFrames timed out");
+        }
+    }
+
+    throw std::runtime_error("recvConsecutiveFrames timed out");
+}
+
+
+
+void Protocol::send(Packet &&packet) {
+    try {
+        if (packet.size() <= 7) {
+            std::vector<uint8_t> data = packet.next(7);
+            sendSingleFrame(data);
+            Logger::info("Sent single frame");
+        } else {
+            auto remaining = packet.remaining();
+            std::vector<uint8_t> data = packet.next(6);
+            sendFirstFrame(remaining, data);
+
+            packet_ = std::move(packet);
+            // Start sending consecutive frames
+            sendConsecutiveFrames();
+        }
     } catch (const std::exception &e) {
-        Logger::critical("Error while sending ISO-TP request: " + std::string(e.what()));
-        //cb(Error::Unknown, Packet());
+        Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
     }
 }
+
+
 
 void Protocol::send(const Frame &frame) {
   Expects(can_);
   can_->send(options_.sourceId, frame.data);
 }
 
+
+
 void Protocol::sendSingleFrame(gsl::span<uint8_t> data) {
   send(Frame::single(data));
 }
+
+
 
 void Protocol::sendFirstFrame(uint16_t size, gsl::span<uint8_t, 6> data) {
   send(Frame::first(size, data));
 }
 
+
+
 void Protocol::sendConsecutiveFrame(uint8_t index, gsl::span<uint8_t> data) {
   send(Frame::consecutive(index, data));
 }
+
+
 
 void Protocol::sendFlowFrame(const FlowControlFrame &fc) {
   send(Frame::flow(fc));
 }
 
-void Protocol::send(Packet &&packet, SendPacketCallback &&cb) {
-    try {
-      if (packet.size() <= 7) {
-          std::vector<uint8_t> data = packet.next(7);
-          sendSingleFrame(data);
-          Logger::info("Sent single frame");
-          notifySendResult(Error::Success);
-      } else {
-          waitForControlFrame();
-          auto remaining = packet.remaining();
-          std::vector<uint8_t> data = packet.next(6);
-          sendFirstFrame(remaining, data);
-      }
-     } catch (const std::exception &e) {
-          Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
-      }
-}
 
-void Protocol::recvPacketAsync(Protocol::RecvPacketCallback &&cb) {
-  Receiver::recv(*this, std::move(cb));
-}
-
+/*
 std::string strError(Error error) {
   switch (error) {
   case Error::Success:
@@ -485,9 +502,13 @@ std::string strError(Error error) {
     return "invalid consecutive index for frame";
   case Error::Timeout:
     return "request timed out";
+  case Error::Unexpected:
+      return "unexpected packet";
+  case Error::Abort:
+      return "remote requested abort";
   default:
     return "unknown";
   }
-}
+}*/
 
 } // namespace isotp

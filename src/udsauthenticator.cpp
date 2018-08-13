@@ -23,52 +23,36 @@
 #include <sstream>
 
 namespace uds {
-Authenticator::Authenticator(Callback &&callback)
-    : callback_(std::move(callback)) {}
-
-bool Authenticator::checkError(Error error) {
-  if (error != Error::Success) {
-    onFail(strError(error));
-    return false;
-  }
-  return true;
-}
 
 void Authenticator::auth(const std::string &key,
-                         std::shared_ptr<uds::Protocol> uds,
+                         uds::Protocol &uds,
                          uint8_t sessionType) {
   key_ = key;
-  uds_ = std::move(uds);
+  uds_ = &uds;
 
   do_session(sessionType);
 }
 
+
+
 void Authenticator::do_session(uint8_t sessionType) {
     Logger::debug("[AUTH] sending session request");
-  uds_->requestSession(
-      sessionType, [this](Error error, uint8_t type, gsl::span<const uint8_t>) {
-        if (!checkError(error)) {
-          return;
-        }
-
-        do_request_seed();
-      });
+  uds_->requestSession(sessionType);
+    do_request_seed();
 }
+
+
 
 void Authenticator::do_request_seed() {
     Logger::debug("[AUTH] Sending seed request");
-  uds_->requestSecuritySeed(
-      [this](Error error, uint8_t type, gsl::span<const uint8_t> seed) {
-        if (!checkError(error)) {
-          return;
-        }
+    std::vector<uint8_t> seed = uds_->requestSecuritySeed();
 
-        // Generate key from seed
-        uint32_t key = generateKey(0xC541A9, seed);
-
-        do_send_key(key);
-      });
+    // Generate key from seed
+    uint32_t key = generateKey(0xC541A9, seed);
+    do_send_key(key);
 }
+
+
 
 void Authenticator::do_send_key(uint32_t key) {
     Logger::debug("[AUTH] Sending key request");
@@ -77,18 +61,10 @@ void Authenticator::do_send_key(uint32_t key) {
   kData[1] = (key & 0xFF00) >> 8;
   kData[2] = (key & 0xFF0000) >> 16;
 
-  uds_->requestSecurityKey(kData, [this](Error error, uint8_t type) {
-    if (!checkError(error)) {
-      return;
-    }
-
-    callback_(true, "");
-  });
+  uds_->requestSecurityKey(kData);
 }
 
-void Authenticator::onFail(const std::string &error) {
-  callback_(false, error);
-}
+
 
 uint32_t Authenticator::generateKey(uint32_t parameter,
                                     gsl::span<const uint8_t> seed) {
