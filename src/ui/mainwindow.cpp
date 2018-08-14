@@ -186,6 +186,7 @@ void MainWindow::updateRoms() {
 void MainWindow::on_buttonDownloadRom_clicked() {
     if (downloadWindow_) {
         delete downloadWindow_;
+        downloadWindow_ = nullptr;
     }
 
     if (const auto &link = LibreTuner::get()->getVehicleLink()) {

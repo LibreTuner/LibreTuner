@@ -22,6 +22,7 @@
 #include <QWidget>
 
 #include <memory>
+#include <thread>
 
 #include "downloadinterface.h"
 #include "rommanager.h"
@@ -58,6 +59,8 @@ private:
   std::shared_ptr<DownloadInterface> downloadInterface_;
   std::string name_;
   DefinitionPtr definition_;
+
+  std::thread worker_;
 
   void start();
 };

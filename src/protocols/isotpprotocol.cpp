@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "isotpprotocol.h"
 #include "timer.h"
 #include "util.hpp"
@@ -116,6 +118,7 @@ Frame Frame::flow(const FlowControlFrame &frame) {
 
 bool Protocol::recvFrame(Frame &frame)
 {
+    auto tStart = std::chrono::steady_clock::now();
     while (true) {
         CanMessage msg;
         if (!can_->recv(msg, options_.timeout)) {
@@ -123,7 +126,11 @@ bool Protocol::recvFrame(Frame &frame)
         }
 
         if (msg.length() == 0 || msg.id() != options_.destId) {
-          continue;
+            if (std::chrono::steady_clock::now() - tStart >= options_.timeout) {
+                //throw std::runtime_error("recvFrame timed out");
+                return false;
+            }
+            continue;
         }
         frame = Frame(msg);
         return true;
@@ -180,7 +187,8 @@ void Protocol::sendConsecutiveFrames()
 
         while (!packet_.eof()) {
             std::this_thread::sleep_for(fc.separationTime);
-            sendConsecutiveFrame(incrementConsec(), packet_.next(7));
+            std::vector<uint8_t> data = packet_.next(7);
+            sendConsecutiveFrame(incrementConsec(), data);
 
             if (fc.blockSize > 0) {
                 if (fc.blockSize == 1) {
@@ -347,10 +355,7 @@ Protocol::Protocol(std::unique_ptr<CanInterface> &&can, Options options)
 
 
 
-Protocol::~Protocol()
-{
-    Logger::debug("Destructed protocol");
-}
+Protocol::~Protocol() = default;
 
 
 
@@ -393,6 +398,7 @@ void Protocol::recv(Packet &result) {
             sendFlowFrame(fc);
             // Start receiving consec packets
             recvConsecutiveFrames(result, ff.size - ff.data_length);
+            return;
         }
         if (std::chrono::steady_clock::now() - tStart >= options_.timeout) {
             throw std::runtime_error("recv timed out");
@@ -412,6 +418,7 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining)
     consecIndex_ = 0;
     while (recvFrame(frame)) {
         if (frame.type() == FrameType::Consecutive) {
+            tStart = std::chrono::steady_clock::now();
             ConsecutiveFrame cf;
             if (!frame.consecutive(cf)) {
                 throw std::runtime_error("malformed consecutive frame");
@@ -440,23 +447,19 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining)
 
 
 void Protocol::send(Packet &&packet) {
-    try {
-        if (packet.size() <= 7) {
-            std::vector<uint8_t> data = packet.next(7);
-            sendSingleFrame(data);
-            Logger::info("Sent single frame");
-        } else {
-            auto remaining = packet.remaining();
-            std::vector<uint8_t> data = packet.next(6);
-            sendFirstFrame(remaining, data);
+    if (packet.size() <= 7) {
+        std::vector<uint8_t> data = packet.next(7);
+        sendSingleFrame(data);
+    } else {
+        auto remaining = packet.remaining();
+        std::vector<uint8_t> data = packet.next(6);
+        sendFirstFrame(remaining, data);
 
-            packet_ = std::move(packet);
-            // Start sending consecutive frames
-            sendConsecutiveFrames();
-        }
-    } catch (const std::exception &e) {
-        Logger::critical("Failed to send ISO-TP message: " + std::string(e.what()));
+        packet_ = std::move(packet);
+        // Start sending consecutive frames
+        sendConsecutiveFrames();
     }
+
 }
 
 

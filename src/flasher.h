@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <string>
+#include <atomic>
 
 #include "flashable.h"
 #include "protocols/udsprotocol.h"
@@ -47,6 +48,9 @@ public:
 
   /* Flash that shit */
   virtual void flash(FlashablePtr flashable) = 0;
+
+  /* Cancels the active flash */
+  virtual void cancel() =0;
 };
 
 
@@ -57,12 +61,14 @@ public:
                  std::unique_ptr<uds::Protocol> &&uds);
 
   void flash(FlashablePtr flashable) override;
+  void cancel() override;
 
 private:
   std::unique_ptr<uds::Protocol> uds_;
   FlashablePtr flash_;
   uds::Authenticator auth_;
   std::string key_;
+  std::atomic<bool> canceled_;
 
   size_t left_{}, sent_{};
 

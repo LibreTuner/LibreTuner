@@ -22,6 +22,7 @@
 #include <QWidget>
 
 #include <memory>
+#include <thread>
 
 #include "flasher.h"
 #include "styledwindow.h"
@@ -44,7 +45,7 @@ class FlashWindow : public QDialog {
 public:
   FlashWindow(std::unique_ptr<Flasher> &&flasher_, const FlashablePtr &flashable);
 
-  virtual ~FlashWindow() = default;
+  virtual ~FlashWindow() override;
 
   void onCompletion();
   void onError(const std::string &error);
@@ -60,6 +61,7 @@ private:
   Ui::FlashWindow *ui;
   FlashablePtr flashable_;
   std::unique_ptr<Flasher> flasher_;
+  std::thread worker_;
 };
 
 #endif // FLASHWINDOW_H

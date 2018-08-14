@@ -227,15 +227,21 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
     QMessageBox msg(QMessageBox::Information, "Querying vehicle", "Searching for a connected vehicle...");
     msg.show();
 
-    std::unique_ptr<VehicleLink> link = queryVehicleLink();
-    msg.hide();
+    try {
+        std::unique_ptr<VehicleLink> link = queryVehicleLink();
+        msg.hide();
 
-    if (!link) {
-        QMessageBox(QMessageBox::Critical, "Query error", "A vehicle could not be queried. Is the device connected and ECU active?").exec();
-        return nullptr;
+        if (!link) {
+            QMessageBox(QMessageBox::Critical, "Query error", "A vehicle could not be queried. Is the device connected and ECU active?").exec();
+            return nullptr;
+        }
+
+        return link;
+    } catch (const std::exception &e) {
+        QMessageBox(QMessageBox::Critical, "Query error", QString("Error while querying vehicle: ") + QString(e.what())).exec();
     }
 
-    return link;
+    return nullptr;
 }
 
 std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()

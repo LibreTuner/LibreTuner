@@ -59,7 +59,7 @@ public:
 
   std::vector<uint8_t>::size_type size() const { return data_.size(); }
 
-  std::vector<uint8_t>::size_type remaining() const {
+  int remaining() const {
     return data_.end() - pointer_;
   }
 

@@ -23,6 +23,7 @@
 #include "definitions/definitionmanager.h"
 #include "protocols/socketcaninterface.h"
 #include "vehicle.h"
+#include "logger.h"
 
 #include <QMessageBox>
 #include <utility>
@@ -38,18 +39,24 @@ DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Veh
 }
 
 void DownloadWindow::start() {
-  downloadInterface_->setProgressCallback([this] (float progress) { updateProgress(progress); });
+    if (worker_.joinable()) {
+        // Nope
+        return;
+    }
+    downloadInterface_->setProgressCallback([this] (float progress) { updateProgress(progress); });
 
-  ui->buttonBack->setEnabled(false);
-  ui->buttonContinue->setEnabled(false);
+    ui->buttonBack->setEnabled(false);
+    ui->buttonContinue->setEnabled(false);
 
-  ui->stackedWidget->setCurrentIndex(1);
-  try {
-    downloadInterface_->download();
-    onCompletion();
-  } catch (const std::exception &e) {
-    downloadError(QString(e.what()));
-  }
+    ui->stackedWidget->setCurrentIndex(1);
+    worker_ = std::thread([this]() {
+        try {
+            downloadInterface_->download();
+            onCompletion();
+        } catch (const std::exception &e) {
+            downloadError(QString(e.what()));
+        }
+    });
 }
 
 void DownloadWindow::mainDownloadError(const QString &error) {
@@ -61,8 +68,6 @@ void DownloadWindow::mainDownloadError(const QString &error) {
   // msgBox.setStandardButtons(QMessageBox::Ok);
   msgBox.exec();
 
-  //downloadInterface_.reset();
-
   ui->buttonBack->setEnabled(true);
   ui->buttonContinue->setEnabled(true);
   ui->stackedWidget->setCurrentIndex(0);
@@ -71,7 +76,6 @@ void DownloadWindow::mainDownloadError(const QString &error) {
 void DownloadWindow::downloadError(const QString &error) {
   QMetaObject::invokeMethod(this, "mainDownloadError", Qt::QueuedConnection,
                             Q_ARG(QString, error));
-  //downloadInterface_.reset();
 }
 
 void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
@@ -100,7 +104,6 @@ void DownloadWindow::onCompletion() {
     QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
                               Q_ARG(bool, true), Q_ARG(QString, QString()));
   }
-  // downloadInterface_.reset();
 }
 
 void DownloadWindow::updateProgress(float progress) {
@@ -126,4 +129,12 @@ void DownloadWindow::on_buttonBack_clicked() {
   }
 }
 
-DownloadWindow::~DownloadWindow() { delete ui; }
+DownloadWindow::~DownloadWindow() {
+    if (worker_.joinable()) {
+        // Notify cancel
+        Logger::info("Canceling download");
+        downloadInterface_->cancel();
+        worker_.join();
+    }
+    delete ui;
+}

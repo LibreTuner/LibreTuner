@@ -24,6 +24,7 @@
 
 #include <gsl/span>
 #include <memory>
+#include <atomic>
 
 #include "asyncroutine.h"
 #include "udsauthenticator.h"
@@ -48,6 +49,9 @@ public:
    * Signals onError if an error occurs. */
   virtual void download() = 0;
 
+  /* Cancels the active download */
+  virtual void cancel() =0;
+
   /* Returns the downloaded data */
   virtual gsl::span<const uint8_t> data() =0;
 };
@@ -61,7 +65,8 @@ public:
                          std::string key, uint32_t size);
 
   void download() override;
-  virtual gsl::span<const uint8_t> data();
+  void cancel() override;
+  virtual gsl::span<const uint8_t> data() override;
 
 private:
   uds::Authenticator auth_;
@@ -79,8 +84,9 @@ private:
 
   std::vector<uint8_t> downloadData_;
 
-  bool update_progress();
+  std::atomic<bool> canceled_;
 
+  bool update_progress();
 };
 
 #endif // DOWNLOADINTERFACE_H

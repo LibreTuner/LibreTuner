@@ -22,6 +22,7 @@
 #include "definitions/definition.h"
 #include "flashable.h"
 #include "flasher.h"
+#include "logger.h"
 
 #include <cassert>
 
@@ -41,15 +42,30 @@ FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher, const FlashablePtr&
   flasher_->setProgressCallback([this](float progress) { onProgress(progress); });
 }
 
+FlashWindow::~FlashWindow()
+{
+    if (worker_.joinable()) {
+        Logger::info("Canceling flash");
+        flasher_->cancel();
+        worker_.join();
+    }
+}
+
 void FlashWindow::on_buttonCancel_clicked() { close(); }
 
 void FlashWindow::on_buttonFlash_clicked() {
-    try {
-        flasher_->flash(flashable_);
-        onCompletion();
-    } catch (const std::exception &e) {
-        onError(e.what());
+    if (worker_.joinable()) {
+        // Already flashing
+        return;
     }
+    worker_ = std::thread([this] {
+        try {
+            flasher_->flash(flashable_);
+            onCompletion();
+        } catch (const std::exception &e) {
+            onError(e.what());
+        }
+    });
 }
 
 void FlashWindow::mainCompletion() {

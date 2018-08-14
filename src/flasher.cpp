@@ -18,6 +18,7 @@
 
 #include "flasher.h"
 #include "flashable.h"
+#include "logger.h"
 #include "protocols/caninterface.h"
 #include "protocols/isotpprotocol.h"
 #include "udsauthenticator.h"
@@ -37,9 +38,17 @@ MazdaT1Flasher::MazdaT1Flasher(std::string key,
       uds_(std::move(uds)) {}
 
 void MazdaT1Flasher::flash(FlashablePtr flashable) {
+    canceled_ = false;
     flash_ = std::move(flashable);
     auth_.auth(key_, *uds_, 0x85);
+    if (canceled_)
+        return;
     do_erase();
+}
+
+void MazdaT1Flasher::cancel()
+{
+    canceled_ = true;
 }
 
 
@@ -48,6 +57,10 @@ void MazdaT1Flasher::do_erase() {
     std::array<uint8_t, 4> eraseRequest = {0xB1, 0x00, 0xB2, 0x00};
     uds::Packet _response;
     uds_->request(eraseRequest, 0xF1, _response);
+    if (canceled_) {
+        Logger::warning("Canceled flash after erasing");
+        return;
+    }
     do_request_download();
 }
 
@@ -63,6 +76,11 @@ void MazdaT1Flasher::do_request_download() {
     uds::Packet _response;
     // Send download request
     uds_->request(msg, UDS_RES_REQUESTDOWNLOAD, _response);
+
+    if (canceled_) {
+        Logger::warning("Canceled flash after erasure");
+        return;
+    }
 
     // Start uploading
     sent_ = 0;
@@ -89,5 +107,9 @@ void MazdaT1Flasher::sendLoad() {
 
         notifyProgress(static_cast<double>(sent_) /
                          flash_->size());
+        if (canceled_) {
+            Logger::warning("Canceled flash during upload");
+            return;
+        }
     }
 }

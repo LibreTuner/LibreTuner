@@ -23,6 +23,7 @@
 #include <array>
 #include <cassert>
 #include <utility>
+#include <sstream>
 
 
 
@@ -30,7 +31,6 @@ namespace uds {
 
 void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) {
     isotp_->send(isotp::Packet(data));
-
     // Receive until we get a non-response-pending packet
     while (true) {
         // Receive response
@@ -50,6 +50,9 @@ void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Packet
                     // Response pending
                     continue;
                 }
+                std::stringstream ss;
+                ss << "negative UDS response: 0x" << std::hex << (int)code << " (" << std::dec << (int)code << ")";
+                throw std::runtime_error(ss.str());
             }
             throw std::runtime_error("negative UDS response");
         }
