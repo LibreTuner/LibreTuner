@@ -56,7 +56,7 @@ void FlashWindow::on_buttonCancel_clicked() { close(); }
 
 
 void FlashWindow::on_buttonFlash_clicked() {
-    if (worker_.joinable()) {
+    if (worker_.joinable() || !flasher_) {
         // Already flashing
         return;
     }
@@ -93,6 +93,7 @@ void FlashWindow::stop()
         flasher_->cancel();
         worker_.join();
     }
+    flasher_.reset();
 }
 
 

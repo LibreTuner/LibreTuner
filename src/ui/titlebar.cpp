@@ -138,7 +138,7 @@ bool TitleBar::eventFilter(QObject *watched, QEvent *event)
         //QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
         if (watched == restore_ || watched == maximize_ || watched == minimize_ || watched == close_) {
             QPushButton *button = static_cast<QPushButton*>(watched);
-            button->setIconSize(QSize(button->width() - 35, button->height() - 35));
+            button->setIconSize(QSize(button->width() * 0.4f, button->height() * 0.4f));
         }
     }
     return QWidget::eventFilter(watched, event);

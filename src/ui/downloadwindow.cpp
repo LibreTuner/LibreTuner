@@ -30,8 +30,8 @@
 
 Q_DECLARE_METATYPE(DefinitionPtr)
 
-DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Vehicle &vehicle, QWidget *parent)
-    : QDialog(parent), ui(new Ui::DownloadWindow), downloadInterface_(downloader), definition_(vehicle.definition) {
+DownloadWindow::DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader, const Vehicle &vehicle, QWidget *parent)
+    : QDialog(parent), ui(new Ui::DownloadWindow), downloadInterface_(std::move(downloader)), definition_(vehicle.definition) {
   ui->setupUi(this);
 
   ui->labelVehicle->setText(QString::fromStdString(definition_->name()));
@@ -39,7 +39,7 @@ DownloadWindow::DownloadWindow(const DownloadInterfacePtr &downloader, const Veh
 }
 
 void DownloadWindow::start() {
-    if (worker_.joinable()) {
+    if (worker_.joinable() || !downloadInterface_) {
         // Nope
         return;
     }
@@ -71,6 +71,7 @@ void DownloadWindow::stop()
         downloadInterface_->cancel();
         worker_.join();
     }
+    downloadInterface_.reset();
 }
 
 void DownloadWindow::closeEvent(QCloseEvent *event)

@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
+
 QWidget *MainWindow::createLogsTab() {
   QWidget *widget = new QWidget();
   auto *layout = new QVBoxLayout();
@@ -90,6 +91,7 @@ QWidget *MainWindow::createLogsTab() {
   widget->setLayout(layout);
   return widget;
 }
+
 
 
 QWidget *MainWindow::createRomsTab() {
@@ -116,6 +118,7 @@ QWidget *MainWindow::createRomsTab() {
   widget->setLayout(layout);
   return widget;
 }
+
 
 
 QWidget *MainWindow::createTunesTab() {
@@ -147,6 +150,7 @@ QWidget *MainWindow::createOverviewTab() {
 }
 
 
+
 void MainWindow::setupMenu() {
   auto *menuBar = new QMenuBar;
   QMenu *fileMenu = menuBar->addMenu(tr("&File"));
@@ -174,6 +178,7 @@ void MainWindow::updateTunes() {
 }
 
 
+
 void MainWindow::updateRoms() {
   QLayoutItem *child;
   while ((child = romsLayout_->takeAt(0)) != nullptr) {
@@ -186,6 +191,7 @@ void MainWindow::updateRoms() {
 }
 
 
+
 void MainWindow::on_buttonDownloadRom_clicked() {
     if (downloadWindow_) {
         delete downloadWindow_;
@@ -193,11 +199,13 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     }
 
     if (const auto &link = LibreTuner::get()->getVehicleLink()) {
-        DownloadInterfacePtr di = link->downloader();
-        downloadWindow_ = new DownloadWindow(di, link->vehicle(), this);
+        auto di = link->downloader();
+        downloadWindow_ = new DownloadWindow(std::move(di), link->vehicle(), this);
         downloadWindow_->show();
     }
 }
+
+
 
 void MainWindow::newLogClicked()
 {
@@ -215,6 +223,7 @@ void MainWindow::newLogClicked()
     loggerWindow_ = std::make_unique<DataLoggerWindow>(log, std::move(logger), link->vehicle().definition);
     loggerWindow_->show();
 }
+
 
 
 void MainWindow::closeEvent(QCloseEvent * /*event*/) {

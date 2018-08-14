@@ -40,7 +40,7 @@ class DownloadWindow;
 class DownloadWindow : public QDialog {
   Q_OBJECT
 public:
-  explicit DownloadWindow(const DownloadInterfacePtr &downloader, const Vehicle &vehicle, QWidget *parent = nullptr);
+  explicit DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader, const Vehicle &vehicle, QWidget *parent = nullptr);
   ~DownloadWindow() override;
 
   /* Download interface callbacks */
@@ -57,7 +57,7 @@ private slots:
 
 private:
   Ui::DownloadWindow *ui;
-  std::shared_ptr<DownloadInterface> downloadInterface_;
+  std::unique_ptr<DownloadInterface> downloadInterface_;
   std::string name_;
   DefinitionPtr definition_;
 
