@@ -119,7 +119,7 @@ std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const
         return nullptr;
     }
     if (auto c = can()) {
-        return std::make_unique<isotp::Protocol>(std::move(c), isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 8, std::chrono::milliseconds{100}});
+        return std::make_unique<isotp::Protocol>(std::move(c), isotp::Options{vehicle_.definition->serverId(), vehicle_.definition->serverId() + 8, std::chrono::milliseconds{8000}});
     }
     return nullptr;
 }
