@@ -41,6 +41,8 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QStyledItemDelegate>
+
 #include <memory>
 #include <future>
 
@@ -253,17 +255,25 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
     }
 
     Logger::debug("Starting vehicle query");
-    Vehicle v = dl->queryVehicle();
+    Vehicle v;
+    try {
+        v = dl->queryVehicle();
+    } catch (const std::exception &e) {
+        Logger::warning("Failed to query vehicle: " + std::string(e.what()));
+    }
     if (!v.valid()) {
         // Ask to manually select a vehicle
         StyledDialog window;
-        window.mainLayout()->addWidget(new QLabel("A vehicle could not automatically be queried. Please manually select from the list or cancel."));
+        QLabel *label = new QLabel("A vehicle could not automatically be queried.\nPlease manually select from the list or cancel.");
+        label->setAlignment(Qt::AlignCenter);
+        window.mainLayout()->addWidget(label);
 
         QComboBox *combo = new QComboBox;
         for (int i = 0; i < DefinitionManager::get()->count(); ++i) {
             const DefinitionPtr &def = DefinitionManager::get()->definitions()[i];
             combo->addItem(QString::fromStdString(def->name()), QVariant(i));
         }
+        combo->setItemDelegate(new QStyledItemDelegate());
         window.mainLayout()->addWidget(combo);
 
         QPushButton *button = new QPushButton("Select");

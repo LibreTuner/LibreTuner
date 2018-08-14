@@ -35,11 +35,17 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 {
     T::setWindowFlag(Qt::Window);
     T::setObjectName("mainWindow");
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(1);
+    QWidget *bg = new QWidget;
+    bg->setContentsMargins(0, 0, 0, 0);
+    bg->setAutoFillBackground(true);
+    layout->addWidget(bg);
     layout_ = new QVBoxLayout;
     layout_->setSpacing(0);
 
 #ifdef _WIN32
-    layout_->setMargin(1);
+    layout_->setMargin(0);
     titleBar_ = new TitleBar(this);
     titleBar_->setTitle("Test");
 
@@ -51,7 +57,8 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
     //setWindowFlags(Qt::FramelessWindowHint);
 #endif
 
-    T::setLayout(layout_);
+    bg->setLayout(layout_);
+    T::setLayout(layout);
     setResizable(true);
 }
 

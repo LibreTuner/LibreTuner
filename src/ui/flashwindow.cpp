@@ -60,6 +60,7 @@ void FlashWindow::on_buttonFlash_clicked() {
         // Already flashing
         return;
     }
+    ui->stackedWidget->setCurrentIndex(1);
     worker_ = std::thread([this] {
         try {
             if (flasher_->flash(flashable_)) {
