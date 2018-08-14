@@ -41,6 +41,7 @@ TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
   layout_->addWidget(wrapper);
 
   ui->setupUi(wrapper);
+  resize(1050, 500);
   ui->tableEdit->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
   ui->labelAxisX->setVisible(false);
   ui->labelAxisY->setVisible(false);
