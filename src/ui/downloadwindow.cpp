@@ -131,7 +131,8 @@ void DownloadWindow::updateProgress(float progress) {
                             Q_ARG(int, static_cast<int>(progress * 100)));
 
   std::chrono::steady_clock::duration dur = std::chrono::steady_clock::now() - lastUpdate_;
-  float minutesRemaining = (static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(dur).count()) / 60.0f) / progress;
+  float elapsed = (static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(dur).count()) / 60.0f);
+  float minutesRemaining =  (elapsed * (1.0f - progress)) / progress;
   QMetaObject::invokeMethod(ui->labelETR, "setText", Qt::QueuedConnection, Q_ARG(QString, QString("Estimated time remaining: ") + QString::number(minutesRemaining) + QString(" minutes")));
 }
 
