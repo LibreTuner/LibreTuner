@@ -45,7 +45,7 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 
     layout_->addWidget(titleBar_);
 
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+    T::setWindowFlags(T::windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
 #else
     layout_->setMargin(0);
     //setWindowFlags(Qt::FramelessWindowHint);
@@ -63,7 +63,7 @@ void StyledWidget<T>::setResizable(bool resizable)
         T::setWindowFlags(T::windowFlags() | Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
-        HWND hwnd = reinterpret_cast<HWND>(winId());
+        HWND hwnd = reinterpret_cast<HWND>(T::winId());
         DWORD style = GetWindowLong(hwnd, GWL_STYLE);
         SetWindowLong(hwnd, GWL_STYLE, style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
 #endif
@@ -71,7 +71,7 @@ void StyledWidget<T>::setResizable(bool resizable)
         T::setWindowFlags(T::windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
-        HWND hwnd = reinterpret_cast<HWND>(winId());
+        HWND hwnd = reinterpret_cast<HWND>(T::winId());
         DWORD style = GetWindowLong(hwnd, GWL_STYLE);
         SetWindowLong(hwnd, GWL_STYLE, style & ~WS_MAXIMIZEBOX & ~WS_CAPTION);
 #endif
@@ -121,7 +121,7 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, lo
 
             if (IsZoomed(msg->hwnd)) {
                 // Maximized
-                fix_maximized_window(msg->hwnd, maximumWidth(), maximumHeight(), params.rgrc[0]);
+                fix_maximized_window(msg->hwnd, T::maximumWidth(), T::maximumHeight(), params.rgrc[0]);
             }
         }
         *result = 0;
@@ -130,7 +130,7 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, lo
     case WM_NCHITTEST: {
         static const QMargins margins(5, 5, 5, 5);
         RECT winrect;
-        GetWindowRect(reinterpret_cast<HWND>(winId()), &winrect);
+        GetWindowRect(reinterpret_cast<HWND>(T::winId()), &winrect);
 
         QPoint topLeft(winrect.left, winrect.top);
         QPoint bottomRight(winrect.right, winrect.bottom);
@@ -144,8 +144,8 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, lo
         long x = GET_X_LPARAM(msg->lParam);
         long y = GET_Y_LPARAM(msg->lParam);
 
-        bool resizeWidth = minimumWidth() != maximumWidth();
-        bool resizeHeight = minimumHeight() != maximumHeight();
+        bool resizeWidth = T::minimumWidth() != T::maximumWidth();
+        bool resizeHeight = T::minimumHeight() != T::maximumHeight();
 
         *result = 0;
         if (resizeWidth) {
@@ -209,10 +209,10 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, lo
     case WM_GETMINMAXINFO: {
         MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO*>(msg->lParam);
 
-        mmi->ptMinTrackSize.x = minimumWidth();
-        mmi->ptMinTrackSize.y = minimumHeight();
-        mmi->ptMaxTrackSize.x = maximumWidth();
-        mmi->ptMaxTrackSize.y = maximumHeight();
+        mmi->ptMinTrackSize.x = T::minimumWidth();
+        mmi->ptMinTrackSize.y = T::minimumHeight();
+        mmi->ptMaxTrackSize.x = T::maximumWidth();
+        mmi->ptMaxTrackSize.y = T::maximumHeight();
 
         *result = 1;
         return true;
@@ -243,10 +243,10 @@ void StyledWidget<T>::changeEvent(QEvent *e)
 {
     if (e->type() == QEvent::WindowStateChange) {
         QWindowStateChangeEvent *ev = static_cast<QWindowStateChangeEvent*>(e);
-        if ((windowState() && Qt::WindowMaximized) && !resizable_) {
-            setWindowState(Qt::WindowNoState);
+        if ((T::windowState() && Qt::WindowMaximized) && !resizable_) {
+            T::setWindowState(Qt::WindowNoState);
         }
-        titleBar_->setMaximized(!(ev->oldState() & Qt::WindowMaximized) && (windowState() & Qt::WindowMaximized));
+        titleBar_->setMaximized(!(ev->oldState() & Qt::WindowMaximized) && (T::windowState() & Qt::WindowMaximized));
     }
 
     QWidget::changeEvent(e);
@@ -269,7 +269,7 @@ template<class T>
 IntermediateWidget<T>::IntermediateWidget(QWidget *parent) : parent_(new StyledWidget<QWidget>(parent))
 {
     parent_->mainLayout()->addWidget(this);
-    installEventFilter(parent_);
+    T::installEventFilter(parent_);
     parent_->show();
 }
 
@@ -293,7 +293,7 @@ bool StyledWidget<T>::eventFilter(QObject *object, QEvent *event)
     if (event->type() == QEvent::Show) {
         Logger::debug("Show");
         QShowEvent *showEvent = static_cast<QShowEvent*>(event);
-        show();
+        T::show();
     }
     return false;
 }

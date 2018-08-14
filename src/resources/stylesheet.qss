@@ -18,8 +18,25 @@ QWidget#mainWindow {
     background: #000487;
 }
 
+TitleBar {
+    min-height: 2em;
+    max-height: 2em;
+}
+
+QLabel#icon {
+    min-height: 2em;
+    max-height: 2em;
+    min-width: 2em;
+    max-width: 2em;
+}
+
 TitleBar > QPushButton {
     background-color: #303030;
+    min-width: 2.5em;
+    max-width: 2.5em;
+    min-height: 2em;
+    max-height: 2em;
+    /*padding: 0.4em 0.4em 0.4em 0.4em;*/
 }
 
 TitleBar > QPushButton:hover {

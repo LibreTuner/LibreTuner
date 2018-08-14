@@ -51,6 +51,10 @@ private:
     QPushButton *minimize_;
 
     bool maximizable_ = true;
+
+    // QObject interface
+public:
+    virtual bool eventFilter(QObject *watched, QEvent *event);
 };
 
 #endif // TITLEBAR_H

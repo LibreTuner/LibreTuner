@@ -34,12 +34,14 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     auto *layout = new QHBoxLayout;
     layout->setSpacing(0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setFixedHeight(30);
+    //setFixedHeight(30);
 
     QLabel *icon = new QLabel();
+    icon->setObjectName("icon");
     layout->addWidget(icon);
-    icon->setPixmap(QPixmap(":/icons/LibreTuner.png").scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    icon->setFixedSize(30, 30);
+    icon->setPixmap(QPixmap(":/icons/LibreTuner.png"));
+    icon->setScaledContents(true);
+    //icon->setFixedSize(30, 30);
 
     title_ = new QLabel();
     layout->addWidget(title_);
@@ -49,8 +51,7 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     minimize_ = new QPushButton();
     layout->addWidget(minimize_);
     minimize_->setIcon(QIcon(":/icons/minimize.svg"));
-    minimize_->setIconSize(QSize(12, 12));
-    minimize_->setFixedSize(50, 30);
+    minimize_->installEventFilter(this);
     minimize_->setFlat(true);
     connect(minimize_, &QPushButton::clicked, [this]() {
         window_->setWindowState(Qt::WindowMinimized);
@@ -59,8 +60,7 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     maximize_ = new QPushButton();
     layout->addWidget(maximize_);
     maximize_->setIcon(QIcon(":/icons/maximize.svg"));
-    maximize_->setIconSize(QSize(12, 12));
-    maximize_->setFixedSize(50, 30);
+    maximize_->installEventFilter(this);
     maximize_->setFlat(true);
     connect(maximize_, &QPushButton::clicked, [this]() {
         window_->setWindowState(Qt::WindowMaximized);
@@ -70,8 +70,7 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     layout->addWidget(restore_);
     restore_->setVisible(false);
     restore_->setIcon(QIcon(":/icons/restore.svg"));
-    restore_->setIconSize(QSize(12, 12));
-    restore_->setFixedSize(50, 30);
+    restore_->installEventFilter(this);
     restore_->setFlat(true);
     connect(restore_, &QPushButton::clicked, [this]() {
        window_->setWindowState(Qt::WindowNoState);
@@ -81,8 +80,7 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window)
     layout->addWidget(close_);
     close_->setObjectName("close");
     close_->setIcon(QIcon(":/icons/close.svg"));
-    close_->setIconSize(QSize(12, 12));
-    close_->setFixedSize(50, 30);
+    close_->installEventFilter(this);
     close_->setFlat(true);
     connect(close_, &QPushButton::clicked, [this]() {
         window_->close();
@@ -132,5 +130,17 @@ void TitleBar::setMaximized(bool maximized)
         if (restore_)
             restore_->setAttribute(Qt::WA_UnderMouse, false);
     }
+}
+
+bool TitleBar::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::Resize) {
+        //QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
+        if (watched == restore_ || watched == maximize_ || watched == minimize_ || watched == close_) {
+            QPushButton *button = static_cast<QPushButton*>(watched);
+            button->setIconSize(QSize(button->width() - 35, button->height() - 35));
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
