@@ -27,6 +27,7 @@
 #include "ui/styledwindow.h"
 #include "logger.h"
 #include "vehicle.h"
+#include "definitions/definition.h"
 
 #ifdef WITH_SOCKETCAN
 #include "os/sockethandler.h"
@@ -254,7 +255,31 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
     Logger::debug("Starting vehicle query");
     Vehicle v = dl->queryVehicle();
     if (!v.valid()) {
-        return nullptr;
+        // Ask to manually select a vehicle
+        StyledDialog window;
+        window.mainLayout()->addWidget(new QLabel("A vehicle could not automatically be queried. Please manually select from the list or cancel."));
+
+        QComboBox *combo = new QComboBox;
+        for (int i = 0; i < DefinitionManager::get()->count(); ++i) {
+            const DefinitionPtr &def = DefinitionManager::get()->definitions()[i];
+            combo->addItem(QString::fromStdString(def->name()), QVariant(i));
+        }
+        window.mainLayout()->addWidget(combo);
+
+        QPushButton *button = new QPushButton("Select");
+        window.mainLayout()->addWidget(button);
+        connect(button, &QPushButton::clicked, [&v, combo, &window] {
+            QVariant data = combo->currentData();
+            if (!data.isNull()) {
+                const DefinitionPtr &def = DefinitionManager::get()->definitions()[data.toInt()];
+                v = Vehicle{def->name(), "unknown", def};
+            }
+            window.close();
+        });
+        window.exec();
+        if (!v.valid()) {
+            return nullptr;
+        }
     }
     return std::make_unique<VehicleLink>(std::move(v), dl);
 }
