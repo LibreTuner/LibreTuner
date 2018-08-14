@@ -46,8 +46,8 @@ class Flasher : public AsyncRoutine {
 public:
   virtual ~Flasher() = default;
 
-  /* Flash that shit */
-  virtual void flash(FlashablePtr flashable) = 0;
+  /* Flash that shit. Returns false if canceled. */
+  virtual bool flash(FlashablePtr flashable) = 0;
 
   /* Cancels the active flash */
   virtual void cancel() =0;
@@ -60,7 +60,7 @@ public:
   MazdaT1Flasher(std::string key,
                  std::unique_ptr<uds::Protocol> &&uds);
 
-  void flash(FlashablePtr flashable) override;
+  bool flash(FlashablePtr flashable) override;
   void cancel() override;
 
 private:
@@ -72,9 +72,9 @@ private:
 
   size_t left_{}, sent_{};
 
-  void sendLoad();
-  void do_erase();
-  void do_request_download();
+  bool sendLoad();
+  bool do_erase();
+  bool do_request_download();
 };
 
 #endif // FLASHER_H

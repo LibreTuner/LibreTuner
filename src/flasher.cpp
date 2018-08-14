@@ -37,13 +37,13 @@ MazdaT1Flasher::MazdaT1Flasher(std::string key,
     : key_(std::move(key)),
       uds_(std::move(uds)) {}
 
-void MazdaT1Flasher::flash(FlashablePtr flashable) {
+bool MazdaT1Flasher::flash(FlashablePtr flashable) {
     canceled_ = false;
     flash_ = std::move(flashable);
     auth_.auth(key_, *uds_, 0x85);
     if (canceled_)
-        return;
-    do_erase();
+        return false;
+    return do_erase();
 }
 
 void MazdaT1Flasher::cancel()
@@ -53,20 +53,20 @@ void MazdaT1Flasher::cancel()
 
 
 
-void MazdaT1Flasher::do_erase() {
+bool MazdaT1Flasher::do_erase() {
     std::array<uint8_t, 4> eraseRequest = {0xB1, 0x00, 0xB2, 0x00};
     uds::Packet _response;
     uds_->request(eraseRequest, 0xF1, _response);
     if (canceled_) {
         Logger::warning("Canceled flash after erasing");
-        return;
+        return false;
     }
-    do_request_download();
+    return do_request_download();
 }
 
 
 
-void MazdaT1Flasher::do_request_download() {
+bool MazdaT1Flasher::do_request_download() {
     // Send address...size
     std::array<uint8_t, 9> msg{};
     msg[0] = UDS_REQ_REQUESTDOWNLOAD;
@@ -79,18 +79,18 @@ void MazdaT1Flasher::do_request_download() {
 
     if (canceled_) {
         Logger::warning("Canceled flash after erasure");
-        return;
+        return false;
     }
 
     // Start uploading
     sent_ = 0;
     left_ = flash_->size();
-    sendLoad();
+    return sendLoad();
 }
 
 
 
-void MazdaT1Flasher::sendLoad() {
+bool MazdaT1Flasher::sendLoad() {
     while (left_ != 0) {
         size_t toSend = std::min<size_t>(left_, 0xFFE);
         std::vector<uint8_t> data;
@@ -109,7 +109,8 @@ void MazdaT1Flasher::sendLoad() {
                          flash_->size());
         if (canceled_) {
             Logger::warning("Canceled flash during upload");
-            return;
+            return false;
         }
     }
+    return true;
 }

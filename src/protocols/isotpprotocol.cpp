@@ -428,7 +428,7 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining)
                 throw std::runtime_error("mismatched consecutive frame index");
             }
 
-            auto needed = std::min(cf.data_length, remaining);
+            auto needed = std::min<int>(cf.data_length, remaining);
 
             result.append(gsl::make_span(cf.data).first(needed));
             remaining -= needed;

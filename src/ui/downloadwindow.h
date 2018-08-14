@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #include "downloadinterface.h"
 #include "rommanager.h"
@@ -60,9 +61,16 @@ private:
   std::string name_;
   DefinitionPtr definition_;
 
+  std::chrono::steady_clock::time_point lastUpdate_;
+
   std::thread worker_;
 
   void start();
+  void stop();
+
+  // QWidget interface
+protected:
+  void closeEvent(QCloseEvent *event);
 };
 
 #endif // DOWNLOADWINDOW_H

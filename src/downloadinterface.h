@@ -46,8 +46,8 @@ public:
   virtual ~DownloadInterface() = default;
 
   /* Starts downloading. Calls updateProgress if possible.
-   * Signals onError if an error occurs. */
-  virtual void download() = 0;
+   * Returns false if canceled. */
+  virtual bool download() = 0;
 
   /* Cancels the active download */
   virtual void cancel() =0;
@@ -64,7 +64,7 @@ public:
   Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds,
                          std::string key, uint32_t size);
 
-  void download() override;
+  bool download() override;
   void cancel() override;
   virtual gsl::span<const uint8_t> data() override;
 

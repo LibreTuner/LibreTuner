@@ -49,14 +49,33 @@ void DownloadWindow::start() {
     ui->buttonContinue->setEnabled(false);
 
     ui->stackedWidget->setCurrentIndex(1);
+    ui->progressDownload->setValue(0);
+    ui->labelETR->setText("");
+    lastUpdate_ = std::chrono::steady_clock::now();
     worker_ = std::thread([this]() {
         try {
-            downloadInterface_->download();
-            onCompletion();
+            if (downloadInterface_->download()) {
+                onCompletion();
+            }
         } catch (const std::exception &e) {
             downloadError(QString(e.what()));
         }
     });
+}
+
+void DownloadWindow::stop()
+{
+    if (worker_.joinable()) {
+        // Notify cancel
+        Logger::info("Canceling download");
+        downloadInterface_->cancel();
+        worker_.join();
+    }
+}
+
+void DownloadWindow::closeEvent(QCloseEvent *event)
+{
+    stop();
 }
 
 void DownloadWindow::mainDownloadError(const QString &error) {
@@ -110,6 +129,10 @@ void DownloadWindow::updateProgress(float progress) {
   QMetaObject::invokeMethod(ui->progressDownload, "setValue",
                             Qt::QueuedConnection,
                             Q_ARG(int, static_cast<int>(progress * 100)));
+
+  std::chrono::steady_clock::duration dur = std::chrono::steady_clock::now() - lastUpdate_;
+  float minutesRemaining = static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(dur).count()) / 60.0f;
+  QMetaObject::invokeMethod(ui->labelETR, "setText", Qt::QueuedConnection, Q_ARG(QString, QString("Estimated time remaining: ") + QString::number(minutesRemaining)));
 }
 
 void DownloadWindow::on_buttonContinue_clicked() {
@@ -130,11 +153,6 @@ void DownloadWindow::on_buttonBack_clicked() {
 }
 
 DownloadWindow::~DownloadWindow() {
-    if (worker_.joinable()) {
-        // Notify cancel
-        Logger::info("Canceling download");
-        downloadInterface_->cancel();
-        worker_.join();
-    }
+    stop();
     delete ui;
 }

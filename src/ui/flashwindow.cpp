@@ -42,16 +42,18 @@ FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher, const FlashablePtr&
   flasher_->setProgressCallback([this](float progress) { onProgress(progress); });
 }
 
+
+
 FlashWindow::~FlashWindow()
 {
-    if (worker_.joinable()) {
-        Logger::info("Canceling flash");
-        flasher_->cancel();
-        worker_.join();
-    }
+    stop();
 }
 
+
+
 void FlashWindow::on_buttonCancel_clicked() { close(); }
+
+
 
 void FlashWindow::on_buttonFlash_clicked() {
     if (worker_.joinable()) {
@@ -60,13 +62,18 @@ void FlashWindow::on_buttonFlash_clicked() {
     }
     worker_ = std::thread([this] {
         try {
-            flasher_->flash(flashable_);
-            onCompletion();
+            if (flasher_->flash(flashable_)) {
+                onCompletion();
+            } else {
+                onError("canceled");
+            }
         } catch (const std::exception &e) {
             onError(e.what());
         }
     });
 }
+
+
 
 void FlashWindow::mainCompletion() {
   // flasher_.reset();
@@ -77,9 +84,31 @@ void FlashWindow::mainCompletion() {
   msgBox.exec();
 }
 
+
+
+void FlashWindow::stop()
+{
+    if (worker_.joinable()) {
+        Logger::info("Canceling flash");
+        flasher_->cancel();
+        worker_.join();
+    }
+}
+
+
+
+void FlashWindow::closeEvent(QCloseEvent *event)
+{
+    stop();
+}
+
+
+
 void FlashWindow::onCompletion() {
   QMetaObject::invokeMethod(this, "mainCompletion", Qt::QueuedConnection);
 }
+
+
 
 void FlashWindow::mainError(const QString &error) {
   // flasher_.reset();
@@ -93,10 +122,14 @@ void FlashWindow::mainError(const QString &error) {
   ui->stackedWidget->setCurrentIndex(0);
 }
 
+
+
 void FlashWindow::onError(const std::string &error) {
   QMetaObject::invokeMethod(this, "mainError", Qt::QueuedConnection,
                             Q_ARG(QString, QString::fromStdString(error)));
 }
+
+
 
 void FlashWindow::onProgress(float percent) {
   QMetaObject::invokeMethod(ui->progressBar, "setValue", Qt::QueuedConnection,

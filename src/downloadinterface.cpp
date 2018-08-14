@@ -44,7 +44,7 @@ bool Uds23DownloadInterface::update_progress() {
 
 
 
-void Uds23DownloadInterface::download() {
+bool Uds23DownloadInterface::download() {
   canceled_ = false;
   downloadOffset_ = 0;
   downloadSize_ = totalSize_;
@@ -61,6 +61,7 @@ void Uds23DownloadInterface::download() {
       downloadOffset_ += data.size();
       downloadSize_ -= data.size();
   } while (!canceled_ && update_progress());
+  return !canceled_;
 }
 
 

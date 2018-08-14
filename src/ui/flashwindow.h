@@ -62,6 +62,12 @@ private:
   FlashablePtr flashable_;
   std::unique_ptr<Flasher> flasher_;
   std::thread worker_;
+
+  void stop();
+
+  // QWidget interface
+protected:
+  void closeEvent(QCloseEvent *event);
 };
 
 #endif // FLASHWINDOW_H
