@@ -103,8 +103,8 @@ set(libretuner_SRC
     ui/settingswidget.h
     ui/titlebar.cpp
     ui/titlebar.h
-    #ui/styledwindow.cpp
-    #ui/styledwindow.h
+    ui/styledwindow.cpp
+    ui/styledwindow.h
     ui/dataloggerwindow.cpp
     ui/dataloggerwindow.h
 

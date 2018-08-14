@@ -34,10 +34,13 @@
 #include <QTreeWidget>
 
 TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
+    : StyledWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
   assert(tune);
 
-  ui->setupUi(this);
+  QMainWindow *wrapper = new QMainWindow;
+  layout_->addWidget(wrapper);
+
+  ui->setupUi(wrapper);
   ui->tableEdit->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
   ui->labelAxisX->setVisible(false);
   ui->labelAxisY->setVisible(false);

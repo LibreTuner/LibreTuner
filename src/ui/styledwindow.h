@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QDialog>
+#include <QMainWindow>
 #include <type_traits>
 
 class TitleBar;
@@ -38,9 +39,11 @@ public:
 
     void setResizable(bool resizable);
 
+    bool eventFilter(QObject *object, QEvent *event) override;
+
 #ifdef _WIN32
-  //bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-  //void changeEvent(QEvent *e) override;
+  bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+  void changeEvent(QEvent *e) override;
 #endif
 signals:
 
@@ -48,7 +51,7 @@ public slots:
 
 protected:
 #ifdef _WIN32
-  //TitleBar *titleBar_;
+  TitleBar *titleBar_;
 #endif
   QLayout *layout_;
 
@@ -56,11 +59,32 @@ private:
   bool resizable_ = true;
 };
 
+template<class T>
+class IntermediateWidget : public T {
+public:
+    explicit IntermediateWidget(QWidget *parent = nullptr);
+
+    virtual void showEvent(QShowEvent *event) override;
+
+    ~IntermediateWidget() override;
+
+private:
+    StyledWidget<QWidget> *parent_;
+};
+
 class StyledWindow : public StyledWidget<QWidget>
 {
     Q_OBJECT
 public:
     explicit StyledWindow(QWidget *parent = nullptr);
+
+};
+
+class StyledMainWindow : public StyledWidget<QMainWindow>
+{
+    Q_OBJECT
+public:
+    explicit StyledMainWindow(QWidget *parent = nullptr);
 };
 
 class StyledDialog : public StyledWidget<QDialog>

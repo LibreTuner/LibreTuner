@@ -29,7 +29,7 @@
 #include <QLayout>
 #include <QComboBox>
 
-class MainWindow : public QMainWindow {
+class MainWindow : public StyledWindow {//public QMainWindow {
   Q_OBJECT
 
 public:
@@ -50,6 +50,7 @@ private:
   QLayout *romsLayout_;
   QComboBox *comboLogVehicles_;
   QListView *listLogs_;
+  QMainWindow *main_;
 
   void setupMenu();
 

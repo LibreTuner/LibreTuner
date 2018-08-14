@@ -18,6 +18,7 @@
 
 #include "styledwindow.h"
 #include "titlebar.h"
+#include "logger.h"
 
 #include <QVBoxLayout>
 #include <QApplication>
@@ -37,21 +38,21 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
     layout_ = new QVBoxLayout;
     layout_->setSpacing(0);
 
-//#ifdef _WIN32
-    /*layout_->setMargin(1);
+#ifdef _WIN32
+    layout_->setMargin(1);
     titleBar_ = new TitleBar(this);
     titleBar_->setTitle("Test");
 
     layout_->addWidget(titleBar_);
 
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);*/
-//#else
+    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+#else
     layout_->setMargin(0);
     //setWindowFlags(Qt::FramelessWindowHint);
-//#endif
+#endif
 
     T::setLayout(layout_);
-    //setResizable(true);
+    setResizable(true);
 }
 
 template<class T>
@@ -103,11 +104,15 @@ void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT &rect) 
 #endif
 
 #ifdef _WIN32
-/*template<class T>
+template<class T>
 bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
     Q_UNUSED(eventType);
-    MSG *msg = static_cast<MSG*>(message);
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+    MSG *msg = *reinterpret_cast<MSG**>(message);
+#else
+    MSG *msg = reinterpret_cast<MSG*>(message);
+#endif
 
     switch (msg->message) {
     case WM_NCCALCSIZE: {
@@ -245,13 +250,12 @@ void StyledWidget<T>::changeEvent(QEvent *e)
     }
 
     QWidget::changeEvent(e);
-}*/
+}
 #endif
 
 
 StyledWindow::StyledWindow(QWidget *parent) : StyledWidget<QWidget>(parent)
 {
-
 }
 
 StyledDialog::StyledDialog(QWidget *parent) : StyledWidget<QDialog>(parent)
@@ -259,4 +263,42 @@ StyledDialog::StyledDialog(QWidget *parent) : StyledWidget<QDialog>(parent)
     //titleBar_->setMaximizable(false);
     //titleBar_->setMinimizable(false);
     //setResizable(false);
+}
+
+template<class T>
+IntermediateWidget<T>::IntermediateWidget(QWidget *parent) : parent_(new StyledWidget<QWidget>(parent))
+{
+    parent_->mainLayout()->addWidget(this);
+    installEventFilter(parent_);
+    parent_->show();
+}
+
+template<class T>
+void IntermediateWidget<T>::showEvent(QShowEvent *event)
+{
+    Logger::debug("show event");
+}
+
+template<class T>
+IntermediateWidget<T>::~IntermediateWidget()
+{
+    //delete parent_;
+}
+
+template<class T>
+bool StyledWidget<T>::eventFilter(QObject *object, QEvent *event)
+{
+    Logger::debug("Got event");
+    Logger::debug(std::to_string(static_cast<int>(event->type())));
+    if (event->type() == QEvent::Show) {
+        Logger::debug("Show");
+        QShowEvent *showEvent = static_cast<QShowEvent*>(event);
+        show();
+    }
+    return false;
+}
+
+StyledMainWindow::StyledMainWindow(QWidget *parent) : StyledWidget<QMainWindow>(parent)
+{
+
 }
