@@ -39,11 +39,7 @@ Uds23DownloadInterface::Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&
 
 bool Uds23DownloadInterface::update_progress() {
   notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
-  if (downloadSize_ == 0) {
-    return false;
-  }
-
-  return true;
+  return downloadSize_ > 0;
 }
 
 
