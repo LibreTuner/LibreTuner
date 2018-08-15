@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
   tabs->addTab(createTunesTab(), "Tunes");
   tabs->addTab(createRomsTab(), "ROMs");
   tabs->addTab(createLogsTab(), "Logs");
+  tabs->addTab(createDiagnosticsTab(), "Diagnostics");
 
   main_->setCentralWidget(tabs);
 
@@ -94,6 +95,25 @@ QWidget *MainWindow::createLogsTab() {
 
 
 
+QWidget *MainWindow::createDiagnosticsTab()
+{
+    QWidget *widget = new QWidget();
+    auto *layout = new QVBoxLayout();
+    QPushButton *buttonScan = new QPushButton(tr("Scan for diagnostic codes"));
+    layout->addWidget(buttonScan);
+    connect(buttonScan, &QPushButton::clicked, [] {
+        // Stub
+    });
+
+    listCodes_ = new QListView;
+    layout->addWidget(listCodes_);
+
+    widget->setLayout(layout);
+    return widget;
+}
+
+
+
 QWidget *MainWindow::createRomsTab() {
   QWidget *widget = new QWidget();
   auto *layout = new QVBoxLayout();
@@ -102,8 +122,7 @@ QWidget *MainWindow::createRomsTab() {
   area->setWidgetResizable(true);
 
   area->setStyleSheet("QScrollArea { background: transparent; }\n"
-                      "QScrollArea > QWidget > QWidget { background: transparent; }\n"
-                      "QScrollArea > QWidget > QScrollBar { background: palette(base); }");
+                      "QScrollArea > QWidget > QWidget { background: transparent; }\n");
   layout->addWidget(area);
 
   QWidget *scrollContents = new QWidget();

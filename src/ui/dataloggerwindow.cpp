@@ -33,6 +33,9 @@
 
 DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent) : log_(log), logger_(std::move(logger)), definition_(definition), QWidget(parent)
 {
+    Expects(logger_);
+    Expects(log_);
+    Expects(definition_);
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
     auto *hlayout = new QHBoxLayout;

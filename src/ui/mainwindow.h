@@ -50,6 +50,7 @@ private:
   QLayout *romsLayout_;
   QComboBox *comboLogVehicles_;
   QListView *listLogs_;
+  QListView *listCodes_;
   QMainWindow *main_;
 
   void setupMenu();
@@ -58,6 +59,7 @@ private:
   QWidget *createTunesTab();
   QWidget *createRomsTab();
   QWidget *createLogsTab();
+  QWidget *createDiagnosticsTab();
 
 public slots:
   void updateRoms();
