@@ -16,33 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logger.h"
-#include "libretuner.h"
-#include <iostream>
+#ifndef LOGVIEW_H
+#define LOGVIEW_H
 
-Logger::Logger()
-= default;
+#include <QPlainTextEdit>
+#include <QAbstractItemModel>
 
-void Logger::log(Logger::Mode mode, const std::string &message)
+class LogView : public QPlainTextEdit
 {
-    if (LibreTuner *lt = LibreTuner::get()) {
-        lt->log().append(mode, message);
-    }
-    std::cout << "[" << modeString(mode) << "] " << message << std::endl;
-}
+    Q_OBJECT
+public:
+    LogView();
 
-std::string Logger::modeString(Logger::Mode mode)
-{
-    switch (mode) {
-    case Logger::Mode::Debug:
-        return "DEBUG";
-    case Logger::Mode::Info:
-        return "INFO";
-    case Logger::Mode::Warning:
-        return "WARNING";
-    case Logger::Mode::Critical:
-        return "CRITICAL";
-    default:
-        return "";
-    }
-}
+    void setModel(QAbstractItemModel *model);
+
+private slots:
+    void rowsInserted(const QModelIndex &parent, int first, int last);
+
+private:
+    QAbstractItemModel *model_ = nullptr;
+};
+
+#endif // LOGVIEW_H

@@ -294,4 +294,7 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
     return std::make_unique<VehicleLink>(std::move(v), dl);
 }
 
-LibreTuner::~LibreTuner() = default;
+LibreTuner::~LibreTuner()
+{
+    _global = nullptr;
+}

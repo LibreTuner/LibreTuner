@@ -26,7 +26,9 @@
 #include "tunemanager.h"
 #include "tunewidget.h"
 #include "titlebar.h"
+#include "logview.h"
 
+#include <QDockWidget>
 #include <QPushButton>
 #include <QMenuBar>
 #include <QMenu>
@@ -58,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
   tabs->addTab(createRomsTab(), "ROMs");
   tabs->addTab(createLogsTab(), "Logs");
   tabs->addTab(createDiagnosticsTab(), "Diagnostics");
+
+  createLog();
 
   main_->setCentralWidget(tabs);
 
@@ -112,6 +116,20 @@ QWidget *MainWindow::createDiagnosticsTab()
 
     widget->setLayout(layout);
     return widget;
+}
+
+void MainWindow::createLog()
+{
+    LogView *log = new LogView;
+    log->setModel(&LibreTuner::get()->log());
+    log->setReadOnly(true);
+    log->setWordWrapMode(QTextOption::NoWrap);
+
+    logDock_ = new QDockWidget;
+    logDock_->setWidget(log);
+    logDock_->setFeatures(QDockWidget::DockWidgetMovable);
+    logDock_->setWindowTitle("Log");
+    main_->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, logDock_);
 }
 
 

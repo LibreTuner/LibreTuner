@@ -16,33 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#ifndef LOG_H
+#define LOG_H
+
 #include "logger.h"
-#include "libretuner.h"
-#include <iostream>
 
-Logger::Logger()
-= default;
+#include <QAbstractItemModel>
 
-void Logger::log(Logger::Mode mode, const std::string &message)
+struct LogEntry {
+    Logger::Mode mode;
+    std::string text;
+};
+
+class Log : public QAbstractListModel
 {
-    if (LibreTuner *lt = LibreTuner::get()) {
-        lt->log().append(mode, message);
-    }
-    std::cout << "[" << modeString(mode) << "] " << message << std::endl;
-}
+public:
+    Log();
+    Log(const Log&) = delete;
+    Log(Log&&) = delete;
+    Log &operator=(const Log&) = delete;
 
-std::string Logger::modeString(Logger::Mode mode)
-{
-    switch (mode) {
-    case Logger::Mode::Debug:
-        return "DEBUG";
-    case Logger::Mode::Info:
-        return "INFO";
-    case Logger::Mode::Warning:
-        return "WARNING";
-    case Logger::Mode::Critical:
-        return "CRITICAL";
-    default:
-        return "";
-    }
-}
+
+    /* Adds to the end of log */
+    void append(LogEntry &&entry);
+
+    void append(Logger::Mode mode, const std::string &text);
+
+    // QAbstractItemModel interface
+public:
+    virtual int rowCount(const QModelIndex &parent) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+
+private:
+    std::vector<LogEntry> entries_;
+};
+
+#endif // LOG_H

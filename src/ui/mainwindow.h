@@ -52,6 +52,7 @@ private:
   QListView *listLogs_;
   QListView *listCodes_;
   QMainWindow *main_;
+  QDockWidget *logDock_;
 
   void setupMenu();
 
@@ -60,6 +61,7 @@ private:
   QWidget *createRomsTab();
   QWidget *createLogsTab();
   QWidget *createDiagnosticsTab();
+  void createLog();
 
 public slots:
   void updateRoms();

@@ -22,6 +22,7 @@
 #include "definitions/definitionmanager.h"
 #include "protocols/canlog.h"
 #include "datalink.h"
+#include "log.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
 
@@ -74,11 +75,15 @@ public:
      The returned link may be nullptr if no datalink is attached. */
   std::unique_ptr<VehicleLink> queryVehicleLink();
 
+  /* Returns the log */
+  Log &log() { return log_; }
+
 private:
   std::unique_ptr<MainWindow> mainWindow_;
   std::unique_ptr<TuneEditor> tuneEditor_;
   std::unique_ptr<FlashWindow> flashWindow_;
   CanLog canLog_;
+  Log log_;
 
   /* Location of home directory. */
   QString home_;

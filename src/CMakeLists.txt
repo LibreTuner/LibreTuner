@@ -52,6 +52,8 @@ set(libretuner_SRC
     datalogger.h
     asyncroutine.cpp
     asyncroutine.h
+    log.cpp
+    log.h
 
     util/signal.cpp
     util/signal.h
@@ -107,6 +109,8 @@ set(libretuner_SRC
     ui/styledwindow.h
     ui/dataloggerwindow.cpp
     ui/dataloggerwindow.h
+    ui/logview.cpp
+    ui/logview.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
