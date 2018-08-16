@@ -23,8 +23,8 @@
 #include <QDialog>
 #include <QMainWindow>
 #include <type_traits>
+#include "titlebar.h"
 
-class TitleBar;
 /* A window with custom borders and a title bar on supported platforms */
 
 template<class T>
@@ -36,6 +36,8 @@ public:
     QLayout *mainLayout() {
         return layout_;
     }
+
+    void setTitle(const QString &title);
 
     void setResizable(bool resizable);
 
@@ -57,6 +59,7 @@ protected:
 
 private:
   bool resizable_ = true;
+  QLayout *bgLayout_;
 };
 
 template<class T>
@@ -93,5 +96,17 @@ class StyledDialog : public StyledWidget<QDialog>
 public:
     explicit StyledDialog(QWidget *parent = nullptr);
 };
+
+
+
+template<class T>
+void StyledWidget<T>::setTitle(const QString &title)
+{
+#ifdef _WIN32
+    titleBar_->setTitle(title);
+#else
+    T::setWindowTitle(title);
+#endif
+}
 
 #endif // STYLEDWINDOW_H

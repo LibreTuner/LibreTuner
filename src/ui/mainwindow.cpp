@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     : StyledWindow(parent) {
   resize(QSize(1100, 630));
 
+  setTitle("LibreTuner");
+
   main_ = new QMainWindow;
   layout_->addWidget(main_);
 

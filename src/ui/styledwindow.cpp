@@ -35,12 +35,12 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 {
     T::setWindowFlag(Qt::Window);
     T::setObjectName("mainWindow");
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(1);
+    bgLayout_ = new QVBoxLayout;
+    bgLayout_->setMargin(1);
     QWidget *bg = new QWidget;
     bg->setContentsMargins(0, 0, 0, 0);
     bg->setAutoFillBackground(true);
-    layout->addWidget(bg);
+    bgLayout_->addWidget(bg);
     layout_ = new QVBoxLayout;
     layout_->setSpacing(0);
 
@@ -58,7 +58,7 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
 #endif
 
     bg->setLayout(layout_);
-    T::setLayout(layout);
+    T::setLayout(bgLayout_);
     setResizable(true);
 }
 
@@ -253,7 +253,9 @@ void StyledWidget<T>::changeEvent(QEvent *e)
         if ((T::windowState() && Qt::WindowMaximized) && !resizable_) {
             T::setWindowState(Qt::WindowNoState);
         }
-        titleBar_->setMaximized(!(ev->oldState() & Qt::WindowMaximized) && (T::windowState() & Qt::WindowMaximized));
+        bool maximized = !(ev->oldState() & Qt::WindowMaximized) && (T::windowState() & Qt::WindowMaximized);
+        titleBar_->setMaximized(maximized);
+        bgLayout_->setMargin(maximized ? 0 : 1);
     }
 
     QWidget::changeEvent(e);

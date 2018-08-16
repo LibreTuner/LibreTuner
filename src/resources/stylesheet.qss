@@ -36,7 +36,6 @@ TitleBar > QPushButton {
     max-width: 2.5em;
     min-height: 2em;
     max-height: 2em;
-    /*padding: 0.4em 0.4em 0.4em 0.4em;*/
 }
 
 TitleBar > QPushButton:hover {
@@ -282,27 +281,13 @@ QListWidget {
     border: 1px solid #505050;
 }
 
-QTreeView::branch:has-siblings:!adjoins-item {
-    border-image: url(:/icons/vline.png) 0;
-}
 
-QTreeView::branch:has-siblings:adjoins-item {
-    border-image: url(:/icons/branch-more.png) 0;
-}
-
-QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-    border-image: url(:/icons/branch-end.png) 0;
-}
-
-QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
+QTreeView::branch:closed:has-children {
         border-image: none;
         image: url(:/icons/branch-closed.png);
-        color: red;
 }
 
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings  {
+QTreeView::branch:open {
         border-image: none;
         image: url(:/icons/branch-open.png);
 }

@@ -36,6 +36,7 @@
 TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
     : StyledWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
   assert(tune);
+  setTitle("LibreTuner - Tune Editor");
 
   QMainWindow *wrapper = new QMainWindow;
   layout_->addWidget(wrapper);
@@ -156,7 +157,7 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
 void TuneEditor::onTableModified() {
   if (!changed_) {
     changed_ = true;
-    setWindowTitle("LibreTuner - Tune Editor *");
+    setTitle("LibreTuner - Tune Editor *");
   }
 }
 
