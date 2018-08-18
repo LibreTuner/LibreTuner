@@ -292,3 +292,6 @@ QTreeView::branch:open {
         image: url(:/icons/branch-open.png);
 }
 
+LogView {
+    background: #202020;
+}
