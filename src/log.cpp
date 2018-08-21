@@ -81,9 +81,9 @@ QVariant Log::data(const QModelIndex &index, int role) const
         case Logger::Mode::Info:
             return QColor::fromRgb(255, 255, 255);
         case Logger::Mode::Debug:
-            return QColor::fromRgb(106, 76, 255);
+            return QColor::fromRgb(185, 81, 255);
         case Logger::Mode::Warning:
-            return QColor::fromRgb(244, 165, 68);
+            return QColor::fromRgb(229, 137, 25);
         }
     }
 

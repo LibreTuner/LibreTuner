@@ -74,4 +74,9 @@ void LogView::rowsInserted(const QModelIndex &parent, int first, int last)
 
         cursor.insertText(text, format);
     }
-}
+
+    QTextCursor cursor = textCursor();
+    cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor, 1);
+    setTextCursor(cursor);
+
+ }
