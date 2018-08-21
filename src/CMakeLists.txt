@@ -54,6 +54,8 @@ set(libretuner_SRC
     asyncroutine.h
     log.cpp
     log.h
+    scanresult.cpp
+    scanresult.h
 
     util/signal.cpp
     util/signal.h

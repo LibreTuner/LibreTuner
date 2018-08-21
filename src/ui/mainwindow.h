@@ -24,6 +24,7 @@
 #include "interfaceswindow.h"
 #include "styledwindow.h"
 #include "dataloggerwindow.h"
+#include "scanresult.h"
 
 #include <QMainWindow>
 #include <QLayout>
@@ -45,6 +46,8 @@ private:
   DownloadWindow *downloadWindow_ = nullptr;
   InterfacesWindow interfacesWindow_;
   std::unique_ptr<DataLoggerWindow> loggerWindow_;
+
+  ScanResult scanResult_;
 
   QLayout *tunesLayout_;
   QLayout *romsLayout_;

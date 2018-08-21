@@ -112,6 +112,7 @@ QWidget *MainWindow::createDiagnosticsTab()
     });
 
     listCodes_ = new QListView;
+    listCodes_->setModel(&scanResult_);
     layout->addWidget(listCodes_);
 
     widget->setLayout(layout);
