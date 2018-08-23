@@ -113,6 +113,8 @@ set(libretuner_SRC
     ui/dataloggerwindow.h
     ui/logview.cpp
     ui/logview.h
+    ui/diagnosticswidget.cpp
+    ui/diagnosticswidget.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
