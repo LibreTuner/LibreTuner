@@ -27,53 +27,47 @@
 /*
  * SocketCan interface for linux hosts
  */
-class SocketCanInterface : public CanInterface, public Socket {
+class SocketCanInterface : public CanInterface {
 public:
-  /* Creates a socket and attempts to bind to an interface.
-   * Throws an error if unsuccessful */
-  static std::shared_ptr<SocketCanInterface> create(const std::string &ifname);
-
   SocketCanInterface(SocketCanInterface &) = delete;
   SocketCanInterface(const SocketCanInterface &) = delete;
   SocketCanInterface(SocketCanInterface &&) = delete;
 
   ~SocketCanInterface() override;
 
-  void send(const CanMessage &message) override;
-
-  /* Receives a message and places it into message. Invalidates
-   * the message if nonblocking and no data is ready to be
-   * received. */
-  void recv(CanMessage &message);
 
   /* Closes the socket */
   void close();
-
-  /* Starts the read loop thread for asynchronous operations */
-  void start() override;
 
   /* Binds the socket to a SocketCAN interface. Returns false
    * if an error occured. */
   bool bind(const std::string &ifname);
 
-  /* Returns true if the socket is ready for reading/writing */
-  bool valid() override { return socket_ > 0; }
-
   /* Sets the socket as nonblocking for async operations */
   void setNonblocking();
 
   /* Socket functions */
-  int fd() override;
-  void onRead() override;
+  int fd() const;
 
   // These constructors should never be used directly!
-  SocketCanInterface() = default;
+  SocketCanInterface(const std::string &ifname);
+
+  // CanInterface interface
+public:
+   virtual void send(const CanMessage &message) override;
+
+   /* Returns true if a message was received before the timeoutc or if nonblocking is enabled
+    * and no messages are queued. */
+   virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
+
+   /* Returns true if the socket is ready for reading/writing */
+   bool valid() override { return socket_ > 0; }
+
+   /* Starts the read loop thread for asynchronous operations */
+   void start() override;
 
 private:
   int socket_ = 0;
-  std::mutex mutex_;
-
-  std::weak_ptr<SocketCanInterface> self_;
 };
 
 #endif // SOCKETCANINTERFACE_H

@@ -54,6 +54,7 @@ StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent)
     T::setWindowFlags(T::windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
 #else
     layout_->setMargin(0);
+    bgLayout_->setMargin(0);
     //setWindowFlags(Qt::FramelessWindowHint);
 #endif
 

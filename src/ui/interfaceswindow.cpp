@@ -109,7 +109,7 @@ QModelIndex InterfacesModel::index(int row, int column, const QModelIndex &paren
 
 QModelIndex InterfacesModel::parent(const QModelIndex &child) const
 {
-    int ind = reinterpret_cast<int>(child.internalPointer());
+    int ind = static_cast<int>(reinterpret_cast<intptr_t>(child.internalPointer()));
     if (ind != 0) {
         return createIndex(ind - 1, 0, nullptr);
     }

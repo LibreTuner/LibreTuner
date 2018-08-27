@@ -27,6 +27,7 @@
 #include "tunewidget.h"
 #include "titlebar.h"
 #include "logview.h"
+#include "diagnosticswidget.h"
 
 #include <QDockWidget>
 #include <QPushButton>
@@ -103,20 +104,7 @@ QWidget *MainWindow::createLogsTab() {
 
 QWidget *MainWindow::createDiagnosticsTab()
 {
-    QWidget *widget = new QWidget();
-    auto *layout = new QVBoxLayout();
-    QPushButton *buttonScan = new QPushButton(tr("Scan for diagnostic codes"));
-    layout->addWidget(buttonScan);
-    connect(buttonScan, &QPushButton::clicked, [] {
-        // Stub
-    });
-
-    listCodes_ = new QListView;
-    listCodes_->setModel(&scanResult_);
-    layout->addWidget(listCodes_);
-
-    widget->setLayout(layout);
-    return widget;
+    return new DiagnosticsWidget();
 }
 
 void MainWindow::createLog()

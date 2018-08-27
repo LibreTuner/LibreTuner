@@ -42,21 +42,17 @@ SocketCanInterface::~SocketCanInterface() {
   }
 }
 
-void SocketCanInterface::recv(CanMessage &message) {
-  std::lock_guard<std::mutex> lk(mutex_);
-  if (socket_ == 0) {
-    // Dead
-    message.invalidate();
-    return;
-  }
 
+
+bool SocketCanInterface::recv(CanMessage &message, std::chrono::milliseconds timeout) {
+  Expects(socket_ != 0);
   can_frame frame;
 
   int nbytes = ::recv(socket_, &frame, sizeof(can_frame), MSG_DONTWAIT);
   if (nbytes < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       message.invalidate();
-      return;
+      return false;
     }
     throw std::runtime_error("Failed to read from socket: " +
                              std::string(strerror(errno)));
@@ -64,11 +60,13 @@ void SocketCanInterface::recv(CanMessage &message) {
 
   // TODO: remove EFF/RTR/ERR flags
   message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
+  return true;
 }
 
+
+
 void SocketCanInterface::send(const CanMessage &message) {
-  std::lock_guard<std::mutex> lk(mutex_);
-  assert(socket_ != 0);
+  Expects(socket_ != 0);
 
   can_frame frame;
 
@@ -88,6 +86,8 @@ void SocketCanInterface::send(const CanMessage &message) {
   }
 }
 
+
+
 bool SocketCanInterface::bind(const std::string &ifname) {
   socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (socket_ == -1) {
@@ -95,7 +95,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
                              std::string(strerror(errno)));
   }
 
-  sockaddr_can addr = {0};
+  sockaddr_can addr = {};
   ifreq ifr;
 
   strcpy(ifr.ifr_name, ifname.c_str());
@@ -115,65 +115,33 @@ bool SocketCanInterface::bind(const std::string &ifname) {
   return true;
 }
 
+
+
 void SocketCanInterface::close() {
-  std::lock_guard<std::mutex> lk(mutex_);
-  assert(socket_ != 0);
-  SocketHandler::get()->removeSocket(this);
+  Expects(socket_ != 0);
   ::close(socket_);
   socket_ = 0;
 }
 
+
+
 void SocketCanInterface::start() {
   assert(socket_ != 0);
-
-  // setNonblocking();
-  SocketHandler::get()->addSocket(this);
 }
 
-int SocketCanInterface::fd() { return socket_; }
 
-void SocketCanInterface::onRead() {
-  auto ptr = self_.lock();
-  if (!ptr) {
-    return;
-  }
-  CanMessage message;
-  while (true) {
-    try {
-      recv(message);
-      if (message.valid()) {
-        signal_->call(message);
-      } else {
-        break;
-      }
-    } catch (...) {
-      // rethrow for now...
-      // TODO: Log error somewhere
-      throw;
-    }
-  }
+
+int SocketCanInterface::fd() const { return socket_; }
+
+SocketCanInterface::SocketCanInterface(const std::string &ifname)
+{
+    Expects(bind(ifname));
 }
+
+
 
 void SocketCanInterface::setNonblocking() {
-  assert(socket_ != 0);
+  Expects(socket_ != 0);
   int flags = fcntl(socket_, F_GETFL, 0);
   fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
-}
-
-std::shared_ptr<SocketCanInterface>
-SocketCanInterface::create(const std::string &ifname) {
-  auto res = cache.find(ifname);
-  std::shared_ptr<SocketCanInterface> ptr;
-  if (res != cache.end()) {
-    if (auto p = res->second.lock()) {
-      return p;
-    } else {
-      cache.erase(res);
-    }
-  }
-  ptr = std::make_shared<SocketCanInterface>();
-  ptr->bind(ifname);
-  ptr->self_ = ptr;
-  cache.emplace(ifname, ptr);
-  return ptr;
 }
