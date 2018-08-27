@@ -24,7 +24,6 @@
 #include "interfaceswindow.h"
 #include "styledwindow.h"
 #include "dataloggerwindow.h"
-#include "scanresult.h"
 
 #include <QMainWindow>
 #include <QLayout>
@@ -47,13 +46,10 @@ private:
   InterfacesWindow interfacesWindow_;
   std::unique_ptr<DataLoggerWindow> loggerWindow_;
 
-  ScanResult scanResult_;
-
   QLayout *tunesLayout_;
   QLayout *romsLayout_;
   QComboBox *comboLogVehicles_;
   QListView *listLogs_;
-  QListView *listCodes_;
   QMainWindow *main_;
   QDockWidget *logDock_;
 

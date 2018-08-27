@@ -2,6 +2,9 @@
 #define DIAGNOSTICSWIDGET_H
 
 #include <QWidget>
+#include <QListView>
+
+#include "scanresult.h"
 
 class DiagnosticsWidget : public QWidget
 {
@@ -12,6 +15,11 @@ public:
 signals:
 
 public slots:
+
+private:
+    QListView *listCodes_;
+
+    ScanResult scanResult_;
 };
 
 #endif // DIAGNOSTICSWIDGET_H
