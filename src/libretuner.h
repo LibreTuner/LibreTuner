@@ -68,11 +68,13 @@ public:
    * if none exist. May return nullptr */
   DataLinkPtr getDataLink();
 
-  /* Returns a vehicle link queried with the default datalink */
+  /* Returns a vehicle link queried with the default datalink. Yeah it's
+   * confusing. Use this one \/*/
   std::unique_ptr<VehicleLink> getVehicleLink();
 
   /* Queries for an attached vehicle and returns a vehicle link.
-     The returned link may be nullptr if no datalink is attached. */
+   * The returned link may be nullptr if no datalink is attached. If you're
+   * confused, use that one /\ */
   std::unique_ptr<VehicleLink> queryVehicleLink();
 
   /* Returns the log */

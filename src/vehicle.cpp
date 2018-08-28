@@ -23,6 +23,7 @@
 #include "definitions/definition.h"
 #include "protocols/isotpprotocol.h"
 #include "protocols/udsprotocol.h"
+#include "diagnosticsinterface.h"
 #include "datalink.h"
 #include "datalogger.h"
 #include "flasher.h"
@@ -74,6 +75,19 @@ std::unique_ptr<DownloadInterface> VehicleLink::downloader() const
     default:
         return nullptr;
     }
+}
+
+std::unique_ptr<DiagnosticsInterface> VehicleLink::diagnostics() const
+{
+    assert(datalink_);
+    if (!vehicle_.definition) {
+        return nullptr;
+    }
+
+    if (auto iface = uds()) {
+        return std::make_unique<UdsDiagnosticInterface>(std::move(iface));
+    }
+    return nullptr;
 }
 
 

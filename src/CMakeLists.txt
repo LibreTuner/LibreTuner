@@ -56,6 +56,8 @@ set(libretuner_SRC
     log.h
     scanresult.cpp
     scanresult.h
+    diagnosticsinterface.cpp
+    diagnosticsinterface.h
 
     util/signal.cpp
     util/signal.h

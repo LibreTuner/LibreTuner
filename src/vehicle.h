@@ -35,6 +35,8 @@ using DataLinkPtr = std::shared_ptr<DataLink>;
 class DownloadInterface;
 using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
+class DiagnosticsInterface;
+
 class Flasher;
 using FlasherPtr = std::shared_ptr<Flasher>;
 
@@ -71,6 +73,9 @@ public:
 
     /* Returns a usable download interface for the link, if one exists. May return nullptr. */
     std::unique_ptr<DownloadInterface> downloader() const;
+
+    /* Returns a diagnostic interface for the link. If none exist, returns nullptr. */
+    std::unique_ptr<DiagnosticsInterface> diagnostics() const;
 
     /* Returns a flash interface for flashing, if one exists. May return nullptr. */
     std::unique_ptr<Flasher> flasher() const;
