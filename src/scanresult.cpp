@@ -80,7 +80,12 @@ QVariant ScanResult::headerData(int section, Qt::Orientation orientation, int ro
 static char firstDtc[4] = {'P', 'C', 'B', 'U'};
 
 static char numericChar(uint8_t c) {
-    return static_cast<char>(c) + '0';
+    if (c <= 9) {
+        return static_cast<char>(c) + '0';
+    } else if (c <= 15) {
+        return static_cast<char>(c) - 10 + 'A';
+    }
+    return '?';
 }
 
 std::string DiagnosticCode::codeString() const

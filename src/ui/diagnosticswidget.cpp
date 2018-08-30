@@ -2,6 +2,7 @@
 
 #include "libretuner.h"
 #include "diagnosticsinterface.h"
+#include "logger.h"
 
 #include <QBoxLayout>
 #include <QPushButton>
@@ -26,7 +27,13 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
 
         // Clear the scan result prior
         scanResult_.clear();
+        Logger::debug("Scanning");
+        try {
         diag->scan(scanResult_);
+        } catch (const std::exception &e) {
+            Logger::debug("Error: " + std::string(e.what()));
+        }
+        Logger::debug("Scanned");
     });
 
     listCodes_ = new QListView;

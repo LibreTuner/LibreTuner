@@ -67,6 +67,8 @@ public:
     VehicleLink(const Vehicle &vehicle, const DataLinkPtr &link) : vehicle_(vehicle), datalink_(link) {}
     VehicleLink(Vehicle &&vehicle, const DataLinkPtr &link) : vehicle_(std::move(vehicle)), datalink_(link) {}
 
+    ~VehicleLink();
+
     /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
        nullptr if a logger could not be created. */
     std::unique_ptr<DataLogger> logger() const;

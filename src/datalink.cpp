@@ -159,7 +159,6 @@ bool J2534DataLink::checkDevice() {
 
 DataLink::~DataLink()
 {
-
 }
 
 DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {

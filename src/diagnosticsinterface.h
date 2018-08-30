@@ -29,6 +29,8 @@ namespace uds {
 class DiagnosticsInterface
 {
 public:
+    virtual ~DiagnosticsInterface() = default;
+
     /* Scans the interface for codes and fills result */
     virtual void scan(ScanResult &result) =0;
 };
@@ -38,6 +40,7 @@ public:
 class UdsDiagnosticInterface : public DiagnosticsInterface {
 public:
     explicit UdsDiagnosticInterface(std::unique_ptr<uds::Protocol> &&uds);
+
 
     virtual void scan(ScanResult &result) override;
 

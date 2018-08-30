@@ -27,6 +27,7 @@
 #include "datalink.h"
 #include "datalogger.h"
 #include "flasher.h"
+#include "logger.h"
 
 
 Vehicle Vehicle::fromVin(const std::string &vin) {
@@ -147,4 +148,9 @@ std::unique_ptr<CanInterface> VehicleLink::can() const
         return nullptr;
     }
     return datalink_->can(vehicle_.definition->baudrate());
+}
+
+VehicleLink::~VehicleLink()
+{
+    Logger::debug("Closing vehicle link");
 }

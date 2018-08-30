@@ -19,6 +19,7 @@
 #include "diagnosticsinterface.h"
 
 #include "protocols/udsprotocol.h"
+#include "logger.h"
 
 #include <gsl/gsl>
 
@@ -38,7 +39,7 @@ void UdsDiagnosticInterface::scan(ScanResult &result)
     uds_->request(request, 0x43, response);
 
     // Decode results as per https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
-    for (size_t i = 0; i < response.data.size(); i += 2) {
+    for (size_t i = 1; i < response.data.size(); i += 2) {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
         code.description = "unknown";

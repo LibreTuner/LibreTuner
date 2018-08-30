@@ -33,7 +33,7 @@ class ScanResult : public QAbstractTableModel
 public:
     ScanResult();
 
-    void add(DiagnosticCode &&code) { codes_.emplace_back(std::move(code)); }
+    void add(DiagnosticCode &&code) { beginInsertRows(QModelIndex(), codes_.size(), codes_.size()); codes_.emplace_back(std::move(code)); endInsertRows(); }
 
     void clear() { codes_.clear(); }
 
