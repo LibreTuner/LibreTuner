@@ -58,6 +58,8 @@ set(libretuner_SRC
     scanresult.h
     diagnosticsinterface.cpp
     diagnosticsinterface.h
+    dtcdescriptions.cpp
+    dtcdescriptions.h
 
     util/signal.cpp
     util/signal.h

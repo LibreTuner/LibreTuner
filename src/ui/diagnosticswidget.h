@@ -2,7 +2,7 @@
 #define DIAGNOSTICSWIDGET_H
 
 #include <QWidget>
-#include <QListView>
+#include <QTableView>
 
 #include "scanresult.h"
 
@@ -17,7 +17,7 @@ signals:
 public slots:
 
 private:
-    QListView *listCodes_;
+    QTableView *listCodes_;
 
     ScanResult scanResult_;
 };

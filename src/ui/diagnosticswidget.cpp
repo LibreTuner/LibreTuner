@@ -6,8 +6,8 @@
 
 #include <QBoxLayout>
 #include <QPushButton>
-#include <QListView>
 #include <QMessageBox>
+#include <QHeaderView>
 
 DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
 {
@@ -19,25 +19,31 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
         if (!link) {
             return;
         }
-        auto diag = link->diagnostics();
+        std::unique_ptr<DiagnosticsInterface> diag;
+        try {
+            diag = link->diagnostics();
+        } catch (const std::exception &e) {
+            QMessageBox(QMessageBox::Warning, "No diagnostic interface", "Failed to load diagnostic interface: " + QString(e.what())).exec();
+            return;
+        }
         if (!diag) {
-            QMessageBox(QMessageBox::Warning, "No diagnostic interface", "The default datalink does not have a supported diagnostic interface").show();
+            QMessageBox(QMessageBox::Warning, "No diagnostic interface", "The default datalink does not have a supported diagnostic interface").exec();
             return;
         }
 
         // Clear the scan result prior
         scanResult_.clear();
-        Logger::debug("Scanning");
         try {
         diag->scan(scanResult_);
         } catch (const std::exception &e) {
-            Logger::debug("Error: " + std::string(e.what()));
+            Logger::critical("Scan error: " + std::string(e.what()));
         }
-        Logger::debug("Scanned");
     });
 
-    listCodes_ = new QListView;
+    listCodes_ = new QTableView;
     listCodes_->setModel(&scanResult_);
+    listCodes_->horizontalHeader()->setStretchLastSection(true);
+    listCodes_->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     layout->addWidget(listCodes_);
 
     setLayout(layout);
