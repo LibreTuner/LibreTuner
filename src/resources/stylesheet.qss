@@ -176,6 +176,10 @@ QComboBox QAbstractItemView::item {
     min-height: 1.2em;
 }
 
+QTableView {
+    border: 1px solid #404040;
+}
+
 QTableView QTableCornerButton::section {
     border: 0px;
     background-color: #303030;
