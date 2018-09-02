@@ -69,6 +69,10 @@ QVariant ScanResult::headerData(int section, Qt::Orientation orientation, int ro
         return QVariant();
     }
 
+    if (orientation != Qt::Horizontal) {
+        return QVariant();
+    }
+
     if (section == 0) {
         return "Code";
     } else if (section == 1) {

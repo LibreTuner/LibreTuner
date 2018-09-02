@@ -44,6 +44,7 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
     listCodes_->setModel(&scanResult_);
     listCodes_->horizontalHeader()->setStretchLastSection(true);
     listCodes_->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    listCodes_->verticalHeader()->setVisible(false);
     layout->addWidget(listCodes_);
 
     setLayout(layout);
