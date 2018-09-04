@@ -56,7 +56,7 @@ void DtcDescriptions::load()
             continue;
         }
 
-        descriptions_.emplace(attrs.value("id").toString().toStdString(), xml.text().toString().toStdString());
+        descriptions_.emplace(attrs.value("code").toString().toStdString(), xml.readElementText().toStdString());
     }
 
     if (xml.hasError()) {
