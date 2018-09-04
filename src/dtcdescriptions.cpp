@@ -65,6 +65,8 @@ void DtcDescriptions::load()
                              .arg(xml.lineNumber())
                              .arg(xml.columnNumber()).toStdString());
     }
+
+    Logger::info("Loaded " + std::to_string(descriptions_.size()) + " DTC descriptions");
 }
 
 
