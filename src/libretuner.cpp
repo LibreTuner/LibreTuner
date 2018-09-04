@@ -54,6 +54,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
   Q_INIT_RESOURCE(icons);
   Q_INIT_RESOURCE(definitions);
   Q_INIT_RESOURCE(stylesheet);
+  Q_INIT_RESOURCE(codes);
 
   home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -118,12 +119,16 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
   checkHome();
 
+  dtcDescriptions_.load();
+
   QFile file(":/stylesheet.qss");
   if (file.open(QFile::ReadOnly)) {
       setStyleSheet(file.readAll());
       file.close();
   }
 }
+
+
 
 void LibreTuner::editTune(const TunePtr &tune) {
   TuneDataPtr data = std::make_shared<TuneData>(tune);
@@ -139,6 +144,8 @@ void LibreTuner::editTune(const TunePtr &tune) {
   tuneEditor_ = std::make_unique<TuneEditor>(data);
   tuneEditor_->show();
 }
+
+
 
 void LibreTuner::flashTune(const TunePtr &tune) {
   TuneDataPtr data = std::make_shared<TuneData>(tune);
@@ -173,7 +180,11 @@ void LibreTuner::flashTune(const TunePtr &tune) {
   }
 }
 
+
+
 LibreTuner *LibreTuner::get() { return _global; }
+
+
 
 void LibreTuner::checkHome() {
   QDir home(home_);
@@ -198,6 +209,8 @@ void LibreTuner::checkHome() {
     }
   }
 }
+
+
 
 DataLinkPtr LibreTuner::getDataLink() {
   // Get the default interface
@@ -225,6 +238,8 @@ DataLinkPtr LibreTuner::getDataLink() {
   }
 }
 
+
+
 std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
 {
     QMessageBox msg(QMessageBox::Information, "Querying vehicle", "Searching for a connected vehicle...");
@@ -246,6 +261,8 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink()
 
     return nullptr;
 }
+
+
 
 std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
 {
@@ -293,6 +310,8 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink()
     }
     return std::make_unique<VehicleLink>(std::move(v), dl);
 }
+
+
 
 LibreTuner::~LibreTuner()
 {

@@ -17,8 +17,64 @@
  */
 
 #include "dtcdescriptions.h"
+#include "logger.h"
 
-DtcDescriptions::DtcDescriptions()
+#include <QXmlStreamReader>
+#include <QFile>
+
+
+
+void DtcDescriptions::load()
 {
+    QFile file(":/codes.xml");
+    if (!file.open(QFile::ReadOnly)) {
+        Logger::warning("Could not open :/codes.xml. DTC descriptions will not be available");
+        return;
+    }
 
+    QXmlStreamReader xml(&file);
+
+    if (!xml.readNextStartElement()) {
+        Logger::warning("Could not load DTC descriptions: no xml start element");
+        return;
+    }
+
+    if (xml.name() != "codes") {
+        Logger::warning(("Could not load DTC descriptions: xml start element name was '" + xml.name() + "', expected 'codes'").toStdString());
+        return;
+    }
+
+    while (xml.readNextStartElement()) {
+        if (xml.name() != "code") {
+            xml.raiseError("unexpected element. Expected 'code' tag");
+            continue;
+        }
+
+        QXmlStreamAttributes attrs = xml.attributes();
+        if (!attrs.hasAttribute("code")) {
+            xml.raiseError("no code attribute");
+            continue;
+        }
+
+        descriptions_.emplace(attrs.value("id").toString().toStdString(), xml.text().toString().toStdString());
+    }
+
+    if (xml.hasError()) {
+        Logger::warning(QObject::tr("Failed to load DTC descriptions due to an xml error: %1\nLine %2, column %3")
+                             .arg(xml.errorString())
+                             .arg(xml.lineNumber())
+                             .arg(xml.columnNumber()).toStdString());
+    }
+}
+
+
+
+std::pair<bool, std::string> DtcDescriptions::get(const std::string &code) const
+{
+    auto it = descriptions_.find(code);
+    if (it == descriptions_.end()) {
+        return std::make_pair(false, std::string());
+    }
+
+    return std::make_pair(true, it->second);
 }

@@ -21,6 +21,7 @@
 
 #include "definitions/definitionmanager.h"
 #include "protocols/canlog.h"
+#include "dtcdescriptions.h"
 #include "datalink.h"
 #include "log.h"
 #include "ui/mainwindow.h"
@@ -77,6 +78,8 @@ public:
    * confused, use that one /\ */
   std::unique_ptr<VehicleLink> queryVehicleLink();
 
+  const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
+
   /* Returns the log */
   Log &log() { return log_; }
 
@@ -86,6 +89,7 @@ private:
   std::unique_ptr<FlashWindow> flashWindow_;
   CanLog canLog_;
   Log log_;
+  DtcDescriptions dtcDescriptions_;
 
   /* Location of home directory. */
   QString home_;

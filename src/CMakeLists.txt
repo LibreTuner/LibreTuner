@@ -168,6 +168,7 @@ qt5_add_resources(libretuner_SRC
     resources/icons.qrc
     resources/definitions.qrc
     resources/stylesheet.qrc
+    resources/codes.qrc
 )
 
 # Separate the program into a library for testing

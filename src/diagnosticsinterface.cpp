@@ -20,6 +20,7 @@
 
 #include "protocols/udsprotocol.h"
 #include "logger.h"
+#include "libretuner.h"
 
 #include <gsl/gsl>
 
@@ -42,7 +43,10 @@ void UdsDiagnosticInterface::scan(ScanResult &result)
     for (size_t i = 1; i < response.data.size(); i += 2) {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
-        code.description = "unknown";
+
+        // Temporary description resolution. In the future, manufacturer-specific codes will be added
+        auto descRes = LibreTuner::get()->dtcDescriptions().get(code.codeString());
+        code.description = descRes.first ? descRes.second : "unknown";
 
         result.add(std::move(code));
     }
