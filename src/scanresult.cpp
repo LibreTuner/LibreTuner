@@ -25,6 +25,13 @@ ScanResult::ScanResult()
 
 }
 
+void ScanResult::clear()
+{
+    beginResetModel();
+    codes_.clear();
+    endResetModel();
+}
+
 int ScanResult::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) {

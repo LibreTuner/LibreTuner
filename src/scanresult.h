@@ -35,7 +35,7 @@ public:
 
     void add(DiagnosticCode &&code) { beginInsertRows(QModelIndex(), codes_.size(), codes_.size()); codes_.emplace_back(std::move(code)); endInsertRows(); }
 
-    void clear() { codes_.clear(); }
+    void clear();
 
     // QAbstractItemModel interface
 public:
