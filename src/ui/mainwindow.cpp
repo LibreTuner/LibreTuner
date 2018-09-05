@@ -237,7 +237,7 @@ void MainWindow::on_buttonDownloadRom_clicked() {
 
 void MainWindow::newLogClicked()
 {
-    VehicleLinkPtr link = LibreTuner::get()->getVehicleLink();
+    std::unique_ptr<VehicleLink> link = LibreTuner::get()->getVehicleLink();
     if (!link) {
         return;
     }
