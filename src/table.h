@@ -65,7 +65,7 @@ public:
 
   /* Serializes raw data. Returns false if the buffer is too small. */
   virtual bool serialize(gsl::span<uint8_t> data,
-                         Endianness endian = ENDIAN_BIG) = 0;
+                         Endianness endian = Endianness::Big) = 0;
 
   /* Returns the minimum buffer size for serialization */
   virtual size_t rawSize() = 0;
@@ -132,7 +132,7 @@ public:
   void calcDifference(const TablePtr &table) override;
 
   bool serialize(gsl::span<uint8_t> data,
-                 Endianness endian = ENDIAN_BIG) override;
+                 Endianness endian = Endianness::Big) override;
 
   size_t rawSize() override;
 
@@ -180,7 +180,7 @@ public:
   void calcDifference(const TablePtr &table) override;
 
   bool serialize(gsl::span<uint8_t> data,
-                 Endianness endian = ENDIAN_BIG) override;
+                 Endianness endian = Endianness::Big) override;
 
   size_t rawSize() override;
 
@@ -436,7 +436,7 @@ void Table::readRow(std::vector<T> &data, Endianness endian,
                     gsl::span<const uint8_t> raw) {
   const uint8_t *ptr = raw.data();
   const uint8_t *end = raw.data() + raw.size();
-  if (endian == ENDIAN_BIG) {
+  if (endian == Endianness::Big) {
     for (; ptr < end; ptr += sizeof(T)) {
       data.push_back(readBE<T>(gsl::make_span(ptr, end)));
     }
@@ -452,7 +452,7 @@ void Table::readRow(std::vector<T> &data, Endianness endian,
 template <typename T>
 void Table::writeRow(std::vector<T> &data, Endianness endian,
                      gsl::span<uint8_t> odata) {
-  if (endian == ENDIAN_BIG) {
+  if (endian == Endianness::Big) {
     for (T f : data) {
       writeBE<T>(f, odata);
       odata = odata.subspan(sizeof(T));

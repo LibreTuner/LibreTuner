@@ -450,7 +450,7 @@ bool Definition::loadMain(const QString &path) {
   bool foundSize = false, foundFlashOffset = false, foundFlashSize = false;
 
   // Default endianness is big
-  endianness_ = ENDIAN_BIG;
+  endianness_ = Endianness::Big;
   downloadMode_ = DM_NONE;
   flashMode_ = FLASH_NONE;
 
@@ -475,9 +475,9 @@ bool Definition::loadMain(const QString &path) {
     } else if (xml.name() == "endianness") {
       QString sEndian = xml.readElementText().trimmed().toLower();
       if (sEndian == "big") {
-        endianness_ = ENDIAN_BIG;
+        endianness_ = Endianness::Big;
       } else if (sEndian == "little") {
-        endianness_ = ENDIAN_LITTLE;
+        endianness_ = Endianness::Little;
       } else {
         xml.raiseError(
             "Invalid endianness. Expected values: 'big' or 'little'");

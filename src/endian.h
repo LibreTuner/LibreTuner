@@ -20,9 +20,9 @@
 #define ENDIANNESS_H
 
 // TODO: make this an enum class
-enum Endianness {
-  ENDIAN_BIG,
-  ENDIAN_LITTLE,
+enum class Endianness {
+  Big,
+  Little,
 };
 
 #endif

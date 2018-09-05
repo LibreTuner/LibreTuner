@@ -56,7 +56,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx,
       if (data.size() != (definition->sizeX() * sizeof(float))) {
         return std::make_pair(false, "Invalid table size");
       }
-      table = std::make_shared<Table1d<float>>(definition, ENDIAN_BIG, data);
+      table = std::make_shared<Table1d<float>>(definition, Endianness::Big, data);
       break;
     }
     break;
@@ -67,7 +67,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx,
           (definition->sizeX() * definition->sizeY() * sizeof(float))) {
         return std::make_pair(false, "Invalid table size");
       }
-      table = std::make_shared<Table2d<float>>(definition, ENDIAN_BIG, data);
+      table = std::make_shared<Table2d<float>>(definition, Endianness::Big, data);
       break;
     }
 
