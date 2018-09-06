@@ -37,7 +37,7 @@ class Packet {
 public:
   Packet();
   Packet(Packet &&) = default;
-  isotp::Packet &operator=(Packet &&packet);
+  Packet &operator=(Packet &&packet);
   explicit Packet(gsl::span<const uint8_t> data);
 
   /* Sets the packet data and resets the pointer
