@@ -68,7 +68,7 @@ FrameType frame_type(const CanMessage &message) {
 
 
 
-Frame Frame::single(gsl::span<uint8_t> data) {
+Frame Frame::single(gsl::span<const uint8_t> data) {
   Expects(data.size() <= 7);
   Frame f;
   f.data[0] = data.size();
@@ -79,7 +79,7 @@ Frame Frame::single(gsl::span<uint8_t> data) {
 
 
 
-Frame Frame::first(uint16_t size, gsl::span<uint8_t, 6> data) {
+Frame Frame::first(uint16_t size, gsl::span<const uint8_t, 6> data) {
   Frame f;
   f.data[0] = 0x10 | ((size >> 8) & 0x0F);
   f.data[1] = static_cast<uint8_t>(size & 0xFF);
@@ -91,7 +91,7 @@ Frame Frame::first(uint16_t size, gsl::span<uint8_t, 6> data) {
 
 
 
-Frame Frame::consecutive(uint8_t index, gsl::span<uint8_t> data) {
+Frame Frame::consecutive(uint8_t index, gsl::span<const uint8_t> data) {
   Expects(data.size() <= 7);
   Expects(index <= 15);
   Frame f;
@@ -188,7 +188,7 @@ void Protocol::sendConsecutiveFrames()
         while (!packet_.eof()) {
             std::this_thread::sleep_for(fc.separationTime);
             std::vector<uint8_t> data = packet_.next(7);
-            sendConsecutiveFrame(incrementConsec(), data);
+            send_consecutive_frame(*this, incrementConsec(), data);
 
             if (fc.blockSize > 0) {
                 if (fc.blockSize == 1) {
@@ -395,7 +395,7 @@ void Protocol::recv(Packet &result) {
             }
             result.append(gsl::make_span(ff.data).first(ff.data_length));
             FlowControlFrame fc;
-            sendFlowFrame(fc);
+            send_flow_frame(*this, fc);
             // Start receiving consec packets
             recvConsecutiveFrames(result, ff.size - ff.data_length);
             return;
@@ -451,11 +451,11 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining)
 void Protocol::send(Packet &&packet) {
     if (packet.size() <= 7) {
         std::vector<uint8_t> data = packet.next(7);
-        sendSingleFrame(data);
+        send_single_frame(*this, data);
     } else {
         auto remaining = packet.remaining();
         std::vector<uint8_t> data = packet.next(6);
-        sendFirstFrame(remaining, data);
+        send_first_frame(*this, remaining, data);
 
         packet_ = std::move(packet);
         // Start sending consecutive frames
@@ -473,26 +473,30 @@ void Protocol::send(const Frame &frame) {
 
 
 
-void Protocol::sendSingleFrame(gsl::span<uint8_t> data) {
-  send(Frame::single(data));
+void send_first_frame(isotp::Protocol& protocol, uint16_t size, gsl::span<const uint8_t, 6> data)
+{
+    protocol.send(Frame::first(size, data));
 }
 
 
 
-void Protocol::sendFirstFrame(uint16_t size, gsl::span<uint8_t, 6> data) {
-  send(Frame::first(size, data));
+void send_consecutive_frame(isotp::Protocol& protocol, uint8_t index, gsl::span<const uint8_t> data)
+{
+    protocol.send(Frame::consecutive(index, data));
 }
 
 
 
-void Protocol::sendConsecutiveFrame(uint8_t index, gsl::span<uint8_t> data) {
-  send(Frame::consecutive(index, data));
+void send_flow_frame(isotp::Protocol& protocol, const isotp::FlowControlFrame& frame)
+{
+    protocol.send(Frame::flow(frame));
 }
 
 
 
-void Protocol::sendFlowFrame(const FlowControlFrame &fc) {
-  send(Frame::flow(fc));
+void send_single_frame(isotp::Protocol& protocol, gsl::span<const uint8_t> data)
+{
+    protocol.send(Frame::single(data));
 }
 
 } // namespace isotp

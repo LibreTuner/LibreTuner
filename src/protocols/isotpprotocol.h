@@ -123,9 +123,9 @@ struct Frame {
   Frame() = default;
   explicit Frame(const CanMessage &message);
 
-  static Frame single(gsl::span<uint8_t> data);
-  static Frame first(uint16_t size, gsl::span<uint8_t, 6> data);
-  static Frame consecutive(uint8_t index, gsl::span<uint8_t> data);
+  static Frame single(gsl::span<const uint8_t> data);
+  static Frame first(uint16_t size, gsl::span<const uint8_t, 6> data);
+  static Frame consecutive(uint8_t index, gsl::span<const uint8_t> data);
   static Frame flow(const FlowControlFrame &frame);
 
   FrameType type() const;
@@ -155,15 +155,6 @@ public:
                     Options = Options());
   ~Protocol();
 
-  void sendSingleFrame(gsl::span<uint8_t> data);
-
-  void sendFirstFrame(uint16_t size, gsl::span<uint8_t, 6> data);
-
-  void sendConsecutiveFrame(uint8_t index, gsl::span<uint8_t> data);
-
-  // Sends a flow control frame
-  void sendFlowFrame(const FlowControlFrame &frame);
-
   void recv(Packet &result);
 
   // Sends a request and waits for a response
@@ -179,15 +170,15 @@ public:
   void setOptions(const Options &options) { options_ = options; }
 
   const Options &options() const { return options_; }
+  
+  /* Sends a frame to the CAN interface */
+  void send(const Frame &frame);
 
 private:
   std::unique_ptr<CanInterface> can_;
   Options options_;
   uint8_t consecIndex_;
   Packet packet_;
-
-  /* Sends a frame to the CAN interface */
-  void send(const Frame &frame);
 
   // Sending
   void sendConsecutiveFrames();
@@ -199,6 +190,16 @@ private:
 
   bool recvFrame(Frame &frame);
 };
+
+
+void send_single_frame(Protocol &protocol, gsl::span<const uint8_t> data);
+
+void send_first_frame(Protocol &protocol, uint16_t size, gsl::span<const uint8_t, 6> data);
+
+void send_consecutive_frame(Protocol &protocol, uint8_t index, gsl::span<const uint8_t> data);
+
+// Sends a flow control frame
+void send_flow_frame(Protocol &protocol, const FlowControlFrame &frame);
 
 
 namespace details {
