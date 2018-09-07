@@ -93,14 +93,8 @@ void Tune::readTables(QXmlStreamReader &xml) {
         QByteArray data =
             QByteArray::fromBase64(xml.readElementText().toLatin1());
 
-        auto res = tables_->set(
-            id, gsl::make_span(reinterpret_cast<const uint8_t *>(data.data()),
+        tables_->set(id, gsl::make_span(reinterpret_cast<const uint8_t *>(data.data()),
                                data.size()));
-        if (!res.first) {
-            xml.raiseError(QString::fromStdString("Error reading table data: " +
-                                                  res.second));
-            return;
-        }
     }
 }
 

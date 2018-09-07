@@ -37,7 +37,7 @@ TablePtr TableGroup::get(size_t idx, bool create) {
     return table;
 }
 
-std::pair<bool, std::string> TableGroup::set(size_t idx,
+void TableGroup::set(size_t idx,
                                              gsl::span<const uint8_t> data) {
     assert(idx < tables_.size());
     assert(data.size() >= 0);
@@ -54,7 +54,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx,
         switch (dataType) {
         case TDATA_FLOAT:
             if (data.size() != (definition->sizeX() * sizeof(float))) {
-                return std::make_pair(false, "Invalid table size");
+                throw std::runtime_error("invalid table size");
             }
             table = std::make_shared<Table1d<float>>(definition,
                                                      Endianness::Big, data);
@@ -66,7 +66,7 @@ std::pair<bool, std::string> TableGroup::set(size_t idx,
         case TDATA_FLOAT:
             if (data.size() !=
                 (definition->sizeX() * definition->sizeY() * sizeof(float))) {
-                return std::make_pair(false, "Invalid table size");
+                throw std::runtime_error("invalid table size");
             }
             table = std::make_shared<Table2d<float>>(definition,
                                                      Endianness::Big, data);
@@ -83,8 +83,6 @@ std::pair<bool, std::string> TableGroup::set(size_t idx,
         table->calcDifference(base_->getTable(idx));
         tables_[idx] = table;
     }
-
-    return std::make_pair(true, "");
 }
 
 void TableGroup::apply(gsl::span<uint8_t> data) {

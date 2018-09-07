@@ -43,9 +43,8 @@ public:
      * and the table does not exist. */
     TablePtr get(size_t idx, bool create = true);
 
-    /* Creates a new table from data. Returns (false, error) on error and (true,
-     * "") on success. */
-    std::pair<bool, std::string> set(size_t idx, gsl::span<const uint8_t> data);
+    /* Creates a new table from data. May throw exception. */
+    void set(size_t idx, gsl::span<const uint8_t> data);
 
     /* Applies table modifications to rom data */
     void apply(gsl::span<uint8_t> data);
