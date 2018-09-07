@@ -25,9 +25,9 @@
 #include <QXmlStreamWriter>
 
 enum class InterfaceType {
-  SocketCan,
-  J2534,
-  Invalid,
+    SocketCan,
+    J2534,
+    Invalid,
 };
 
 class InterfaceSettings;
@@ -35,61 +35,61 @@ using InterfaceSettingsPtr = std::shared_ptr<InterfaceSettings>;
 
 class InterfaceSettings {
 public:
-  void save(QXmlStreamWriter &xml);
-  void load(QXmlStreamReader &xml);
+    void save(QXmlStreamWriter &xml);
+    void load(QXmlStreamReader &xml);
 
-  static std::string stringType(InterfaceType type);
+    static std::string stringType(InterfaceType type);
 
-  static InterfaceType type(std::string name);
+    static InterfaceType type(std::string name);
 
-  InterfaceSettings(InterfaceType type) : type_(type) {};
+    InterfaceSettings(InterfaceType type) : type_(type){};
 
-  /* Creates an interface for the specified type. Returns
-   * nullptr if the type is not supported */
-  static InterfaceSettingsPtr create(InterfaceType type);
+    /* Creates an interface for the specified type. Returns
+     * nullptr if the type is not supported */
+    static InterfaceSettingsPtr create(InterfaceType type);
 
-  InterfaceType type() { return type_; }
+    InterfaceType type() { return type_; }
 
-  std::string name() { return name_; }
+    std::string name() { return name_; }
 
-  void setName(const std::string &name) { name_ = name; }
+    void setName(const std::string &name) { name_ = name; }
 
-  virtual ~InterfaceSettings() = default;
+    virtual ~InterfaceSettings() = default;
 
 protected:
-  virtual void saveCustom(QXmlStreamWriter &xml) = 0;
-  /* Loads a custom element. */
-  virtual void loadCustom(QXmlStreamReader &xml) = 0;
+    virtual void saveCustom(QXmlStreamWriter &xml) = 0;
+    /* Loads a custom element. */
+    virtual void loadCustom(QXmlStreamReader &xml) = 0;
 
 private:
-  InterfaceType type_;
-  std::string name_;
+    InterfaceType type_;
+    std::string name_;
 };
 
 class SocketCanSettings : public InterfaceSettings {
 public:
-  void setInterface(const std::string &interface);
-  std::string interface() { return scInterface_; }
-  SocketCanSettings() : InterfaceSettings(InterfaceType::SocketCan) {}
+    void setInterface(const std::string &interface);
+    std::string interface() { return scInterface_; }
+    SocketCanSettings() : InterfaceSettings(InterfaceType::SocketCan) {}
 
 protected:
-  void saveCustom(QXmlStreamWriter &xml) override;
+    void saveCustom(QXmlStreamWriter &xml) override;
 
-  void loadCustom(QXmlStreamReader &xml) override;
+    void loadCustom(QXmlStreamReader &xml) override;
 
 private:
-  std::string scInterface_;
+    std::string scInterface_;
 };
 
 namespace j2534 {
 class J2534;
 using J2534Ptr = std::shared_ptr<J2534>;
-}
+} // namespace j2534
 
 class J2534Settings : public InterfaceSettings {
 public:
     void setInterface(const j2534::J2534Ptr &j2534);
-    j2534::J2534Ptr interface() const  { return j2534_; }
+    j2534::J2534Ptr interface() const { return j2534_; }
     J2534Settings() : InterfaceSettings(InterfaceType::J2534) {}
 
 protected:
