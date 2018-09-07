@@ -17,49 +17,49 @@
  */
 
 #include "romwidget.h"
-#include "rommanager.h"
 #include "logger.h"
+#include "rommanager.h"
 
 #include "createtunedialog.h"
 #include <QGraphicsPixmapItem>
+#include <QPainter>
 #include <QPushButton>
 #include <QStyle>
-#include <QVBoxLayout>
 #include <QStyleOption>
-#include <QPainter>
+#include <QVBoxLayout>
 
-RomWidget::RomWidget(const RomMeta& rom, QWidget *parent) : QWidget(parent), romId_(rom.id) {
-  auto *vlayout = new QVBoxLayout(this);
-  auto *hlayout = new QHBoxLayout();
-  auto *buttonLayout = new QVBoxLayout();
+RomWidget::RomWidget(const RomMeta &rom, QWidget *parent)
+    : QWidget(parent), romId_(rom.id) {
+    auto *vlayout = new QVBoxLayout(this);
+    auto *hlayout = new QHBoxLayout();
+    auto *buttonLayout = new QVBoxLayout();
 
-  label_ = new QLabel(QString::fromStdString(rom.name), this);
-  label_->setAlignment(Qt::AlignCenter);
+    label_ = new QLabel(QString::fromStdString(rom.name), this);
+    label_->setAlignment(Qt::AlignCenter);
 
-  QLabel *icon = new QLabel();
-  icon->setPixmap(QPixmap(":/icons/rom-file.png"));
-  vlayout->addWidget(label_);
-  vlayout->addLayout(hlayout);
-  hlayout->addWidget(icon);
-  hlayout->addLayout(buttonLayout);
+    QLabel *icon = new QLabel();
+    icon->setPixmap(QPixmap(":/icons/rom-file.png"));
+    vlayout->addWidget(label_);
+    vlayout->addLayout(hlayout);
+    hlayout->addWidget(icon);
+    hlayout->addLayout(buttonLayout);
 
-  tuneButton_ = new QPushButton(
-      style()->standardIcon(QStyle::SP_FileDialogNewFolder), "Create tune");
-  deleteButton_ =
-      new QPushButton(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
+    tuneButton_ = new QPushButton(
+        style()->standardIcon(QStyle::SP_FileDialogNewFolder), "Create tune");
+    deleteButton_ =
+        new QPushButton(style()->standardIcon(QStyle::SP_TrashIcon), "Delete");
 
-  connect(tuneButton_, &QPushButton::clicked, this,
-          &RomWidget::createTuneClicked);
+    connect(tuneButton_, &QPushButton::clicked, this,
+            &RomWidget::createTuneClicked);
 
-  buttonLayout->addWidget(tuneButton_);
-  buttonLayout->addWidget(deleteButton_);
+    buttonLayout->addWidget(tuneButton_);
+    buttonLayout->addWidget(deleteButton_);
 
-  setLayout(vlayout);
-  setAutoFillBackground(true);
+    setLayout(vlayout);
+    setAutoFillBackground(true);
 }
 
-void RomWidget::paintEvent(QPaintEvent *event)
-{
+void RomWidget::paintEvent(QPaintEvent *event) {
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
@@ -72,7 +72,8 @@ void RomWidget::createTuneClicked() {
     const RomMeta *rom = RomManager::get()->fromId(romId_);
     if (rom == nullptr) {
         Logger::warning("ROM no longer exists");
-        // We need not return here because CreateTuneDialog can take a nullptr in its constructor
+        // We need not return here because CreateTuneDialog can take a nullptr
+        // in its constructor
     }
     CreateTuneDialog dlg(rom);
     dlg.exec();

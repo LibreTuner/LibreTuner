@@ -19,18 +19,17 @@
 #ifndef J2534CANINTERFACE_H
 #define J2534CANINTERFACE_H
 
+#include <atomic>
 #include <memory>
 #include <thread>
-#include <atomic>
 
-#include "protocols/caninterface.h"
 #include "j2534.h"
+#include "protocols/caninterface.h"
 
 
 namespace j2534 {
 
-class Can : public CanInterface
-{
+class Can : public CanInterface {
 public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
     Can(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
@@ -41,7 +40,8 @@ public:
 public:
     virtual void send(const CanMessage &message) override;
     // Returns true if a message was received before the timeout
-    virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
+    virtual bool recv(CanMessage &message,
+                      std::chrono::milliseconds timeout) override;
     virtual bool valid() override;
     virtual void start() override;
 
@@ -49,5 +49,5 @@ private:
     j2534::Channel channel_;
 };
 
-}
+} // namespace j2534
 #endif // J2534CANINTERFACE_H

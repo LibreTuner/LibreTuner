@@ -21,8 +21,8 @@
 
 // TODO: make this an enum class
 enum class Endianness {
-  Big,
-  Little,
+    Big,
+    Little,
 };
 
 #endif

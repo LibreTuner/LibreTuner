@@ -36,42 +36,42 @@
  * Manages ROM files and metadata
  */
 class RomManager : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  static RomManager *get();
-  
-  RomManager(const RomManager&) = delete;
-  RomManager &operator=(const RomManager&) = delete;
+    static RomManager *get();
 
-  /* Loads rom list and metadata. */
-  void load();
+    RomManager(const RomManager &) = delete;
+    RomManager &operator=(const RomManager &) = delete;
 
-  /* Saves rom list and metadata */
-  void save();
+    /* Loads rom list and metadata. */
+    void load();
 
-  const std::vector<RomMeta> &roms() { return roms_; }
+    /* Saves rom list and metadata */
+    void save();
 
-  void addRom(const std::string &name, const DefinitionPtr &definition,
-              gsl::span<const uint8_t> data);
+    const std::vector<RomMeta> &roms() { return roms_; }
 
-  /* Returns the ROM with id or nullptr if the ROM does
-   * not exist. Be careful not to store this reference
-   * as ROMs can be added or removed. */
-  const RomMeta *fromId(int id) const;
-  
-  /* Loads a ROM from a ROM id. May throw an exception if the id
-   * does not exist or if the ROM could not be loaded */
-  std::shared_ptr<Rom> loadId(int id);
+    void addRom(const std::string &name, const DefinitionPtr &definition,
+                gsl::span<const uint8_t> data);
+
+    /* Returns the ROM with id or nullptr if the ROM does
+     * not exist. Be careful not to store this reference
+     * as ROMs can be added or removed. */
+    const RomMeta *fromId(int id) const;
+
+    /* Loads a ROM from a ROM id. May throw an exception if the id
+     * does not exist or if the ROM could not be loaded */
+    std::shared_ptr<Rom> loadId(int id);
 
 private:
-  RomManager() = default;
-  std::vector<RomMeta> roms_;
-  int nextId_{};
+    RomManager() = default;
+    std::vector<RomMeta> roms_;
+    int nextId_{};
 
-  void readRoms(QXmlStreamReader &xml);
+    void readRoms(QXmlStreamReader &xml);
 
 signals:
-  void updateRoms();
+    void updateRoms();
 };
 
 #endif // ROMMANAGER_H

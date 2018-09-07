@@ -20,12 +20,12 @@
 #define FLASHABLE_H
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 enum FlashMode {
-  FLASH_NONE = 0,
-  FLASH_T1, // Uses a CAN interface. Supported: Mazdaspeed 6
+    FLASH_NONE = 0,
+    FLASH_T1, // Uses a CAN interface. Supported: Mazdaspeed 6
 };
 
 class SubDefinition;
@@ -38,19 +38,19 @@ class Tune;
  */
 class Flashable {
 public:
-  explicit Flashable(const std::shared_ptr<Tune>& tune);
+    explicit Flashable(const std::shared_ptr<Tune> &tune);
 
-  // The address offset the data should be flashed to
-  size_t offset() const { return offset_; }
+    // The address offset the data should be flashed to
+    size_t offset() const { return offset_; }
 
-  const std::vector<uint8_t> &data() const { return data_; }
+    const std::vector<uint8_t> &data() const { return data_; }
 
-  SubDefinitionPtr definition() const { return definition_; }
+    SubDefinitionPtr definition() const { return definition_; }
 
 private:
-  std::vector<uint8_t> data_;
-  size_t offset_;
-  SubDefinitionPtr definition_;
+    std::vector<uint8_t> data_;
+    size_t offset_;
+    SubDefinitionPtr definition_;
 };
 
 #endif // FLASHABLE_H

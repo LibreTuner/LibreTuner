@@ -33,32 +33,32 @@ class RomMeta;
  * Manages tunes and tune metadata
  */
 class TuneManager : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  /* Returns the global TuneManager object */
-  static TuneManager *get();
+    /* Returns the global TuneManager object */
+    static TuneManager *get();
 
-  /* Loads tune metadata from storage. */
-  void load();
+    /* Loads tune metadata from storage. */
+    void load();
 
-  /* Saves tune data. */
-  void save();
+    /* Saves tune data. */
+    void save();
 
-  const std::vector<TuneMeta> &tunes() const { return tunes_; }
+    const std::vector<TuneMeta> &tunes() const { return tunes_; }
 
-  /* Creates a new tune with base 'base'. Returns the new tune.
-   * If the tune could not be created, throw exception. */
-  TuneMeta *createTune(const RomMeta& base, const std::string &name);
+    /* Creates a new tune with base 'base'. Returns the new tune.
+     * If the tune could not be created, throw exception. */
+    TuneMeta *createTune(const RomMeta &base, const std::string &name);
 
 private:
-  TuneManager();
+    TuneManager();
 
-  void readTunes(QXmlStreamReader &xml);
+    void readTunes(QXmlStreamReader &xml);
 
-  std::vector<TuneMeta> tunes_;
+    std::vector<TuneMeta> tunes_;
 
 signals:
-  void updateTunes();
+    void updateTunes();
 };
 
 #endif // TUNEMANAGER_H

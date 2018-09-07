@@ -22,14 +22,15 @@
 
 #include <array>
 #include <cassert>
-#include <utility>
 #include <sstream>
+#include <utility>
 
 
 
 namespace uds {
 
-void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) {
+void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId,
+                             Packet &response) {
     isotp_->send(isotp::Packet(data));
     // Receive until we get a non-response-pending packet
     while (true) {
@@ -51,14 +52,16 @@ void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId, Packet
                     continue;
                 }
                 std::stringstream ss;
-                ss << "negative UDS response: 0x" << std::hex << (int)code << " (" << std::dec << (int)code << ")";
+                ss << "negative UDS response: 0x" << std::hex << (int)code
+                   << " (" << std::dec << (int)code << ")";
                 throw std::runtime_error(ss.str());
             }
             throw std::runtime_error("negative UDS response");
         }
 
         if (response.id != expectedId) {
-            throw std::runtime_error("uds response id does not match expected id");
+            throw std::runtime_error(
+                "uds response id does not match expected id");
         }
         return;
     }
@@ -92,20 +95,21 @@ std::vector<uint8_t> Protocol::requestSession(uint8_t type) {
 
 
 std::vector<uint8_t> Protocol::requestSecuritySeed() {
-  std::array<uint8_t, 2> req = {UDS_REQ_SECURITY, 1};
-  Packet packet;
-  request(req, UDS_RES_SECURITY, packet);
+    std::array<uint8_t, 2> req = {UDS_REQ_SECURITY, 1};
+    Packet packet;
+    request(req, UDS_RES_SECURITY, packet);
 
-  if (packet.data.empty()) {
-      throw std::runtime_error("empty SecurityAccess response");
-  }
+    if (packet.data.empty()) {
+        throw std::runtime_error("empty SecurityAccess response");
+    }
 
-  if (packet.data[0] != 1) {
-      throw std::runtime_error("securityAccessType does not match requestSeed");
-  }
+    if (packet.data[0] != 1) {
+        throw std::runtime_error(
+            "securityAccessType does not match requestSeed");
+    }
 
-  packet.data.erase(packet.data.begin());
-  return packet.data;
+    packet.data.erase(packet.data.begin());
+    return packet.data;
 }
 
 
@@ -128,22 +132,23 @@ void Protocol::requestSecurityKey(gsl::span<uint8_t> key) {
 
 
 
-std::vector<uint8_t> Protocol::requestReadMemoryAddress(uint32_t address, uint16_t length) {
-  std::array<uint8_t, 7> req{};
-  req[0] = UDS_REQ_READMEM;
+std::vector<uint8_t> Protocol::requestReadMemoryAddress(uint32_t address,
+                                                        uint16_t length) {
+    std::array<uint8_t, 7> req{};
+    req[0] = UDS_REQ_READMEM;
 
-  req[1] = (address & 0xFF000000) >> 24;
-  req[2] = (address & 0xFF0000) >> 16;
-  req[3] = (address & 0xFF00) >> 8;
-  req[4] = address & 0xFF;
+    req[1] = (address & 0xFF000000) >> 24;
+    req[2] = (address & 0xFF0000) >> 16;
+    req[3] = (address & 0xFF00) >> 8;
+    req[4] = address & 0xFF;
 
-  req[5] = length >> 8;
-  req[6] = length & 0xFF;
+    req[5] = length >> 8;
+    req[6] = length & 0xFF;
 
-  Packet packet;
-  request(req, UDS_RES_READMEM, packet);
+    Packet packet;
+    request(req, UDS_RES_READMEM, packet);
 
-  return packet.data;
+    return packet.data;
 }
 
 } // namespace uds

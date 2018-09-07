@@ -22,62 +22,63 @@
 #include "interfacemanager.h"
 #include "socketcansettingsui.h"
 
-#include <QMessageBox>
 #include <QComboBox>
+#include <QMessageBox>
 #include <QStyledItemDelegate>
 
 Q_DECLARE_METATYPE(InterfaceType)
 
 AddInterfaceDialog::AddInterfaceDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::AddInterfaceDialog) {
-  ui->setupUi(this);
+    ui->setupUi(this);
 
-  ui->comboMode->setItemDelegate(new QStyledItemDelegate());
-  ui->labelError->setVisible(false);
+    ui->comboMode->setItemDelegate(new QStyledItemDelegate());
+    ui->labelError->setVisible(false);
 
-  ui->comboMode->addItem("SocketCAN", QVariant::fromValue<InterfaceType>(
-                                          InterfaceType::SocketCan));
-  ui->comboMode->addItem(
-      "J2534", QVariant::fromValue<InterfaceType>(InterfaceType::J2534));
+    ui->comboMode->addItem("SocketCAN", QVariant::fromValue<InterfaceType>(
+                                            InterfaceType::SocketCan));
+    ui->comboMode->addItem(
+        "J2534", QVariant::fromValue<InterfaceType>(InterfaceType::J2534));
 
-  on_comboMode_currentIndexChanged(ui->comboMode->currentIndex());
+    on_comboMode_currentIndexChanged(ui->comboMode->currentIndex());
 }
 
 AddInterfaceDialog::~AddInterfaceDialog() { delete ui; }
 
 void AddInterfaceDialog::replaceSettings(
     std::unique_ptr<SettingsWidget> widget) {
-  if (customSettings_)
-    ui->mainLayout->removeWidget(customSettings_.get());
-  customSettings_ = std::move(widget);
-  if (customSettings_) {
-    ui->mainLayout->addWidget(customSettings_.get());
-    ui->buttonCreate->setEnabled(true);
-  } else {
-    ui->buttonCreate->setEnabled(false);
-  }
+    if (customSettings_)
+        ui->mainLayout->removeWidget(customSettings_.get());
+    customSettings_ = std::move(widget);
+    if (customSettings_) {
+        ui->mainLayout->addWidget(customSettings_.get());
+        ui->buttonCreate->setEnabled(true);
+    } else {
+        ui->buttonCreate->setEnabled(false);
+    }
 }
 
 void AddInterfaceDialog::on_comboMode_currentIndexChanged(int index) {
-  auto iface = SettingsWidget::create(
-      ui->comboMode->itemData(index).value<InterfaceType>());
-  replaceSettings(std::move(iface));
-  if (!customSettings_) {
-    ui->labelError->setText("The selected interface is not supported on this platform");
-    ui->labelError->setVisible(true);
-  } else {
-    ui->labelError->setVisible(false);
-  }
+    auto iface = SettingsWidget::create(
+        ui->comboMode->itemData(index).value<InterfaceType>());
+    replaceSettings(std::move(iface));
+    if (!customSettings_) {
+        ui->labelError->setText(
+            "The selected interface is not supported on this platform");
+        ui->labelError->setVisible(true);
+    } else {
+        ui->labelError->setVisible(false);
+    }
 }
 
 void AddInterfaceDialog::on_buttonCreate_clicked() {
-  if (!customSettings_) {
-    return;
-  }
+    if (!customSettings_) {
+        return;
+    }
 
-  auto settings = customSettings_->settings();
-  if (settings) {
-    InterfaceManager::get().add(settings);
-    close();
-  }
+    auto settings = customSettings_->settings();
+    if (settings) {
+        InterfaceManager::get().add(settings);
+        close();
+    }
 }

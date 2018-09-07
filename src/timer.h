@@ -19,13 +19,13 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <thread>
-#include <atomic>
-#include <memory>
 
 class TimerRunLoop;
 
@@ -33,51 +33,52 @@ class TimerRunLoop;
  * @todo write docs
  */
 class Timer : public std::enable_shared_from_this<Timer> {
-  friend TimerRunLoop;
+    friend TimerRunLoop;
+
 public:
-  using Callback = std::function<void()>;
+    using Callback = std::function<void()>;
 
-  static std::shared_ptr<Timer> create();
-  static std::shared_ptr<Timer> create(Callback &&cb);
+    static std::shared_ptr<Timer> create();
+    static std::shared_ptr<Timer> create(Callback &&cb);
 
-  void setCallback(Callback &&cb);
-  void setTimeout(std::chrono::milliseconds timeout);
-  std::chrono::milliseconds timeout() const { return timeout_; }
-  /* Starts the timeout timer */
-  void enable();
-  /* Stops the timeout timer */
-  void disable();
+    void setCallback(Callback &&cb);
+    void setTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds timeout() const { return timeout_; }
+    /* Starts the timeout timer */
+    void enable();
+    /* Stops the timeout timer */
+    void disable();
 
-  bool active() const;
-  bool running() const;
+    bool active() const;
+    bool running() const;
 
-  std::chrono::steady_clock::time_point nextTrigger() const;
+    std::chrono::steady_clock::time_point nextTrigger() const;
 
-  ~Timer();
+    ~Timer();
 
-  Timer(const Timer&) = delete;
-  Timer(Timer &&) = delete;
+    Timer(const Timer &) = delete;
+    Timer(Timer &&) = delete;
 
-  Timer() = default;
-  explicit Timer(Callback &&cb);
+    Timer() = default;
+    explicit Timer(Callback &&cb);
 
 protected:
-  bool tryTrigger();
-  void trigger();
+    bool tryTrigger();
+    void trigger();
 
 private:
-  std::chrono::milliseconds timeout_{};
+    std::chrono::milliseconds timeout_{};
 
-  std::chrono::steady_clock::time_point nextTrigger_;
+    std::chrono::steady_clock::time_point nextTrigger_;
 
-  std::mutex mutex_;
+    std::mutex mutex_;
 
-  Callback callback_;
+    Callback callback_;
 
-  // true if the timer is waiting
-  bool active_;
-  // true if the timer is currently being triggered
-  std::atomic<bool> running_{};
+    // true if the timer is waiting
+    bool active_;
+    // true if the timer is currently being triggered
+    std::atomic<bool> running_{};
 };
 using TimerPtr = std::shared_ptr<Timer>;
 

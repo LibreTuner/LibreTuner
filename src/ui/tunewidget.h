@@ -28,23 +28,24 @@
 
 
 
-// TODO: Maybe not store a copy of the TuneMeta, but the tune id for later lookup to avoid unecessary memory usage
+// TODO: Maybe not store a copy of the TuneMeta, but the tune id for later
+// lookup to avoid unecessary memory usage
 
 
 /**
  * Widget displaying a tune for the tunes tab.
  */
 class TuneWidget : public QFrame {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  TuneWidget(const TuneMeta &tune, QWidget *parent = 0);
+    TuneWidget(const TuneMeta &tune, QWidget *parent = 0);
 
 private:
-  TuneMeta tune_;
+    TuneMeta tune_;
 
 private slots:
-  void editClicked();
-  void flashClicked();
+    void editClicked();
+    void flashClicked();
 };
 
 #endif // TUNEWIDGET_H

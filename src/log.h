@@ -29,13 +29,12 @@ struct LogEntry {
     std::string text;
 };
 
-class Log : public QAbstractListModel
-{
+class Log : public QAbstractListModel {
 public:
     Log();
-    Log(const Log&) = delete;
-    Log(Log&&) = delete;
-    Log &operator=(const Log&) = delete;
+    Log(const Log &) = delete;
+    Log(Log &&) = delete;
+    Log &operator=(const Log &) = delete;
 
 
     /* Adds to the end of log */

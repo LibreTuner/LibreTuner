@@ -31,11 +31,11 @@ typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 
 /* ROM Metadata */
 struct RomMeta {
-  std::string name;
-  std::string path;
-  std::string definitionId;
-  std::string subDefinitionId;
-  int id;
+    std::string name;
+    std::string path;
+    std::string definitionId;
+    std::string subDefinitionId;
+    int id;
 };
 
 class Table;
@@ -44,27 +44,27 @@ typedef std::shared_ptr<Table> TablePtr;
 /* The object that actually stores firmware data. */
 class Rom {
 public:
-  explicit Rom(const RomMeta& rom);
+    explicit Rom(const RomMeta &rom);
 
-  /* Returns the base table from the table index */
-  TablePtr getTable(int idx);
+    /* Returns the base table from the table index */
+    TablePtr getTable(int idx);
 
-  const std::vector<uint8_t> data() { return data_; }
+    const std::vector<uint8_t> data() { return data_; }
 
-  std::string name() { return name_; }
+    std::string name() { return name_; }
 
-  DefinitionPtr definition() const { return definition_; }
+    DefinitionPtr definition() const { return definition_; }
 
-  SubDefinitionPtr subDefinition() const { return subDefinition_; }
+    SubDefinitionPtr subDefinition() const { return subDefinition_; }
 
 private:
-  std::string name_;
+    std::string name_;
 
-  DefinitionPtr definition_;
-  SubDefinitionPtr subDefinition_;
+    DefinitionPtr definition_;
+    SubDefinitionPtr subDefinition_;
 
-  /* Raw firmware data */
-  std::vector<uint8_t> data_;
+    /* Raw firmware data */
+    std::vector<uint8_t> data_;
 };
 
 #endif // ROM_H

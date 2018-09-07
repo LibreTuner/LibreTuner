@@ -20,8 +20,8 @@
 #define J2534_H
 
 #include <memory>
-#include <string>
 #include <mutex>
+#include <string>
 
 #include "datalink.h"
 
@@ -29,47 +29,51 @@
 // PassThruConnect flags
 /////////////////////////
 
-#define CAN_29BIT_ID						0x00000100
-#define ISO9141_NO_CHECKSUM					0x00000200
-#define CAN_ID_BOTH							0x00000800
-#define ISO9141_K_LINE_ONLY					0x00001000
-#define SNIFF_MODE							0x10000000 // OP2.0: listens to a bus (e.g. CAN) without acknowledging
+#define CAN_29BIT_ID 0x00000100
+#define ISO9141_NO_CHECKSUM 0x00000200
+#define CAN_ID_BOTH 0x00000800
+#define ISO9141_K_LINE_ONLY 0x00001000
+#define SNIFF_MODE                                                             \
+    0x10000000 // OP2.0: listens to a bus (e.g. CAN) without acknowledging
 
 
 //////////////////
 // RxStatus flags
 //////////////////
 
-#define TX_MSG_TYPE							0x00000001
-#define START_OF_MESSAGE					0x00000002
-#define ISO15765_FIRST_FRAME				0x00000002
-#define RX_BREAK							0x00000004
-#define TX_DONE								0x00000008
-#define ISO15765_PADDING_ERROR				0x00000010
-#define ISO15765_EXT_ADDR					0x00000080
-#define ISO15765_ADDR_TYPE					0x00000080
-//#define CAN_29BIT_ID						0x00000100 // (already defined above)
+#define TX_MSG_TYPE 0x00000001
+#define START_OF_MESSAGE 0x00000002
+#define ISO15765_FIRST_FRAME 0x00000002
+#define RX_BREAK 0x00000004
+#define TX_DONE 0x00000008
+#define ISO15765_PADDING_ERROR 0x00000010
+#define ISO15765_EXT_ADDR 0x00000080
+#define ISO15765_ADDR_TYPE 0x00000080
+//#define CAN_29BIT_ID						0x00000100 // (already defined
+// above)
 
 //////////////////
 // TxStatus flags
 //////////////////
 
-#define ISO15765_FRAME_PAD					0x00000040
-//#define ISO15765_ADDR_TYPE				0x00000080 // (already defined above)
-//#define CAN_29BIT_ID						0x00000100 // (already defined above)
-#define WAIT_P3_MIN_ONLY					0x00000200
-#define SW_CAN_HV_TX						0x00000400 // OP2.0: Not supported
-#define SCI_MODE							0x00400000 // OP2.0: Not supported
-#define SCI_TX_VOLTAGE						0x00800000 // OP2.0: Not supported
+#define ISO15765_FRAME_PAD 0x00000040
+//#define ISO15765_ADDR_TYPE				0x00000080 // (already defined
+// above)
+//#define CAN_29BIT_ID						0x00000100 // (already defined
+// above)
+#define WAIT_P3_MIN_ONLY 0x00000200
+#define SW_CAN_HV_TX 0x00000400   // OP2.0: Not supported
+#define SCI_MODE 0x00400000       // OP2.0: Not supported
+#define SCI_TX_VOLTAGE 0x00800000 // OP2.0: Not supported
 
 
 ////////////////
 // Filter types
 ////////////////
 
-#define PASS_FILTER							0x00000001
-#define BLOCK_FILTER						0x00000002
-#define FLOW_CONTROL_FILTER					0x00000003
+#define PASS_FILTER 0x00000001
+#define BLOCK_FILTER 0x00000002
+#define FLOW_CONTROL_FILTER 0x00000003
 
 
 
@@ -94,28 +98,36 @@ struct Info {
 
 struct PASSTHRU_MSG {
     uint32_t ProtocolID; /* vehicle network protocol */
-    uint32_t RxStatus; /* receive message status */
-    uint32_t TxFlags; /* transmit message flags */
-    uint32_t Timestamp; /* receive message timestamp(in microseconds) */
-    uint32_t DataSize; /* byte size of message payload in the Data array */
-    uint32_t ExtraDataIndex; /* start of extra data(i.e. CRC, checksum, etc) in Data array */
+    uint32_t RxStatus;   /* receive message status */
+    uint32_t TxFlags;    /* transmit message flags */
+    uint32_t Timestamp;  /* receive message timestamp(in microseconds) */
+    uint32_t DataSize;   /* byte size of message payload in the Data array */
+    uint32_t ExtraDataIndex;  /* start of extra data(i.e. CRC, checksum, etc) in
+                                 Data array */
     unsigned char Data[4128]; /* message payload or data */
 };
 
-using PassThruOpen_t = int32_t (*) (void*, uint32_t*);
-using PassThruClose_t = int32_t (*) (uint32_t);
-using PassThruConnect_t = int32_t (*) (uint32_t, uint32_t, uint32_t, uint32_t, uint32_t*);
-using PassThruDisconnect_t = int32_t (*) (uint32_t);
-using PassThruReadMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruWriteMsgs_t = int32_t (*) (uint32_t, PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruStartPeriodicMsg_t = int32_t (*) (uint32_t, const PASSTHRU_MSG*, uint32_t*, uint32_t);
-using PassThruStopPeriodicMsg_t = int32_t (*) (uint32_t, uint32_t);
-using PassThruStartMsgFilter_t = int32_t (*) (uint32_t, uint32_t, const PASSTHRU_MSG*, const PASSTHRU_MSG*, const PASSTHRU_MSG*, uint32_t*);
-using PassThruStopMsgFilter_t = int32_t (*) (uint32_t, uint32_t);
-using PassThruSetProgrammingVoltage_t = int32_t (*) (uint32_t, uint32_t);
-using PassThruReadVersion_t = int32_t (*) (char*, char*, char*);
-using PassThruGetLastError_t = int32_t (*) (char*);
-using PassThruIoctl_t = int32_t (*) (uint32_t, uint32_t, void*, void*);
+using PassThruOpen_t = int32_t (*)(void *, uint32_t *);
+using PassThruClose_t = int32_t (*)(uint32_t);
+using PassThruConnect_t = int32_t (*)(uint32_t, uint32_t, uint32_t, uint32_t,
+                                      uint32_t *);
+using PassThruDisconnect_t = int32_t (*)(uint32_t);
+using PassThruReadMsgs_t = int32_t (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+                                       uint32_t);
+using PassThruWriteMsgs_t = int32_t (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+                                        uint32_t);
+using PassThruStartPeriodicMsg_t = int32_t (*)(uint32_t, const PASSTHRU_MSG *,
+                                               uint32_t *, uint32_t);
+using PassThruStopPeriodicMsg_t = int32_t (*)(uint32_t, uint32_t);
+using PassThruStartMsgFilter_t = int32_t (*)(uint32_t, uint32_t,
+                                             const PASSTHRU_MSG *,
+                                             const PASSTHRU_MSG *,
+                                             const PASSTHRU_MSG *, uint32_t *);
+using PassThruStopMsgFilter_t = int32_t (*)(uint32_t, uint32_t);
+using PassThruSetProgrammingVoltage_t = int32_t (*)(uint32_t, uint32_t);
+using PassThruReadVersion_t = int32_t (*)(char *, char *, char *);
+using PassThruGetLastError_t = int32_t (*)(char *);
+using PassThruIoctl_t = int32_t (*)(uint32_t, uint32_t, void *, void *);
 
 
 class J2534;
@@ -166,20 +178,23 @@ public:
 
     ~Channel();
 
-    Channel(const Channel&) = delete;
-    Channel(Channel&& chann);
+    Channel(const Channel &) = delete;
+    Channel(Channel &&chann);
 
     /* Reads `pNumMsgs` messages or until the timeout expires. If timeout is 0,
-     * reads the buffer and returns immediately. Sets pNumMsgs to the amount of messages
-       actually read. Refer to the j2534 spec for more information. */
+     * reads the buffer and returns immediately. Sets pNumMsgs to the amount of
+     messages actually read. Refer to the j2534 spec for more information. */
     void readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
-    /* Writes the array of `pMsg` (size `pNumMsgs`) until timeout expires. Is timeout is 0,
-     * queues as many transmit messages as possible and returns immediately. Sets pNumMsgs to
-       the amount of messages sent. Refer to the j2534 spec for more information. */
+    /* Writes the array of `pMsg` (size `pNumMsgs`) until timeout expires. Is
+     timeout is 0,
+     * queues as many transmit messages as possible and returns immediately.
+     Sets pNumMsgs to the amount of messages sent. Refer to the j2534 spec for
+     more information. */
     void writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
 
-    void startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg,
+    void startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg,
+                        const PASSTHRU_MSG *pPatternMsg,
                         const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
 
     /* Disconnects the channel from the j2534 device. The object
@@ -190,7 +205,8 @@ public:
 
     // This should only be constructed internally.
     // Use J2534Device::connect
-    Channel(const J2534Ptr &j2534, const DevicePtr &device, uint32_t channel) : j2534_(j2534), device_(device), channel_(channel) {}
+    Channel(const J2534Ptr &j2534, const DevicePtr &device, uint32_t channel)
+        : j2534_(j2534), device_(device), channel_(channel) {}
 
 private:
     J2534Ptr j2534_;
@@ -214,10 +230,11 @@ public:
     /* Establishes a logical communication channel with the vehicle
      * network (via the PassThru device) using the specified network
      * layer protocol and selected protocol options. */
-    Channel connect(Protocol protocol, uint32_t flags = 0, uint32_t baudrate = 500000);
+    Channel connect(Protocol protocol, uint32_t flags = 0,
+                    uint32_t baudrate = 500000);
 
-    Device(const Device&) = delete;
-    Device(Device&& dev);
+    Device(const Device &) = delete;
+    Device(Device &&dev);
 
     bool valid() const { return !!j2534_; }
 
@@ -229,8 +246,7 @@ private:
 };
 
 // TODO: Synchronize this all into one thread! (IMPORTANT!!!)
-class J2534 : public std::enable_shared_from_this<J2534>
-{
+class J2534 : public std::enable_shared_from_this<J2534> {
 public:
     // Initializes the interface by loading the DLL. May throw an exception
     void init();
@@ -245,12 +261,16 @@ public:
     void close(uint32_t device);
 
     // see Device::connect
-    uint32_t connect(uint32_t device, Protocol protocol, uint32_t flags, uint32_t baudrate);
+    uint32_t connect(uint32_t device, Protocol protocol, uint32_t flags,
+                     uint32_t baudrate);
 
-    void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
-    void writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
-    void startMsgFilter(uint32_t channel,
-                        uint32_t type, const PASSTHRU_MSG *pMaskMsg, const PASSTHRU_MSG *pPatternMsg,
+    void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                  uint32_t timeout);
+    void writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+                   uint32_t timeout);
+    void startMsgFilter(uint32_t channel, uint32_t type,
+                        const PASSTHRU_MSG *pMaskMsg,
+                        const PASSTHRU_MSG *pPatternMsg,
                         const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
 
     // Disconnects a logical communication channel
@@ -273,7 +293,7 @@ public:
 private:
     Info info_;
 
-    void* hDll_ = nullptr;
+    void *hDll_ = nullptr;
 
     bool loaded_ = false;
 
@@ -298,6 +318,6 @@ private:
     PassThruSetProgrammingVoltage_t PassThruSetProgrammingVoltage{};
 };
 
-}
+} // namespace j2534
 
 #endif // J2534_H

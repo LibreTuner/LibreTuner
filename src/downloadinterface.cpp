@@ -18,9 +18,9 @@
 
 #include "downloadinterface.h"
 #include "definitions/definition.h"
+#include "logger.h"
 #include "protocols/udsprotocol.h"
 #include "udsauthenticator.h"
-#include "logger.h"
 
 #include <algorithm>
 #include <cassert>
@@ -31,49 +31,46 @@
 #include "protocols/socketcaninterface.h"
 #endif
 
-Uds23DownloadInterface::Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds, std::string key, uint32_t size)
-    : key_(std::move(key)), totalSize_(size), uds_(std::move(uds)) {
-}
+Uds23DownloadInterface::Uds23DownloadInterface(
+    std::unique_ptr<uds::Protocol> &&uds, std::string key, uint32_t size)
+    : key_(std::move(key)), totalSize_(size), uds_(std::move(uds)) {}
 
 
 
 bool Uds23DownloadInterface::update_progress() {
-  notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
-  return downloadSize_ > 0;
+    notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
+    return downloadSize_ > 0;
 }
 
 
 
 bool Uds23DownloadInterface::download() {
-  canceled_ = false;
-  downloadOffset_ = 0;
-  downloadSize_ = totalSize_;
-  auth_.auth(key_, *uds_);
+    canceled_ = false;
+    downloadOffset_ = 0;
+    downloadSize_ = totalSize_;
+    auth_.auth(key_, *uds_);
 
-  do {
-      std::vector<uint8_t> data = uds_->requestReadMemoryAddress(downloadOffset_, std::min<uint32_t>(downloadSize_, 0xFFE));
+    do {
+        std::vector<uint8_t> data = uds_->requestReadMemoryAddress(
+            downloadOffset_, std::min<uint32_t>(downloadSize_, 0xFFE));
 
-      if (data.empty()) {
-          throw std::runtime_error("received 0 bytes in download packet");
-      }
+        if (data.empty()) {
+            throw std::runtime_error("received 0 bytes in download packet");
+        }
 
-      downloadData_.insert(downloadData_.end(), data.begin(), data.end());
-      downloadOffset_ += data.size();
-      downloadSize_ -= data.size();
-  } while (!canceled_ && update_progress());
-  return !canceled_;
+        downloadData_.insert(downloadData_.end(), data.begin(), data.end());
+        downloadOffset_ += data.size();
+        downloadSize_ -= data.size();
+    } while (!canceled_ && update_progress());
+    return !canceled_;
 }
 
 
 
-void Uds23DownloadInterface::cancel()
-{
-    canceled_ = true;
-}
+void Uds23DownloadInterface::cancel() { canceled_ = true; }
 
 
 
-gsl::span<const uint8_t> Uds23DownloadInterface::data()
-{
+gsl::span<const uint8_t> Uds23DownloadInterface::data() {
     return downloadData_;
 }

@@ -19,13 +19,12 @@
 #ifndef TITLEBAR_H
 #define TITLEBAR_H
 
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 
 class QPushButton;
 
-class TitleBar : public QWidget
-{
+class TitleBar : public QWidget {
     Q_OBJECT
 public:
     explicit TitleBar(QWidget *window);

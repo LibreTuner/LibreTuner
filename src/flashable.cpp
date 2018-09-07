@@ -24,18 +24,18 @@
 
 #include <cassert>
 
-Flashable::Flashable(const std::shared_ptr<Tune>& tune) {
-  assert(tune);
-  std::shared_ptr<Rom> rom = tune->rom();
-  definition_ = rom->subDefinition();
-  offset_ = rom->definition()->flashOffset();
+Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
+    assert(tune);
+    std::shared_ptr<Rom> rom = tune->rom();
+    definition_ = rom->subDefinition();
+    offset_ = rom->definition()->flashOffset();
 
-  data_ = rom->data();
+    data_ = rom->data();
 
-  // Apply tune on top of ROM
-  tune->apply(data_);
+    // Apply tune on top of ROM
+    tune->apply(data_);
 
-  // Reassign to flash region
-  data_.assign(data_.data() + offset_,
-               data_.data() + offset_ + rom->definition()->flashSize());
+    // Reassign to flash region
+    data_.assign(data_.data() + offset_,
+                 data_.data() + offset_ + rom->definition()->flashSize());
 }

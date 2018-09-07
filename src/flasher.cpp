@@ -34,8 +34,7 @@
 
 MazdaT1Flasher::MazdaT1Flasher(std::string key,
                                std::unique_ptr<uds::Protocol> &&uds)
-    : key_(std::move(key)),
-      uds_(std::move(uds)) {}
+    : key_(std::move(key)), uds_(std::move(uds)) {}
 
 bool MazdaT1Flasher::flash(FlashablePtr flashable) {
     canceled_ = false;
@@ -46,10 +45,7 @@ bool MazdaT1Flasher::flash(FlashablePtr flashable) {
     return do_erase();
 }
 
-void MazdaT1Flasher::cancel()
-{
-    canceled_ = true;
-}
+void MazdaT1Flasher::cancel() { canceled_ = true; }
 
 
 
@@ -97,7 +93,7 @@ bool MazdaT1Flasher::sendLoad() {
         data.reserve(toSend + 1);
         data.emplace_back(UDS_REQ_TRANSFERDATA);
         data.insert(data.begin() + 1, flash_->data().begin() + sent_,
-                  flash_->data().begin() + sent_ + toSend);
+                    flash_->data().begin() + sent_ + toSend);
 
         sent_ += toSend;
         left_ -= toSend;
@@ -105,8 +101,7 @@ bool MazdaT1Flasher::sendLoad() {
         uds::Packet _response;
         uds_->request(data, UDS_RES_TRANSFERDATA, _response);
 
-        notifyProgress(static_cast<double>(sent_) /
-                         flash_->data().size());
+        notifyProgress(static_cast<double>(sent_) / flash_->data().size());
         if (canceled_) {
             Logger::warning("Canceled flash during upload");
             return false;

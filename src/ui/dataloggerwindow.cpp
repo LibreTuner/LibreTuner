@@ -19,24 +19,27 @@
 #include "dataloggerwindow.h"
 
 #include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QListWidget>
 #include <QLabel>
+#include <QListWidget>
 #include <QMessageBox>
 #include <QShowEvent>
+#include <QVBoxLayout>
 
-#include "libretuner.h"
-#include "datalog.h"
 #include "datalink.h"
+#include "datalog.h"
 #include "datalogger.h"
 #include "definitions/definition.h"
+#include "libretuner.h"
 
-DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent) : log_(log), logger_(std::move(logger)), definition_(definition), QWidget(parent)
-{
+DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log,
+                                   std::unique_ptr<DataLogger> &&logger,
+                                   DefinitionPtr definition, QWidget *parent)
+    : log_(log), logger_(std::move(logger)), definition_(definition),
+      QWidget(parent) {
     Expects(logger_);
     Expects(log_);
     Expects(definition_);
-    setAttribute( Qt::WA_DeleteOnClose, false );
+    setAttribute(Qt::WA_DeleteOnClose, false);
     setWindowTitle("LibreTuner - Data Logger");
     auto *hlayout = new QHBoxLayout;
     setLayout(hlayout);
@@ -58,13 +61,13 @@ DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLo
 
     buttonLog_ = new QPushButton("Start logging");
     logLayout->addWidget(buttonLog_);
-    connect(buttonLog_, &QPushButton::clicked, this, &DataLoggerWindow::buttonClicked);
+    connect(buttonLog_, &QPushButton::clicked, this,
+            &DataLoggerWindow::buttonClicked);
 }
 
 DataLoggerWindow::~DataLoggerWindow() = default;
 
-void DataLoggerWindow::showEvent(QShowEvent *event)
-{
+void DataLoggerWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event)
     pidList_->clear();
 
@@ -85,8 +88,7 @@ void DataLoggerWindow::showEvent(QShowEvent *event)
     }
 }
 
-void DataLoggerWindow::hideEvent(QHideEvent * /*event*/)
-{
+void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
     // TODO: ask to save log
     pidList_->clear();
     definition_.reset();
@@ -94,8 +96,7 @@ void DataLoggerWindow::hideEvent(QHideEvent * /*event*/)
     logger_.reset();
 }
 
-void DataLoggerWindow::buttonClicked()
-{
+void DataLoggerWindow::buttonClicked() {
     if (!logger_) {
         return;
     }

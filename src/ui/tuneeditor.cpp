@@ -33,167 +33,170 @@
 #include <QMessageBox>
 #include <QTreeWidget>
 
-TuneEditor::TuneEditor(const std::shared_ptr<Tune>& tune, QWidget *parent)
+TuneEditor::TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent)
     : StyledWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
-  assert(tune);
-  setTitle("LibreTuner - Tune Editor");
+    assert(tune);
+    setTitle("LibreTuner - Tune Editor");
 
-  QMainWindow *wrapper = new QMainWindow;
-  layout_->addWidget(wrapper);
+    QMainWindow *wrapper = new QMainWindow;
+    layout_->addWidget(wrapper);
 
-  ui->setupUi(wrapper);
-  resize(1050, 500);
-  ui->tableEdit->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
-  ui->labelAxisX->setVisible(false);
-  ui->labelAxisY->setVisible(false);
+    ui->setupUi(wrapper);
+    resize(1050, 500);
+    ui->tableEdit->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+    ui->labelAxisX->setVisible(false);
+    ui->labelAxisY->setVisible(false);
 
 
-  ui->tableEdit->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  ui->tableEdit->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableEdit->verticalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    ui->tableEdit->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
 
-  connect(this, &TuneEditor::tableChanged, ui->graphWidget,
-          &GraphWidget::tableChanged);
+    connect(this, &TuneEditor::tableChanged, ui->graphWidget,
+            &GraphWidget::tableChanged);
 
-  connect(ui->treeTables, &QTreeWidget::itemActivated, this, &TuneEditor::on_treeTables_itemActivated);
+    connect(ui->treeTables, &QTreeWidget::itemActivated, this,
+            &TuneEditor::on_treeTables_itemActivated);
 
-  std::vector<std::pair<TableCategory, QTreeWidgetItem *>> categories_;
+    std::vector<std::pair<TableCategory, QTreeWidgetItem *>> categories_;
 
-  TableDefinitions *tables = tune_->rom()->definition()->tables();
+    TableDefinitions *tables = tune_->rom()->definition()->tables();
 
-  for (int i = 0; i < tables->count(); ++i) {
-    const TableDefinition *def = tables->at(i);
-    if (!def->valid()) {
-      continue;
+    for (int i = 0; i < tables->count(); ++i) {
+        const TableDefinition *def = tables->at(i);
+        if (!def->valid()) {
+            continue;
+        }
+
+        QTreeWidgetItem *par = nullptr;
+
+        for (auto &cat : categories_) {
+            if (cat.first == def->category()) {
+                par = cat.second;
+                break;
+            }
+        }
+
+        if (par == nullptr) {
+            par = new QTreeWidgetItem(ui->treeTables);
+            switch (def->category()) {
+            case TCAT_LIMITER:
+                par->setText(0, tr("Limits"));
+                break;
+            case TCAT_MISC:
+                par->setText(0, tr("Miscellaneous"));
+                break;
+            }
+
+            categories_.emplace_back(def->category(), par);
+        }
+
+        auto *item = new QTreeWidgetItem(par);
+        item->setText(0, QString::fromStdString(def->name()));
+        item->setData(0, Qt::UserRole, QVariant(i));
     }
 
-    QTreeWidgetItem *par = nullptr;
-
-    for (auto &cat : categories_) {
-      if (cat.first == def->category()) {
-        par = cat.second;
-        break;
-      }
-    }
-
-    if (par == nullptr) {
-      par = new QTreeWidgetItem(ui->treeTables);
-      switch (def->category()) {
-      case TCAT_LIMITER:
-        par->setText(0, tr("Limits"));
-        break;
-      case TCAT_MISC:
-        par->setText(0, tr("Miscellaneous"));
-        break;
-      }
-
-      categories_.emplace_back(def->category(), par);
-    }
-
-    auto *item = new QTreeWidgetItem(par);
-    item->setText(0, QString::fromStdString(def->name()));
-    item->setData(0, Qt::UserRole, QVariant(i));
-  }
-
-  setWindowFlag(Qt::Window);
+    setWindowFlag(Qt::Window);
 }
 
 
 
 void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
-                                             int  /*column*/) {
-  QVariant data = item->data(0, Qt::UserRole);
-  bool ok;
-  int index = data.toInt(&ok);
-  if (!ok) {
-    return;
-  }
+                                             int /*column*/) {
+    QVariant data = item->data(0, Qt::UserRole);
+    bool ok;
+    int index = data.toInt(&ok);
+    if (!ok) {
+        return;
+    }
 
-  if (currentTable_) {
-    disconnect(currentTable_.get(), &Table::onModified, this,
-               &TuneEditor::onTableModified);
-  }
+    if (currentTable_) {
+        disconnect(currentTable_.get(), &Table::onModified, this,
+                   &TuneEditor::onTableModified);
+    }
 
-  currentTable_ = tune_->tables()->get(index);
-  if (!currentTable_) {
-    return;
-  }
-  connect(currentTable_.get(), &Table::onModified, this,
-          &TuneEditor::onTableModified);
+    currentTable_ = tune_->tables()->get(index);
+    if (!currentTable_) {
+        return;
+    }
+    connect(currentTable_.get(), &Table::onModified, this,
+            &TuneEditor::onTableModified);
 
-  ui->tableEdit->setModel(currentTable_.get());
+    ui->tableEdit->setModel(currentTable_.get());
 
-  // This is not elegant. Maybe the class structure should be changed
-  ui->labelMemory->setText(
-      QStringLiteral("0x") +
-      QString::number(tune_->rom()->subDefinition()->getTableLocation(
-                          currentTable_->definition()->id()),
-                      16));
-  ui->infoName->setText(
-      QString::fromStdString(currentTable_->definition()->name()));
-  ui->infoDesc->setText(
-      QString::fromStdString(currentTable_->definition()->description()));
+    // This is not elegant. Maybe the class structure should be changed
+    ui->labelMemory->setText(
+        QStringLiteral("0x") +
+        QString::number(tune_->rom()->subDefinition()->getTableLocation(
+                            currentTable_->definition()->id()),
+                        16));
+    ui->infoName->setText(
+        QString::fromStdString(currentTable_->definition()->name()));
+    ui->infoDesc->setText(
+        QString::fromStdString(currentTable_->definition()->description()));
 
-  const TableAxis *axis = currentTable_->definition()->axisX();
-  if (axis != nullptr) {
-    ui->labelAxisX->setText(QString::fromStdString(axis->label()));
-    ui->labelAxisX->setVisible(true);
-    ui->tableEdit->horizontalHeader()->setVisible(true);
-  } else {
-    ui->labelAxisX->setVisible(false);
-    ui->tableEdit->horizontalHeader()->setVisible(false);
-  }
+    const TableAxis *axis = currentTable_->definition()->axisX();
+    if (axis != nullptr) {
+        ui->labelAxisX->setText(QString::fromStdString(axis->label()));
+        ui->labelAxisX->setVisible(true);
+        ui->tableEdit->horizontalHeader()->setVisible(true);
+    } else {
+        ui->labelAxisX->setVisible(false);
+        ui->tableEdit->horizontalHeader()->setVisible(false);
+    }
 
-  axis = currentTable_->definition()->axisY();
-  if (axis != nullptr) {
-    ui->labelAxisY->setText(QString::fromStdString(axis->label()));
-    ui->labelAxisY->setVisible(true);
-    ui->tableEdit->verticalHeader()->setVisible(true);
-  } else {
-    ui->labelAxisY->setVisible(false);
-    ui->tableEdit->verticalHeader()->setVisible(false);
-  }
+    axis = currentTable_->definition()->axisY();
+    if (axis != nullptr) {
+        ui->labelAxisY->setText(QString::fromStdString(axis->label()));
+        ui->labelAxisY->setVisible(true);
+        ui->tableEdit->verticalHeader()->setVisible(true);
+    } else {
+        ui->labelAxisY->setVisible(false);
+        ui->tableEdit->verticalHeader()->setVisible(false);
+    }
 
-  emit tableChanged(currentTable_);
+    emit tableChanged(currentTable_);
 }
 
 
 
 void TuneEditor::onTableModified() {
-  if (!changed_) {
-    changed_ = true;
-    setTitle("LibreTuner - Tune Editor *");
-  }
+    if (!changed_) {
+        changed_ = true;
+        setTitle("LibreTuner - Tune Editor *");
+    }
 }
 
 
 
 void TuneEditor::closeEvent(QCloseEvent *event) {
-  if (changed_) {
-    QMessageBox mb;
-    mb.setText(tr("This tune has been modified"));
-    mb.setWindowTitle(tr("Unsaved changes"));
-    mb.setInformativeText(tr("Do you want to save your changes?"));
-    mb.setIcon(QMessageBox::Question);
-    mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard |
-                          QMessageBox::Save);
-    mb.setDefaultButton(QMessageBox::Save);
-    switch (mb.exec()) {
-    case QMessageBox::Save:
-      // Save then accept
-      if (save()) {
-        event->accept();
-        return;
-      }
-      event->ignore();
-      break;
-    case QMessageBox::Discard:
-      event->accept();
-      break;
-    case QMessageBox::Cancel:
-    default:
-      event->ignore();
+    if (changed_) {
+        QMessageBox mb;
+        mb.setText(tr("This tune has been modified"));
+        mb.setWindowTitle(tr("Unsaved changes"));
+        mb.setInformativeText(tr("Do you want to save your changes?"));
+        mb.setIcon(QMessageBox::Question);
+        mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard |
+                              QMessageBox::Save);
+        mb.setDefaultButton(QMessageBox::Save);
+        switch (mb.exec()) {
+        case QMessageBox::Save:
+            // Save then accept
+            if (save()) {
+                event->accept();
+                return;
+            }
+            event->ignore();
+            break;
+        case QMessageBox::Discard:
+            event->accept();
+            break;
+        case QMessageBox::Cancel:
+        default:
+            event->ignore();
+        }
     }
-  }
 }
 
 

@@ -22,8 +22,7 @@
 #include <string>
 
 /* Static logger */
-class Logger
-{
+class Logger {
 public:
     enum class Mode {
         Debug,
@@ -36,13 +35,9 @@ public:
 
     static void log(Mode mode, const std::string &message);
 
-    static void debug(const std::string &message) {
-        log(Mode::Debug, message);
-    }
+    static void debug(const std::string &message) { log(Mode::Debug, message); }
 
-    static void info(const std::string &message) {
-        log(Mode::Info, message);
-    }
+    static void info(const std::string &message) { log(Mode::Info, message); }
 
     static void warning(const std::string &message) {
         log(Mode::Warning, message);

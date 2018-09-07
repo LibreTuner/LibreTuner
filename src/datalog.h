@@ -20,53 +20,53 @@
 #define LIBRETUNER_DATALOG_H
 
 #include <chrono>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "vehicle.h"
 
 enum class DataUnit {
-  None,
-  Percentage,
-  Degrees,
+    None,
+    Percentage,
+    Degrees,
 };
 
 class DataLog {
 public:
-  using TimePoint = std::chrono::steady_clock::time_point;
-  struct DataHead {
-    std::string name;
-    std::string description;
-    std::string formula;
-    uint32_t id;
-    DataUnit unit;
-  };
+    using TimePoint = std::chrono::steady_clock::time_point;
+    struct DataHead {
+        std::string name;
+        std::string description;
+        std::string formula;
+        uint32_t id;
+        DataUnit unit;
+    };
 
-  struct Data {
-    DataHead head;
-    std::vector<std::pair<TimePoint, double>> values;
-  };
+    struct Data {
+        DataHead head;
+        std::vector<std::pair<TimePoint, double>> values;
+    };
 
-  std::chrono::system_clock::time_point creationTime() const {
-    return creationTime_;
-  }
+    std::chrono::system_clock::time_point creationTime() const {
+        return creationTime_;
+    }
 
-  const Vehicle &vehicle() const { return vehicle_; }
+    const Vehicle &vehicle() const { return vehicle_; }
 
-  /* adds a point to a dataset. Returns false if the dataset
-   * with the specified id does not exist. */
-  bool add(uint32_t id, std::pair<TimePoint, double> value);
+    /* adds a point to a dataset. Returns false if the dataset
+     * with the specified id does not exist. */
+    bool add(uint32_t id, std::pair<TimePoint, double> value);
 
-  /* Adds a value at the current time */
-  bool add(uint32_t id, double value);
+    /* Adds a value at the current time */
+    bool add(uint32_t id, double value);
 
-  void addData(const DataHead &data);
+    void addData(const DataHead &data);
 
 private:
-  std::chrono::system_clock::time_point creationTime_;
-  Vehicle vehicle_;
+    std::chrono::system_clock::time_point creationTime_;
+    Vehicle vehicle_;
 
-  std::unordered_map<uint32_t, Data> data_;
+    std::unordered_map<uint32_t, Data> data_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
 

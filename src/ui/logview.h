@@ -19,11 +19,10 @@
 #ifndef LOGVIEW_H
 #define LOGVIEW_H
 
-#include <QPlainTextEdit>
 #include <QAbstractItemModel>
+#include <QPlainTextEdit>
 
-class LogView : public QPlainTextEdit
-{
+class LogView : public QPlainTextEdit {
     Q_OBJECT
 public:
     LogView();

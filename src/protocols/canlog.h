@@ -25,29 +25,29 @@
 #include <vector>
 
 class CanLog : public QAbstractTableModel {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  void addMessage(const CanMessage &message);
+    void addMessage(const CanMessage &message);
 
-  size_t size() const { return messages_.size(); }
+    size_t size() const { return messages_.size(); }
 
-  const CanMessage &get(size_t index) const { return messages_[index]; }
+    const CanMessage &get(size_t index) const { return messages_[index]; }
 
-  int columnCount(const QModelIndex &parent) const override;
-  QVariant data(const QModelIndex &index, int role) const override;
-  int rowCount(const QModelIndex &parent) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role) const override;
+    int columnCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role) const override;
 
-  ~CanLog();
+    ~CanLog();
 
 private:
-  std::vector<CanMessage> messages_;
-  mutable std::mutex mutex_;
+    std::vector<CanMessage> messages_;
+    mutable std::mutex mutex_;
 
 signals:
-  void dataChanged(int first, int last);
-  void destructing();
+    void dataChanged(int first, int last);
+    void destructing();
 };
 
 #endif // CANLOG_H

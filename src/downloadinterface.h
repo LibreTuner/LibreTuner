@@ -22,38 +22,38 @@
 #include <QFile>
 #include <QString>
 
+#include <atomic>
 #include <gsl/span>
 #include <memory>
-#include <atomic>
 
 #include "asyncroutine.h"
 #include "udsauthenticator.h"
 
 enum DownloadMode {
-  DM_NONE = 0,
-  DM_MAZDA23,
+    DM_NONE = 0,
+    DM_MAZDA23,
 };
 
 class CanInterface;
 
 class DownloadInterface : public AsyncRoutine {
 public:
-  enum Type {
-    TYPE_CAN,
-    TYPE_J2534,
-  };
+    enum Type {
+        TYPE_CAN,
+        TYPE_J2534,
+    };
 
-  virtual ~DownloadInterface() = default;
+    virtual ~DownloadInterface() = default;
 
-  /* Starts downloading. Calls updateProgress if possible.
-   * Returns false if canceled. */
-  virtual bool download() = 0;
+    /* Starts downloading. Calls updateProgress if possible.
+     * Returns false if canceled. */
+    virtual bool download() = 0;
 
-  /* Cancels the active download */
-  virtual void cancel() =0;
+    /* Cancels the active download */
+    virtual void cancel() = 0;
 
-  /* Returns the downloaded data */
-  virtual gsl::span<const uint8_t> data() =0;
+    /* Returns the downloaded data */
+    virtual gsl::span<const uint8_t> data() = 0;
 };
 using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
@@ -61,32 +61,32 @@ using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
 class Uds23DownloadInterface : public DownloadInterface {
 public:
-  Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds,
-                         std::string key, uint32_t size);
+    Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds,
+                           std::string key, uint32_t size);
 
-  bool download() override;
-  void cancel() override;
-  virtual gsl::span<const uint8_t> data() override;
+    bool download() override;
+    void cancel() override;
+    virtual gsl::span<const uint8_t> data() override;
 
 private:
-  uds::Authenticator auth_;
+    uds::Authenticator auth_;
 
-  std::unique_ptr<uds::Protocol> uds_;
+    std::unique_ptr<uds::Protocol> uds_;
 
-  std::string key_;
+    std::string key_;
 
-  /* Next memory location to be read from */
-  size_t downloadOffset_{};
-  /* Amount of data left to be transfered */
-  size_t downloadSize_{};
-  /* Total size to be transfered. Used for progress updates */
-  size_t totalSize_;
+    /* Next memory location to be read from */
+    size_t downloadOffset_{};
+    /* Amount of data left to be transfered */
+    size_t downloadSize_{};
+    /* Total size to be transfered. Used for progress updates */
+    size_t totalSize_;
 
-  std::vector<uint8_t> downloadData_;
+    std::vector<uint8_t> downloadData_;
 
-  std::atomic<bool> canceled_;
+    std::atomic<bool> canceled_;
 
-  bool update_progress();
+    bool update_progress();
 };
 
 #endif // DOWNLOADINTERFACE_H

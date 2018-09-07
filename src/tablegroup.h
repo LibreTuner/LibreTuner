@@ -33,27 +33,27 @@ typedef std::shared_ptr<Table> TablePtr;
  */
 class TableGroup {
 public:
-  explicit TableGroup(const std::shared_ptr<Rom> &base);
+    explicit TableGroup(const std::shared_ptr<Rom> &base);
 
-  size_t count() const { return tables_.size(); }
+    size_t count() const { return tables_.size(); }
 
-  /* Returns a table from a table id. If create is true and
-   * a table does not exist, creates a new table
-   * from the ROM data. Returns nullptr if create is false
-   * and the table does not exist. */
-  TablePtr get(size_t idx, bool create = true);
+    /* Returns a table from a table id. If create is true and
+     * a table does not exist, creates a new table
+     * from the ROM data. Returns nullptr if create is false
+     * and the table does not exist. */
+    TablePtr get(size_t idx, bool create = true);
 
-  /* Creates a new table from data. Returns (false, error) on error and (true,
-   * "") on success. */
-  std::pair<bool, std::string> set(size_t idx, gsl::span<const uint8_t> data);
+    /* Creates a new table from data. Returns (false, error) on error and (true,
+     * "") on success. */
+    std::pair<bool, std::string> set(size_t idx, gsl::span<const uint8_t> data);
 
-  /* Applies table modifications to rom data */
-  void apply(gsl::span<uint8_t> data);
+    /* Applies table modifications to rom data */
+    void apply(gsl::span<uint8_t> data);
 
 private:
-  std::shared_ptr<Rom> base_;
+    std::shared_ptr<Rom> base_;
 
-  std::vector<TablePtr> tables_;
+    std::vector<TablePtr> tables_;
 };
 typedef std::shared_ptr<TableGroup> TableGroupPtr;
 

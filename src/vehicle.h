@@ -52,34 +52,39 @@ class CanInterface;
 using CanInterfacePtr = std::shared_ptr<CanInterface>;
 
 struct Vehicle {
-  std::string name;
-  std::string vin;
-  DefinitionPtr definition;
+    std::string name;
+    std::string vin;
+    DefinitionPtr definition;
 
-  bool valid() const { return !vin.empty(); }
+    bool valid() const { return !vin.empty(); }
 
-  static Vehicle fromVin(const std::string &vin);
+    static Vehicle fromVin(const std::string &vin);
 };
 
 // VehicleLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
 class VehicleLink {
 public:
-    VehicleLink(const Vehicle &vehicle, const DataLinkPtr &link) : vehicle_(vehicle), datalink_(link) {}
-    VehicleLink(Vehicle &&vehicle, const DataLinkPtr &link) : vehicle_(std::move(vehicle)), datalink_(link) {}
+    VehicleLink(const Vehicle &vehicle, const DataLinkPtr &link)
+        : vehicle_(vehicle), datalink_(link) {}
+    VehicleLink(Vehicle &&vehicle, const DataLinkPtr &link)
+        : vehicle_(std::move(vehicle)), datalink_(link) {}
 
     ~VehicleLink();
 
-    /* Returns a logger suitable for logging from the vehicle using the datalink. Returns
-       nullptr if a logger could not be created. */
+    /* Returns a logger suitable for logging from the vehicle using the
+       datalink. Returns nullptr if a logger could not be created. */
     std::unique_ptr<DataLogger> logger() const;
 
-    /* Returns a usable download interface for the link, if one exists. May return nullptr. */
+    /* Returns a usable download interface for the link, if one exists. May
+     * return nullptr. */
     std::unique_ptr<DownloadInterface> downloader() const;
 
-    /* Returns a diagnostic interface for the link. If none exist, returns nullptr. */
+    /* Returns a diagnostic interface for the link. If none exist, returns
+     * nullptr. */
     std::unique_ptr<DiagnosticsInterface> diagnostics() const;
 
-    /* Returns a flash interface for flashing, if one exists. May return nullptr. */
+    /* Returns a flash interface for flashing, if one exists. May return
+     * nullptr. */
     std::unique_ptr<Flasher> flasher() const;
 
     /* Returns a UDS interface. May return nullptr if the vehicle/datalink
@@ -95,6 +100,7 @@ public:
     std::unique_ptr<CanInterface> can() const;
 
     const Vehicle &vehicle() const { return vehicle_; }
+
 private:
     Vehicle vehicle_;
     DataLinkPtr datalink_;

@@ -18,34 +18,38 @@
 
 #include "diagnosticsinterface.h"
 
-#include "protocols/udsprotocol.h"
-#include "logger.h"
 #include "libretuner.h"
+#include "logger.h"
+#include "protocols/udsprotocol.h"
 
 #include <gsl/gsl>
 
 
-UdsDiagnosticInterface::UdsDiagnosticInterface(std::unique_ptr<uds::Protocol> &&uds) : uds_(std::move(uds))
-{
+UdsDiagnosticInterface::UdsDiagnosticInterface(
+    std::unique_ptr<uds::Protocol> &&uds)
+    : uds_(std::move(uds)) {
     Expects(uds_);
 }
 
 
 
-void UdsDiagnosticInterface::scan(ScanResult &result)
-{
+void UdsDiagnosticInterface::scan(ScanResult &result) {
     static uint8_t request[1] = {3};
     uds::Packet response;
-    // Scan with OBD-II Service 03      https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
+    // Scan with OBD-II Service 03
+    // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
     uds_->request(request, 0x43, response);
 
-    // Decode results as per https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
+    // Decode results as per
+    // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
     for (size_t i = 1; i < response.data.size(); i += 2) {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
 
-        // Temporary description resolution. In the future, manufacturer-specific codes will be added
-        auto descRes = LibreTuner::get()->dtcDescriptions().get(code.codeString());
+        // Temporary description resolution. In the future,
+        // manufacturer-specific codes will be added
+        auto descRes =
+            LibreTuner::get()->dtcDescriptions().get(code.codeString());
         code.description = descRes.first ? descRes.second : "unknown";
 
         result.add(std::move(code));

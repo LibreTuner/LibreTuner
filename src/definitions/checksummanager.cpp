@@ -20,76 +20,79 @@
 #include "util.hpp"
 
 void Checksum::addModifiable(uint32_t offset, uint32_t size) {
-  modifiable_.emplace_back(offset, size);
+    modifiable_.emplace_back(offset, size);
 }
 
 uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
-  if (data.size() < offset_ + size_) {
-    if (ok != nullptr) {
-      *ok = false;
+    if (data.size() < offset_ + size_) {
+        if (ok != nullptr) {
+            *ok = false;
+        }
+        return 0;
     }
-    return 0;
-  }
 
-  data = data.subspan(offset_);
+    data = data.subspan(offset_);
 
-  uint32_t sum = 0;
-  // Add up the big endian int32s
-  for (int i = 0; i < size_ / 4; ++i, data = data.subspan(4)) {
-    sum += readBE<int32_t>(data);
-  }
+    uint32_t sum = 0;
+    // Add up the big endian int32s
+    for (int i = 0; i < size_ / 4; ++i, data = data.subspan(4)) {
+        sum += readBE<int32_t>(data);
+    }
 
-  if (ok != nullptr) {
-    *ok = true;
-  }
-  return sum;
+    if (ok != nullptr) {
+        *ok = true;
+    }
+    return sum;
 }
 
 void ChecksumBasic::correct(gsl::span<uint8_t> data) const {
-  if (data.size() < offset_ + size_) {
-    throw std::runtime_error("checksum region exceeds the rom size.");
-  }
-
-  bool foundMod = false;
-  uint32_t modifiableOffset;
-
-  // Find a usable modifiable region
-  for (const auto &it : modifiable_) {
-    if (it.second >= 4) {
-      modifiableOffset = it.first;
-      foundMod = true;
-      break;
+    if (data.size() < offset_ + size_) {
+        throw std::runtime_error("checksum region exceeds the rom size.");
     }
-  }
-  if (!foundMod) {
-    throw std::runtime_error("failed to find a usable modifiable region for checksum correction.");
-  }
 
-  // Zero the region
-  writeBE<int32_t>(0, data.subspan(offset_ + modifiableOffset));
+    bool foundMod = false;
+    uint32_t modifiableOffset;
 
-  // compute should never fail after the check above
-  uint32_t oSum = compute(data);
+    // Find a usable modifiable region
+    for (const auto &it : modifiable_) {
+        if (it.second >= 4) {
+            modifiableOffset = it.first;
+            foundMod = true;
+            break;
+        }
+    }
+    if (!foundMod) {
+        throw std::runtime_error("failed to find a usable modifiable region "
+                                 "for checksum correction.");
+    }
 
-  uint32_t val = target_ - oSum;
-  writeBE<int32_t>(val, data.subspan(offset_ + modifiableOffset));
+    // Zero the region
+    writeBE<int32_t>(0, data.subspan(offset_ + modifiableOffset));
 
-  // Check if the correction was successful
-  if (compute(data) != target_) {
-    throw std::runtime_error("checksum does not equal target after correction");
-  }
+    // compute should never fail after the check above
+    uint32_t oSum = compute(data);
+
+    uint32_t val = target_ - oSum;
+    writeBE<int32_t>(val, data.subspan(offset_ + modifiableOffset));
+
+    // Check if the correction was successful
+    if (compute(data) != target_) {
+        throw std::runtime_error(
+            "checksum does not equal target after correction");
+    }
 }
 
 void ChecksumManager::correct(gsl::span<uint8_t> data) {
-  for (const ChecksumPtr &checksum : checksums_) {
-    checksum->correct(data);
-  }
+    for (const ChecksumPtr &checksum : checksums_) {
+        checksum->correct(data);
+    }
 }
 
 ChecksumBasic *ChecksumManager::addBasic(uint32_t offset, uint32_t size,
                                          uint32_t target) {
-  std::shared_ptr<ChecksumBasic> checksum = std::make_shared<ChecksumBasic>(offset, size, target);
+    std::shared_ptr<ChecksumBasic> checksum =
+        std::make_shared<ChecksumBasic>(offset, size, target);
 
-  checksums_.push_back(std::static_pointer_cast<Checksum>(checksum));
-  return checksum.get();
+    checksums_.push_back(std::static_pointer_cast<Checksum>(checksum));
+    return checksum.get();
 }

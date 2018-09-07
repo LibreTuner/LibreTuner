@@ -21,43 +21,43 @@
 
 #include "util/signal.h"
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include <gsl/span>
 
 struct CanMessage {
 public:
-  void setMessage(uint32_t id, gsl::span<const uint8_t> data);
+    void setMessage(uint32_t id, gsl::span<const uint8_t> data);
 
-  bool valid() const { return messageLength_ != 0; }
+    bool valid() const { return messageLength_ != 0; }
 
-  void invalidate() { messageLength_ = 0; }
+    void invalidate() { messageLength_ = 0; }
 
-  CanMessage();
-  CanMessage(uint32_t id, gsl::span<const uint8_t> data);
+    CanMessage();
+    CanMessage(uint32_t id, gsl::span<const uint8_t> data);
 
-  uint32_t id() const { return id_; }
+    uint32_t id() const { return id_; }
 
-  const uint8_t *message() const { return message_; }
+    const uint8_t *message() const { return message_; }
 
-  /* Returns a human-readable string representing the message data */
-  std::string strMessage() const;
+    /* Returns a human-readable string representing the message data */
+    std::string strMessage() const;
 
-  uint8_t length() const { return messageLength_; }
+    uint8_t length() const { return messageLength_; }
 
-  uint8_t &operator[](uint8_t index) { return message_[index]; }
+    uint8_t &operator[](uint8_t index) { return message_[index]; }
 
-  const uint8_t &operator[](uint8_t index) const { return message_[index]; }
+    const uint8_t &operator[](uint8_t index) const { return message_[index]; }
 
-  uint32_t id_;
-  uint8_t message_[8];
-  uint8_t messageLength_;
+    uint32_t id_;
+    uint8_t message_[8];
+    uint8_t messageLength_;
 };
 
 class CanInterface;
@@ -65,36 +65,37 @@ class CanInterface;
 /* Abstract CAN interface */
 class CanInterface {
 public:
-  enum class CanError {
-    Success = 0,
-    Socket, // Socket creation error. err will be set
-    Read,   // Read error. err will be set
-    Write,
-  };
+    enum class CanError {
+        Success = 0,
+        Socket, // Socket creation error. err will be set
+        Read,   // Read error. err will be set
+        Write,
+    };
 
-  CanInterface();
-  virtual ~CanInterface() = default;
+    CanInterface();
+    virtual ~CanInterface() = default;
 
-  /* Send a CAN message. The size of data must be <= 8
-   * Returns true if a message was sent */
-  void send(int id, gsl::span<const uint8_t> data);
+    /* Send a CAN message. The size of data must be <= 8
+     * Returns true if a message was sent */
+    void send(int id, gsl::span<const uint8_t> data);
 
-  virtual void send(const CanMessage &message) = 0;
+    virtual void send(const CanMessage &message) = 0;
 
-  // Returns false if no message was received and the timeout expired.
-  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) =0;
+    // Returns false if no message was received and the timeout expired.
+    virtual bool recv(CanMessage &message,
+                      std::chrono::milliseconds timeout) = 0;
 
-  /* Returns true if the socket is ready for reading/writing */
-  virtual bool valid() = 0;
+    /* Returns true if the socket is ready for reading/writing */
+    virtual bool valid() = 0;
 
-  /* Starts reading from the interface and calling callbacks. This function
-   * may block until the the interface has fully started. */
-  virtual void start() = 0;
+    /* Starts reading from the interface and calling callbacks. This function
+     * may block until the the interface has fully started. */
+    virtual void start() = 0;
 
 protected:
-  //std::shared_ptr<SignalType> signal_;
-  CanError lastError_;
-  int lastErrno_;
+    // std::shared_ptr<SignalType> signal_;
+    CanError lastError_;
+    int lastErrno_;
 };
 
 #endif // CANINTERFACE_H

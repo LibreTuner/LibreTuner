@@ -34,30 +34,30 @@ class Rom;
  * TODO: write docs
  */
 struct TuneMeta {
-  std::string name;
-  std::string path;
-  int baseId;
+    std::string name;
+    std::string path;
+    int baseId;
 };
 
 
 
 class Tune {
 public:
-  explicit Tune(const TuneMeta &tune);
+    explicit Tune(const TuneMeta &tune);
 
-  /* Applies table modifications to data and computes checksums.
-   * Returns false on error and sets lastError. */
-  void apply(gsl::span<uint8_t> data);
+    /* Applies table modifications to data and computes checksums.
+     * Returns false on error and sets lastError. */
+    void apply(gsl::span<uint8_t> data);
 
-  TableGroupPtr tables() { return tables_; }
+    TableGroupPtr tables() { return tables_; }
 
-  const std::shared_ptr<Rom> &rom() { return rom_; }
+    const std::shared_ptr<Rom> &rom() { return rom_; }
 
-  void save();
+    void save();
 
 private:
     TuneMeta meta_;
-    
+
     std::shared_ptr<Rom> rom_;
 
     TableGroupPtr tables_;

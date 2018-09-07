@@ -25,20 +25,21 @@
 #include <QAbstractItemModel>
 
 CanViewer::CanViewer(QWidget *parent) : QWidget(parent), ui(new Ui::CanViewer) {
-  //QWidget *main = new QWidget;
-  //mainLayout()->addWidget(main);
-  ui->setupUi(this);
+    // QWidget *main = new QWidget;
+    // mainLayout()->addWidget(main);
+    ui->setupUi(this);
 
-  logModel_ = LibreTuner::get()->canLog();
-  ui->logView->setModel(logModel_);
-  connect(logModel_, &QAbstractItemModel::rowsInserted, this,
-          &CanViewer::rowsInserted);
+    logModel_ = LibreTuner::get()->canLog();
+    ui->logView->setModel(logModel_);
+    connect(logModel_, &QAbstractItemModel::rowsInserted, this,
+            &CanViewer::rowsInserted);
 }
 
 CanViewer::~CanViewer() { delete ui; }
 
-void CanViewer::rowsInserted(const QModelIndex & /*parent*/, int  /*first*/, int  /*last*/) {
-  if (ui->autoScroll->isChecked()) {
-    ui->logView->scrollToBottom();
-  }
+void CanViewer::rowsInserted(const QModelIndex & /*parent*/, int /*first*/,
+                             int /*last*/) {
+    if (ui->autoScroll->isChecked()) {
+        ui->logView->scrollToBottom();
+    }
 }

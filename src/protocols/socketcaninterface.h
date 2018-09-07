@@ -29,45 +29,46 @@
  */
 class SocketCanInterface : public CanInterface {
 public:
-  SocketCanInterface(SocketCanInterface &) = delete;
-  SocketCanInterface(const SocketCanInterface &) = delete;
-  SocketCanInterface(SocketCanInterface &&) = delete;
+    SocketCanInterface(SocketCanInterface &) = delete;
+    SocketCanInterface(const SocketCanInterface &) = delete;
+    SocketCanInterface(SocketCanInterface &&) = delete;
 
-  ~SocketCanInterface() override;
+    ~SocketCanInterface() override;
 
 
-  /* Closes the socket */
-  void close();
+    /* Closes the socket */
+    void close();
 
-  /* Binds the socket to a SocketCAN interface. Returns false
-   * if an error occured. */
-  bool bind(const std::string &ifname);
+    /* Binds the socket to a SocketCAN interface. Returns false
+     * if an error occured. */
+    bool bind(const std::string &ifname);
 
-  /* Sets the socket as nonblocking for async operations */
-  void setNonblocking();
+    /* Sets the socket as nonblocking for async operations */
+    void setNonblocking();
 
-  /* Socket functions */
-  int fd() const;
+    /* Socket functions */
+    int fd() const;
 
-  // These constructors should never be used directly!
-  SocketCanInterface(const std::string &ifname);
+    // These constructors should never be used directly!
+    SocketCanInterface(const std::string &ifname);
 
-  // CanInterface interface
+    // CanInterface interface
 public:
-   virtual void send(const CanMessage &message) override;
+    virtual void send(const CanMessage &message) override;
 
-   /* Returns true if a message was received before the timeoutc or if nonblocking is enabled
-    * and no messages are queued. */
-   virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
+    /* Returns true if a message was received before the timeoutc or if
+     * nonblocking is enabled and no messages are queued. */
+    virtual bool recv(CanMessage &message,
+                      std::chrono::milliseconds timeout) override;
 
-   /* Returns true if the socket is ready for reading/writing */
-   bool valid() override { return socket_ > 0; }
+    /* Returns true if the socket is ready for reading/writing */
+    bool valid() override { return socket_ > 0; }
 
-   /* Starts the read loop thread for asynchronous operations */
-   void start() override;
+    /* Starts the read loop thread for asynchronous operations */
+    void start() override;
 
 private:
-  int socket_ = 0;
+    int socket_ = 0;
 };
 
 #endif // SOCKETCANINTERFACE_H

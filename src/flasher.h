@@ -19,14 +19,14 @@
 #ifndef FLASHER_H
 #define FLASHER_H
 
+#include <atomic>
 #include <memory>
 #include <string>
-#include <atomic>
 
+#include "asyncroutine.h"
 #include "flashable.h"
 #include "protocols/udsprotocol.h"
 #include "udsauthenticator.h"
-#include "asyncroutine.h"
 
 class Flasher;
 typedef std::shared_ptr<Flasher> FlasherPtr;
@@ -44,37 +44,36 @@ typedef std::shared_ptr<Flashable> FlashablePtr;
  */
 class Flasher : public AsyncRoutine {
 public:
-  virtual ~Flasher() = default;
+    virtual ~Flasher() = default;
 
-  /* Flash that shit. Returns false if canceled. */
-  virtual bool flash(FlashablePtr flashable) = 0;
+    /* Flash that shit. Returns false if canceled. */
+    virtual bool flash(FlashablePtr flashable) = 0;
 
-  /* Cancels the active flash */
-  virtual void cancel() =0;
+    /* Cancels the active flash */
+    virtual void cancel() = 0;
 };
 
 
 
 class MazdaT1Flasher : public Flasher {
 public:
-  MazdaT1Flasher(std::string key,
-                 std::unique_ptr<uds::Protocol> &&uds);
+    MazdaT1Flasher(std::string key, std::unique_ptr<uds::Protocol> &&uds);
 
-  bool flash(FlashablePtr flashable) override;
-  void cancel() override;
+    bool flash(FlashablePtr flashable) override;
+    void cancel() override;
 
 private:
-  std::unique_ptr<uds::Protocol> uds_;
-  FlashablePtr flash_;
-  uds::Authenticator auth_;
-  std::string key_;
-  std::atomic<bool> canceled_;
+    std::unique_ptr<uds::Protocol> uds_;
+    FlashablePtr flash_;
+    uds::Authenticator auth_;
+    std::string key_;
+    std::atomic<bool> canceled_;
 
-  size_t left_{}, sent_{};
+    size_t left_{}, sent_{};
 
-  bool sendLoad();
-  bool do_erase();
-  bool do_request_download();
+    bool sendLoad();
+    bool do_erase();
+    bool do_request_download();
 };
 
 #endif // FLASHER_H

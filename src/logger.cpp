@@ -20,19 +20,16 @@
 #include "libretuner.h"
 #include <iostream>
 
-Logger::Logger()
-= default;
+Logger::Logger() = default;
 
-void Logger::log(Logger::Mode mode, const std::string &message)
-{
+void Logger::log(Logger::Mode mode, const std::string &message) {
     if (LibreTuner *lt = LibreTuner::get()) {
         lt->log().append(mode, message);
     }
     std::cout << "[" << modeString(mode) << "] " << message << std::endl;
 }
 
-std::string Logger::modeString(Logger::Mode mode)
-{
+std::string Logger::modeString(Logger::Mode mode) {
     switch (mode) {
     case Logger::Mode::Debug:
         return "DEBUG";

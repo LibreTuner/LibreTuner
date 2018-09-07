@@ -41,109 +41,110 @@ Tune::Tune(const TuneMeta &tune) : meta_(tune) {
 
     // Load tables
     QFile file(LibreTuner::get()->home() + "/tunes/" +
-                QString::fromStdString(meta_.path));
+               QString::fromStdString(meta_.path));
     if (!file.open(QFile::ReadOnly)) {
         throw std::runtime_error(file.errorString().toStdString());
     }
 
     QXmlStreamReader xml(&file);
     if (xml.readNextStartElement()) {
-    if (xml.name() == "tables") {
-        readTables(xml);
-    } else {
-        xml.raiseError(QObject::tr("Unexpected element"));
-    }
+        if (xml.name() == "tables") {
+            readTables(xml);
+        } else {
+            xml.raiseError(QObject::tr("Unexpected element"));
+        }
     }
 
     if (xml.error()) {
         throw std::runtime_error(QString("%1\nLine %2, column %3")
-                        .arg(xml.errorString())
-                        .arg(xml.lineNumber())
-                        .arg(xml.columnNumber())
-                        .toStdString());
-    
+                                     .arg(xml.errorString())
+                                     .arg(xml.lineNumber())
+                                     .arg(xml.columnNumber())
+                                     .toStdString());
     }
 }
 
 void Tune::readTables(QXmlStreamReader &xml) {
-  assert(xml.isStartElement() && xml.name() == "tables");
+    assert(xml.isStartElement() && xml.name() == "tables");
 
-  while (xml.readNextStartElement()) {
-    if (xml.name() != "table") {
-      xml.raiseError("Unexpected element in tables");
-      return;
+    while (xml.readNextStartElement()) {
+        if (xml.name() != "table") {
+            xml.raiseError("Unexpected element in tables");
+            return;
+        }
+
+        if (!xml.attributes().hasAttribute("id")) {
+            xml.raiseError("Expected id attribute");
+            return;
+        }
+
+        bool valid;
+        int id = xml.attributes().value("id").toInt(&valid);
+        if (!valid) {
+            xml.raiseError("id is not a number");
+            return;
+        }
+
+        if (id >= tables_->count()) {
+            xml.raiseError("id is out of range");
+            return;
+        }
+
+        QByteArray data =
+            QByteArray::fromBase64(xml.readElementText().toLatin1());
+
+        auto res = tables_->set(
+            id, gsl::make_span(reinterpret_cast<const uint8_t *>(data.data()),
+                               data.size()));
+        if (!res.first) {
+            xml.raiseError(QString::fromStdString("Error reading table data: " +
+                                                  res.second));
+            return;
+        }
     }
-
-    if (!xml.attributes().hasAttribute("id")) {
-      xml.raiseError("Expected id attribute");
-      return;
-    }
-
-    bool valid;
-    int id = xml.attributes().value("id").toInt(&valid);
-    if (!valid) {
-      xml.raiseError("id is not a number");
-      return;
-    }
-
-    if (id >= tables_->count()) {
-      xml.raiseError("id is out of range");
-      return;
-    }
-
-    QByteArray data = QByteArray::fromBase64(xml.readElementText().toLatin1());
-
-    auto res = tables_->set(
-        id, gsl::make_span(reinterpret_cast<const uint8_t *>(data.data()),
-                           data.size()));
-    if (!res.first) {
-      xml.raiseError(
-          QString::fromStdString("Error reading table data: " + res.second));
-      return;
-    }
-  }
 }
 
 void Tune::save() {
-  QFile file(LibreTuner::get()->home() + "/tunes/" +
-             QString::fromStdString(meta_.path));
-  if (!file.open(QFile::WriteOnly)) {
-      throw std::runtime_error(file.errorString().toStdString());
-  }
-
-  QXmlStreamWriter xml(&file);
-  xml.setAutoFormatting(true);
-  xml.setAutoFormattingIndent(-1); // tabs > spaces
-
-  xml.writeStartDocument();
-  xml.writeDTD("<!DOCTYPE tune>");
-  xml.writeStartElement("tables");
-
-  for (int i = 0; i < tables_->count(); ++i) {
-    TablePtr table = tables_->get(i, false);
-    if (table && table->modified()) {
-      xml.writeStartElement("table");
-      xml.writeAttribute("id", QString::number(i));
-      std::vector<uint8_t> data;
-      data.resize(table->rawSize());
-      assert(table->serialize(data));
-      xml.writeCharacters(QString(
-          QByteArray(reinterpret_cast<const char *>(data.data()), data.size())
-              .toBase64()));
-      xml.writeEndElement();
+    QFile file(LibreTuner::get()->home() + "/tunes/" +
+               QString::fromStdString(meta_.path));
+    if (!file.open(QFile::WriteOnly)) {
+        throw std::runtime_error(file.errorString().toStdString());
     }
-  }
-  xml.writeEndElement();
-  xml.writeEndDocument();
 
-  if (xml.hasError()) {
-    throw std::runtime_error("unknown XML error while writing tune");
-  }
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.setAutoFormattingIndent(-1); // tabs > spaces
+
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE tune>");
+    xml.writeStartElement("tables");
+
+    for (int i = 0; i < tables_->count(); ++i) {
+        TablePtr table = tables_->get(i, false);
+        if (table && table->modified()) {
+            xml.writeStartElement("table");
+            xml.writeAttribute("id", QString::number(i));
+            std::vector<uint8_t> data;
+            data.resize(table->rawSize());
+            assert(table->serialize(data));
+            xml.writeCharacters(
+                QString(QByteArray(reinterpret_cast<const char *>(data.data()),
+                                   data.size())
+                            .toBase64()));
+            xml.writeEndElement();
+        }
+    }
+    xml.writeEndElement();
+    xml.writeEndDocument();
+
+    if (xml.hasError()) {
+        throw std::runtime_error("unknown XML error while writing tune");
+    }
 }
 
 void Tune::apply(gsl::span<uint8_t> data) {
-  tables_->apply(data);
+    tables_->apply(data);
 
-  // Checksums
-  rom_->subDefinition()->checksums()->correct(data);
+    // Checksums
+    rom_->subDefinition()->checksums()->correct(data);
 }

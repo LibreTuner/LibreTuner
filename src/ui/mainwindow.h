@@ -20,51 +20,51 @@
 #define MAINWINDOW_H
 
 #include "canviewer.h"
+#include "dataloggerwindow.h"
 #include "downloadwindow.h"
 #include "interfaceswindow.h"
 #include "styledwindow.h"
-#include "dataloggerwindow.h"
 
-#include <QMainWindow>
-#include <QLayout>
 #include <QComboBox>
+#include <QLayout>
+#include <QMainWindow>
 
-class MainWindow : public StyledWindow {//public QMainWindow {
-  Q_OBJECT
+class MainWindow : public StyledWindow { // public QMainWindow {
+    Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
 
 private slots:
-  void on_buttonDownloadRom_clicked();
-  void newLogClicked();
-  void closeEvent(QCloseEvent *event) override;
+    void on_buttonDownloadRom_clicked();
+    void newLogClicked();
+    void closeEvent(QCloseEvent *event) override;
 
 private:
-  CanViewer canViewer_;
-  DownloadWindow *downloadWindow_ = nullptr;
-  InterfacesWindow interfacesWindow_;
-  std::unique_ptr<DataLoggerWindow> loggerWindow_;
+    CanViewer canViewer_;
+    DownloadWindow *downloadWindow_ = nullptr;
+    InterfacesWindow interfacesWindow_;
+    std::unique_ptr<DataLoggerWindow> loggerWindow_;
 
-  QLayout *tunesLayout_;
-  QLayout *romsLayout_;
-  QComboBox *comboLogVehicles_;
-  QListView *listLogs_;
-  QMainWindow *main_;
-  QDockWidget *logDock_;
+    QLayout *tunesLayout_;
+    QLayout *romsLayout_;
+    QComboBox *comboLogVehicles_;
+    QListView *listLogs_;
+    QMainWindow *main_;
+    QDockWidget *logDock_;
 
-  void setupMenu();
+    void setupMenu();
 
-  QWidget *createOverviewTab();
-  QWidget *createTunesTab();
-  QWidget *createRomsTab();
-  QWidget *createLogsTab();
-  QWidget *createDiagnosticsTab();
-  void createLog();
+    QWidget *createOverviewTab();
+    QWidget *createTunesTab();
+    QWidget *createRomsTab();
+    QWidget *createLogsTab();
+    QWidget *createDiagnosticsTab();
+    void createLog();
 
 public slots:
-  void updateRoms();
-  void updateTunes();
+    void updateRoms();
+    void updateTunes();
 };
 
 #endif // MAINWINDOW_H
