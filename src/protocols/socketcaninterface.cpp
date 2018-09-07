@@ -100,7 +100,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
 
   strcpy(ifr.ifr_name, ifname.c_str());
   if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0) {
-    throw std::runtime_error("Failed to find interface: " +
+    throw std::runtime_error("Failed to find socketcan interface: " +
                              std::string(strerror(errno)));
   }
 
@@ -108,7 +108,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
   addr.can_ifindex = ifr.ifr_ifindex;
 
   if (::bind(socket_, (sockaddr *)&addr, sizeof(addr)) < 0) {
-    throw std::runtime_error("Failed to bind interface: " +
+    throw std::runtime_error("Failed to bind socketcan interface: " +
                              std::string(strerror(errno)));
   }
 
