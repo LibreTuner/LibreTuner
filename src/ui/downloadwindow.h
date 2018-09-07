@@ -20,6 +20,7 @@
 #define DOWNLOADWINDOW_H
 
 #include <QWidget>
+#include <QDialog>
 
 #include <memory>
 #include <thread>
@@ -70,7 +71,7 @@ private:
 
   // QWidget interface
 protected:
-  void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // DOWNLOADWINDOW_H

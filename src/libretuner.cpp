@@ -84,19 +84,21 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     msgBox.exec();
   }
 
-  if (!RomManager::get()->load()) {
+  try {
+    RomManager::get()->load();
+  } catch (const std::exception &e) {
     QMessageBox msgBox;
-    msgBox.setText("Could not load ROM metadata from roms.xml: " +
-                   RomManager::get()->lastError());
+    msgBox.setText(QStringLiteral("Could not load ROM metadata from roms.xml: ") + e.what());
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setWindowTitle("RomManager error");
     msgBox.exec();
   }
 
-  if (!TuneManager::get()->load()) {
+  try {
+    TuneManager::get()->load();
+  } catch (const std::exception &e) {
     QMessageBox msgBox;
-    msgBox.setText("Could not load tune metadata from tunes.xml: " +
-                   RomManager::get()->lastError());
+    msgBox.setText(QStringLiteral("Could not load tune metadata from tunes.xml: ") + e.what());
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setWindowTitle("TuneManager error");
     msgBox.exec();
@@ -130,54 +132,58 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
 
 
-void LibreTuner::editTune(const TunePtr &tune) {
-  TuneDataPtr data = std::make_shared<TuneData>(tune);
-  if (!data->valid()) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Tune data error");
-    msgBox.setText(QStringLiteral("Error opening tune: ") +
-                   QString::fromStdString(data->lastError()));
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-    return;
-  }
-  tuneEditor_ = std::make_unique<TuneEditor>(data);
-  tuneEditor_->show();
+void LibreTuner::editTune(const TuneMeta &tune) {
+    std::shared_ptr<Tune> data;
+    try {
+        data = std::make_shared<Tune>(tune);
+    } catch (const std::exception &e) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Tune data error");
+        msgBox.setText(QStringLiteral("Error opening tune: ") + e.what());
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+        return;
+    }
+    tuneEditor_ = std::make_unique<TuneEditor>(data);
+    tuneEditor_->show();
 }
 
 
 
-void LibreTuner::flashTune(const TunePtr &tune) {
-  TuneDataPtr data = std::make_shared<TuneData>(tune);
-  if (!data->valid()) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Tune data error");
-    msgBox.setText(QStringLiteral("Error opening tune: ") +
-                   QString::fromStdString(data->lastError()));
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-    return;
-  }
-  std::shared_ptr<Flashable> flash = std::make_shared<Flashable>(data);
-  if (!flash->valid()) {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Flash error");
-    msgBox.setText(QStringLiteral("Failed to create flashable from tune: ") +
-                   QString::fromStdString(flash->lastError()));
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-    return;
-  }
-
-  if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
-    std::unique_ptr<Flasher> flasher = link->flasher();
-    if (!flasher) {
-        QMessageBox(QMessageBox::Critical, "Flash failure", "Failed to get a valid flash interface for the vehicle link. Is a flash mode set in the definition file and does the datalink support it?").exec();
+void LibreTuner::flashTune(const TuneMeta &tune) {
+    // TODO: Standard way to open tunes (we repeat the same code in editTune and flashTune... ew)
+    std::shared_ptr<Tune> data;
+    try {
+        data = std::make_shared<Tune>(tune);
+    } catch (const std::exception &e) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Tune data error");
+        msgBox.setText(QStringLiteral("Error opening tune: ") + e.what());
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
         return;
     }
-    flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), flash);
-    flashWindow_->show();
-  }
+    std::shared_ptr<Flashable> flash;
+    try {
+     flash = std::make_shared<Flashable>(data);
+    } catch (const std::exception &e) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Flash error");
+        msgBox.setText(QStringLiteral("Failed to create flashable from tune: ") + e.what());
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+        return;
+    }
+
+    if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
+        std::unique_ptr<Flasher> flasher = link->flasher();
+        if (!flasher) {
+            QMessageBox(QMessageBox::Critical, "Flash failure", "Failed to get a valid flash interface for the vehicle link. Is a flash mode set in the definition file and does the datalink support it?").exec();
+            return;
+        }
+        flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), flash);
+        flashWindow_->show();
+    }
 }
 
 

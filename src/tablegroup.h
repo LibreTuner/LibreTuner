@@ -33,7 +33,7 @@ typedef std::shared_ptr<Table> TablePtr;
  */
 class TableGroup {
 public:
-  explicit TableGroup(const RomDataPtr &base);
+  explicit TableGroup(const std::shared_ptr<Rom> &base);
 
   size_t count() const { return tables_.size(); }
 
@@ -51,7 +51,7 @@ public:
   void apply(gsl::span<uint8_t> data);
 
 private:
-  RomDataPtr base_;
+  std::shared_ptr<Rom> base_;
 
   std::vector<TablePtr> tables_;
 };

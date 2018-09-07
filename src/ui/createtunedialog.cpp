@@ -22,38 +22,47 @@
 #include "rommanager.h"
 #include <QMessageBox>
 #include <QStyledItemDelegate>
-#include <tunemanager.h>
+#include "tunemanager.h"
+#include "logger.h"
 
-Q_DECLARE_METATYPE(RomPtr)
-
-CreateTuneDialog::CreateTuneDialog(const RomPtr& base)
+CreateTuneDialog::CreateTuneDialog(const RomMeta *base)
     : ui_(new Ui::CreateTuneDialog) {
   ui_->setupUi(this);
 
   ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
-  for (RomPtr &rom : RomManager::get()->roms()) {
-    ui_->comboBase->addItem(QString::fromStdString(rom->name()),
-                            QVariant::fromValue(rom));
-    if (base != nullptr && rom == base) {
+  for (const RomMeta &rom : RomManager::get()->roms()) {
+    ui_->comboBase->addItem(QString::fromStdString(rom.name),
+                            QVariant(rom.id));
+    if (base != nullptr && rom.id == base->id) {
       ui_->comboBase->setCurrentIndex(ui_->comboBase->count() - 1);
     }
   }
 }
 
+
+
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
-void CreateTuneDialog::on_buttonCreate_clicked() {
-  if (!TuneManager::get()->createTune(
-          ui_->comboBase->currentData().value<RomPtr>(),
-          ui_->lineName->text().toStdString())) {
-    QMessageBox msgBox;
-    msgBox.setText("Error while creating tune: " +
-                   TuneManager::get()->lastError());
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setWindowTitle("Tune creation error");
-    msgBox.exec();
-  }
 
-  close();
+
+void CreateTuneDialog::on_buttonCreate_clicked() {
+    int romId = ui_->comboBase->currentData().toInt();
+    const RomMeta *rom = RomManager::get()->fromId(romId);
+    if (rom == nullptr) {
+        Logger::warning("Rom with ID '" + std::to_string(romId) + "' no longer exists");
+        return;
+    }
+    
+    try {
+        TuneManager::get()->createTune(*rom, ui_->lineName->text().toStdString());
+    } catch (const std::exception &e) {
+        QMessageBox msgBox;
+        msgBox.setText(QStringLiteral("Error while creating tune: ") + e.what());
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setWindowTitle("Tune creation error");
+        msgBox.exec();
+    }
+
+    close();
 }

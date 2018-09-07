@@ -20,10 +20,11 @@
 #define ROMMANAGER_H
 
 #include <cstdint>
-#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <gsl/span>
 
 #include <QObject>
 #include <QXmlStreamReader>
@@ -38,32 +39,33 @@ class RomManager : public QObject {
   Q_OBJECT
 public:
   static RomManager *get();
+  
+  RomManager(const RomManager&) = delete;
+  RomManager &operator=(const RomManager&) = delete;
 
-  /* Loads rom list and metadata. Returns true if no errors
-   * occurred */
-  bool load();
+  /* Loads rom list and metadata. */
+  void load();
 
   /* Saves rom list and metadata */
-  bool save();
+  void save();
 
-  QString lastError() const { return lastError_; }
+  const std::vector<RomMeta> &roms() { return roms_; }
 
-  /* Returns the amount of roms */
-  size_t count() const { return roms_.size(); }
-
-  std::vector<RomPtr> &roms() { return roms_; }
-
-  bool addRom(const std::string &name, const DefinitionPtr &definition,
+  void addRom(const std::string &name, const DefinitionPtr &definition,
               gsl::span<const uint8_t> data);
 
   /* Returns the ROM with id or nullptr if the ROM does
-   * not exist */
-  RomPtr fromId(int id);
+   * not exist. Be careful not to store this reference
+   * as ROMs can be added or removed. */
+  const RomMeta *fromId(int id) const;
+  
+  /* Loads a ROM from a ROM id. May throw an exception if the id
+   * does not exist or if the ROM could not be loaded */
+  std::shared_ptr<Rom> loadId(int id);
 
 private:
   RomManager() = default;
-  QString lastError_;
-  std::vector<RomPtr> roms_;
+  std::vector<RomMeta> roms_;
   int nextId_{};
 
   void readRoms(QXmlStreamReader &xml);

@@ -33,8 +33,7 @@ class IsoTpInterface;
 class IsoTpTest;
 
 class TuneEditor;
-class Tune;
-typedef std::shared_ptr<Tune> TunePtr;
+class TuneMeta;
 
 class VehicleLink;
 
@@ -60,10 +59,10 @@ public:
   QString home() { return home_; }
 
   /* Open the tune editor */
-  void editTune(const TunePtr &tune);
+  void editTune(const TuneMeta &tune);
 
   /* Open tune flasher */
-  void flashTune(const TunePtr &tune);
+  void flashTune(const TuneMeta &tune);
 
   /* Returns the default datalink. Queries the user to create one
    * if none exist. May return nullptr */

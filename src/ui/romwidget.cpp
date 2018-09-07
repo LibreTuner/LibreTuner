@@ -18,6 +18,7 @@
 
 #include "romwidget.h"
 #include "rommanager.h"
+#include "logger.h"
 
 #include "createtunedialog.h"
 #include <QGraphicsPixmapItem>
@@ -27,12 +28,12 @@
 #include <QStyleOption>
 #include <QPainter>
 
-RomWidget::RomWidget(const RomPtr& rom, QWidget *parent) : rom_(rom), QWidget(parent) {
+RomWidget::RomWidget(const RomMeta& rom, QWidget *parent) : QWidget(parent), romId_(rom.id) {
   auto *vlayout = new QVBoxLayout(this);
   auto *hlayout = new QHBoxLayout();
   auto *buttonLayout = new QVBoxLayout();
 
-  label_ = new QLabel(QString::fromStdString(rom->name()), this);
+  label_ = new QLabel(QString::fromStdString(rom.name), this);
   label_->setAlignment(Qt::AlignCenter);
 
   QLabel *icon = new QLabel();
@@ -68,6 +69,11 @@ void RomWidget::paintEvent(QPaintEvent *event)
 }
 
 void RomWidget::createTuneClicked() {
-  CreateTuneDialog dlg(rom_);
-  dlg.exec();
+    const RomMeta *rom = RomManager::get()->fromId(romId_);
+    if (rom == nullptr) {
+        Logger::warning("ROM no longer exists");
+        // We need not return here because CreateTuneDialog can take a nullptr in its constructor
+    }
+    CreateTuneDialog dlg(rom);
+    dlg.exec();
 }

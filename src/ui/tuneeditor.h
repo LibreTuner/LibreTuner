@@ -31,8 +31,8 @@ namespace Ui {
 class TuneEditor;
 }
 
-class TuneData;
-typedef std::shared_ptr<TuneData> TuneDataPtr;
+class Tune;
+
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
 
@@ -42,14 +42,14 @@ typedef std::shared_ptr<Table> TablePtr;
 class TuneEditor : public StyledWindow {
   Q_OBJECT
 public:
-  TuneEditor(const TuneDataPtr &tune, QWidget *parent = 0);
+  TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent = 0);
 
   void closeEvent(QCloseEvent *event) override;
 
   bool save();
 
 private:
-  TuneDataPtr tune_;
+  std::shared_ptr<Tune> tune_;
   Ui::TuneEditor *ui;
   TablePtr currentTable_;
 

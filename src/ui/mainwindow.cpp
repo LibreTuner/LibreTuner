@@ -200,7 +200,7 @@ void MainWindow::updateTunes() {
     delete child;
   }
 
-  for (const TunePtr &tune : TuneManager::get()->tunes()) {
+  for (const TuneMeta &tune : TuneManager::get()->tunes()) {
     tunesLayout_->addWidget(new TuneWidget(tune));
   }
 }
@@ -213,7 +213,7 @@ void MainWindow::updateRoms() {
     delete child;
   }
 
-  for (const RomPtr &rom : RomManager::get()->roms()) {
+  for (const RomMeta &rom : RomManager::get()->roms()) {
     romsLayout_->addWidget(new RomWidget(rom));
   }
 }
@@ -241,10 +241,17 @@ void MainWindow::newLogClicked()
     if (!link) {
         return;
     }
+    
+    std::unique_ptr<DataLogger> logger;
 
-    std::unique_ptr<DataLogger> logger = link->logger();
-    if (!logger) {
-        QMessageBox(QMessageBox::Critical, "Logger error", "Failed to create a usable datalogger. The datalink may not support the needed protocol or there is no log mode set in the definition file.").exec();
+    try {
+        logger = link->logger();
+        if (!logger) {
+            QMessageBox(QMessageBox::Critical, "Logger error", "Failed to create a usable datalogger. The datalink may not support the needed protocol or there is no log mode set in the definition file.").exec();
+            return;
+        }
+    } catch (const std::exception &e) {
+        QMessageBox(QMessageBox::Critical, "Logger error", QStringLiteral("An error occurred while creating the datalogger: ") + e.what()).exec();
         return;
     }
     DataLogPtr log = std::make_shared<DataLog>();

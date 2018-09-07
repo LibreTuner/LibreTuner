@@ -71,7 +71,7 @@ bool MazdaT1Flasher::do_request_download() {
     std::array<uint8_t, 9> msg{};
     msg[0] = UDS_REQ_REQUESTDOWNLOAD;
     writeBE<int32_t>(flash_->offset(), gsl::make_span(msg).subspan(1));
-    writeBE<int32_t>(flash_->size(), gsl::make_span(msg).subspan(5));
+    writeBE<int32_t>(flash_->data().size(), gsl::make_span(msg).subspan(5));
 
     uds::Packet _response;
     // Send download request
@@ -84,7 +84,7 @@ bool MazdaT1Flasher::do_request_download() {
 
     // Start uploading
     sent_ = 0;
-    left_ = flash_->size();
+    left_ = flash_->data().size();
     return sendLoad();
 }
 
@@ -96,8 +96,8 @@ bool MazdaT1Flasher::sendLoad() {
         std::vector<uint8_t> data;
         data.reserve(toSend + 1);
         data.emplace_back(UDS_REQ_TRANSFERDATA);
-        data.insert(data.begin() + 1, flash_->data() + sent_,
-                  flash_->data() + sent_ + toSend);
+        data.insert(data.begin() + 1, flash_->data().begin() + sent_,
+                  flash_->data().begin() + sent_ + toSend);
 
         sent_ += toSend;
         left_ -= toSend;
@@ -106,7 +106,7 @@ bool MazdaT1Flasher::sendLoad() {
         uds_->request(data, UDS_RES_TRANSFERDATA, _response);
 
         notifyProgress(static_cast<double>(sent_) /
-                         flash_->size());
+                         flash_->data().size());
         if (canceled_) {
             Logger::warning("Canceled flash during upload");
             return false;

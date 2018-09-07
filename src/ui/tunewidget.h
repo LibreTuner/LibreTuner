@@ -24,19 +24,23 @@
 
 #include <memory>
 
-class Tune;
-typedef std::shared_ptr<Tune> TunePtr;
+#include "tune.h"
+
+
+
+// TODO: Maybe not store a copy of the TuneMeta, but the tune id for later lookup to avoid unecessary memory usage
+
 
 /**
- * @todo write docs
+ * Widget displaying a tune for the tunes tab.
  */
 class TuneWidget : public QFrame {
   Q_OBJECT
 public:
-  TuneWidget(const TunePtr &tune, QWidget *parent = 0);
+  TuneWidget(const TuneMeta &tune, QWidget *parent = 0);
 
 private:
-  TunePtr tune_;
+  TuneMeta tune_;
 
 private slots:
   void editClicked();

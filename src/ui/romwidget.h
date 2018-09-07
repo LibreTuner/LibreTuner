@@ -26,8 +26,7 @@
 
 class QPushButton;
 
-class Rom;
-typedef std::shared_ptr<Rom> RomPtr;
+class RomMeta;
 
 /**
  * Widget for the ROM list
@@ -35,7 +34,7 @@ typedef std::shared_ptr<Rom> RomPtr;
 class RomWidget : public QWidget {
   Q_OBJECT
 public:
-  explicit RomWidget(const RomPtr& rom, QWidget *parent = 0);
+  explicit RomWidget(const RomMeta& rom, QWidget *parent = 0);
 
   void paintEvent(QPaintEvent *event) override;
 private:
@@ -43,7 +42,7 @@ private:
   QPushButton *deleteButton_;
   QPushButton *tuneButton_;
 
-  RomPtr rom_;
+  int romId_;
 
 public slots:
   void createTuneClicked();

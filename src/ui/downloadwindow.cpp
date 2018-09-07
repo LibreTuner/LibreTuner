@@ -116,14 +116,15 @@ void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
 }
 
 void DownloadWindow::onCompletion() {
-  if (!RomManager::get()->addRom(ui->lineName->text().toStdString(), definition_, downloadInterface_->data())) {
-    QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
-                              Q_ARG(bool, false),
-                              Q_ARG(QString, RomManager::get()->lastError()));
-  } else {
-    QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
-                              Q_ARG(bool, true), Q_ARG(QString, QString()));
-  }
+    try {
+        RomManager::get()->addRom(ui->lineName->text().toStdString(), definition_, downloadInterface_->data());
+        QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
+                                Q_ARG(bool, true), Q_ARG(QString, QString()));
+    } catch (const std::exception &e) {
+        QMetaObject::invokeMethod(this, "mainOnCompletion", Qt::QueuedConnection,
+                            Q_ARG(bool, false),
+                            Q_ARG(QString, e.what()));
+    }
 }
 
 void DownloadWindow::updateProgress(float progress) {

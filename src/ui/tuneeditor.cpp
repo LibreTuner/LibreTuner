@@ -33,7 +33,7 @@
 #include <QMessageBox>
 #include <QTreeWidget>
 
-TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
+TuneEditor::TuneEditor(const std::shared_ptr<Tune>& tune, QWidget *parent)
     : StyledWindow(parent), ui(new Ui::TuneEditor), tune_(tune) {
   assert(tune);
   setTitle("LibreTuner - Tune Editor");
@@ -58,7 +58,7 @@ TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
 
   std::vector<std::pair<TableCategory, QTreeWidgetItem *>> categories_;
 
-  TableDefinitions *tables = tune_->romData()->definition()->tables();
+  TableDefinitions *tables = tune_->rom()->definition()->tables();
 
   for (int i = 0; i < tables->count(); ++i) {
     const TableDefinition *def = tables->at(i);
@@ -97,6 +97,8 @@ TuneEditor::TuneEditor(const TuneDataPtr& tune, QWidget *parent)
   setWindowFlag(Qt::Window);
 }
 
+
+
 void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
                                              int  /*column*/) {
   QVariant data = item->data(0, Qt::UserRole);
@@ -123,7 +125,7 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
   // This is not elegant. Maybe the class structure should be changed
   ui->labelMemory->setText(
       QStringLiteral("0x") +
-      QString::number(tune_->romData()->subDefinition()->getTableLocation(
+      QString::number(tune_->rom()->subDefinition()->getTableLocation(
                           currentTable_->definition()->id()),
                       16));
   ui->infoName->setText(
@@ -154,12 +156,16 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
   emit tableChanged(currentTable_);
 }
 
+
+
 void TuneEditor::onTableModified() {
   if (!changed_) {
     changed_ = true;
     setTitle("LibreTuner - Tune Editor *");
   }
 }
+
+
 
 void TuneEditor::closeEvent(QCloseEvent *event) {
   if (changed_) {
@@ -190,18 +196,21 @@ void TuneEditor::closeEvent(QCloseEvent *event) {
   }
 }
 
+
+
 bool TuneEditor::save() {
-  if (tune_->save()) {
-    return true;
-  }
+    try {
+        tune_->save();
+        return true;
+    } catch (const std::exception &e) {
+        QMessageBox mb;
+        mb.setText(tr("Failed to save tune data"));
+        mb.setWindowTitle(tr("Failed to save"));
+        mb.setInformativeText(e.what());
+        mb.setIcon(QMessageBox::Critical);
+        mb.setStandardButtons(QMessageBox::Ok);
+        mb.exec();
 
-  QMessageBox mb;
-  mb.setText(tr("Failed to save tune data"));
-  mb.setWindowTitle(tr("Failed to save"));
-  mb.setInformativeText(QString::fromStdString(tune_->lastError()));
-  mb.setIcon(QMessageBox::Critical);
-  mb.setStandardButtons(QMessageBox::Ok);
-  mb.exec();
-
-  return false;
+        return false;
+    }
 }

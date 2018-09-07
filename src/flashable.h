@@ -28,39 +28,29 @@ enum FlashMode {
   FLASH_T1, // Uses a CAN interface. Supported: Mazdaspeed 6
 };
 
-class TuneData;
-typedef std::shared_ptr<TuneData> TuneDataPtr;
-
 class SubDefinition;
 typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
+
+class Tune;
 
 /**
  * A representation of data able to be flashed.
  */
 class Flashable {
 public:
-  explicit Flashable(const TuneDataPtr& tune);
-
-  bool valid() const { return valid_; }
+  explicit Flashable(const std::shared_ptr<Tune>& tune);
 
   // The address offset the data should be flashed to
   size_t offset() const { return offset_; }
 
-  size_t size() const { return data_.size(); }
-
-  const uint8_t *data() const { return data_.data(); }
-
-  std::string lastError() const { return lastError_; }
+  const std::vector<uint8_t> &data() const { return data_; }
 
   SubDefinitionPtr definition() const { return definition_; }
 
 private:
   std::vector<uint8_t> data_;
   size_t offset_;
-  bool valid_;
   SubDefinitionPtr definition_;
-
-  std::string lastError_;
 };
 
 #endif // FLASHABLE_H

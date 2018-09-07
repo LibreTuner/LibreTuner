@@ -36,10 +36,8 @@ public:
   /* Adds a region modifiable for checksum computation */
   void addModifiable(uint32_t offset, uint32_t size);
 
-  /* Corrects the checksum for the data using modifiable sections.
-   * Returns (false, errmsg) on failure and (true, "") on success. */
-  virtual std::pair<bool, std::string>
-  correct(gsl::span<uint8_t> data) const = 0;
+  /* Corrects the checksum for the data using modifiable sections. */
+  virtual void correct(gsl::span<uint8_t> data) const = 0;
 
   /* Returns the computed checksum. If length is too small,
    * returns 0 and sets ok to false.*/
@@ -63,7 +61,7 @@ public:
   uint32_t compute(gsl::span<const uint8_t> data,
                    bool *ok = nullptr) const override;
 
-  std::pair<bool, std::string> correct(gsl::span<uint8_t> data) const override;
+  void correct(gsl::span<uint8_t> data) const override;
 };
 
 /**
@@ -76,7 +74,7 @@ public:
 
   /* Corrects the checksums for the data using modifiable sections.
    * Returns (false, errmsg) on failure and (true, "") on success. */
-  std::pair<bool, std::string> correct(gsl::span<uint8_t> data);
+  void correct(gsl::span<uint8_t> data);
 
 private:
   std::vector<ChecksumPtr> checksums_;

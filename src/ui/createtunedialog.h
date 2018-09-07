@@ -29,8 +29,7 @@ namespace Ui {
 class CreateTuneDialog;
 }
 
-class Rom;
-typedef std::shared_ptr<Rom> RomPtr;
+class RomMeta;
 
 /**
  * @todo write docs
@@ -38,7 +37,7 @@ typedef std::shared_ptr<Rom> RomPtr;
 class CreateTuneDialog : public QDialog {
   Q_OBJECT
 public:
-  CreateTuneDialog(const RomPtr &base = nullptr);
+  CreateTuneDialog(const RomMeta *base = nullptr);
 
   ~CreateTuneDialog();
 

@@ -22,7 +22,7 @@
 
 #include <cassert>
 
-TableGroup::TableGroup(const RomDataPtr &base) : base_(base) {
+TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
   tables_.resize(base->definition()->tables()->count());
 }
 

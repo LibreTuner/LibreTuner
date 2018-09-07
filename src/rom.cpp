@@ -20,44 +20,37 @@
 #include "definitions/definition.h"
 #include "libretuner.h"
 #include "table.h"
+#include "logger.h"
 
 #include <cassert>
 
 #include <QFile>
 
-RomData::RomData(const RomPtr& rom) : rom_(rom) {
-  assert(rom);
-  definition_ = DefinitionManager::get()->getDefinition(rom->definitionId());
+Rom::Rom(const RomMeta& meta) : name_(meta.name) {
+  definition_ = DefinitionManager::get()->getDefinition(meta.definitionId);
   if (!definition_) {
-    lastError_ = "Definition does not exist";
-    valid_ = false;
-    return;
+    throw std::runtime_error("definition does not exist");
   }
-  subDefinition_ = definition_->findSubtype(rom->subDefinitionId());
+  subDefinition_ = definition_->findSubtype(meta.subDefinitionId);
   if (!subDefinition_) {
-    lastError_ =
-        "Sub-definition '" + rom->subDefinitionId() + "' does not exist";
-    valid_ = false;
-    return;
+    throw std::runtime_error("sub-definition '" + meta.subDefinitionId + "' does not exist");
   }
 
   QFile file(LibreTuner::get()->home() + "/roms/" +
-             QString::fromStdString(rom->path()));
+             QString::fromStdString(meta.path));
   if (!file.open(QFile::ReadOnly)) {
-    lastError_ = file.errorString().toStdString();
-    valid_ = false;
-    return;
+    throw std::runtime_error(file.errorString().toStdString());
   }
 
   QByteArray data = file.readAll();
   data_.assign(data.data(), data.data() + data.size());
 
   // TODO: add checksum and check data size
-
-  valid_ = true;
 }
 
-TablePtr RomData::getTable(int idx) {
+
+
+TablePtr Rom::getTable(int idx) {
   const TableDefinition *def = definition_->tables()->at(idx);
   if (!def->valid()) {
     return nullptr;
@@ -99,6 +92,7 @@ TablePtr RomData::getTable(int idx) {
       }
     }
   } catch (const std::out_of_range &err) {
+    Logger::warning(err.what());
     // TODO: log this
     return nullptr;
   }

@@ -27,11 +27,13 @@ TuneManager *TuneManager::get() {
   return &manager;
 }
 
+
+
 TuneManager::TuneManager() = default;
 
-TunePtr TuneManager::createTune(const RomPtr& base, const std::string &name) {
-  assert(base);
 
+
+TuneMeta *TuneManager::createTune(const RomMeta& base, const std::string &name) {
   LibreTuner::get()->checkHome();
 
   QString tuneRoot = LibreTuner::get()->home() + "/tunes/";
@@ -45,8 +47,7 @@ TunePtr TuneManager::createTune(const RomPtr& base, const std::string &name) {
 
   QFile file(tuneRoot + path);
   if (!file.open(QFile::WriteOnly)) {
-    lastError_ = file.errorString();
-    return nullptr;
+    throw std::runtime_error(file.errorString().toStdString());
   }
 
   QXmlStreamWriter xml(&file);
@@ -57,20 +58,20 @@ TunePtr TuneManager::createTune(const RomPtr& base, const std::string &name) {
   xml.writeEndDocument();
   file.close();
 
-  TunePtr tune = std::make_shared<Tune>();
-  tune->setName(name);
-  tune->setPath(path.toStdString());
-  tune->setBase(base);
+  TuneMeta tune;
+  tune.name = name;
+  tune.path = path.toStdString();
+  tune.baseId = base.id;
 
-  tunes_.push_back(tune);
+  tunes_.emplace_back(std::move(tune));
   emit updateTunes();
 
-  if (!save()) {
-    return nullptr;
-  }
+  save();
 
-  return tune;
+  return &*tunes_.end();
 }
+
+
 
 void TuneManager::readTunes(QXmlStreamReader &xml) {
   assert(xml.isStartElement() && xml.name() == "tunes");
@@ -82,15 +83,15 @@ void TuneManager::readTunes(QXmlStreamReader &xml) {
       return;
     }
 
-    TunePtr tune = std::make_shared<Tune>();
+    TuneMeta tune;
 
     // Read ROM data
     while (xml.readNextStartElement()) {
       if (xml.name() == "name") {
-        tune->setName(xml.readElementText().toStdString());
+        tune.name = xml.readElementText().toStdString();
       }
       if (xml.name() == "path") {
-        tune->setPath(xml.readElementText().toStdString());
+        tune.path = xml.readElementText().toStdString();
       }
       if (xml.name() == "base") {
         // Locate the base rom from the ID
@@ -101,7 +102,7 @@ void TuneManager::readTunes(QXmlStreamReader &xml) {
           return;
         }
 
-        tune->setBase(RomManager::get()->fromId(id));
+        tune.baseId = id;
       }
     }
 
@@ -109,15 +110,16 @@ void TuneManager::readTunes(QXmlStreamReader &xml) {
   }
 }
 
-bool TuneManager::save() {
+
+
+void TuneManager::save() {
   LibreTuner::get()->checkHome();
 
   QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
   QFile listFile(listPath);
   if (!listFile.open(QFile::WriteOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
+    throw std::runtime_error(listFile.errorString().toStdString());
   }
 
   QXmlStreamWriter xml(&listFile);
@@ -127,32 +129,32 @@ bool TuneManager::save() {
   xml.writeStartDocument();
   xml.writeDTD("<!DOCTYPE tunes>");
   xml.writeStartElement("tunes");
-  for (const TunePtr& tune : tunes_) {
+  for (const TuneMeta& tune : tunes_) {
     xml.writeStartElement("tune");
-    xml.writeTextElement("name", QString::fromStdString(tune->name()));
-    xml.writeTextElement("path", QString::fromStdString(tune->path()));
-    xml.writeTextElement("base", QString::number(tune->base()->id()));
+    xml.writeTextElement("name", QString::fromStdString(tune.name));
+    xml.writeTextElement("path", QString::fromStdString(tune.path));
+    xml.writeTextElement("base", QString::number(tune.baseId));
 
     xml.writeEndElement();
   }
 
   xml.writeEndDocument();
-  return true;
 }
 
-bool TuneManager::load() {
+
+
+void TuneManager::load() {
   LibreTuner::get()->checkHome();
 
   QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
   if (!QFile::exists(listPath)) {
-    return true;
+    return;
   }
 
   QFile listFile(listPath);
   if (!listFile.open(QFile::ReadOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
+    throw std::runtime_error(listFile.errorString().toStdString());
   }
 
   QXmlStreamReader xml(&listFile);
@@ -166,14 +168,11 @@ bool TuneManager::load() {
   }
 
   if (xml.error()) {
-    lastError_ = QObject::tr("%1\nLine %2, column %3")
+    throw std::runtime_error(QObject::tr("%1\nLine %2, column %3")
                      .arg(xml.errorString())
                      .arg(xml.lineNumber())
-                     .arg(xml.columnNumber());
-    return false;
+                     .arg(xml.columnNumber()).toStdString());
   }
 
   emit updateTunes();
-
-  return true;
 }

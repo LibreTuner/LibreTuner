@@ -33,53 +33,39 @@
 #include "util.hpp"
 #include <cassert>
 
-TuneData::TuneData(const TunePtr &tune) : tune_(tune) {
-  if (!tune->base()) {
-    lastError_ = "tune does not have a valid base";
-    valid_ = false;
-    return;
-  }
-  rom_ = std::make_shared<RomData>(tune->base());
-  if (!rom_->valid()) {
-    lastError_ = rom_->lastError();
-    valid_ = false;
-    return;
-  }
+Tune::Tune(const TuneMeta &tune) : meta_(tune) {
+    // Locate the base rom from the id
+    rom_ = RomManager::get()->loadId(meta_.baseId);
 
-  tables_ = std::make_shared<TableGroup>(rom_);
+    tables_ = std::make_shared<TableGroup>(rom_);
 
-  // Load tables
-  QFile file(LibreTuner::get()->home() + "/tunes/" +
-             QString::fromStdString(tune->path()));
-  if (!file.open(QFile::ReadOnly)) {
-    lastError_ = file.errorString().toStdString();
-    valid_ = false;
-    return;
-  }
-
-  QXmlStreamReader xml(&file);
-  if (xml.readNextStartElement()) {
-    if (xml.name() == "tables") {
-      readTables(xml);
-    } else {
-      xml.raiseError(QObject::tr("Unexpected element"));
+    // Load tables
+    QFile file(LibreTuner::get()->home() + "/tunes/" +
+                QString::fromStdString(meta_.path));
+    if (!file.open(QFile::ReadOnly)) {
+        throw std::runtime_error(file.errorString().toStdString());
     }
-  }
 
-  if (xml.error()) {
-    lastError_ = QString("%1\nLine %2, column %3")
-                     .arg(xml.errorString())
-                     .arg(xml.lineNumber())
-                     .arg(xml.columnNumber())
-                     .toStdString();
-    valid_ = false;
-    return;
-  }
+    QXmlStreamReader xml(&file);
+    if (xml.readNextStartElement()) {
+    if (xml.name() == "tables") {
+        readTables(xml);
+    } else {
+        xml.raiseError(QObject::tr("Unexpected element"));
+    }
+    }
 
-  valid_ = true;
+    if (xml.error()) {
+        throw std::runtime_error(QString("%1\nLine %2, column %3")
+                        .arg(xml.errorString())
+                        .arg(xml.lineNumber())
+                        .arg(xml.columnNumber())
+                        .toStdString());
+    
+    }
 }
 
-void TuneData::readTables(QXmlStreamReader &xml) {
+void Tune::readTables(QXmlStreamReader &xml) {
   assert(xml.isStartElement() && xml.name() == "tables");
 
   while (xml.readNextStartElement()) {
@@ -118,12 +104,11 @@ void TuneData::readTables(QXmlStreamReader &xml) {
   }
 }
 
-bool TuneData::save() {
+void Tune::save() {
   QFile file(LibreTuner::get()->home() + "/tunes/" +
-             QString::fromStdString(tune_->path()));
+             QString::fromStdString(meta_.path));
   if (!file.open(QFile::WriteOnly)) {
-    lastError_ = file.errorString().toStdString();
-    return false;
+      throw std::runtime_error(file.errorString().toStdString());
   }
 
   QXmlStreamWriter xml(&file);
@@ -152,22 +137,13 @@ bool TuneData::save() {
   xml.writeEndDocument();
 
   if (xml.hasError()) {
-    lastError_ = "Unknown error while writing tables";
-    return false;
+    throw std::runtime_error("unknown XML error while writing tune");
   }
-
-  return true;
 }
 
-bool TuneData::apply(gsl::span<uint8_t> data) {
+void Tune::apply(gsl::span<uint8_t> data) {
   tables_->apply(data);
 
   // Checksums
-  std::pair<bool, std::string> res =
-      rom_->subDefinition()->checksums()->correct(data);
-  if (!res.first) {
-    lastError_ = std::string("Failed to correct checksum: ") + res.second;
-    return false;
-  }
-  return true;
+  rom_->subDefinition()->checksums()->correct(data);
 }

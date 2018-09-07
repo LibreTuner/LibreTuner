@@ -31,19 +31,18 @@ RomManager *RomManager::get() {
   return &romManager;
 }
 
-bool RomManager::load() {
+void RomManager::load() {
   LibreTuner::get()->checkHome();
 
   QString listPath = LibreTuner::get()->home() + "/" + "roms.xml";
 
   if (!QFile::exists(listPath)) {
-    return true;
+    return;
   }
 
   QFile listFile(listPath);
   if (!listFile.open(QFile::ReadOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
+    throw std::runtime_error(listFile.errorString().toStdString());
   }
 
   QXmlStreamReader xml(&listFile);
@@ -61,16 +60,13 @@ bool RomManager::load() {
   nextId_++;
 
   if (xml.error()) {
-    lastError_ = QObject::tr("%1\nLine %2, column %3")
+    throw std::runtime_error(QObject::tr("%1\nLine %2, column %3")
                      .arg(xml.errorString())
                      .arg(xml.lineNumber())
-                     .arg(xml.columnNumber());
-    return false;
+                     .arg(xml.columnNumber()).toStdString());
   }
 
   emit updateRoms();
-
-  return true;
 }
 
 void RomManager::readRoms(QXmlStreamReader &xml) {
@@ -83,15 +79,15 @@ void RomManager::readRoms(QXmlStreamReader &xml) {
       return;
     }
 
-    RomPtr rom = std::make_shared<Rom>();
-    rom->setId(-1);
+    RomMeta rom;
+    rom.id = -1;
 
     // Read ROM data
     while (xml.readNextStartElement()) {
       if (xml.name() == "name") {
-        rom->setName(xml.readElementText().trimmed().toStdString());
+        rom.name = xml.readElementText().trimmed().toStdString();
       } else if (xml.name() == "path") {
-        rom->setPath(xml.readElementText().trimmed().toStdString());
+        rom.path = xml.readElementText().trimmed().toStdString();
       } else if (xml.name() == "type") {
         QString type = xml.readElementText().toLower();
         DefinitionPtr def =
@@ -100,38 +96,38 @@ void RomManager::readRoms(QXmlStreamReader &xml) {
           xml.raiseError("Invalid ROM type");
           break;
         }
-        rom->setDefinition(def->id());
+        rom.definitionId = def->id();
       } else if (xml.name() == "subtype") {
         QString type = xml.readElementText().toLower();
-        rom->setSubDefinition(type.toStdString());
+        rom.subDefinitionId = type.toStdString();
         // TODO: check if this subtype exists
       } else if (xml.name() == "id") {
         bool ok;
-        rom->setId(xml.readElementText().toInt(&ok));
+        rom.id = xml.readElementText().toInt(&ok);
         if (!ok) {
           xml.raiseError("id is not a valid decimal number");
         }
-        if (rom->id() > nextId_) {
-          nextId_ = rom->id();
+        if (rom.id > nextId_) {
+          nextId_ = rom.id;
         }
       }
     }
 
     // Verifications
     if (!xml.hasError()) {
-      if (rom->name().empty()) {
+      if (rom.name.empty()) {
         xml.raiseError("ROM name is empty");
       }
-      if (rom->path().empty()) {
+      if (rom.path.empty()) {
         xml.raiseError("ROM path is empty");
       }
-      if (rom->definitionId().empty()) {
+      if (rom.definitionId.empty()) {
         xml.raiseError("ROM type is empty");
       }
-      if (rom->subDefinitionId().empty()) {
+      if (rom.subDefinitionId.empty()) {
         xml.raiseError("ROM subtype is empty");
       }
-      if (rom->id() < 0) {
+      if (rom.id < 0) {
         xml.raiseError("ROM id is empty or negative");
       }
     }
@@ -140,19 +136,18 @@ void RomManager::readRoms(QXmlStreamReader &xml) {
       return;
     }
 
-    roms_.push_back(rom);
+    roms_.emplace_back(std::move(rom));
   }
 }
 
-bool RomManager::save() {
+void RomManager::save() {
   LibreTuner::get()->checkHome();
 
   QString listPath = LibreTuner::get()->home() + "/" + "roms.xml";
 
   QFile listFile(listPath);
   if (!listFile.open(QFile::WriteOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
+    throw std::runtime_error(listFile.errorString().toStdString());
   }
 
   QXmlStreamWriter xml(&listFile);
@@ -162,22 +157,21 @@ bool RomManager::save() {
   xml.writeStartDocument();
   xml.writeDTD("<!DOCTYPE roms>");
   xml.writeStartElement("roms");
-  for (const RomPtr &rom : roms_) {
+  for (const RomMeta &rom : roms_) {
     xml.writeStartElement("rom");
-    xml.writeTextElement("name", QString::fromStdString(rom->name()));
-    xml.writeTextElement("path", QString::fromStdString(rom->path()));
-    xml.writeTextElement("id", QString::number(rom->id()));
-    xml.writeTextElement("type", QString::fromStdString(rom->definitionId()));
+    xml.writeTextElement("name", QString::fromStdString(rom.name));
+    xml.writeTextElement("path", QString::fromStdString(rom.path));
+    xml.writeTextElement("id", QString::number(rom.id));
+    xml.writeTextElement("type", QString::fromStdString(rom.definitionId));
     xml.writeTextElement("subtype",
-                         QString::fromStdString(rom->subDefinitionId()));
+                         QString::fromStdString(rom.subDefinitionId));
     xml.writeEndElement();
   }
   xml.writeEndElement();
   xml.writeEndDocument();
-  return true;
 }
 
-bool RomManager::addRom(const std::string &name,
+void RomManager::addRom(const std::string &name,
                         const DefinitionPtr &definition,
                         gsl::span<const uint8_t> data) {
   LibreTuner::get()->checkHome();
@@ -199,31 +193,41 @@ bool RomManager::addRom(const std::string &name,
   // Determine the subtype
   SubDefinitionPtr subtype = definition->identifySubtype(data);
   if (!subtype) {
-    lastError_ = "Unknown firmware version or this is the wrong vehicle. If "
+    throw std::runtime_error("unknown firmware version or this is the wrong vehicle. If "
                  "this is the correct vehicle, please submit a bug report so "
-                 "we can add support for this firmware version.";
-    return false;
+                 "we can add support for this firmware version.");
   }
 
-  RomPtr rom = std::make_shared<Rom>();
-  rom->setName(name);
-  rom->setPath(path.toStdString());
-  rom->setDefinition(definition->id());
-  rom->setSubDefinition(subtype->id());
-  rom->setId(nextId_++);
-  roms_.push_back(rom);
+  RomMeta meta;
+  meta.name = name;
+  meta.path = path.toStdString();
+  meta.definitionId = definition->id();
+  meta.subDefinitionId = subtype->id();
+  meta.id = nextId_++;
+  roms_.emplace_back(std::move(meta));
 
   emit updateRoms();
 
-  return save();
+  save();
 }
 
-RomPtr RomManager::fromId(int id) {
-  for (RomPtr &rom : roms_) {
-    if (rom->id() == id) {
-      return rom;
+const RomMeta *RomManager::fromId(int id) const {
+  for (const RomMeta &rom : roms_) {
+    if (rom.id == id) {
+      return &rom;
     }
   }
 
   return nullptr;
+}
+
+
+std::shared_ptr<Rom> RomManager::loadId(int id)
+{
+    auto *meta = fromId(id);
+    if (!meta) {
+        throw std::runtime_error("could not find ROM with id '" + std::to_string(id) + "'");
+    }
+    
+    return std::make_shared<Rom>(*meta);
 }

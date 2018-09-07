@@ -45,11 +45,9 @@ uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
   return sum;
 }
 
-std::pair<bool, std::string>
-ChecksumBasic::correct(gsl::span<uint8_t> data) const {
+void ChecksumBasic::correct(gsl::span<uint8_t> data) const {
   if (data.size() < offset_ + size_) {
-    return std::make_pair<bool, std::string>(
-        false, "Checksum region exceeds the rom size.");
+    throw std::runtime_error("checksum region exceeds the rom size.");
   }
 
   bool foundMod = false;
@@ -64,9 +62,7 @@ ChecksumBasic::correct(gsl::span<uint8_t> data) const {
     }
   }
   if (!foundMod) {
-    return std::make_pair<bool, std::string>(
-        false,
-        "Failed to find a usable modifiable region for checksum correction.");
+    throw std::runtime_error("failed to find a usable modifiable region for checksum correction.");
   }
 
   // Zero the region
@@ -80,21 +76,14 @@ ChecksumBasic::correct(gsl::span<uint8_t> data) const {
 
   // Check if the correction was successful
   if (compute(data) != target_) {
-    return std::make_pair<bool, std::string>(
-        false, "Checksum does not equal target after correction");
+    throw std::runtime_error("checksum does not equal target after correction");
   }
-
-  return std::make_pair<bool, std::string>(true, std::string());
 }
 
-std::pair<bool, std::string> ChecksumManager::correct(gsl::span<uint8_t> data) {
+void ChecksumManager::correct(gsl::span<uint8_t> data) {
   for (const ChecksumPtr &checksum : checksums_) {
-    auto res = checksum->correct(data);
-    if (!res.first) {
-      return res;
-    }
+    checksum->correct(data);
   }
-  return std::make_pair<bool, std::string>(true, std::string());
 }
 
 ChecksumBasic *ChecksumManager::addBasic(uint32_t offset, uint32_t size,
