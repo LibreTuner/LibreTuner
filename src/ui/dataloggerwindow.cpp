@@ -102,10 +102,15 @@ void DataLoggerWindow::reset()
 
     // TODO: set error handler
     logger_->setLog(log_);
-    // logger_->addPid(0, 5, "X - 40");
 
     for (const PidDefinition &pid : definition_->pids().pids()) {
         if (!pid.valid) {
+            continue;
+        }
+        try {
+            logger_->addPid(pid.id, pid.code, pid.formula);
+        } catch (const std::exception &e) {
+            Logger::warning(std::string("Error while adding PID ") + std::to_string(pid.id) + ": " + e.what());
             continue;
         }
         auto *item = new QListWidgetItem;
@@ -113,6 +118,5 @@ void DataLoggerWindow::reset()
         item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.id));
         item->setFlags(Qt::ItemIsUserCheckable);
         pidList_->addItem(item);
-        logger_->addPid(pid.id, pid.code, pid.formula);
     }
 }

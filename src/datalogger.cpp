@@ -148,7 +148,7 @@ void UdsDataLogger::enable() {
     }
     if (uds_) {
         running_ = true;
-        processNext();
+        run();
     } else {
         throw std::runtime_error("a UDS device is not attached to the logger");
     }

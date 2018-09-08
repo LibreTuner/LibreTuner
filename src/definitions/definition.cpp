@@ -409,6 +409,7 @@ void Definition::loadPids(QXmlStreamReader &xml) {
         }
 
         PidDefinition pid;
+        pid.valid = true;
         QXmlStreamAttributes attributes = xml.attributes();
         if (!attributes.hasAttribute("id")) {
             xml.raiseError("Could not load PID: no id attribute");

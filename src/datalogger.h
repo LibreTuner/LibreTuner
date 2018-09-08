@@ -38,9 +38,9 @@ public:
     Pid(Pid &&);
     Pid(const Pid &) = delete;
 
-    void setX(uint8_t x) { vars_["x"] = x; }
-    void setY(uint8_t y) { vars_["y"] = y; }
-    void setZ(uint8_t z) { vars_["z"] = z; }
+    void setX(uint8_t x) { vars_["a"] = x; }
+    void setY(uint8_t y) { vars_["b"] = y; }
+    void setZ(uint8_t z) { vars_["c"] = z; }
 
     double evaluate() const;
     uint32_t id() const { return id_; }
