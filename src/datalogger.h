@@ -82,6 +82,8 @@ public:
     explicit UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds);
     UdsDataLogger(const UdsDataLogger &) = delete;
     UdsDataLogger(UdsDataLogger &&) = delete;
+    
+    ~UdsDataLogger();
 
     using ErrorCall = std::function<void(const std::string &error)>;
 

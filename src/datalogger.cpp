@@ -148,7 +148,13 @@ void UdsDataLogger::enable() {
     }
     if (uds_) {
         running_ = true;
-        run();
+        
+        if (thread_.joinable()) {
+            // Wait for thread to exit..
+            thread_.join();
+        }
+        
+        thread_ = std::thread([this] { run(); });
     } else {
         throw std::runtime_error("a UDS device is not attached to the logger");
     }
@@ -157,6 +163,16 @@ void UdsDataLogger::enable() {
 
 
 void UdsDataLogger::disable() { running_ = false; }
+
+
+
+UdsDataLogger::~UdsDataLogger()
+{
+    if (thread_.joinable()) {
+        disable();
+        thread_.join();
+    }
+}
 
 
 
