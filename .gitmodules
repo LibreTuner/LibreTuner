@@ -4,6 +4,6 @@
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = https://github.com/google/googletest.git
-[submodule "lib/capnproto"]
-	path = lib/capnproto
-	url = https://github.com/capnproto/capnproto.git
+[submodule "lib/cparse"]
+	path = lib/cparse
+	url = git@github.com:LibreTuner/cparse.git

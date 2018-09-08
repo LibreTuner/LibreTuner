@@ -174,7 +174,7 @@ qt5_add_resources(libretuner_SRC
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts GSL ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts GSL cparse ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

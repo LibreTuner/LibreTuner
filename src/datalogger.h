@@ -22,10 +22,11 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
+#include <thread>
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
-//#include "exprtk.hpp"
+#include <shunting-yard.h>
 
 enum class PidType {
     Queried,
@@ -37,9 +38,9 @@ public:
     Pid(Pid &&);
     Pid(const Pid &) = delete;
 
-    void setX(uint8_t x) { x_ = x; }
-    void setY(uint8_t y) { y_ = y; }
-    void setZ(uint8_t z) { z_ = z; }
+    void setX(uint8_t x) { vars_["x"] = x; }
+    void setY(uint8_t y) { vars_["y"] = y; }
+    void setZ(uint8_t z) { vars_["z"] = z; }
 
     double evaluate() const;
     uint32_t id() const { return id_; }
@@ -47,15 +48,11 @@ public:
     uint16_t code() const { return code_; }
 
 private:
-    std::string formula_;
     uint32_t id_;
     uint16_t code_;
 
-    // exprtk::expression<double> expression_;
-    // exprtk::symbol_table<double> symbol_table_;
-    // exprtk::parser<double> parser_;
-    // allow for up to three bytes of information
-    double x_{}, y_{}, z_{};
+    TokenMap vars_;
+    calculator expression_;
 };
 
 class DataLogger;
@@ -101,7 +98,9 @@ public:
     void setErrorCallback(ErrorCall &&error);
 
 private:
-    void freeze();
+    /* Thread routine */
+    void run();
+    
     void throwError(const std::string &error);
 
     std::chrono::steady_clock::time_point freeze_time_;
@@ -113,6 +112,8 @@ private:
     bool running_ = false;
     size_t current_pid_ = 0;
     ErrorCall errorCall_;
+    
+    std::thread thread_;
 };
 
 

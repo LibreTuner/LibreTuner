@@ -11,6 +11,7 @@ find_package(Threads REQUIRED)
 option(Test "Build all tests." OFF)
 
 add_subdirectory(lib/GSL)
+add_subdirectory(lib/cparse)
 add_subdirectory(src)
 
 #if (Test)

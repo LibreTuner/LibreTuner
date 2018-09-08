@@ -21,17 +21,27 @@
 
 #include <utility>
 
+
+
 void DataLogger::setLog(const DataLogPtr &log) { log_ = log; }
+
+
 
 void DataLogger::addPid(uint32_t id, uint16_t code,
                         const std::string &formula) {
     addPid(Pid(id, code, formula));
 }
 
+
+
 UdsDataLogger::UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds)
     : uds_(std::move(uds)) {}
 
+
+
 void UdsDataLogger::addPid(Pid &&pid) { pids_.emplace_back(std::move(pid)); }
+
+
 
 Pid *UdsDataLogger::nextPid() {
     if (++current_pid_ >= pids_.size()) {
@@ -43,10 +53,9 @@ Pid *UdsDataLogger::nextPid() {
     return &pids_[current_pid_];
 }
 
+
+
 void UdsDataLogger::processNext() {
-    if (!running_) {
-        return;
-    }
     if (!uds_) {
         disable();
     }
@@ -67,45 +76,44 @@ void UdsDataLogger::processNext() {
         data.emplace_back(pid->code() >> 8);
     }
     data.emplace_back(pid->code() & 0xFF);
-    /*uds_->request(data, 0x41, [this, pid](uds::Error error, const uds::Packet
-    &packet) { if (error != uds::Error::Success) { throwError("could not query
-    data: " + uds::strError(error)); return;
-      }
-      // Do calculations
-      gsl::span<const uint8_t> data = gsl::make_span(packet.data);
-      if (pid->code() > 0xFF) {
-          data = data.subspan(2);
-      } else {
-          data = data.subspan(1);
-      }
+    uds::Packet response;
+    uds_->request(data, 0x41, response);
+    
+    
+    if (pid->code() > 0xFF) {
+        response.data.erase(response.data.begin(), response.data.begin() + 2);
+    } else {
+        response.data.erase(response.data.begin());
+    }
 
-      switch (data.size()) {
-      case 0:
-          break;
-      default:
-      case 3:
-          pid->setZ(data[2]);
-      case 2:
-          pid->setY(data[1]);
-      case 1:
-          pid->setX(data[0]);
-          break;
-      }
+    switch (data.size()) {
+    case 0:
+        break;
+    default:
+    case 3:
+        pid->setZ(data[2]);
+    case 2:
+        pid->setY(data[1]);
+    case 1:
+        pid->setX(data[0]);
+        break;
+    }
 
-      if (log_) {
-          double result = pid->evaluate();
-          log_->add(pid->id(), result);
-      }
-
-      processNext();
-    });*/
+    if (log_) {
+        double result = pid->evaluate();
+        log_->add(pid->id(), result);
+    }
 }
+
+
 
 void UdsDataLogger::setErrorCallback(UdsDataLogger::ErrorCall &&error) {
     errorCall_ = std::move(error);
 }
 
-void UdsDataLogger::freeze() {
+
+
+void UdsDataLogger::run() {
     /*std::array<uint8_t, 2> data{0x01, 0x02};
     uds_->request(data, 0x41, [this](uds::Error  error, const uds::Packet
     &packet) { if (error != uds::Error::Success) { throwError("could not freeze
@@ -114,8 +122,16 @@ void UdsDataLogger::freeze() {
       current_pid_ = 0;
       processNext();
     });*/
-    processNext();
+    try {
+        while (running_)
+            processNext();
+    } catch (const std::exception &e) {
+        disable();
+        Logger::warning(std::string("Error while running datalogger: ") + e.what() + ". Aborting.");
+    }
 }
+
+
 
 void UdsDataLogger::throwError(const std::string &error) {
     Logger::critical("UdsDataLogger: " + error);
@@ -124,48 +140,35 @@ void UdsDataLogger::throwError(const std::string &error) {
     }
 }
 
+
+
 void UdsDataLogger::enable() {
     if (running_) {
         return;
     }
     if (uds_) {
         running_ = true;
-        freeze();
+        processNext();
     } else {
         throw std::runtime_error("a UDS device is not attached to the logger");
     }
 }
 
+
+
 void UdsDataLogger::disable() { running_ = false; }
 
 
+
 Pid::Pid(uint32_t id, uint16_t code, const std::string &formula)
-    : id_(id), code_(code), formula_(formula) {
-    /*symbol_table_.add_variable("X", x_);
-    symbol_table_.add_variable("Y", y_);
-    symbol_table_.add_variable("Z", z_);
+    : id_(id), code_(code), expression_(formula.c_str()) {}
 
-    expression_.register_symbol_table(symbol_table_);
-    if (!parser_.compile(formula, expression_)) {
-        throw std::runtime_error("expression could not compile.");
-    }*/
-}
 
-Pid::Pid(Pid &&pid) {
-    id_ = pid.id_;
-    formula_ = std::move(pid.formula_);
-    code_ = pid.code_;
 
-    /*symbol_table_.add_variable("X", x_);
-    symbol_table_.add_variable("Y", y_);
-    symbol_table_.add_variable("Z", z_);
+Pid::Pid(Pid &&pid)
+    : id_(pid.id_), code_(pid.code_), vars_(std::move(pid.vars_)),
+      expression_(std::move(pid.expression_)) {}
 
-    expression_.register_symbol_table(symbol_table_);
-    if (!parser_.compile(formula_, expression_)) {
-        throw std::runtime_error("expression could not compile.");
-    }*/
-}
 
-double Pid::evaluate() const {
-    return 0; // expression_.value();
-}
+
+double Pid::evaluate() const { return expression_.eval(vars_).asDouble(); }
