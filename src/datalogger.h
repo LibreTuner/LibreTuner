@@ -20,102 +20,100 @@
 #define LIBRETUNER_DATALOGGER_H
 
 #include <cstdint>
-#include <string>
 #include <mutex>
+#include <string>
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
 //#include "exprtk.hpp"
 
 enum class PidType {
-  Queried,
+    Queried,
 };
 
 class Pid {
 public:
-  Pid(uint32_t id, uint16_t code, const std::string &formula);
-  Pid(Pid&&);
-  Pid(const Pid&) = delete;
+    Pid(uint32_t id, uint16_t code, const std::string &formula);
+    Pid(Pid &&);
+    Pid(const Pid &) = delete;
 
-  void setX(uint8_t x) {x_ = x;}
-  void setY(uint8_t y) {y_ = y;}
-  void setZ(uint8_t z) {z_ = z;}
+    void setX(uint8_t x) { x_ = x; }
+    void setY(uint8_t y) { y_ = y; }
+    void setZ(uint8_t z) { z_ = z; }
 
-  double evaluate() const;
-  uint32_t id() const {return id_;}
+    double evaluate() const;
+    uint32_t id() const { return id_; }
 
-  uint16_t code() const {return code_;}
+    uint16_t code() const { return code_; }
 
 private:
-  std::string formula_;
-  uint32_t id_;
-  uint16_t code_;
+    std::string formula_;
+    uint32_t id_;
+    uint16_t code_;
 
-  //exprtk::expression<double> expression_;
-  //exprtk::symbol_table<double> symbol_table_;
-  //exprtk::parser<double> parser_;
-  // allow for up to three bytes of information
-  double x_{}, y_{}, z_{};
+    // exprtk::expression<double> expression_;
+    // exprtk::symbol_table<double> symbol_table_;
+    // exprtk::parser<double> parser_;
+    // allow for up to three bytes of information
+    double x_{}, y_{}, z_{};
 };
 
 class DataLogger;
 
 class DataLogger {
 public:
-  void setLog(const DataLogPtr &log);
+    void setLog(const DataLogPtr &log);
 
-  virtual ~DataLogger() = default;
+    virtual ~DataLogger() = default;
 
-  virtual void enable() =0;
-  virtual void disable() =0;
-  /* Returns true if the logger is running */
-  virtual bool running() const =0;
+    virtual void enable() = 0;
+    virtual void disable() = 0;
+    /* Returns true if the logger is running */
+    virtual bool running() const = 0;
 
-  virtual void addPid(Pid &&pid) =0;
+    virtual void addPid(Pid &&pid) = 0;
 
-  virtual void addPid(uint32_t id, uint16_t code, const std::string &formula);
+    virtual void addPid(uint32_t id, uint16_t code, const std::string &formula);
 
 protected:
-  DataLogPtr log_;
+    DataLogPtr log_;
 };
 
 
 class UdsDataLogger : public DataLogger {
 public:
-  explicit UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds);
-  UdsDataLogger(const UdsDataLogger&) = delete;
-  UdsDataLogger(UdsDataLogger&&) = delete;
+    explicit UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds);
+    UdsDataLogger(const UdsDataLogger &) = delete;
+    UdsDataLogger(UdsDataLogger &&) = delete;
 
-  using ErrorCall = std::function<void(const std::string &error)>;
+    using ErrorCall = std::function<void(const std::string &error)>;
 
-  void addPid(Pid &&pid) override;
+    void addPid(Pid &&pid) override;
 
-  Pid *nextPid();
+    Pid *nextPid();
 
-  void enable() override;
-  void disable() override;
-  bool running() const override {
-      return running_;
-  }
+    void enable() override;
+    void disable() override;
+    bool running() const override { return running_; }
 
-  void processNext();
+    void processNext();
 
-  void setErrorCallback(ErrorCall &&error);
+    void setErrorCallback(ErrorCall &&error);
 
 private:
-  void freeze();
-  void throwError(const std::string &error);
+    void freeze();
+    void throwError(const std::string &error);
 
-  std::chrono::steady_clock::time_point freeze_time_;
+    std::chrono::steady_clock::time_point freeze_time_;
 
-  std::unique_ptr<uds::Protocol> uds_;
-  std::vector<Pid> pids_;
+    std::unique_ptr<uds::Protocol> uds_;
+    std::vector<Pid> pids_;
 
-  std::mutex mutex_;
-  bool running_ = false;
-  size_t current_pid_ = 0;
-  ErrorCall errorCall_;
+    std::mutex mutex_;
+    bool running_ = false;
+    size_t current_pid_ = 0;
+    ErrorCall errorCall_;
 };
 
 
-#endif //LIBRETUNER_DATALOGGER_H
+#endif // LIBRETUNER_DATALOGGER_H

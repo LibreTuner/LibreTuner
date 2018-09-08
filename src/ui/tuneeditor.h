@@ -31,8 +31,8 @@ namespace Ui {
 class TuneEditor;
 }
 
-class TuneData;
-typedef std::shared_ptr<TuneData> TuneDataPtr;
+class Tune;
+
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
 
@@ -40,28 +40,28 @@ typedef std::shared_ptr<Table> TablePtr;
  * Tune editor window
  */
 class TuneEditor : public StyledWindow {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  TuneEditor(const TuneDataPtr &tune, QWidget *parent = 0);
+    TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent = 0);
 
-  void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
-  bool save();
+    bool save();
 
 private:
-  TuneDataPtr tune_;
-  Ui::TuneEditor *ui;
-  TablePtr currentTable_;
+    std::shared_ptr<Tune> tune_;
+    Ui::TuneEditor *ui;
+    TablePtr currentTable_;
 
-  /* Set to true if a table has been modified */
-  bool changed_ = false;
+    /* Set to true if a table has been modified */
+    bool changed_ = false;
 
 private slots:
-  void on_treeTables_itemActivated(QTreeWidgetItem *item, int column);
-  void onTableModified();
+    void on_treeTables_itemActivated(QTreeWidgetItem *item, int column);
+    void onTableModified();
 
 signals:
-  void tableChanged(TablePtr table);
+    void tableChanged(TablePtr table);
 };
 
 #endif // TUNEEDITOR_H

@@ -19,23 +19,22 @@
 #ifndef DTCDESCRIPTIONS_H
 #define DTCDESCRIPTIONS_H
 
-#include <utility>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
-class DtcDescriptions
-{
+class DtcDescriptions {
 public:
     DtcDescriptions() = default;
-    DtcDescriptions(DtcDescriptions&&) = delete;
-    DtcDescriptions(const DtcDescriptions&&) = delete;
-    DtcDescriptions &operator=(const DtcDescriptions&) = delete;
+    DtcDescriptions(DtcDescriptions &&) = delete;
+    DtcDescriptions(const DtcDescriptions &&) = delete;
+    DtcDescriptions &operator=(const DtcDescriptions &) = delete;
 
     /* Load DTC description file */
     void load();
 
-    /* Returns (true, desc) where desc is the description for code or (false, "") if no description
-     * is available */
+    /* Returns (true, desc) where desc is the description for code or (false,
+     * "") if no description is available */
     std::pair<bool, std::string> get(const std::string &code) const;
 
 private:

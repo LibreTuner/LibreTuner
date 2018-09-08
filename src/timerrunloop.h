@@ -19,52 +19,53 @@
 #ifndef LIBRETUNER_TIMERRUNLOOP_H
 #define LIBRETUNER_TIMERRUNLOOP_H
 
-#include <functional>
-#include <set>
-#include <atomic>
-#include <mutex>
 #include "timer.h"
+#include <atomic>
+#include <functional>
+#include <mutex>
+#include <set>
 
 class Timer;
 
 class TimerRunLoop {
 public:
-  static TimerRunLoop &get();
+    static TimerRunLoop &get();
 
-  void addTimer(const std::shared_ptr<Timer> &timer);
+    void addTimer(const std::shared_ptr<Timer> &timer);
 
-  void removeTimer(const std::shared_ptr<Timer> &timer);
+    void removeTimer(const std::shared_ptr<Timer> &timer);
 
-  void startWorker();
-  void stopWorker();
+    void startWorker();
+    void stopWorker();
 
-  ~TimerRunLoop();
+    ~TimerRunLoop();
 
 private:
-  TimerRunLoop();
+    TimerRunLoop();
 
-  void runLoop();
+    void runLoop();
 
-  struct TCompare {
-    bool operator()(const std::weak_ptr<Timer> &first, const std::weak_ptr<Timer> &second) const {
-      if (auto pfirst = first.lock()) {
-        if (auto psecond = second.lock()) {
-          return pfirst->nextTrigger() < psecond->nextTrigger();
-        } else {
-          return false;
+    struct TCompare {
+        bool operator()(const std::weak_ptr<Timer> &first,
+                        const std::weak_ptr<Timer> &second) const {
+            if (auto pfirst = first.lock()) {
+                if (auto psecond = second.lock()) {
+                    return pfirst->nextTrigger() < psecond->nextTrigger();
+                } else {
+                    return false;
+                }
+            }
+            return true;
         }
-      }
-      return true;
-    }
-  };
+    };
 
-  std::mutex mutex_;
-  std::condition_variable wake_;
-  std::multiset<std::weak_ptr<Timer>, TCompare> queue_;
-  std::thread worker_;
+    std::mutex mutex_;
+    std::condition_variable wake_;
+    std::multiset<std::weak_ptr<Timer>, TCompare> queue_;
+    std::thread worker_;
 
-  std::atomic<bool> running_;
+    std::atomic<bool> running_;
 };
 
 
-#endif //LIBRETUNER_TIMERRUNLOOP_H
+#endif // LIBRETUNER_TIMERRUNLOOP_H

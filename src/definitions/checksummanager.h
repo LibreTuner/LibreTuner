@@ -30,40 +30,38 @@ typedef std::shared_ptr<Checksum> ChecksumPtr;
 
 class Checksum {
 public:
-  Checksum(uint32_t offset, uint32_t size, uint32_t target)
-      : offset_(offset), size_(size), target_(target) {}
+    Checksum(uint32_t offset, uint32_t size, uint32_t target)
+        : offset_(offset), size_(size), target_(target) {}
 
-  /* Adds a region modifiable for checksum computation */
-  void addModifiable(uint32_t offset, uint32_t size);
+    /* Adds a region modifiable for checksum computation */
+    void addModifiable(uint32_t offset, uint32_t size);
 
-  /* Corrects the checksum for the data using modifiable sections.
-   * Returns (false, errmsg) on failure and (true, "") on success. */
-  virtual std::pair<bool, std::string>
-  correct(gsl::span<uint8_t> data) const = 0;
+    /* Corrects the checksum for the data using modifiable sections. */
+    virtual void correct(gsl::span<uint8_t> data) const = 0;
 
-  /* Returns the computed checksum. If length is too small,
-   * returns 0 and sets ok to false.*/
-  virtual uint32_t compute(gsl::span<const uint8_t> data,
-                           bool *ok = nullptr) const = 0;
+    /* Returns the computed checksum. If length is too small,
+     * returns 0 and sets ok to false.*/
+    virtual uint32_t compute(gsl::span<const uint8_t> data,
+                             bool *ok = nullptr) const = 0;
 
 protected:
-  uint32_t offset_;
-  uint32_t size_;
-  uint32_t target_;
+    uint32_t offset_;
+    uint32_t size_;
+    uint32_t target_;
 
-  std::vector<std::pair<uint32_t, uint32_t>> modifiable_;
+    std::vector<std::pair<uint32_t, uint32_t>> modifiable_;
 };
 
 /* Basic type checksum */
 class ChecksumBasic : public Checksum {
 public:
-  ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
-      : Checksum(offset, size, target) {}
+    ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
+        : Checksum(offset, size, target) {}
 
-  uint32_t compute(gsl::span<const uint8_t> data,
-                   bool *ok = nullptr) const override;
+    uint32_t compute(gsl::span<const uint8_t> data,
+                     bool *ok = nullptr) const override;
 
-  std::pair<bool, std::string> correct(gsl::span<uint8_t> data) const override;
+    void correct(gsl::span<uint8_t> data) const override;
 };
 
 /**
@@ -71,15 +69,15 @@ public:
  */
 class ChecksumManager {
 public:
-  /* Adds a basic type checksum */
-  ChecksumBasic *addBasic(uint32_t offset, uint32_t size, uint32_t target);
+    /* Adds a basic type checksum */
+    ChecksumBasic *addBasic(uint32_t offset, uint32_t size, uint32_t target);
 
-  /* Corrects the checksums for the data using modifiable sections.
-   * Returns (false, errmsg) on failure and (true, "") on success. */
-  std::pair<bool, std::string> correct(gsl::span<uint8_t> data);
+    /* Corrects the checksums for the data using modifiable sections.
+     * Returns (false, errmsg) on failure and (true, "") on success. */
+    void correct(gsl::span<uint8_t> data);
 
 private:
-  std::vector<ChecksumPtr> checksums_;
+    std::vector<ChecksumPtr> checksums_;
 };
 
 #endif // CHECKSUMMANAGER_H

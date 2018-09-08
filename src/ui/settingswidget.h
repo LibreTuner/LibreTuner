@@ -27,37 +27,37 @@
 #include <QWidget>
 
 class SettingsWidget : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit SettingsWidget(QWidget *parent = nullptr);
+    explicit SettingsWidget(QWidget *parent = nullptr);
 
-  virtual InterfaceSettingsPtr settings() = 0;
+    virtual InterfaceSettingsPtr settings() = 0;
 
-  virtual void setSettings(const InterfaceSettingsPtr &ptr) = 0;
+    virtual void setSettings(const InterfaceSettingsPtr &ptr) = 0;
 
-  /* Creates a new settings UI for the given type. Returns nullptr
-   * if the given type is unsupported. */
-  static std::unique_ptr<SettingsWidget> create(InterfaceType type);
+    /* Creates a new settings UI for the given type. Returns nullptr
+     * if the given type is unsupported. */
+    static std::unique_ptr<SettingsWidget> create(InterfaceType type);
 
-  static std::unique_ptr<SettingsWidget>
-  create(const InterfaceSettingsPtr &settings);
+    static std::unique_ptr<SettingsWidget>
+    create(const InterfaceSettingsPtr &settings);
 
 private slots:
-  void on_nameChanged(const QString &text);
+    void on_nameChanged(const QString &text);
 
 protected:
-  QFormLayout *layout_;
-  QLabel *labelError_;
+    QFormLayout *layout_;
+    QLabel *labelError_;
 
-  virtual void setName(const std::string &name) = 0;
-  virtual std::string name() = 0;
-  void updateUi();
+    virtual void setName(const std::string &name) = 0;
+    virtual std::string name() = 0;
+    void updateUi();
 
-  bool checkName();
-  void displayError(const QString &text);
+    bool checkName();
+    void displayError(const QString &text);
 
 private:
-  QLineEdit *editName_;
+    QLineEdit *editName_;
 };
 
 #endif // LIBRETUNER_SETTINGSWIDGET_H

@@ -23,33 +23,33 @@
 #include <sstream>
 
 void CanMessage::setMessage(uint32_t id, gsl::span<const uint8_t> data) {
-  Expects(data.size() <= 8);
-  id_ = id;
-  messageLength_ = static_cast<uint8_t>(data.size());
-  std::copy(data.begin(), data.end(), message_);
+    Expects(data.size() <= 8);
+    id_ = id;
+    messageLength_ = static_cast<uint8_t>(data.size());
+    std::copy(data.begin(), data.end(), message_);
 }
 
 std::string CanMessage::strMessage() const {
-  std::stringstream ss;
-  for (uint8_t c = 0; c < length(); ++c) {
-    if (c != 0) {
-      ss << "  ";
+    std::stringstream ss;
+    for (uint8_t c = 0; c < length(); ++c) {
+        if (c != 0) {
+            ss << "  ";
+        }
+        ss << std::hex << static_cast<unsigned int>(message_[c]);
     }
-    ss << std::hex << static_cast<unsigned int>(message_[c]);
-  }
 
-  return ss.str();
+    return ss.str();
 }
 
-CanMessage::CanMessage() : id_(0), message_{0}, messageLength_(0) {  }
+CanMessage::CanMessage() : id_(0), message_{0}, messageLength_(0) {}
 
 CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
-  setMessage(id, data);
+    setMessage(id, data);
 }
 
-//CanInterface::CanInterface() : signal_(SignalType::create()) {}
+// CanInterface::CanInterface() : signal_(SignalType::create()) {}
 CanInterface::CanInterface() {}
 
 void CanInterface::send(int id, gsl::span<const uint8_t> data) {
-  send(CanMessage(id, data));
+    send(CanMessage(id, data));
 }

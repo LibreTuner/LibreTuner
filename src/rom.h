@@ -23,9 +23,6 @@
 #include <string>
 #include <vector>
 
-class RomData;
-typedef std::shared_ptr<RomData> RomDataPtr;
-
 class Definition;
 typedef std::shared_ptr<Definition> DefinitionPtr;
 
@@ -33,75 +30,41 @@ class SubDefinition;
 typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
 
 /* ROM Metadata */
-class Rom {
-public:
-  void setName(const std::string &name) { name_ = name; }
-
-  std::string name() const { return name_; }
-
-  void setPath(const std::string &path) { path_ = path; }
-
-  std::string path() const { return path_; }
-
-  int id() const { return id_; }
-
-  void setId(int id) { id_ = id; }
-
-  std::string definitionId() const { return definitionId_; }
-
-  void setDefinition(const std::string &id) { definitionId_ = id; }
-
-  std::string subDefinitionId() const { return subDefinitionId_; }
-
-  void setSubDefinition(const std::string &id) { subDefinitionId_ = id; }
-
-private:
-  std::string name_;
-  std::string path_;
-  std::string definitionId_;
-  std::string subDefinitionId_;
-  int id_;
+struct RomMeta {
+    std::string name;
+    std::string path;
+    std::string definitionId;
+    std::string subDefinitionId;
+    int id;
 };
-typedef std::shared_ptr<Rom> RomPtr;
 
 class Table;
 typedef std::shared_ptr<Table> TablePtr;
 
 /* The object that actually stores firmware data. */
-class RomData {
+class Rom {
 public:
-  explicit RomData(const RomPtr& rom);
+    explicit Rom(const RomMeta &rom);
 
-  /* Returns the base table from the table index */
-  TablePtr getTable(int idx);
+    /* Returns the base table from the table index */
+    TablePtr getTable(int idx);
 
-  bool valid() const { return valid_; }
+    const std::vector<uint8_t> data() { return data_; }
 
-  std::string lastError() const { return lastError_; }
+    std::string name() { return name_; }
 
-  const uint8_t *data() const { return data_.data(); }
+    DefinitionPtr definition() const { return definition_; }
 
-  uint8_t *data() { return data_.data(); }
-
-  size_t size() const { return data_.size(); }
-
-  RomPtr rom() const { return rom_; }
-
-  DefinitionPtr definition() const { return definition_; }
-
-  SubDefinitionPtr subDefinition() const { return subDefinition_; }
+    SubDefinitionPtr subDefinition() const { return subDefinition_; }
 
 private:
-  RomPtr rom_;
+    std::string name_;
 
-  bool valid_;
-  std::string lastError_;
+    DefinitionPtr definition_;
+    SubDefinitionPtr subDefinition_;
 
-  DefinitionPtr definition_;
-  SubDefinitionPtr subDefinition_;
-
-  /* Raw firmware data */
-  std::vector<uint8_t> data_;
+    /* Raw firmware data */
+    std::vector<uint8_t> data_;
 };
 
 #endif // ROM_H

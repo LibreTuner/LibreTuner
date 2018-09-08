@@ -24,40 +24,40 @@
 
 SocketCanSettingsUi::SocketCanSettingsUi(QWidget *parent)
     : SettingsWidget(parent), settings_(std::make_shared<SocketCanSettings>()) {
-  QLabel *label = new QLabel("Interface:");
-  lineEdit_ = new QLineEdit;
-  connect(lineEdit_, &QLineEdit::textEdited, this,
-          &SocketCanSettingsUi::on_interfaceChanged);
+    QLabel *label = new QLabel("Interface:");
+    lineEdit_ = new QLineEdit;
+    connect(lineEdit_, &QLineEdit::textEdited, this,
+            &SocketCanSettingsUi::on_interfaceChanged);
 
-  layout_->addRow(label, lineEdit_);
+    layout_->addRow(label, lineEdit_);
 }
 
 void SocketCanSettingsUi::on_interfaceChanged(const QString &text) {
-  settings_->setInterface(text.toStdString());
+    settings_->setInterface(text.toStdString());
 }
 
 void SocketCanSettingsUi::setSettings(const InterfaceSettingsPtr &ptr) {
-  assert(ptr);
-  assert(ptr->type() == InterfaceType::SocketCan);
-  settings_ = std::static_pointer_cast<SocketCanSettings>(ptr);
+    assert(ptr);
+    assert(ptr->type() == InterfaceType::SocketCan);
+    settings_ = std::static_pointer_cast<SocketCanSettings>(ptr);
 
-  lineEdit_->setText(QString::fromStdString(settings_->interface()));
-  updateUi();
+    lineEdit_->setText(QString::fromStdString(settings_->interface()));
+    updateUi();
 }
 
 void SocketCanSettingsUi::setName(const std::string &name) {
-  settings_->setName(name);
+    settings_->setName(name);
 }
 
 std::string SocketCanSettingsUi::name() { return settings_->name(); }
 
 InterfaceSettingsPtr SocketCanSettingsUi::settings() {
-  if (!checkName()) {
-    return nullptr;
-  }
-  if (settings_->interface().empty()) {
-    displayError("Interface must not be empty");
-    return nullptr;
-  }
-  return settings_;
+    if (!checkName()) {
+        return nullptr;
+    }
+    if (settings_->interface().empty()) {
+        displayError("Interface must not be empty");
+        return nullptr;
+    }
+    return settings_;
 }

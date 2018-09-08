@@ -25,72 +25,45 @@
 
 #include <QXmlStreamReader>
 
-class Rom;
-typedef std::shared_ptr<Rom> RomPtr;
-
-class RomData;
-typedef std::shared_ptr<RomData> RomDataPtr;
-
 class TableGroup;
 typedef std::shared_ptr<TableGroup> TableGroupPtr;
+
+class Rom;
 
 /**
  * TODO: write docs
  */
+struct TuneMeta {
+    std::string name;
+    std::string path;
+    int baseId;
+};
+
+
+
 class Tune {
 public:
-  void setName(const std::string &name) { name_ = name; }
+    explicit Tune(const TuneMeta &tune);
 
-  const std::string &name() const { return name_; }
+    /* Applies table modifications to data and computes checksums.
+     * Returns false on error and sets lastError. */
+    void apply(gsl::span<uint8_t> data);
 
-  void setPath(const std::string &path) { path_ = path; }
+    TableGroupPtr tables() { return tables_; }
 
-  const std::string &path() const { return path_; }
+    const std::shared_ptr<Rom> &rom() { return rom_; }
 
-  RomPtr base() { return base_; }
-
-  void setBase(RomPtr base) { base_ = base; }
-
-private:
-  std::string name_;
-  std::string path_;
-
-  RomPtr base_;
-};
-typedef std::shared_ptr<Tune> TunePtr;
-
-class TuneData {
-public:
-  explicit TuneData(const TunePtr &tune);
-
-  /* Applies table modifications to data and computes checksums.
-   * Returns false on error and sets lastError. */
-  bool apply(gsl::span<uint8_t> data);
-
-  bool valid() const { return valid_; }
-
-  std::string lastError() const { return lastError_; }
-
-  TableGroupPtr tables() { return tables_; }
-
-  TunePtr tune() { return tune_; }
-
-  RomDataPtr romData() { return rom_; }
-
-  bool save();
+    void save();
 
 private:
-  TunePtr tune_;
-  RomDataPtr rom_;
+    TuneMeta meta_;
 
-  std::string lastError_;
+    std::shared_ptr<Rom> rom_;
 
-  bool valid_;
+    TableGroupPtr tables_;
 
-  TableGroupPtr tables_;
-
-  void readTables(QXmlStreamReader &xml);
+    void readTables(QXmlStreamReader &xml);
 };
-typedef std::shared_ptr<TuneData> TuneDataPtr;
+
 
 #endif // TUNE_H

@@ -28,12 +28,15 @@ struct DiagnosticCode {
     std::string codeString() const;
 };
 
-class ScanResult : public QAbstractTableModel
-{
+class ScanResult : public QAbstractTableModel {
 public:
     ScanResult();
 
-    void add(DiagnosticCode &&code) { beginInsertRows(QModelIndex(), codes_.size(), codes_.size()); codes_.emplace_back(std::move(code)); endInsertRows(); }
+    void add(DiagnosticCode &&code) {
+        beginInsertRows(QModelIndex(), codes_.size(), codes_.size());
+        codes_.emplace_back(std::move(code));
+        endInsertRows();
+    }
 
     void clear();
 
@@ -42,7 +45,8 @@ public:
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                                int role) const override;
 
 private:
     std::vector<DiagnosticCode> codes_;

@@ -21,32 +21,32 @@
 
 #include <memory>
 
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 
 class QPushButton;
 
-class Rom;
-typedef std::shared_ptr<Rom> RomPtr;
+class RomMeta;
 
 /**
  * Widget for the ROM list
  */
 class RomWidget : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit RomWidget(const RomPtr& rom, QWidget *parent = 0);
+    explicit RomWidget(const RomMeta &rom, QWidget *parent = 0);
 
-  void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+
 private:
-  QLabel *label_;
-  QPushButton *deleteButton_;
-  QPushButton *tuneButton_;
+    QLabel *label_;
+    QPushButton *deleteButton_;
+    QPushButton *tuneButton_;
 
-  RomPtr rom_;
+    int romId_;
 
 public slots:
-  void createTuneClicked();
+    void createTuneClicked();
 };
 
 #endif // ROMWIDGET_H

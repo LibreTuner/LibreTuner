@@ -19,11 +19,11 @@
 #ifndef LIBRETUNE_H
 #define LIBRETUNE_H
 
-#include "definitions/definitionmanager.h"
-#include "protocols/canlog.h"
-#include "dtcdescriptions.h"
 #include "datalink.h"
+#include "definitions/definitionmanager.h"
+#include "dtcdescriptions.h"
 #include "log.h"
+#include "protocols/canlog.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
 
@@ -33,66 +33,65 @@ class IsoTpInterface;
 class IsoTpTest;
 
 class TuneEditor;
-class Tune;
-typedef std::shared_ptr<Tune> TunePtr;
+class TuneMeta;
 
 class VehicleLink;
 
 class FlashWindow;
 
 class LibreTuner : public QApplication {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  LibreTuner(int &argc, char *argv[]);
+    LibreTuner(int &argc, char *argv[]);
 
-  ~LibreTuner() override;
+    ~LibreTuner() override;
 
-  /* Returns the global LibreTune object */
-  static LibreTuner *get();
+    /* Returns the global LibreTune object */
+    static LibreTuner *get();
 
-  /* Returns the CAN log. */
-  CanLog *canLog() { return &canLog_; }
+    /* Returns the CAN log. */
+    CanLog *canLog() { return &canLog_; }
 
-  /* Checks if the home directory exists and if it does not,
-   * creates it. */
-  void checkHome();
+    /* Checks if the home directory exists and if it does not,
+     * creates it. */
+    void checkHome();
 
-  QString home() { return home_; }
+    QString home() { return home_; }
 
-  /* Open the tune editor */
-  void editTune(const TunePtr &tune);
+    /* Open the tune editor */
+    void editTune(const TuneMeta &tune);
 
-  /* Open tune flasher */
-  void flashTune(const TunePtr &tune);
+    /* Open tune flasher */
+    void flashTune(const TuneMeta &tune);
 
-  /* Returns the default datalink. Queries the user to create one
-   * if none exist. May return nullptr */
-  DataLinkPtr getDataLink();
+    /* Returns the default datalink. Queries the user to create one
+     * if none exist. May return nullptr */
+    DataLinkPtr getDataLink();
 
-  /* Returns a vehicle link queried with the default datalink. Yeah it's
-   * confusing. Use this one \/*/
-  std::unique_ptr<VehicleLink> getVehicleLink();
+    /* Returns a vehicle link queried with the default datalink. Yeah it's
+     * confusing. Use this one \/*/
+    std::unique_ptr<VehicleLink> getVehicleLink();
 
-  /* Queries for an attached vehicle and returns a vehicle link.
-   * The returned link may be nullptr if no datalink is attached. If you're
-   * confused, use that one /\ */
-  std::unique_ptr<VehicleLink> queryVehicleLink();
+    /* Queries for an attached vehicle and returns a vehicle link.
+     * The returned link may be nullptr if no datalink is attached. If you're
+     * confused, use that one /\ */
+    std::unique_ptr<VehicleLink> queryVehicleLink();
 
-  const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
+    const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
 
-  /* Returns the log */
-  Log &log() { return log_; }
+    /* Returns the log */
+    Log &log() { return log_; }
 
 private:
-  std::unique_ptr<MainWindow> mainWindow_;
-  std::unique_ptr<TuneEditor> tuneEditor_;
-  std::unique_ptr<FlashWindow> flashWindow_;
-  CanLog canLog_;
-  Log log_;
-  DtcDescriptions dtcDescriptions_;
+    std::unique_ptr<MainWindow> mainWindow_;
+    std::unique_ptr<TuneEditor> tuneEditor_;
+    std::unique_ptr<FlashWindow> flashWindow_;
+    CanLog canLog_;
+    Log log_;
+    DtcDescriptions dtcDescriptions_;
 
-  /* Location of home directory. */
-  QString home_;
+    /* Location of home directory. */
+    QString home_;
 };
 
 #endif // LIBRETUNE_H

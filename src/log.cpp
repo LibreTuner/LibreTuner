@@ -21,15 +21,11 @@
 
 #include <QColor>
 
-Log::Log()
-{
-
-}
+Log::Log() {}
 
 
 
-void Log::append(LogEntry &&entry)
-{
+void Log::append(LogEntry &&entry) {
     beginInsertRows(QModelIndex(), entries_.size(), entries_.size());
 
     entries_.emplace_back(std::move(entry));
@@ -39,15 +35,13 @@ void Log::append(LogEntry &&entry)
 
 
 
-void Log::append(Logger::Mode mode, const std::string &text)
-{
+void Log::append(Logger::Mode mode, const std::string &text) {
     append({mode, text});
 }
 
 
 
-int Log::rowCount(const QModelIndex &parent) const
-{
+int Log::rowCount(const QModelIndex &parent) const {
     if (parent.isValid()) {
         return 0;
     }
@@ -56,8 +50,7 @@ int Log::rowCount(const QModelIndex &parent) const
 
 
 
-QVariant Log::data(const QModelIndex &index, int role) const
-{
+QVariant Log::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) {
         return QVariant();
     }

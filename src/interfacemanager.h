@@ -40,43 +40,43 @@ private:
 
 class InterfaceManager {
 public:
-  using ChangeCall = std::function<void()>;
-  using SignalType = Signal<ChangeCall>;
-  using ConnType = SignalType::ConnectionType;
+    using ChangeCall = std::function<void()>;
+    using SignalType = Signal<ChangeCall>;
+    using ConnType = SignalType::ConnectionType;
 
-  static InterfaceManager &get();
+    static InterfaceManager &get();
 
-  std::shared_ptr<ConnType> connect(ChangeCall &&call) {
-    return signal_->connect(std::move(call));
-  }
+    std::shared_ptr<ConnType> connect(ChangeCall &&call) {
+        return signal_->connect(std::move(call));
+    }
 
-  gsl::span<const InterfaceSettingsPtr> settings();
-  std::vector<InterfaceSettingsPtr> &autosettings();
+    gsl::span<const InterfaceSettingsPtr> settings();
+    std::vector<InterfaceSettingsPtr> &autosettings();
 
-  void add(const InterfaceSettingsPtr &iface);
-  void remove(const InterfaceSettingsPtr &iface);
+    void add(const InterfaceSettingsPtr &iface);
+    void remove(const InterfaceSettingsPtr &iface);
 
-  void addAuto(const InterfaceSettingsPtr &iface);
-  void clearAuto();
+    void addAuto(const InterfaceSettingsPtr &iface);
+    void clearAuto();
 
-  /* Returns the default interface, if one exists */
-  InterfaceSettingsPtr defaultInterface();
+    /* Returns the default interface, if one exists */
+    InterfaceSettingsPtr defaultInterface();
 
-  void load();
-  void save();
+    void load();
+    void save();
 
-  std::string path();
+    std::string path();
 
 private:
-  std::vector<InterfaceSettingsPtr> settings_;
-  std::vector<InterfaceSettingsPtr> autosettings_;
-  std::shared_ptr<SignalType> signal_;
+    std::vector<InterfaceSettingsPtr> settings_;
+    std::vector<InterfaceSettingsPtr> autosettings_;
+    std::shared_ptr<SignalType> signal_;
 
-  InterfaceSettingsPtr default_;
+    InterfaceSettingsPtr default_;
 
-  void resetDefault();
+    void resetDefault();
 
-  InterfaceManager();
+    InterfaceManager();
 };
 
 #endif // LIBRETUNER_INTERFACEMANAGER_H

@@ -29,24 +29,23 @@ namespace Ui {
 class CreateTuneDialog;
 }
 
-class Rom;
-typedef std::shared_ptr<Rom> RomPtr;
+class RomMeta;
 
 /**
  * @todo write docs
  */
 class CreateTuneDialog : public QDialog {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  CreateTuneDialog(const RomPtr &base = nullptr);
+    CreateTuneDialog(const RomMeta *base = nullptr);
 
-  ~CreateTuneDialog();
+    ~CreateTuneDialog();
 
 private:
-  Ui::CreateTuneDialog *ui_;
+    Ui::CreateTuneDialog *ui_;
 
 private slots:
-  void on_buttonCreate_clicked();
+    void on_buttonCreate_clicked();
 };
 
 #endif // CREATETUNEDIALOG_H

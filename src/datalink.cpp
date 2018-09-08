@@ -20,17 +20,18 @@
 #include "datalogger.h"
 #include "interface.h"
 #include "j2534/j2534caninterface.h"
+#include "logger.h"
 #include "protocols/isotpprotocol.h"
 #include "protocols/socketcaninterface.h"
 #include "protocols/udsprotocol.h"
-#include "logger.h"
 #include "vehicle.h"
 
 Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
     // Query the VIN
     std::array<uint8_t, 2> request{0x09, 0x02};
     Logger::debug("Sending UDS query");
-    std::unique_ptr<uds::Protocol> up = std::make_unique<uds::IsoTpInterface>(std::make_unique<isotp::Protocol>(std::move(can)));
+    std::unique_ptr<uds::Protocol> up = std::make_unique<uds::IsoTpInterface>(
+        std::make_unique<isotp::Protocol>(std::move(can)));
 
     uds::Packet packet;
     up->request(request, 0x49, packet);
@@ -51,8 +52,7 @@ Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
         throw std::runtime_error("invalid VIN length");
     }
 
-    std::string vin(reinterpret_cast<const char *>(data.data()),
-                    data.size());
+    std::string vin(reinterpret_cast<const char *>(data.data()), data.size());
     return Vehicle::fromVin(vin);
 }
 
@@ -61,31 +61,29 @@ Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
 #ifdef WITH_SOCKETCAN
 class SocketCanDataLink : public DataLink {
 public:
-  explicit SocketCanDataLink(
-      const std::shared_ptr<SocketCanSettings> &settings);
+    explicit SocketCanDataLink(
+        const std::shared_ptr<SocketCanSettings> &settings);
 
-  Vehicle queryVehicle() override;
+    Vehicle queryVehicle() override;
 
-  std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
+    std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
 
 private:
-  std::shared_ptr<SocketCanInterface> socketcan_;
-  std::string name_;
+    std::shared_ptr<SocketCanInterface> socketcan_;
+    std::string name_;
 };
 
 SocketCanDataLink::SocketCanDataLink(
     const std::shared_ptr<SocketCanSettings> &settings) {
-  name_ = settings->name();
-  protocols_ = DataLinkProtocol::Can;
-  defaultProtocol_ = DataLinkProtocol::Can;
+    name_ = settings->name();
+    protocols_ = DataLinkProtocol::Can;
+    defaultProtocol_ = DataLinkProtocol::Can;
 }
 
-Vehicle SocketCanDataLink::queryVehicle() {
-  return query_can(can(500000));
-}
+Vehicle SocketCanDataLink::queryVehicle() { return query_can(can(500000)); }
 
 std::unique_ptr<CanInterface> SocketCanDataLink::can(uint32_t baudrate) {
-  return std::make_unique<SocketCanInterface>(name_);
+    return std::make_unique<SocketCanInterface>(name_);
 }
 #endif
 
@@ -94,97 +92,94 @@ std::unique_ptr<CanInterface> SocketCanDataLink::can(uint32_t baudrate) {
 #ifdef WITH_J2534
 class J2534DataLink : public DataLink {
 public:
-  explicit J2534DataLink(const std::shared_ptr<J2534Settings> &settings);
-  virtual ~J2534DataLink() override = default;
+    explicit J2534DataLink(const std::shared_ptr<J2534Settings> &settings);
+    virtual ~J2534DataLink() override = default;
 
-  Vehicle queryVehicle() override;
+    Vehicle queryVehicle() override;
 
-  std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
+    std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
 
-  bool checkDevice();
+    bool checkDevice();
 
 private:
-  j2534::J2534Ptr j2534_;
-  //std::unique_ptr<j2534::Can> can_;
-  j2534::DevicePtr device_;
+    j2534::J2534Ptr j2534_;
+    // std::unique_ptr<j2534::Can> can_;
+    j2534::DevicePtr device_;
 };
 
 
 
 J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
-  Expects(settings->interface());
-  j2534_ = settings->interface();
-  if (!j2534_->initialized()) {
-    j2534_->init();
-  }
-  protocols_ = j2534_->protocols();
-  if ((protocols_ & DataLinkProtocol::Can) == DataLinkProtocol::Can) {
-    defaultProtocol_ = DataLinkProtocol::Can;
-  }
-  if (!checkDevice()) {
-      throw std::runtime_error("failed to create j2534 device. Is one connected?");
-  }
+    Expects(settings->interface());
+    j2534_ = settings->interface();
+    if (!j2534_->initialized()) {
+        j2534_->init();
+    }
+    protocols_ = j2534_->protocols();
+    if ((protocols_ & DataLinkProtocol::Can) == DataLinkProtocol::Can) {
+        defaultProtocol_ = DataLinkProtocol::Can;
+    }
+    if (!checkDevice()) {
+        throw std::runtime_error(
+            "failed to create j2534 device. Is one connected?");
+    }
 }
 
 
 
 Vehicle J2534DataLink::queryVehicle() {
-  // 500000 Hz is a good guess
-  if (auto c = can(500000)) {
-    return query_can(std::move(c));
-  }
-  return Vehicle();
+    // 500000 Hz is a good guess
+    if (auto c = can(500000)) {
+        return query_can(std::move(c));
+    }
+    return Vehicle();
 }
 
 
 
 std::unique_ptr<CanInterface> J2534DataLink::can(uint32_t baudrate) {
-  if (!checkDevice()) {
-    return nullptr;
-  }
-  return std::make_unique<j2534::Can>(device_, baudrate);
+    if (!checkDevice()) {
+        return nullptr;
+    }
+    return std::make_unique<j2534::Can>(device_, baudrate);
 }
 
 
 
 bool J2534DataLink::checkDevice() {
-  Expects(j2534_);
-  if (device_) {
-    return true;
-  }
-  device_ = j2534_->open();
-  return !!device_;
+    Expects(j2534_);
+    if (device_) {
+        return true;
+    }
+    device_ = j2534_->open();
+    return !!device_;
 }
 #endif
 
-DataLink::~DataLink()
-{
-}
+DataLink::~DataLink() {}
 
 DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
-  Expects(iface);
-  switch (iface->type()) {
+    Expects(iface);
+    switch (iface->type()) {
 #ifdef WITH_SOCKETCAN
-  case InterfaceType::SocketCan:
-    return std::static_pointer_cast<DataLink>(std::make_shared<SocketCanDataLink>(
-        std::static_pointer_cast<SocketCanSettings>(iface)));
+    case InterfaceType::SocketCan:
+        return std::static_pointer_cast<DataLink>(
+            std::make_shared<SocketCanDataLink>(
+                std::static_pointer_cast<SocketCanSettings>(iface)));
 #endif
 #ifdef WITH_J2534
-  case InterfaceType::J2534:
-    return std::static_pointer_cast<DataLink>(std::make_shared<J2534DataLink>(
-        std::static_pointer_cast<J2534Settings>(iface)));
+    case InterfaceType::J2534:
+        return std::static_pointer_cast<DataLink>(
+            std::make_shared<J2534DataLink>(
+                std::static_pointer_cast<J2534Settings>(iface)));
 #endif
-  default:
-    throw std::runtime_error("unsupported protocol");
-  }
+    default:
+        throw std::runtime_error("unsupported protocol");
+    }
 }
 
-std::unique_ptr<CanInterface> DataLink::can(uint32_t baudrate)
-{
+std::unique_ptr<CanInterface> DataLink::can(uint32_t baudrate) {
     return nullptr;
 }
 
-std::unique_ptr<isotp::Protocol> DataLink::isotp()
-{
-    return nullptr;
-}
+std::unique_ptr<isotp::Protocol> DataLink::isotp() { return nullptr; }

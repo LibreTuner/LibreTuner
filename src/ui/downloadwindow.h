@@ -19,15 +19,16 @@
 #ifndef DOWNLOADWINDOW_H
 #define DOWNLOADWINDOW_H
 
+#include <QDialog>
 #include <QWidget>
 
+#include <chrono>
 #include <memory>
 #include <thread>
-#include <chrono>
 
+#include "datalink.h"
 #include "downloadinterface.h"
 #include "rommanager.h"
-#include "datalink.h"
 #include "styledwindow.h"
 
 namespace Ui {
@@ -38,39 +39,40 @@ class DownloadWindow;
  * Window for downloading firmware from the ECU
  */
 class DownloadWindow : public QDialog {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader, const Vehicle &vehicle, QWidget *parent = nullptr);
-  ~DownloadWindow() override;
+    explicit DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader,
+                            const Vehicle &vehicle, QWidget *parent = nullptr);
+    ~DownloadWindow() override;
 
-  /* Download interface callbacks */
-  void downloadError(const QString &error);
-  void onCompletion();
-  void updateProgress(float progress);
+    /* Download interface callbacks */
+    void downloadError(const QString &error);
+    void onCompletion();
+    void updateProgress(float progress);
 
 private slots:
-  void on_buttonContinue_clicked();
-  void on_buttonBack_clicked();
+    void on_buttonContinue_clicked();
+    void on_buttonBack_clicked();
 
-  void mainDownloadError(const QString &error);
-  void mainOnCompletion(bool success, const QString &error);
+    void mainDownloadError(const QString &error);
+    void mainOnCompletion(bool success, const QString &error);
 
 private:
-  Ui::DownloadWindow *ui;
-  std::unique_ptr<DownloadInterface> downloadInterface_;
-  std::string name_;
-  DefinitionPtr definition_;
+    Ui::DownloadWindow *ui;
+    std::unique_ptr<DownloadInterface> downloadInterface_;
+    std::string name_;
+    DefinitionPtr definition_;
 
-  std::chrono::steady_clock::time_point lastUpdate_;
+    std::chrono::steady_clock::time_point lastUpdate_;
 
-  std::thread worker_;
+    std::thread worker_;
 
-  void start();
-  void stop();
+    void start();
+    void stop();
 
-  // QWidget interface
+    // QWidget interface
 protected:
-  void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // DOWNLOADWINDOW_H

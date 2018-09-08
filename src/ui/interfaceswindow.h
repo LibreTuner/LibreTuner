@@ -1,8 +1,8 @@
 #ifndef INTERFACESWINDOW_H
 #define INTERFACESWINDOW_H
 
-#include <QListWidgetItem>
 #include <QAbstractItemModel>
+#include <QListWidgetItem>
 #include <QWidget>
 #include <gsl/span>
 
@@ -17,12 +17,11 @@ class SettingsWidget;
 
 class InterfacesModel : public QAbstractItemModel {
 public:
-
-
     // QAbstractItemModel interface
 public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    virtual QModelIndex index(int row, int column,
+                              const QModelIndex &parent) const override;
     virtual QModelIndex parent(const QModelIndex &child) const override;
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
@@ -30,29 +29,29 @@ public:
 };
 
 class InterfacesWindow : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  explicit InterfacesWindow(QWidget *parent = nullptr);
-  ~InterfacesWindow() override;
+    explicit InterfacesWindow(QWidget *parent = nullptr);
+    ~InterfacesWindow() override;
 
 private slots:
-  void on_buttonAdd_clicked();
-  void on_buttonRemove_clicked();
-  void on_buttonApply_clicked();
+    void on_buttonAdd_clicked();
+    void on_buttonRemove_clicked();
+    void on_buttonApply_clicked();
 
-  void on_listInterfaces_currentItemChanged(QListWidgetItem *current,
-                                            QListWidgetItem *previous);
+    void on_listInterfaces_currentItemChanged(QListWidgetItem *current,
+                                              QListWidgetItem *previous);
 
 private:
-  Ui::InterfacesWindow *ui;
-  std::shared_ptr<InterfaceManager::ConnType> conn_;
-  std::unique_ptr<SettingsWidget> settings_;
-  InterfacesModel model_;
+    Ui::InterfacesWindow *ui;
+    std::shared_ptr<InterfaceManager::ConnType> conn_;
+    std::unique_ptr<SettingsWidget> settings_;
+    InterfacesModel model_;
 
-  void replaceSettings(std::unique_ptr<SettingsWidget> widget);
+    void replaceSettings(std::unique_ptr<SettingsWidget> widget);
 
-  void interfacesChanged();
+    void interfacesChanged();
 };
 
 #endif // INTERFACESWINDOW_H

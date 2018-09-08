@@ -26,23 +26,24 @@
  */
 class MockCanInterface : public CanInterface {
 public:
-  /**
-   * start does nothing in this case
-   */
-  virtual void start() override {}
+    /**
+     * start does nothing in this case
+     */
+    virtual void start() override {}
 
-  /**
-   * this interface is always valid
-   */
-  virtual bool valid() override { return true; }
+    /**
+     * this interface is always valid
+     */
+    virtual bool valid() override { return true; }
 
-  /**
-   * Fires the signal.
-   */
-  virtual void send(const CanMessage &message) override;
+    /**
+     * Fires the signal.
+     */
+    virtual void send(const CanMessage &message) override;
 
 
-  virtual bool recv(CanMessage &message, std::chrono::milliseconds timeout) override;
+    virtual bool recv(CanMessage &message,
+                      std::chrono::milliseconds timeout) override;
 };
 
 #endif // MOCKCANINTERFACE_H

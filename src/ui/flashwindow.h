@@ -41,33 +41,34 @@ using FlasherPtr = std::shared_ptr<Flasher>;
  * @todo write docs
  */
 class FlashWindow : public QDialog {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  FlashWindow(std::unique_ptr<Flasher> &&flasher_, const FlashablePtr &flashable);
+    FlashWindow(std::unique_ptr<Flasher> &&flasher_,
+                const FlashablePtr &flashable);
 
-  virtual ~FlashWindow() override;
+    virtual ~FlashWindow() override;
 
-  void onCompletion();
-  void onError(const std::string &error);
-  void onProgress(float percent);
+    void onCompletion();
+    void onError(const std::string &error);
+    void onProgress(float percent);
 
 private slots:
-  void on_buttonCancel_clicked();
-  void on_buttonFlash_clicked();
-  void mainError(const QString &error);
-  void mainCompletion();
+    void on_buttonCancel_clicked();
+    void on_buttonFlash_clicked();
+    void mainError(const QString &error);
+    void mainCompletion();
 
 private:
-  Ui::FlashWindow *ui;
-  FlashablePtr flashable_;
-  std::unique_ptr<Flasher> flasher_;
-  std::thread worker_;
+    Ui::FlashWindow *ui;
+    FlashablePtr flashable_;
+    std::unique_ptr<Flasher> flasher_;
+    std::thread worker_;
 
-  void stop();
+    void stop();
 
-  // QWidget interface
+    // QWidget interface
 protected:
-  void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // FLASHWINDOW_H

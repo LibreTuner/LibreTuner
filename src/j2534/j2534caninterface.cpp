@@ -24,14 +24,15 @@
 
 namespace j2534 {
 
-Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(Protocol::CAN, CAN_ID_BOTH, baudrate))
-{
-    Logger::debug("Opened J2534 CAN Interface with baudrate " + std::to_string(baudrate));
+Can::Can(const DevicePtr &device, uint32_t baudrate)
+    : channel_(device->connect(Protocol::CAN, CAN_ID_BOTH, baudrate)) {
+    Logger::debug("Opened J2534 CAN Interface with baudrate " +
+                  std::to_string(baudrate));
     // Setup the filter
-    PASSTHRU_MSG msgMask {};
+    PASSTHRU_MSG msgMask{};
     msgMask.ProtocolID = static_cast<uint32_t>(Protocol::CAN);
     msgMask.RxStatus = 0;
-    msgMask.TxFlags = 0; //ISO15765_FRAME_PAD;
+    msgMask.TxFlags = 0; // ISO15765_FRAME_PAD;
     msgMask.Timestamp = 0;
     msgMask.DataSize = 5;
     msgMask.ExtraDataIndex = 0;
@@ -46,12 +47,9 @@ Can::Can(const DevicePtr &device, uint32_t baudrate) : channel_(device->connect(
     channel_.startMsgFilter(PASS_FILTER, &msgMask, &msgPattern, nullptr, msgId);
 }
 
-Can::~Can()
-{
-}
+Can::~Can() {}
 
-void Can::send(const CanMessage &message)
-{
+void Can::send(const CanMessage &message) {
     assert(valid());
 
     PASSTHRU_MSG msg;
@@ -64,7 +62,8 @@ void Can::send(const CanMessage &message)
     msg.Data[1] = (id & 0xFF0000) >> 16;
     msg.Data[2] = (id & 0xFF00) >> 8;
     msg.Data[3] = id & 0xFF;
-    std::copy(message.message(), message.message() + message.length(), msg.Data + 4);
+    std::copy(message.message(), message.message() + message.length(),
+              msg.Data + 4);
     // Message length + CAN ID length
     msg.DataSize = message.length() + 4;
 
@@ -76,8 +75,7 @@ void Can::send(const CanMessage &message)
     }
 }
 
-bool Can::recv(CanMessage &message, std::chrono::milliseconds timeout)
-{
+bool Can::recv(CanMessage &message, std::chrono::milliseconds timeout) {
     assert(valid());
 
     auto start = std::chrono::system_clock::now();
@@ -96,19 +94,17 @@ bool Can::recv(CanMessage &message, std::chrono::milliseconds timeout)
             // The message does not fit the CAN ID
             continue;
         }
-        uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) | (msg.Data[2] << 8) | (msg.Data[3]);
-        message.setMessage(id, gsl::make_span<uint8_t>(msg.Data + 4, msg.DataSize - 4));
+        uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) |
+                      (msg.Data[2] << 8) | (msg.Data[3]);
+        message.setMessage(
+            id, gsl::make_span<uint8_t>(msg.Data + 4, msg.DataSize - 4));
         return true;
     }
 }
 
-bool Can::valid()
-{
-    return channel_.valid();
-}
+bool Can::valid() { return channel_.valid(); }
 
-void Can::start()
-{
+void Can::start() {
     /*
     assert(!recvThread_.joinable());
     closed_ = false;
@@ -127,11 +123,10 @@ void Can::start()
                 msg.ProtocolID = static_cast<uint32_t>(Protocol::CAN);
             });
             pNumMsgs = 16;
-            // Give a timeout of 1000ms. In the future, this could be configured (TODO)
-            try {
-                channel_.readMsgs(msgs, pNumMsgs, 1000);
-            } catch (const std::exception &ex) {
-                Logger::critical("readMsgs error: " + std::string(ex.what()));
+            // Give a timeout of 1000ms. In the future, this could be configured
+    (TODO) try { channel_.readMsgs(msgs, pNumMsgs, 1000); } catch (const
+    std::exception &ex) { Logger::critical("readMsgs error: " +
+    std::string(ex.what()));
             }
             for (unsigned int i = 0; i < pNumMsgs; ++i) {
                 PASSTHRU_MSG &msg = msgs[i];
@@ -140,8 +135,9 @@ void Can::start()
                     // The message does not fit the CAN ID
                     continue;
                 }
-                uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) | (msg.Data[2] << 8) | (msg.Data[3]);
-                CanMessage canMsg(id, gsl::make_span<uint8_t>(msgs[i].Data + 4, msgs[i].DataSize - 4));
+                uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) |
+    (msg.Data[2] << 8) | (msg.Data[3]); CanMessage canMsg(id,
+    gsl::make_span<uint8_t>(msgs[i].Data + 4, msgs[i].DataSize - 4));
                 signal_->call(std::move(canMsg));
             }
         }
@@ -149,4 +145,4 @@ void Can::start()
 }
 
 
-}
+} // namespace j2534

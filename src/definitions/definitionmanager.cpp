@@ -25,52 +25,52 @@
 #include <QString>
 
 DefinitionManager *DefinitionManager::get() {
-  static DefinitionManager definitionmanager;
-  return &definitionmanager;
+    static DefinitionManager definitionmanager;
+    return &definitionmanager;
 }
 
 DefinitionManager::DefinitionManager() = default;
 
 DefinitionPtr DefinitionManager::getDefinition(const std::string &id) {
-  for (auto it = definitions_.begin(); it != definitions_.end(); ++it) {
-    if ((*it)->id() == id) {
-      return *it;
+    for (auto it = definitions_.begin(); it != definitions_.end(); ++it) {
+        if ((*it)->id() == id) {
+            return *it;
+        }
     }
-  }
-  return nullptr;
+    return nullptr;
 }
 
 bool DefinitionManager::load() {
-  LibreTuner::get()->checkHome();
+    LibreTuner::get()->checkHome();
 
-  QString listPath = LibreTuner::get()->home() + "/definitions";
+    QString listPath = LibreTuner::get()->home() + "/definitions";
 
-  if (!QFile::exists(listPath)) {
-    return true;
-  }
-
-  QDir defsDir(listPath);
-  defsDir.setFilter(QDir::NoFilter);
-  for (QFileInfo &info :
-       defsDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::NoSort)) {
-    if (info.isDir()) {
-      DefinitionPtr def = std::make_shared<Definition>();
-      if (!def->load(info.filePath())) {
-        lastError_ = def->lastError();
-        return false;
-      }
-      definitions_.push_back(def);
+    if (!QFile::exists(listPath)) {
+        return true;
     }
-  }
 
-  return true;
+    QDir defsDir(listPath);
+    defsDir.setFilter(QDir::NoFilter);
+    for (QFileInfo &info : defsDir.entryInfoList(
+             QDir::NoDotAndDotDot | QDir::Dirs, QDir::NoSort)) {
+        if (info.isDir()) {
+            DefinitionPtr def = std::make_shared<Definition>();
+            if (!def->load(info.filePath())) {
+                lastError_ = def->lastError();
+                return false;
+            }
+            definitions_.push_back(def);
+        }
+    }
+
+    return true;
 }
 
 DefinitionPtr DefinitionManager::fromVin(const std::string &vin) const {
-  for (const DefinitionPtr &def : definitions_) {
-    if (def->matchVin(vin)) {
-      return def;
+    for (const DefinitionPtr &def : definitions_) {
+        if (def->matchVin(vin)) {
+            return def;
+        }
     }
-  }
-  return nullptr;
+    return nullptr;
 }

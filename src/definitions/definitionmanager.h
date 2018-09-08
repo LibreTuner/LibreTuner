@@ -33,31 +33,31 @@ typedef std::shared_ptr<Definition> DefinitionPtr;
  */
 class DefinitionManager {
 public:
-  static DefinitionManager *get();
+    static DefinitionManager *get();
 
-  /* Returns the definition with the specified id. Returns
-   * nullptr is no such definition exists. */
-  DefinitionPtr getDefinition(const std::string &id);
+    /* Returns the definition with the specified id. Returns
+     * nullptr is no such definition exists. */
+    DefinitionPtr getDefinition(const std::string &id);
 
-  /* Loads rom list and metadata. Returns true if no errors
-   * occurred */
-  bool load();
+    /* Loads rom list and metadata. Returns true if no errors
+     * occurred */
+    bool load();
 
-  std::string lastError() const { return lastError_; }
+    std::string lastError() const { return lastError_; }
 
-  /* Attempts to find a definition that matches the vin.
-   * Returns nullptr if no definition exists. */
-  DefinitionPtr fromVin(const std::string &vin) const;
+    /* Attempts to find a definition that matches the vin.
+     * Returns nullptr if no definition exists. */
+    DefinitionPtr fromVin(const std::string &vin) const;
 
-  DefinitionPtr *definitions() { return definitions_.data(); }
+    DefinitionPtr *definitions() { return definitions_.data(); }
 
-  size_t count() const { return definitions_.size(); }
+    size_t count() const { return definitions_.size(); }
 
 private:
-  DefinitionManager();
+    DefinitionManager();
 
-  std::string lastError_;
-  std::vector<DefinitionPtr> definitions_;
+    std::string lastError_;
+    std::vector<DefinitionPtr> definitions_;
 };
 
 #endif // DEFINITIONMANAGER_H

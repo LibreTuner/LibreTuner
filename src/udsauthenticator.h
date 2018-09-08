@@ -29,19 +29,19 @@
 namespace uds {
 class Authenticator {
 public:
-  /* Start authentication */
-  void auth(const std::string &key, uds::Protocol &uds,
-            uint8_t sessionType = 0x87);
+    /* Start authentication */
+    void auth(const std::string &key, uds::Protocol &uds,
+              uint8_t sessionType = 0x87);
 
-  uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
+    uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
 
 private:
-  uds::Protocol *uds_;
-  std::string key_;
+    uds::Protocol *uds_;
+    std::string key_;
 
-  void do_session(uint8_t sessionType);
-  void do_request_seed();
-  void do_send_key(uint32_t key);
+    void do_session(uint8_t sessionType);
+    void do_request_seed();
+    void do_send_key(uint32_t key);
 };
 } // namespace uds
 

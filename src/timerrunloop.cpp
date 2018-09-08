@@ -20,79 +20,77 @@
 
 #include <algorithm>
 
-TimerRunLoop::TimerRunLoop() : running_(false) {
-
-}
+TimerRunLoop::TimerRunLoop() : running_(false) {}
 
 TimerRunLoop &TimerRunLoop::get() {
-  static TimerRunLoop trl;
-  return trl;
+    static TimerRunLoop trl;
+    return trl;
 }
 
 void TimerRunLoop::addTimer(const std::shared_ptr<Timer> &timer) {
-  std::lock_guard<std::mutex> lk(mutex_);
-  queue_.insert(timer);
-  wake_.notify_all();
+    std::lock_guard<std::mutex> lk(mutex_);
+    queue_.insert(timer);
+    wake_.notify_all();
 }
 
 void TimerRunLoop::removeTimer(const std::shared_ptr<Timer> &timer) {
-  std::lock_guard<std::mutex> lk(mutex_);
-  queue_.erase(std::weak_ptr<Timer>(timer));
-  wake_.notify_all();
+    std::lock_guard<std::mutex> lk(mutex_);
+    queue_.erase(std::weak_ptr<Timer>(timer));
+    wake_.notify_all();
 }
 
 void TimerRunLoop::runLoop() {
-  std::unique_lock<std::mutex> lk(mutex_);
-  while (running_) {
-    if (queue_.empty()) {
-      wake_.wait(lk);
-      continue;
-    }
+    std::unique_lock<std::mutex> lk(mutex_);
+    while (running_) {
+        if (queue_.empty()) {
+            wake_.wait(lk);
+            continue;
+        }
 
-    auto begin = queue_.begin();
-    std::chrono::steady_clock::time_point nextTrigger;
-    if (auto ptr = begin->lock()) {
-      lk.unlock();
-      if (ptr->tryTrigger()) {
+        auto begin = queue_.begin();
+        std::chrono::steady_clock::time_point nextTrigger;
+        if (auto ptr = begin->lock()) {
+            lk.unlock();
+            if (ptr->tryTrigger()) {
+                lk.lock();
+                continue;
+            }
+            nextTrigger = ptr->nextTrigger();
+            /* We don't want to keep the shared_ptr around while waiting, so
+             * wait and then lock the weak pointer again */
+            lk.lock();
+        } else {
+            // Dead
+            queue_.erase(begin);
+            continue;
+        }
+        std::weak_ptr<Timer> weak = *begin;
+        wake_.wait_until(lk, nextTrigger);
+        lk.unlock();
+        if (auto ptr = weak.lock()) {
+            ptr->tryTrigger();
+        }
         lk.lock();
-        continue;
-      }
-      nextTrigger = ptr->nextTrigger();
-      /* We don't want to keep the shared_ptr around while waiting, so
-       * wait and then lock the weak pointer again */
-      lk.lock();
-    } else {
-      // Dead
-      queue_.erase(begin);
-      continue;
     }
-    std::weak_ptr<Timer> weak = *begin;
-    wake_.wait_until(lk, nextTrigger);
-    lk.unlock();
-    if (auto ptr = weak.lock()) {
-      ptr->tryTrigger();
-    }
-    lk.lock();
-  }
 }
 
 void TimerRunLoop::startWorker() {
-  if (worker_.joinable()) {
-    // Already working; abort
-    return;
-  }
-  running_ = true;
-  worker_ = std::thread(std::bind(&TimerRunLoop::runLoop, this));
+    if (worker_.joinable()) {
+        // Already working; abort
+        return;
+    }
+    running_ = true;
+    worker_ = std::thread(std::bind(&TimerRunLoop::runLoop, this));
 }
 
 void TimerRunLoop::stopWorker() {
-  running_ = false;
-  wake_.notify_all();
-  worker_.join();
+    running_ = false;
+    wake_.notify_all();
+    worker_.join();
 }
 
 TimerRunLoop::~TimerRunLoop() {
-  if (worker_.joinable()) {
-    stopWorker();
-  }
+    if (worker_.joinable()) {
+        stopWorker();
+    }
 }

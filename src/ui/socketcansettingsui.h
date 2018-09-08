@@ -22,25 +22,25 @@
 #include "settingswidget.h"
 
 class SocketCanSettingsUi : public SettingsWidget {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit SocketCanSettingsUi(QWidget *parent = nullptr);
+    explicit SocketCanSettingsUi(QWidget *parent = nullptr);
 
-  InterfaceSettingsPtr settings() override;
+    InterfaceSettingsPtr settings() override;
 
-  void setSettings(const InterfaceSettingsPtr &ptr) override;
+    void setSettings(const InterfaceSettingsPtr &ptr) override;
 
 private slots:
-  void on_interfaceChanged(const QString &text);
+    void on_interfaceChanged(const QString &text);
 
 protected:
-  void setName(const std::string &name) override;
+    void setName(const std::string &name) override;
 
-  std::string name() override;
+    std::string name() override;
 
 private:
-  std::shared_ptr<SocketCanSettings> settings_;
-  QLineEdit *lineEdit_;
+    std::shared_ptr<SocketCanSettings> settings_;
+    QLineEdit *lineEdit_;
 };
 
 #endif // LIBRETUNER_SOCKETCANSETTINGSUI_H

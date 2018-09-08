@@ -29,33 +29,33 @@
 
 #include <cassert>
 
-TuneWidget::TuneWidget(const TunePtr& tune, QWidget *parent)
+TuneWidget::TuneWidget(const TuneMeta &tune, QWidget *parent)
     : QFrame(parent), tune_(tune) {
-  assert(tune);
-  auto *vlayout = new QVBoxLayout(this);
+    auto *vlayout = new QVBoxLayout(this);
 
-  QLabel *title = new QLabel(QString::fromStdString(tune->name()), this);
-  title->setAlignment(Qt::AlignCenter);
-  vlayout->addWidget(title);
+    QLabel *title = new QLabel(QString::fromStdString(tune.name), this);
+    title->setAlignment(Qt::AlignCenter);
+    vlayout->addWidget(title);
 
-  QPushButton *buttonEdit = new QPushButton(
-      style()->standardIcon(QStyle::SP_DialogOpenButton), "Edit", this);
-  vlayout->addWidget(buttonEdit);
-  connect(buttonEdit, &QPushButton::clicked, this, &TuneWidget::editClicked);
+    QPushButton *buttonEdit = new QPushButton(
+        style()->standardIcon(QStyle::SP_DialogOpenButton), "Edit", this);
+    vlayout->addWidget(buttonEdit);
+    connect(buttonEdit, &QPushButton::clicked, this, &TuneWidget::editClicked);
 
-  QPushButton *buttonDelete = new QPushButton(
-      style()->standardIcon(QStyle::SP_TrashIcon), "Delete", this);
-  vlayout->addWidget(buttonDelete);
+    QPushButton *buttonDelete = new QPushButton(
+        style()->standardIcon(QStyle::SP_TrashIcon), "Delete", this);
+    vlayout->addWidget(buttonDelete);
 
-  QPushButton *buttonFlash = new QPushButton(
-      style()->standardIcon(QStyle::SP_CommandLink), "Flash", this);
-  vlayout->addWidget(buttonFlash);
-  connect(buttonFlash, &QPushButton::clicked, this, &TuneWidget::flashClicked);
+    QPushButton *buttonFlash = new QPushButton(
+        style()->standardIcon(QStyle::SP_CommandLink), "Flash", this);
+    vlayout->addWidget(buttonFlash);
+    connect(buttonFlash, &QPushButton::clicked, this,
+            &TuneWidget::flashClicked);
 
-  setLayout(vlayout);
+    setLayout(vlayout);
 
-  setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-  setLineWidth(0);
+    setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    setLineWidth(0);
 }
 
 void TuneWidget::editClicked() { LibreTuner::get()->editTune(tune_); }

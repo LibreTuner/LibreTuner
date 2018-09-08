@@ -23,157 +23,160 @@
 #include <cassert>
 
 TuneManager *TuneManager::get() {
-  static TuneManager manager;
-  return &manager;
+    static TuneManager manager;
+    return &manager;
 }
+
+
 
 TuneManager::TuneManager() = default;
 
-TunePtr TuneManager::createTune(const RomPtr& base, const std::string &name) {
-  assert(base);
 
-  LibreTuner::get()->checkHome();
 
-  QString tuneRoot = LibreTuner::get()->home() + "/tunes/";
-  QString path = QString::fromStdString(name) + ".xml";
-  if (QFile::exists(path)) {
-    int count = 0;
-    do {
-      path = QString::fromStdString(name) + QString::number(++count) + ".xml";
-    } while (QFile::exists(tuneRoot + path));
-  }
+TuneMeta *TuneManager::createTune(const RomMeta &base,
+                                  const std::string &name) {
+    LibreTuner::get()->checkHome();
 
-  QFile file(tuneRoot + path);
-  if (!file.open(QFile::WriteOnly)) {
-    lastError_ = file.errorString();
-    return nullptr;
-  }
+    QString tuneRoot = LibreTuner::get()->home() + "/tunes/";
+    QString path = QString::fromStdString(name) + ".xml";
+    if (QFile::exists(path)) {
+        int count = 0;
+        do {
+            path = QString::fromStdString(name) + QString::number(++count) +
+                   ".xml";
+        } while (QFile::exists(tuneRoot + path));
+    }
 
-  QXmlStreamWriter xml(&file);
-  xml.writeStartDocument();
-  xml.writeDTD("<!DOCTYPE tune>");
-  xml.writeStartElement("tables");
-  xml.writeEndElement();
-  xml.writeEndDocument();
-  file.close();
+    QFile file(tuneRoot + path);
+    if (!file.open(QFile::WriteOnly)) {
+        throw std::runtime_error(file.errorString().toStdString());
+    }
 
-  TunePtr tune = std::make_shared<Tune>();
-  tune->setName(name);
-  tune->setPath(path.toStdString());
-  tune->setBase(base);
+    QXmlStreamWriter xml(&file);
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE tune>");
+    xml.writeStartElement("tables");
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    file.close();
 
-  tunes_.push_back(tune);
-  emit updateTunes();
+    TuneMeta tune;
+    tune.name = name;
+    tune.path = path.toStdString();
+    tune.baseId = base.id;
 
-  if (!save()) {
-    return nullptr;
-  }
+    tunes_.emplace_back(std::move(tune));
+    emit updateTunes();
 
-  return tune;
+    save();
+
+    return &*tunes_.end();
 }
+
+
 
 void TuneManager::readTunes(QXmlStreamReader &xml) {
-  assert(xml.isStartElement() && xml.name() == "tunes");
-  tunes_.clear();
+    assert(xml.isStartElement() && xml.name() == "tunes");
+    tunes_.clear();
 
-  while (xml.readNextStartElement()) {
-    if (xml.name() != "tune") {
-      xml.raiseError("Unexpected element in tunes");
-      return;
-    }
-
-    TunePtr tune = std::make_shared<Tune>();
-
-    // Read ROM data
     while (xml.readNextStartElement()) {
-      if (xml.name() == "name") {
-        tune->setName(xml.readElementText().toStdString());
-      }
-      if (xml.name() == "path") {
-        tune->setPath(xml.readElementText().toStdString());
-      }
-      if (xml.name() == "base") {
-        // Locate the base rom from the ID
-        bool ok;
-        int id = xml.readElementText().toInt(&ok);
-        if (!ok) {
-          xml.raiseError("Base is not a valid decimal number");
-          return;
+        if (xml.name() != "tune") {
+            xml.raiseError("Unexpected element in tunes");
+            return;
         }
 
-        tune->setBase(RomManager::get()->fromId(id));
-      }
-    }
+        TuneMeta tune;
 
-    tunes_.push_back(tune);
-  }
+        // Read ROM data
+        while (xml.readNextStartElement()) {
+            if (xml.name() == "name") {
+                tune.name = xml.readElementText().toStdString();
+            }
+            if (xml.name() == "path") {
+                tune.path = xml.readElementText().toStdString();
+            }
+            if (xml.name() == "base") {
+                // Locate the base rom from the ID
+                bool ok;
+                int id = xml.readElementText().toInt(&ok);
+                if (!ok) {
+                    xml.raiseError("Base is not a valid decimal number");
+                    return;
+                }
+
+                tune.baseId = id;
+            }
+        }
+
+        tunes_.push_back(tune);
+    }
 }
 
-bool TuneManager::save() {
-  LibreTuner::get()->checkHome();
 
-  QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
-  QFile listFile(listPath);
-  if (!listFile.open(QFile::WriteOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
-  }
+void TuneManager::save() {
+    LibreTuner::get()->checkHome();
 
-  QXmlStreamWriter xml(&listFile);
-  xml.setAutoFormatting(true);
-  xml.setAutoFormattingIndent(-1); // tabs > spaces
+    QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
-  xml.writeStartDocument();
-  xml.writeDTD("<!DOCTYPE tunes>");
-  xml.writeStartElement("tunes");
-  for (const TunePtr& tune : tunes_) {
-    xml.writeStartElement("tune");
-    xml.writeTextElement("name", QString::fromStdString(tune->name()));
-    xml.writeTextElement("path", QString::fromStdString(tune->path()));
-    xml.writeTextElement("base", QString::number(tune->base()->id()));
+    QFile listFile(listPath);
+    if (!listFile.open(QFile::WriteOnly)) {
+        throw std::runtime_error(listFile.errorString().toStdString());
+    }
 
-    xml.writeEndElement();
-  }
+    QXmlStreamWriter xml(&listFile);
+    xml.setAutoFormatting(true);
+    xml.setAutoFormattingIndent(-1); // tabs > spaces
 
-  xml.writeEndDocument();
-  return true;
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE tunes>");
+    xml.writeStartElement("tunes");
+    for (const TuneMeta &tune : tunes_) {
+        xml.writeStartElement("tune");
+        xml.writeTextElement("name", QString::fromStdString(tune.name));
+        xml.writeTextElement("path", QString::fromStdString(tune.path));
+        xml.writeTextElement("base", QString::number(tune.baseId));
+
+        xml.writeEndElement();
+    }
+
+    xml.writeEndDocument();
 }
 
-bool TuneManager::load() {
-  LibreTuner::get()->checkHome();
 
-  QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
-  if (!QFile::exists(listPath)) {
-    return true;
-  }
+void TuneManager::load() {
+    LibreTuner::get()->checkHome();
 
-  QFile listFile(listPath);
-  if (!listFile.open(QFile::ReadOnly)) {
-    lastError_ = listFile.errorString();
-    return false;
-  }
+    QString listPath = LibreTuner::get()->home() + "/" + "tunes.xml";
 
-  QXmlStreamReader xml(&listFile);
-
-  if (xml.readNextStartElement()) {
-    if (xml.name() == "tunes") {
-      readTunes(xml);
-    } else {
-      xml.raiseError(QObject::tr("This file is not a tune list document"));
+    if (!QFile::exists(listPath)) {
+        return;
     }
-  }
 
-  if (xml.error()) {
-    lastError_ = QObject::tr("%1\nLine %2, column %3")
-                     .arg(xml.errorString())
-                     .arg(xml.lineNumber())
-                     .arg(xml.columnNumber());
-    return false;
-  }
+    QFile listFile(listPath);
+    if (!listFile.open(QFile::ReadOnly)) {
+        throw std::runtime_error(listFile.errorString().toStdString());
+    }
 
-  emit updateTunes();
+    QXmlStreamReader xml(&listFile);
 
-  return true;
+    if (xml.readNextStartElement()) {
+        if (xml.name() == "tunes") {
+            readTunes(xml);
+        } else {
+            xml.raiseError(
+                QObject::tr("This file is not a tune list document"));
+        }
+    }
+
+    if (xml.error()) {
+        throw std::runtime_error(QObject::tr("%1\nLine %2, column %3")
+                                     .arg(xml.errorString())
+                                     .arg(xml.lineNumber())
+                                     .arg(xml.columnNumber())
+                                     .toStdString());
+    }
+
+    emit updateTunes();
 }

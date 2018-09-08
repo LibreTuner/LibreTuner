@@ -30,21 +30,21 @@ class AddInterfaceDialog;
 }
 
 class AddInterfaceDialog : public QDialog {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  explicit AddInterfaceDialog(QWidget *parent = 0);
-  ~AddInterfaceDialog() override;
+    explicit AddInterfaceDialog(QWidget *parent = 0);
+    ~AddInterfaceDialog() override;
 
 private slots:
-  void on_comboMode_currentIndexChanged(int index);
-  void on_buttonCreate_clicked();
+    void on_comboMode_currentIndexChanged(int index);
+    void on_buttonCreate_clicked();
 
 private:
-  Ui::AddInterfaceDialog *ui;
-  std::unique_ptr<SettingsWidget> customSettings_;
+    Ui::AddInterfaceDialog *ui;
+    std::unique_ptr<SettingsWidget> customSettings_;
 
-  void replaceSettings(std::unique_ptr<SettingsWidget> widget);
+    void replaceSettings(std::unique_ptr<SettingsWidget> widget);
 };
 
 #endif // ADDINTERFACEDIALOG_H

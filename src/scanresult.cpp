@@ -17,39 +17,32 @@
  */
 
 
-#include <cassert>
 #include "scanresult.h"
+#include <cassert>
 
-ScanResult::ScanResult()
-{
+ScanResult::ScanResult() {}
 
-}
-
-void ScanResult::clear()
-{
+void ScanResult::clear() {
     beginResetModel();
     codes_.clear();
     endResetModel();
 }
 
-int ScanResult::rowCount(const QModelIndex &parent) const
-{
+int ScanResult::rowCount(const QModelIndex &parent) const {
     if (parent.isValid()) {
         return 0;
     }
     return codes_.size();
 }
 
-int ScanResult::columnCount(const QModelIndex &parent) const
-{
+int ScanResult::columnCount(const QModelIndex &parent) const {
     if (parent.isValid()) {
         return 0;
     }
     return 2;
 }
 
-QVariant ScanResult::data(const QModelIndex &index, int role) const
-{
+QVariant ScanResult::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -70,8 +63,8 @@ QVariant ScanResult::data(const QModelIndex &index, int role) const
     assert("This should not be called");
 }
 
-QVariant ScanResult::headerData(int section, Qt::Orientation orientation, int role) const
-{
+QVariant ScanResult::headerData(int section, Qt::Orientation orientation,
+                                int role) const {
     if (role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -99,8 +92,7 @@ static char numericChar(uint8_t c) {
     return '?';
 }
 
-std::string DiagnosticCode::codeString() const
-{
+std::string DiagnosticCode::codeString() const {
     std::string res;
     res += firstDtc[(code & 0xC000) >> 14];
     res += numericChar((code & 0x3000) >> 12);

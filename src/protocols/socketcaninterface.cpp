@@ -37,111 +37,109 @@
 static std::unordered_map<std::string, std::weak_ptr<SocketCanInterface>> cache;
 
 SocketCanInterface::~SocketCanInterface() {
-  if (socket_ != 0) {
-    close();
-  }
+    if (socket_ != 0) {
+        close();
+    }
 }
 
 
 
-bool SocketCanInterface::recv(CanMessage &message, std::chrono::milliseconds timeout) {
-  Expects(socket_ != 0);
-  can_frame frame;
+bool SocketCanInterface::recv(CanMessage &message,
+                              std::chrono::milliseconds timeout) {
+    Expects(socket_ != 0);
+    can_frame frame;
 
-  int nbytes = ::recv(socket_, &frame, sizeof(can_frame), MSG_DONTWAIT);
-  if (nbytes < 0) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK) {
-      message.invalidate();
-      return false;
+    int nbytes = ::recv(socket_, &frame, sizeof(can_frame), MSG_DONTWAIT);
+    if (nbytes < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            message.invalidate();
+            return false;
+        }
+        throw std::runtime_error("Failed to read from socket: " +
+                                 std::string(strerror(errno)));
     }
-    throw std::runtime_error("Failed to read from socket: " +
-                             std::string(strerror(errno)));
-  }
 
-  // TODO: remove EFF/RTR/ERR flags
-  message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
-  return true;
+    // TODO: remove EFF/RTR/ERR flags
+    message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
+    return true;
 }
 
 
 
 void SocketCanInterface::send(const CanMessage &message) {
-  Expects(socket_ != 0);
+    Expects(socket_ != 0);
 
-  can_frame frame;
+    can_frame frame;
 
-  memset(&frame, 0, sizeof(can_frame));
-  frame.can_dlc = message.length();
-  frame.can_id = message.id();
-  memcpy(frame.data, message.message(), message.length());
+    memset(&frame, 0, sizeof(can_frame));
+    frame.can_dlc = message.length();
+    frame.can_id = message.id();
+    memcpy(frame.data, message.message(), message.length());
 
-  if (int res =
-          write(socket_, &frame, sizeof(can_frame)) != sizeof(can_frame)) {
-    if (res < 0) {
-      throw std::runtime_error("Failed to write to socket: " +
-                               std::string(strerror(errno)));
+    if (int res =
+            write(socket_, &frame, sizeof(can_frame)) != sizeof(can_frame)) {
+        if (res < 0) {
+            throw std::runtime_error("Failed to write to socket: " +
+                                     std::string(strerror(errno)));
+        }
+        throw std::runtime_error(
+            "Failed to write to socket: wrote fewer bytes than expected");
     }
-    throw std::runtime_error(
-        "Failed to write to socket: wrote fewer bytes than expected");
-  }
 }
 
 
 
 bool SocketCanInterface::bind(const std::string &ifname) {
-  socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-  if (socket_ == -1) {
-    throw std::runtime_error("Failed to create socket: " +
-                             std::string(strerror(errno)));
-  }
+    socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if (socket_ == -1) {
+        throw std::runtime_error("Failed to create socket: " +
+                                 std::string(strerror(errno)));
+    }
 
-  sockaddr_can addr = {};
-  ifreq ifr;
+    sockaddr_can addr = {};
+    ifreq ifr;
 
-  strcpy(ifr.ifr_name, ifname.c_str());
-  if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0) {
-    throw std::runtime_error("Failed to find interface: " +
-                             std::string(strerror(errno)));
-  }
+    strcpy(ifr.ifr_name, ifname.c_str());
+    if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0) {
+        throw std::runtime_error("Failed to find socketcan interface: " +
+                                 std::string(strerror(errno)));
+    }
 
-  addr.can_family = AF_CAN;
-  addr.can_ifindex = ifr.ifr_ifindex;
+    addr.can_family = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
 
-  if (::bind(socket_, (sockaddr *)&addr, sizeof(addr)) < 0) {
-    throw std::runtime_error("Failed to bind interface: " +
-                             std::string(strerror(errno)));
-  }
+    if (::bind(socket_, (sockaddr *)&addr, sizeof(addr)) < 0) {
+        throw std::runtime_error("Failed to bind socketcan interface: " +
+                                 std::string(strerror(errno)));
+    }
 
-  return true;
+    return true;
 }
 
 
 
 void SocketCanInterface::close() {
-  Expects(socket_ != 0);
-  ::close(socket_);
-  socket_ = 0;
+    Expects(socket_ != 0);
+    ::close(socket_);
+    socket_ = 0;
 }
 
 
 
-void SocketCanInterface::start() {
-  assert(socket_ != 0);
-}
+void SocketCanInterface::start() { assert(socket_ != 0); }
 
 
 
 int SocketCanInterface::fd() const { return socket_; }
 
-SocketCanInterface::SocketCanInterface(const std::string &ifname)
-{
+SocketCanInterface::SocketCanInterface(const std::string &ifname) {
     Expects(bind(ifname));
 }
 
 
 
 void SocketCanInterface::setNonblocking() {
-  Expects(socket_ != 0);
-  int flags = fcntl(socket_, F_GETFL, 0);
-  fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
+    Expects(socket_ != 0);
+    int flags = fcntl(socket_, F_GETFL, 0);
+    fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
 }

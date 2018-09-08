@@ -29,18 +29,18 @@ class CanHandler;
 class QAbstractItemModel;
 
 class CanViewer : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  explicit CanViewer(QWidget *parent = 0);
-  ~CanViewer();
+    explicit CanViewer(QWidget *parent = 0);
+    ~CanViewer();
 
 private:
-  Ui::CanViewer *ui;
-  QAbstractItemModel *logModel_ = nullptr;
+    Ui::CanViewer *ui;
+    QAbstractItemModel *logModel_ = nullptr;
 
 public slots:
-  void rowsInserted(const QModelIndex &parent, int first, int last);
+    void rowsInserted(const QModelIndex &parent, int first, int last);
 };
 
 #endif // CANVIEWER_H

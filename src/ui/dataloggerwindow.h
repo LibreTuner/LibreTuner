@@ -19,9 +19,9 @@
 #ifndef DATALOGGERWINDOW_H
 #define DATALOGGERWINDOW_H
 
-#include <QWidget>
-#include <QTreeWidget>
 #include <QPushButton>
+#include <QTreeWidget>
+#include <QWidget>
 
 #include <memory>
 
@@ -43,7 +43,10 @@ class DataLoggerWindow : public StyledWindow
 {
     Q_OBJECT
 public:
-    explicit DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent = nullptr);
+    explicit DataLoggerWindow(const DataLogPtr &log,
+                              std::unique_ptr<DataLogger> &&logger,
+                              DefinitionPtr definition,
+                              QWidget *parent = nullptr);
     virtual ~DataLoggerWindow();
 
     void showEvent(QShowEvent *event);

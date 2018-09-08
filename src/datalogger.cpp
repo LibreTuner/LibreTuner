@@ -21,107 +21,100 @@
 
 #include <utility>
 
-void DataLogger::setLog(const DataLogPtr &log) {
-    log_ = log;
-}
+void DataLogger::setLog(const DataLogPtr &log) { log_ = log; }
 
-void DataLogger::addPid(uint32_t id, uint16_t code, const std::string &formula)
-{
+void DataLogger::addPid(uint32_t id, uint16_t code,
+                        const std::string &formula) {
     addPid(Pid(id, code, formula));
 }
 
-UdsDataLogger::UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds) : uds_(std::move(uds)) {
+UdsDataLogger::UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds)
+    : uds_(std::move(uds)) {}
 
-}
-
-void UdsDataLogger::addPid(Pid &&pid) {
-  pids_.emplace_back(std::move(pid));
-}
+void UdsDataLogger::addPid(Pid &&pid) { pids_.emplace_back(std::move(pid)); }
 
 Pid *UdsDataLogger::nextPid() {
-  if (++current_pid_ >= pids_.size()) {
-    current_pid_ = 0;
-  }
-  if (pids_.empty()) {
-    return nullptr;
-  }
-  return &pids_[current_pid_];
+    if (++current_pid_ >= pids_.size()) {
+        current_pid_ = 0;
+    }
+    if (pids_.empty()) {
+        return nullptr;
+    }
+    return &pids_[current_pid_];
 }
 
 void UdsDataLogger::processNext() {
-  if (!running_) {
-    return;
-  }
-  if (!uds_) {
-    disable();
-  }
-  Pid *pid = nextPid();
-  if (!pid) {
-    disable();
-    return;
-  }
-  if (current_pid_ == 0) {
-    //freeze();
-    //return;
-  }
-
-  // Request the data
-  std::vector<uint8_t> data;
-  data.emplace_back(0x01);
-  if (pid->code() > 0xFF) {
-    data.emplace_back(pid->code() >> 8);
-  }
-  data.emplace_back(pid->code() & 0xFF);
-  /*uds_->request(data, 0x41, [this, pid](uds::Error error, const uds::Packet &packet) {
-    if (error != uds::Error::Success) {
-      throwError("could not query data: " + uds::strError(error));
-      return;
+    if (!running_) {
+        return;
     }
-    // Do calculations
-    gsl::span<const uint8_t> data = gsl::make_span(packet.data);
+    if (!uds_) {
+        disable();
+    }
+    Pid *pid = nextPid();
+    if (!pid) {
+        disable();
+        return;
+    }
+    if (current_pid_ == 0) {
+        // freeze();
+        // return;
+    }
+
+    // Request the data
+    std::vector<uint8_t> data;
+    data.emplace_back(0x01);
     if (pid->code() > 0xFF) {
-        data = data.subspan(2);
-    } else {
-        data = data.subspan(1);
+        data.emplace_back(pid->code() >> 8);
     }
+    data.emplace_back(pid->code() & 0xFF);
+    /*uds_->request(data, 0x41, [this, pid](uds::Error error, const uds::Packet
+    &packet) { if (error != uds::Error::Success) { throwError("could not query
+    data: " + uds::strError(error)); return;
+      }
+      // Do calculations
+      gsl::span<const uint8_t> data = gsl::make_span(packet.data);
+      if (pid->code() > 0xFF) {
+          data = data.subspan(2);
+      } else {
+          data = data.subspan(1);
+      }
 
-    switch (data.size()) {
-    case 0:
-        break;
-    default:
-    case 3:
-        pid->setZ(data[2]);
-    case 2:
-        pid->setY(data[1]);
-    case 1:
-        pid->setX(data[0]);
-        break;
-    }
+      switch (data.size()) {
+      case 0:
+          break;
+      default:
+      case 3:
+          pid->setZ(data[2]);
+      case 2:
+          pid->setY(data[1]);
+      case 1:
+          pid->setX(data[0]);
+          break;
+      }
 
-    if (log_) {
-        double result = pid->evaluate();
-        log_->add(pid->id(), result);
-    }
+      if (log_) {
+          double result = pid->evaluate();
+          log_->add(pid->id(), result);
+      }
 
-    processNext();
-  });*/
+      processNext();
+    });*/
 }
 
 void UdsDataLogger::setErrorCallback(UdsDataLogger::ErrorCall &&error) {
-  errorCall_ = std::move(error);
+    errorCall_ = std::move(error);
 }
 
 void UdsDataLogger::freeze() {
-  /*std::array<uint8_t, 2> data{0x01, 0x02};
-  uds_->request(data, 0x41, [this](uds::Error  error, const uds::Packet &packet) {
-    if (error != uds::Error::Success) {
-      throwError("could not freeze data: " + uds::strError(error));
-      return;
-    }
-    current_pid_ = 0;
+    /*std::array<uint8_t, 2> data{0x01, 0x02};
+    uds_->request(data, 0x41, [this](uds::Error  error, const uds::Packet
+    &packet) { if (error != uds::Error::Success) { throwError("could not freeze
+    data: " + uds::strError(error)); return;
+      }
+      current_pid_ = 0;
+      processNext();
+    });*/
     processNext();
-  });*/
-  processNext();
 }
 
 void UdsDataLogger::throwError(const std::string &error) {
@@ -132,24 +125,22 @@ void UdsDataLogger::throwError(const std::string &error) {
 }
 
 void UdsDataLogger::enable() {
-  if (running_) {
-    return;
-  }
-  if (uds_) {
-    running_ = true;
-    freeze();
-  } else {
-    throw std::runtime_error("a UDS device is not attached to the logger");
-  }
+    if (running_) {
+        return;
+    }
+    if (uds_) {
+        running_ = true;
+        freeze();
+    } else {
+        throw std::runtime_error("a UDS device is not attached to the logger");
+    }
 }
 
-void UdsDataLogger::disable() {
-  running_ = false;
-}
+void UdsDataLogger::disable() { running_ = false; }
 
 
-Pid::Pid(uint32_t id, uint16_t code, const std::string &formula) : id_(id), code_(code), formula_(formula)
-{
+Pid::Pid(uint32_t id, uint16_t code, const std::string &formula)
+    : id_(id), code_(code), formula_(formula) {
     /*symbol_table_.add_variable("X", x_);
     symbol_table_.add_variable("Y", y_);
     symbol_table_.add_variable("Z", z_);
@@ -160,8 +151,7 @@ Pid::Pid(uint32_t id, uint16_t code, const std::string &formula) : id_(id), code
     }*/
 }
 
-Pid::Pid(Pid &&pid)
-{
+Pid::Pid(Pid &&pid) {
     id_ = pid.id_;
     formula_ = std::move(pid.formula_);
     code_ = pid.code_;
@@ -176,7 +166,6 @@ Pid::Pid(Pid &&pid)
     }*/
 }
 
-double Pid::evaluate() const
-{
-    return 0;//expression_.value();
+double Pid::evaluate() const {
+    return 0; // expression_.value();
 }

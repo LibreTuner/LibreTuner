@@ -24,25 +24,18 @@
 
 #include <cassert>
 
-Flashable::Flashable(const TuneDataPtr& tune) {
-  assert(tune);
-  RomDataPtr rom = tune->romData();
-  assert(rom);
-  definition_ = rom->subDefinition();
-  offset_ = rom->definition()->flashOffset();
+Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
+    assert(tune);
+    std::shared_ptr<Rom> rom = tune->rom();
+    definition_ = rom->subDefinition();
+    offset_ = rom->definition()->flashOffset();
 
-  data_.assign(rom->data(), rom->data() + rom->size());
+    data_ = rom->data();
 
-  // Apply tune on top of ROM
-  if (!tune->apply(data_)) {
-    lastError_ = tune->lastError();
-    valid_ = false;
-    return;
-  }
+    // Apply tune on top of ROM
+    tune->apply(data_);
 
-  // Reassign to flash region
-  data_.assign(data_.data() + offset_,
-               data_.data() + offset_ + rom->definition()->flashSize());
-
-  valid_ = true;
+    // Reassign to flash region
+    data_.assign(data_.data() + offset_,
+                 data_.data() + offset_ + rom->definition()->flashSize());
 }

@@ -1,16 +1,15 @@
 #include "diagnosticswidget.h"
 
-#include "libretuner.h"
 #include "diagnosticsinterface.h"
+#include "libretuner.h"
 #include "logger.h"
 
 #include <QBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
 #include <QHeaderView>
+#include <QMessageBox>
+#include <QPushButton>
 
-DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
-{
+DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     auto *layout = new QVBoxLayout();
     QPushButton *buttonScan = new QPushButton(tr("Scan for diagnostic codes"));
     layout->addWidget(buttonScan);
@@ -23,18 +22,24 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
         try {
             diag = link->diagnostics();
         } catch (const std::exception &e) {
-            QMessageBox(QMessageBox::Warning, "No diagnostic interface", "Failed to load diagnostic interface: " + QString(e.what())).exec();
+            QMessageBox(QMessageBox::Warning, "No diagnostic interface",
+                        "Failed to load diagnostic interface: " +
+                            QString(e.what()))
+                .exec();
             return;
         }
         if (!diag) {
-            QMessageBox(QMessageBox::Warning, "No diagnostic interface", "The default datalink does not have a supported diagnostic interface").exec();
+            QMessageBox(QMessageBox::Warning, "No diagnostic interface",
+                        "The default datalink does not have a supported "
+                        "diagnostic interface")
+                .exec();
             return;
         }
 
         // Clear the scan result prior
         scanResult_.clear();
         try {
-        diag->scan(scanResult_);
+            diag->scan(scanResult_);
         } catch (const std::exception &e) {
             Logger::critical("Scan error: " + std::string(e.what()));
         }
@@ -43,7 +48,8 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent)
     listCodes_ = new QTableView;
     listCodes_->setModel(&scanResult_);
     listCodes_->horizontalHeader()->setStretchLastSection(true);
-    listCodes_->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    listCodes_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
     listCodes_->verticalHeader()->setVisible(false);
     layout->addWidget(listCodes_);
 

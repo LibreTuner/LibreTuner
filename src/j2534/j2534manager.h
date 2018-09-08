@@ -25,14 +25,13 @@
 namespace j2534 {
 class J2534;
 using J2534Ptr = std::shared_ptr<J2534>;
-}
+} // namespace j2534
 
-class J2534Manager
-{
+class J2534Manager {
 public:
     J2534Manager();
-    J2534Manager(J2534Manager&&) = delete;
-    J2534Manager(const J2534Manager&) = delete;
+    J2534Manager(J2534Manager &&) = delete;
+    J2534Manager(const J2534Manager &) = delete;
 
     // Returns the singleton
     static J2534Manager &get();

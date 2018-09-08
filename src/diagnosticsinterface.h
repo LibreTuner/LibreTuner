@@ -23,16 +23,15 @@
 #include <memory>
 
 namespace uds {
-    class Protocol;
+class Protocol;
 }
 
-class DiagnosticsInterface
-{
+class DiagnosticsInterface {
 public:
     virtual ~DiagnosticsInterface() = default;
 
     /* Scans the interface for codes and fills result */
-    virtual void scan(ScanResult &result) =0;
+    virtual void scan(ScanResult &result) = 0;
 };
 
 

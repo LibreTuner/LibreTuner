@@ -30,24 +30,23 @@
 #include <QString>
 #include <QStyledItemDelegate>
 
-FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher, const FlashablePtr& flashable)
-    : ui(new Ui::FlashWindow), flashable_(flashable), flasher_(std::move(flasher)) {
-  Expects(flashable_);
-  Expects(flasher_);
-  Expects(flashable_->valid());
+FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher,
+                         const FlashablePtr &flashable)
+    : ui(new Ui::FlashWindow), flashable_(flashable),
+      flasher_(std::move(flasher)) {
+    Expects(flashable_);
+    Expects(flasher_);
 
-  ui->setupUi(this);
-  ui->comboMode->setItemDelegate(new QStyledItemDelegate());
+    ui->setupUi(this);
+    ui->comboMode->setItemDelegate(new QStyledItemDelegate());
 
-  flasher_->setProgressCallback([this](float progress) { onProgress(progress); });
+    flasher_->setProgressCallback(
+        [this](float progress) { onProgress(progress); });
 }
 
 
 
-FlashWindow::~FlashWindow()
-{
-    stop();
-}
+FlashWindow::~FlashWindow() { stop(); }
 
 
 
@@ -77,18 +76,17 @@ void FlashWindow::on_buttonFlash_clicked() {
 
 
 void FlashWindow::mainCompletion() {
-  // flasher_.reset();
-  QMessageBox msgBox;
-  msgBox.setWindowTitle("Flash completed");
-  msgBox.setText("Successfully flashed ROM");
-  msgBox.setIcon(QMessageBox::Information);
-  msgBox.exec();
+    // flasher_.reset();
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Flash completed");
+    msgBox.setText("Successfully flashed ROM");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
 }
 
 
 
-void FlashWindow::stop()
-{
+void FlashWindow::stop() {
     if (worker_.joinable()) {
         Logger::info("Canceling flash");
         flasher_->cancel();
@@ -99,41 +97,38 @@ void FlashWindow::stop()
 
 
 
-void FlashWindow::closeEvent(QCloseEvent *event)
-{
-    stop();
-}
+void FlashWindow::closeEvent(QCloseEvent *event) { stop(); }
 
 
 
 void FlashWindow::onCompletion() {
-  QMetaObject::invokeMethod(this, "mainCompletion", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "mainCompletion", Qt::QueuedConnection);
 }
 
 
 
 void FlashWindow::mainError(const QString &error) {
-  // flasher_.reset();
-  QMessageBox msgBox;
-  msgBox.setText("Error while flashing ROM: " + error);
-  msgBox.setIcon(QMessageBox::Critical);
-  msgBox.setWindowTitle("Flash error");
-  // msgBox.setStandardButtons(QMessageBox::Ok);
-  msgBox.exec();
+    // flasher_.reset();
+    QMessageBox msgBox;
+    msgBox.setText("Error while flashing ROM: " + error);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setWindowTitle("Flash error");
+    // msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
 
-  ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
 
 
 void FlashWindow::onError(const std::string &error) {
-  QMetaObject::invokeMethod(this, "mainError", Qt::QueuedConnection,
-                            Q_ARG(QString, QString::fromStdString(error)));
+    QMetaObject::invokeMethod(this, "mainError", Qt::QueuedConnection,
+                              Q_ARG(QString, QString::fromStdString(error)));
 }
 
 
 
 void FlashWindow::onProgress(float percent) {
-  QMetaObject::invokeMethod(ui->progressBar, "setValue", Qt::QueuedConnection,
-                            Q_ARG(int, static_cast<int>(percent * 100)));
+    QMetaObject::invokeMethod(ui->progressBar, "setValue", Qt::QueuedConnection,
+                              Q_ARG(int, static_cast<int>(percent * 100)));
 }

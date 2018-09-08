@@ -1,8 +1,8 @@
 #ifndef PIDDEFINITIONS_H
 #define PIDDEFINITIONS_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 struct PidDefinition {
     std::string name;
@@ -15,8 +15,7 @@ struct PidDefinition {
     bool valid = false;
 };
 
-class PidDefinitions
-{
+class PidDefinitions {
 public:
     PidDefinitions() = default;
 
@@ -24,9 +23,7 @@ public:
 
     PidDefinition *get(uint32_t id);
 
-    const std::vector<PidDefinition> &pids() const {
-        return pids_;
-    }
+    const std::vector<PidDefinition> &pids() const { return pids_; }
 
 private:
     std::vector<PidDefinition> pids_;

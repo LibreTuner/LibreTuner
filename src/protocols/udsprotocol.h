@@ -51,39 +51,42 @@
 namespace uds {
 
 struct Packet {
-  uint8_t id;
-  std::vector<uint8_t> data;
+    uint8_t id;
+    std::vector<uint8_t> data;
 };
 
 class Protocol {
 public:
-  /* Sends a request. May throw an exception. */
-  virtual void request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) = 0;
+    /* Sends a request. May throw an exception. */
+    virtual void request(gsl::span<uint8_t> data, uint8_t expectedId,
+                         Packet &response) = 0;
 
-  /* All requests may throw an exception */
-  /* Sends a DiagnosticSessionControl request. Returns parameter record. */
-  std::vector<uint8_t> requestSession(uint8_t type);
+    /* All requests may throw an exception */
+    /* Sends a DiagnosticSessionControl request. Returns parameter record. */
+    std::vector<uint8_t> requestSession(uint8_t type);
 
-  std::vector<uint8_t> requestSecuritySeed();
+    std::vector<uint8_t> requestSecuritySeed();
 
-  void requestSecurityKey(gsl::span<uint8_t> key);
+    void requestSecurityKey(gsl::span<uint8_t> key);
 
-  /* ReadMemoryByAddress */
-  std::vector<uint8_t> requestReadMemoryAddress(uint32_t address, uint16_t length);
+    /* ReadMemoryByAddress */
+    std::vector<uint8_t> requestReadMemoryAddress(uint32_t address,
+                                                  uint16_t length);
 
-  virtual ~Protocol() = default;
+    virtual ~Protocol() = default;
 };
 
 
 
 class IsoTpInterface : public Protocol {
 public:
-  explicit IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp);
+    explicit IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp);
 
-  void request(gsl::span<uint8_t> data, uint8_t expectedId, Packet &response) override;
+    void request(gsl::span<uint8_t> data, uint8_t expectedId,
+                 Packet &response) override;
 
 private:
-  std::unique_ptr<isotp::Protocol> isotp_;
+    std::unique_ptr<isotp::Protocol> isotp_;
 };
 
 } // namespace uds
