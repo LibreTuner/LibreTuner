@@ -26,6 +26,7 @@
 #include <memory>
 
 #include "datalogger.h"
+#include "styledwindow.h"
 
 class QListWidget;
 
@@ -38,7 +39,8 @@ using DefinitionPtr = std::shared_ptr<Definition>;
 class DataLog;
 using DataLogPtr = std::shared_ptr<DataLog>;
 
-class DataLoggerWindow : public QWidget {
+class DataLoggerWindow : public StyledWindow
+{
     Q_OBJECT
 public:
     explicit DataLoggerWindow(const DataLogPtr &log,
@@ -64,6 +66,9 @@ private:
     QListWidget *pidList_;
     QTreeWidget *logOutput_;
     QPushButton *buttonLog_;
+
+
+    void reset();
 };
 
 #endif // DATALOGGERWINDOW_H

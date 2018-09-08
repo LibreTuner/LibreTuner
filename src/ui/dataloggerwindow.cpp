@@ -31,18 +31,19 @@
 #include "definitions/definition.h"
 #include "libretuner.h"
 
-DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log,
-                                   std::unique_ptr<DataLogger> &&logger,
-                                   DefinitionPtr definition, QWidget *parent)
-    : log_(log), logger_(std::move(logger)), definition_(definition),
-      QWidget(parent) {
+DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent) : StyledWindow(parent), log_(log), logger_(std::move(logger)), definition_(definition)
+{
     Expects(logger_);
     Expects(log_);
     Expects(definition_);
-    setAttribute(Qt::WA_DeleteOnClose, false);
-    setWindowTitle("LibreTuner - Data Logger");
+    setAttribute( Qt::WA_DeleteOnClose, false );
+    setTitle("LibreTuner - Data Logger");
+
+    QWidget *main = new QWidget();
+
     auto *hlayout = new QHBoxLayout;
-    setLayout(hlayout);
+    mainLayout()->addWidget(main);
+    main->setLayout(hlayout);
 
     auto *pidLayout = new QVBoxLayout;
     hlayout->addLayout(pidLayout);
@@ -63,29 +64,14 @@ DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log,
     logLayout->addWidget(buttonLog_);
     connect(buttonLog_, &QPushButton::clicked, this,
             &DataLoggerWindow::buttonClicked);
+    reset();
 }
 
 DataLoggerWindow::~DataLoggerWindow() = default;
 
 void DataLoggerWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event)
-    pidList_->clear();
 
-    // TODO: set error handler
-    logger_->setLog(log_);
-    // logger_->addPid(0, 5, "X - 40");
-
-    for (const PidDefinition &pid : definition_->pids().pids()) {
-        if (!pid.valid) {
-            continue;
-        }
-        auto *item = new QListWidgetItem;
-        item->setText(QString::fromStdString(pid.name));
-        item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.id));
-        item->setFlags(Qt::ItemIsUserCheckable);
-        pidList_->addItem(item);
-        logger_->addPid(pid.id, pid.code, pid.formula);
-    }
 }
 
 void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
@@ -107,5 +93,26 @@ void DataLoggerWindow::buttonClicked() {
     } else {
         logger_->disable();
         buttonLog_->setText("Start logging");
+    }
+}
+
+void DataLoggerWindow::reset()
+{
+    pidList_->clear();
+
+    // TODO: set error handler
+    logger_->setLog(log_);
+    // logger_->addPid(0, 5, "X - 40");
+
+    for (const PidDefinition &pid : definition_->pids().pids()) {
+        if (!pid.valid) {
+            continue;
+        }
+        auto *item = new QListWidgetItem;
+        item->setText(QString::fromStdString(pid.name));
+        item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.id));
+        item->setFlags(Qt::ItemIsUserCheckable);
+        pidList_->addItem(item);
+        logger_->addPid(pid.id, pid.code, pid.formula);
     }
 }
