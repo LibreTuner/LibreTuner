@@ -62,14 +62,9 @@ DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLo
 
     buttonLog_ = new QPushButton("Start logging");
     logLayout->addWidget(buttonLog_);
-<<<<<<< HEAD
-    connect(buttonLog_, &QPushButton::clicked, this, &DataLoggerWindow::buttonClicked);
-
-    reset();
-=======
     connect(buttonLog_, &QPushButton::clicked, this,
             &DataLoggerWindow::buttonClicked);
->>>>>>> d0d6f672ae86a14c8b61ed01d449611fdfb82410
+    reset();
 }
 
 DataLoggerWindow::~DataLoggerWindow() = default;
