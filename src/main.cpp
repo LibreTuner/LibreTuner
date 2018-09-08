@@ -23,26 +23,13 @@
 #include "protocols/isotpprotocol.h"
 #include <array>
 #include <iostream>
+#include <shunting-yard.h>
+
+extern void cparse_startup();
 
 int main(int argc, char *argv[]) {
     LibreTuner app(argc, argv);
-    /*
-      j2534::Info info;
-      info.functionLibrary = "C:\\Windows\\SysWOW64\\op20pt32.dll";
-      info.protocols = DataLinkProtocol::Can;
-      info.name = "OpenPort 2.0";
 
-      j2534::J2534Ptr j2534 = j2534::J2534::create(std::move(info));
-      j2534->init();
-
-      j2534::DevicePtr device = j2534->open();
-      std::shared_ptr<j2534::Can> can = j2534::Can::create(device, 500000);
-      std::shared_ptr<isotp::Protocol> proto =
-      std::make_shared<isotp::Protocol>(can, isotp::Options{0x7e0, 0x7e8,
-      std::chrono::milliseconds{500}}); std::array<uint8_t, 3> req = {0x1, 0x2,
-      0x3}; proto->send(isotp::Packet(req), [](isotp::Error error) {
-          Logger::debug("Sent the test request");
-      });*/
 
     return LibreTuner::exec();
 }
