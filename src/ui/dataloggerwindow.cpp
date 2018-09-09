@@ -119,6 +119,7 @@ void DataLoggerWindow::reset()
             continue;
         }
         try {
+            log_->addData({pid.name, pid.description, pid.id, DataUnit::None});
             logger_->addPid(pid.id, pid.code, pid.formula);
         } catch (const std::exception &e) {
             Logger::warning(std::string("Error while adding PID ") + std::to_string(pid.id) + ": " + e.what());

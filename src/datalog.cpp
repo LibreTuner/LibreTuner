@@ -17,6 +17,7 @@
  */
 
 #include "datalog.h"
+#include "logger.h"
 
 DataLog::DataLog() : updateSignal_(Signal<UpdateCall>::create())
 {
@@ -30,6 +31,7 @@ bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
     }
 
     it->second.values.emplace_back(value);
+    updateSignal_->call(it->second, value.second);
     return true;
 }
 
@@ -40,6 +42,7 @@ bool DataLog::add(uint32_t id, double value) {
     }
 
     it->second.values.emplace_back(std::chrono::steady_clock::now(), value);
+    updateSignal_->call(it->second, value);
     return true;
 }
 
