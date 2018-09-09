@@ -21,12 +21,13 @@
 
 #include <QChart>
 #include <QHBoxLayout>
+#include <QCategory3DAxis>
 
 using namespace QtCharts;
 
 GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
     surface_ = new QtDataVisualization::Q3DSurface;
-    container_ = QWidget::createWindowContainer(surface_, this);
+    container_ = QWidget::createWindowContainer(surface_);
     chart_ = new QChart();
     chart_->legend()->hide();
     chartView_ = new QChartView(chart_, this);
@@ -35,12 +36,11 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
     chartView_->setVisible(false);
     container_->setVisible(false);
 
-    auto *hLayout = new QHBoxLayout(this);
+    auto *hLayout = new QHBoxLayout;
+    setLayout(hLayout);
     hLayout->addWidget(container_);
     hLayout->addWidget(chartView_);
 
-    series3d_.setDrawMode(
-        QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
     surface_->addSeries(&series3d_);
     surface_->setHorizontalAspectRatio(1.0);
 
@@ -66,9 +66,11 @@ void GraphWidget::tableChanged(const TablePtr &table) {
         auto *modelProxy =
             new QtDataVisualization::QItemModelSurfaceDataProxy(table.get());
         modelProxy->setUseModelCategories(true);
-        // modelProxy->setAutoColumnCategories(false);
+        series3d_.setDrawMode(
+            QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
         series3d_.setDataProxy(modelProxy);
+
         if (table->definition()->axisX()) {
             surface_->axisX()->setTitle(
                 QString::fromStdString(table->definition()->axisX()->label()));
