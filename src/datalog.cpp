@@ -18,6 +18,11 @@
 
 #include "datalog.h"
 
+DataLog::DataLog() : updateSignal_(Signal<UpdateCall>::create())
+{
+}
+
+
 bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
     auto it = data_.find(id);
     if (it == data_.end()) {

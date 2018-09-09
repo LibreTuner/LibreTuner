@@ -24,9 +24,11 @@
 #include <QWidget>
 
 #include <memory>
+#include <unordered_map>
 
 #include "datalogger.h"
 #include "styledwindow.h"
+#include "datalog.h"
 
 class QListWidget;
 
@@ -36,8 +38,6 @@ using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 class Definition;
 using DefinitionPtr = std::shared_ptr<Definition>;
 
-class DataLog;
-using DataLogPtr = std::shared_ptr<DataLog>;
 
 class DataLoggerWindow : public StyledWindow
 {
@@ -57,6 +57,8 @@ signals:
 public slots:
     /* Callback for the start/stop button */
     void buttonClicked();
+    
+    void logUpdate(const DataLog::Data &info, double value);
 
 private:
     DataLogPtr log_;
@@ -66,6 +68,8 @@ private:
     QListWidget *pidList_;
     QTreeWidget *logOutput_;
     QPushButton *buttonLog_;
+    
+    std::shared_ptr<Signal<DataLog::UpdateCall>::ConnectionType> connection_;
 
 
     void reset();

@@ -36,6 +36,7 @@ typedef std::shared_ptr<Table> TablePtr;
 class GraphWidget : public QWidget {
 public:
     explicit GraphWidget(QWidget *parent = nullptr);
+    ~GraphWidget() override;
 
 public slots:
     void tableChanged(const TablePtr &table);
@@ -47,7 +48,7 @@ private:
     QtCharts::QChart *chart_;
     QtCharts::QChartView *chartView_;
 
-    QtDataVisualization::QSurface3DSeries series3d_;
+    QtDataVisualization::QSurface3DSeries *series3d_;
 };
 
 #endif // GRAPHWIDGET_H

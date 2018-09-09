@@ -40,8 +40,11 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
     setLayout(hLayout);
     hLayout->addWidget(container_);
     hLayout->addWidget(chartView_);
-
-    surface_->addSeries(&series3d_);
+    
+    series3d_ = new QtDataVisualization::QSurface3DSeries;
+    // I have no fucking clue if Q3DSeries takes ownership of series
+    
+    surface_->addSeries(series3d_);
     surface_->setHorizontalAspectRatio(1.0);
 
     QLinearGradient gr;
@@ -49,12 +52,18 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
     gr.setColorAt(0.5, Qt::yellow);
     gr.setColorAt(1.0, Qt::red);
 
-    series3d_.setBaseGradient(gr);
-    series3d_.setColorStyle(
+    series3d_->setBaseGradient(gr);
+    series3d_->setColorStyle(
         QtDataVisualization::Q3DTheme::ColorStyleRangeGradient);
 }
 
-#include <iostream>
+
+GraphWidget::~GraphWidget()
+{
+    delete container_;
+}
+
+
 
 void GraphWidget::tableChanged(const TablePtr &table) {
     table_ = table;
@@ -66,10 +75,10 @@ void GraphWidget::tableChanged(const TablePtr &table) {
         auto *modelProxy =
             new QtDataVisualization::QItemModelSurfaceDataProxy(table.get());
         modelProxy->setUseModelCategories(true);
-        series3d_.setDrawMode(
+        series3d_->setDrawMode(
             QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
-        series3d_.setDataProxy(modelProxy);
+        series3d_->setDataProxy(modelProxy);
 
         if (table->definition()->axisX()) {
             surface_->axisX()->setTitle(

@@ -65,7 +65,17 @@ DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLo
     connect(buttonLog_, &QPushButton::clicked, this,
             &DataLoggerWindow::buttonClicked);
     reset();
+    
+    connection_ = log_->connectUpdate([this] (const DataLog::Data& info, double value) {
+        logUpdate(info, value);
+    });
 }
+
+void DataLoggerWindow::logUpdate(const DataLog::Data& info, double value)
+{
+    Logger::debug("Update to " + std::to_string(value));
+}
+
 
 DataLoggerWindow::~DataLoggerWindow() = default;
 
@@ -99,6 +109,7 @@ void DataLoggerWindow::buttonClicked() {
 void DataLoggerWindow::reset()
 {
     pidList_->clear();
+    logOutput_->clear();
 
     // TODO: set error handler
     logger_->setLog(log_);

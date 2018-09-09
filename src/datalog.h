@@ -22,8 +22,10 @@
 #include <chrono>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 #include "vehicle.h"
+#include "util/signal.h"
 
 enum class DataUnit {
     None,
@@ -50,6 +52,10 @@ public:
     std::chrono::system_clock::time_point creationTime() const {
         return creationTime_;
     }
+    
+    using UpdateCall = std::function<void(const Data &info, double value)>;
+    
+    DataLog();
 
     const Vehicle &vehicle() const { return vehicle_; }
 
@@ -62,11 +68,14 @@ public:
 
     void addData(const DataHead &data);
 
+    std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
+
 private:
     std::chrono::system_clock::time_point creationTime_;
     Vehicle vehicle_;
 
     std::unordered_map<uint32_t, Data> data_;
+    std::shared_ptr<Signal<UpdateCall>> updateSignal_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
 
