@@ -34,13 +34,15 @@
 #include "piddefinitions.h"
 #include "tabledefinitions.h"
 
-class Definition;
+namespace definition {
+
+struct Main;
 
 /* Subtype definition. Includes the table locations */
 // Subtype is a misnomer, but it's too late to change (or is it?)
-class SubDefinition {
+class Sub {
 public:
-    explicit SubDefinition(Definition *definition);
+    explicit Sub(Definition *definition);
 
     /* Attempts to load a subtype definition. Returns false and sets
      * lastError on failure. */
@@ -92,7 +94,6 @@ private:
     Definition *definition_;
     std::string id_;
     std::string name_;
-    std::string lastError_;
 
     ChecksumManager checksums_;
 
@@ -115,8 +116,7 @@ private:
 
     // Assign an id (automatically) to each axis for easy lookup?
 };
-typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
-typedef std::weak_ptr<SubDefinition> SubDefinitionWeakPtr;
+using SubPtr = std::shared_ptr<Sub>;
 
 enum class LogMode {
     None,
@@ -126,102 +126,46 @@ enum class LogMode {
 /**
  * An ECU definition
  */
-class Definition {
-public:
-    /* Loads a definition directory */
-    bool load(const QString &path);
+struct Main {
+    std::string name;
+    std::string id;
 
-    /* Loads the main definition file into definition. */
-    bool loadMain(const QString &path);
-
-    /* Loads a subtype (ECU model or firmware version) definition. */
-    bool loadSubtype(const QString &path);
-
-    /* Attempts to determine the subtype of the data. Returns
-     * nullptr if no subtypes match. */
-    SubDefinitionPtr identifySubtype(gsl::span<const uint8_t> data);
-
-    /* Returns the axis with the specified ID. If none exists, returns
-     * nullptr. */
-    TableAxis *getAxis(const std::string &id);
-
-    std::string name() const { return name_; }
-
-    std::string id() const { return id_; }
-
-    std::string lastError() const { return lastError_; }
-
-    uint32_t size() const { return size_; }
-
-    const TableDefinitions *tables() const { return &tables_; }
-
-    TableDefinitions *tables() { return &tables_; }
-
-    PidDefinitions &pids() { return pids_; }
-
-    Endianness endianness() const { return endianness_; }
-
-    DownloadMode downloadMode() const { return downloadMode_; }
-
-    LogMode logMode() const { return logMode_; }
-
-    FlashMode flashMode() const { return flashMode_; }
-
-    std::string key() const { return key_; }
-
-    unsigned serverId() const { return serverId_; }
-
-    uint32_t baudrate() const { return baudrate_; }
-
-    size_t flashOffset() const { return flashOffset_; }
-
-    size_t flashSize() const { return flashSize_; }
-
-    /* Returns the subtype definition with the id. Returns blank pointer
-     * if the subtype does not exist. */
-    SubDefinitionPtr findSubtype(const std::string &id);
-
-    /* Gets the axis id from the string identifier. Returns -1
-     * if the id does not exist. */
-    int axisId(const std::string &id);
-
-    /* Returns true if the supplied VIN matches the definition */
-    bool matchVin(const std::string &vin);
-
-private:
-    std::string lastError_;
-
-    std::string name_;
-    std::string id_;
-
-    DownloadMode downloadMode_;
-    FlashMode flashMode_;
-    uint32_t baudrate_ = 500000;
-    LogMode logMode_ = LogMode::None;
+    DownloadMode downloadMode;
+    FlashMode flashMode;
+    uint32_t baudrate {500000};
+    LogMode logMode = LogMode::None;
     /* Security key */
-    std::string key_;
+    std::string key;
     /* Server ID for ISO-TP reqeusts */
-    unsigned serverId_;
+    unsigned serverId {0x7e0};
 
     /* Flash region */
-    size_t flashOffset_, flashSize_;
+    size_t flashOffset, flashSize;
 
-    Endianness endianness_;
+    Endianness endianness;
 
-    int lastAxisId_ = 0;
-    uint32_t size_;
+    int lastAxisId = 0;
+    uint32_t size;
 
-    TableDefinitions tables_;
-    PidDefinitions pids_;
-    std::unordered_map<std::string, TableAxisPtr> axes_;
-    std::vector<SubDefinitionPtr> subtypes_;
-    std::vector<std::regex> vins_;
-
-    void readTables(QXmlStreamReader &xml);
-    void loadAxes(QXmlStreamReader &xml);
-    void loadVins(QXmlStreamReader &xml);
-    void loadPids(QXmlStreamReader &xml);
+    TableDefinitions tables;
+    PidDefinitions pids;
+    std::unordered_map<std::string, TableAxisPtr> axes;
+    std::vector<SubDefinitionPtr> subtypes;
+    std::vector<std::regex> vins;
 };
-typedef std::shared_ptr<Definition> DefinitionPtr;
+
+/* Returns true if the supplied VIN matches any pattern in vins */
+bool match_vin(const std::vector<std::regex> &vins, const std::string &vin);
+
+/* Searched for a subtype definition from an id. Returns nullptr
+ * if the id does not match a subtype. */
+const SubDefinitionPtr &find_subtype(const std::vector<SubPtr> &subtypes, const std::string &id);
+
+/* Attempts to determine the subtype of the data. Returns
+ * nullptr if no subtypes match. */
+const SubDefinitionPtr &identify(const std::vector<SubPtr> &subtypes, gsl::span<const uint8_t> data);
+
+typedef std::shared_ptr<Main> MainPtr;
+}
 
 #endif // DEFINITION_H

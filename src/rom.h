@@ -38,16 +38,10 @@ struct RomMeta {
     int id;
 };
 
-class Table;
-typedef std::shared_ptr<Table> TablePtr;
-
 /* The object that actually stores firmware data. */
 class Rom {
 public:
     explicit Rom(const RomMeta &rom);
-
-    /* Returns the base table from the table index */
-    TablePtr getTable(int idx);
 
     const std::vector<uint8_t> data() { return data_; }
 

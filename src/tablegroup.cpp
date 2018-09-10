@@ -26,15 +26,15 @@ TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
     tables_.resize(base->definition()->tables()->count());
 }
 
-TablePtr TableGroup::get(size_t idx, bool create) {
+Table *TableGroup::get(size_t idx, bool create) {
     assert(idx < tables_.size());
 
-    TablePtr &table = tables_[idx];
+    std::unique_ptr<Table> &table = tables_[idx];
     if (!table && create) {
         table = base_->getTable(idx);
     }
 
-    return table;
+    return &table;
 }
 
 void TableGroup::set(size_t idx,

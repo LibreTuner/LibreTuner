@@ -26,7 +26,6 @@
 #include <vector>
 
 class Table;
-typedef std::shared_ptr<Table> TablePtr;
 
 /**
  * Handles a group of tables
@@ -41,7 +40,7 @@ public:
      * a table does not exist, creates a new table
      * from the ROM data. Returns nullptr if create is false
      * and the table does not exist. */
-    TablePtr get(size_t idx, bool create = true);
+    Table *get(size_t idx, bool create = true);
 
     /* Creates a new table from data. May throw exception. */
     void set(size_t idx, gsl::span<const uint8_t> data);
@@ -52,7 +51,7 @@ public:
 private:
     std::shared_ptr<Rom> base_;
 
-    std::vector<TablePtr> tables_;
+    std::vector<std::unique_ptr<Table>> tables_;
 };
 typedef std::shared_ptr<TableGroup> TableGroupPtr;
 
