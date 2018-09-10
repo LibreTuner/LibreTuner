@@ -24,6 +24,13 @@
 
 #include <cassert>
 
+namespace definition {
+
+Model::Model(const definition::Main& main)
+{
+}
+
+
 SubDefinition::SubDefinition(Definition *definition)
     : definition_(definition) {}
 

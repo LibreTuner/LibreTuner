@@ -43,8 +43,6 @@ public:
      * occurred */
     bool load();
 
-    std::string lastError() const { return lastError_; }
-
     /* Attempts to find a definition that matches the vin.
      * Returns nullptr if no definition exists. */
     DefinitionPtr fromVin(const std::string &vin) const;
@@ -56,7 +54,6 @@ public:
 private:
     DefinitionManager();
 
-    std::string lastError_;
     std::vector<DefinitionPtr> definitions_;
 };
 

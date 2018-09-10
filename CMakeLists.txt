@@ -6,12 +6,17 @@ project(LibreTuner)
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5DataVisualization CONFIG REQUIRED)
 find_package(Qt5Charts CONFIG REQUIRED)
+find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
 option(Test "Build all tests." OFF)
 
 add_subdirectory(lib/GSL)
 add_subdirectory(lib/cparse)
+add_subdirectory(lib/toml)
+
+set(toml_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/lib/toml)
+
 add_subdirectory(src)
 
 #if (Test)
