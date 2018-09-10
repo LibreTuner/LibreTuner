@@ -26,7 +26,7 @@
 
 #include <QString>
 
-#include <boost/property_tree/ptree.hpp>
+#include <toml/toml.hpp>
 
 #include "checksummanager.h"
 #include "downloadinterface.h"
@@ -71,7 +71,7 @@ struct Tables {
 class Model {
     Model(const Main &main);
     
-    void load(const boost::property_tree::ptree &pt);
+    void load(const toml::table &table);
     
     const std::string &id() const { return id_; }
     const std::string &name() const { return name_; }
