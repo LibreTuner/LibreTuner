@@ -22,252 +22,219 @@
 
 #include <QDir>
 
+#include <algorithm>
 #include <cassert>
 
 namespace definition {
 
-Model::Model(const definition::Main& main)
+void Model::load(const toml::table& file) {
+    name_ = toml::get<std::string>(file.at("name"));
+    id_ = toml::get<std::string>(file.at("id"));
+    
+    // Load tables
+    const auto &tables = toml::get<std::vector<toml::table>>(file.at("table"));
+    std::for_each(tables.begin(), tables.end(), [&](const auto &table) { loadTable(table); });
+    
+    // Load axes
+    const auto &axes = toml::get<std::vector<toml::table>>(file.at("axis"));
+    std::for_each(axes.begin(), axes.end(), [&](const auto &axis) { loadAxis(axis); });
+    
+    // Load identifiers
+    const auto &identifiers = toml::get<std::vector<toml::table>>(file.at("identifier"));
+    std::for_each(identifiers.begin(), identifiers.end(), [&](const auto &identifier) { loadIdentifier(identifier); });
+    
+    // Load checksums
+    const auto &checksums = toml::get<std::vector<toml::table>>(file.at("checksum"));
+    std::for_each(checksums.begin(), checksums.end(), [&](const auto &checksum) { loadChecksum(checksum); });
+}
+
+
+
+void Model::loadTable(const toml::table &table) {
+    const auto id = toml::get<std::size_t>(table.at("id"));
+    const auto offset = toml::get<std::size_t>(table.at("offset"));
+    
+    if (tables_.size() <= id) {
+        tables_.resize(id + 1);
+    }
+    tables_[id] = offset;
+}
+
+
+
+void Model::loadAxis(const toml::table &axis) {
+    const auto &id = toml::get<std::string>(axis.at("id"));
+    const auto offset = toml::get<std::size_t>(axis.at("offset"));
+    
+    axisOffsets_.emplace(id, offset);
+}
+
+
+
+void Model::loadIdentifier(const toml::table &identifier) {
+    const auto offset = toml::get<std::size_t>(identifier.at("offset"));
+    const auto &data = toml::get<std::string>(identifier.at("data"));
+    
+    identifiers_.emplace_back(offset, data.begin(), data.end());
+}
+
+
+
+void Model::loadChecksum(const toml::table &checksum) {
+    const auto &mode = toml::get<std::string>(checksum.at("mode"));
+    const auto offset = toml::get<std::size_t>(checksum.at("offset"));
+    const auto size = toml::get<std::size_t>(checksum.at("size"));
+    const auto target = toml::get<std::size_t>(checksum.at("target"));
+    
+    Checksum *sum;
+    if (mode == "basic") {
+        sum = checksums_.addBasic(offset, size, target);
+    } else {
+        throw std::runtime_error("invalid mode for checksum");
+    }
+    
+    for (const auto &modify : toml::get<std::vector<toml::table>>(checksum.at("modify"))) {
+        sum->addModifiable(toml::get<std::size_t>(modify.at("offset")), toml::get<std::size_t>(modify.at("size")));
+    }
+}
+
+
+
+Model::Model(const definition::Main& main) : main_(main)
 {
 }
 
 
-SubDefinition::SubDefinition(Definition *definition)
-    : definition_(definition) {}
 
-uint32_t SubDefinition::getTableLocation(int tableId, bool *ok) {
-    assert(tableId >= 0);
-    if (locations_.size() <= tableId) {
-        if (ok != nullptr) {
-            *ok = false;
-        }
-        return 0;
+void Main::load(const toml::table& file)
+{
+    name = toml::get<std::string>(file.at("name"));
+    id = toml::get<std::string>(file.at("id"));
+    romsize = toml::get<std::size_t>(file.at("romsize"));
+    baudrate = toml::get<std::size_t>(file.at("baudrate"));
+    
+    // Load transfer
+    {
+        const auto &transfer = toml::get<toml::table>(file.at("transfer"));
+        flashMode = [&](std::string mode) {
+            std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
+            if (mode == "mazdat1") {
+                return FLASH_T1;
+            }
+            return FLASH_NONE;
+        }(toml::get<std::string>(transfer.at("flashmode")));
+        
+        downloadMode = [&](std::string mode) {
+            std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
+            if (mode == "mazda23") {
+                return DM_MAZDA23;
+            }
+            return DM_NONE;
+        }(toml::get<std::string>(transfer.at("downloadmode")));
+        
+        key = toml::get<std::string>(transfer.at("key"));
+        serverId = toml::get<std::size_t>(transfer.at("serverid"));
     }
-
-    if (ok != nullptr) {
-        *ok = true;
+    
+    // Load VIN patterns
+    for (const auto &vin : toml::get<std::vector<std::string>>(file.at("vins"))) {
+        vins.emplace_back(vin);
     }
-    return locations_[tableId];
-}
-
-void SubDefinition::loadTables(QXmlStreamReader &xml) {
-    bool ok;
-
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "table") {
-            QXmlStreamAttributes attributes = xml.attributes();
-            if (!attributes.hasAttribute("id")) {
-                xml.raiseError("No id attribute is defined in table");
-                return;
-            }
-
-            int tableId = attributes.value("id").toInt(&ok);
-            if (!ok) {
-                xml.raiseError("Invalid table id: not an integer");
-                return;
-            }
-
-            if (tableId > MAX_TABLEID) {
-                xml.raiseError("id attribute exceeds maximum value (" +
-                               QString::number(MAX_TABLEID) + ")");
-                return;
-            }
-
-            bool foundOffset = false;
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "offset") {
-                    uint32_t offset = xml.readElementText().toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid offset: not an integer");
-                        return;
-                    }
-                    if (locations_.size() <= tableId) {
-                        locations_.resize(tableId + 1);
-                    }
-                    locations_[tableId] = offset;
-                    foundOffset = true;
-                } else {
-                    xml.raiseError("Unexpected element");
-                    return;
-                }
-            }
-
-            if (!foundOffset) {
-                xml.raiseError("No offset element is defined for table");
-                return;
-            }
-        } else {
-            xml.raiseError("Unexpected element");
-            return;
-        }
+    
+    // Load tables
+    for (const auto &table : toml::get<std::vector<toml::table>>(file.at("table"))) {
+        loadTable(table);
     }
 }
 
-void SubDefinition::loadAxes(QXmlStreamReader &xml) {
-    bool ok;
 
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "axis") {
-            QXmlStreamAttributes attributes = xml.attributes();
-            if (!attributes.hasAttribute("id")) {
-                xml.raiseError("No id attribute is defined in table");
-                return;
-            }
 
-            int iId = definition_->axisId(
-                attributes.value("id").toString().toStdString());
-            if (iId == -1) {
-                xml.raiseError(
-                    "Invalid table id: not defined in main definition");
-                return;
-            }
-
-            bool foundOffset = false;
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "offset") {
-                    uint32_t offset = xml.readElementText().toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid offset: not an integer");
-                        return;
-                    }
-                    if (axesOffsets_.size() <= iId) {
-                        axesOffsets_.resize(iId + 1);
-                    }
-                    axesOffsets_[iId] = offset;
-                    foundOffset = true;
-                } else {
-                    xml.raiseError("Unexpected element");
-                    return;
-                }
-            }
-
-            if (!foundOffset) {
-                xml.raiseError("No offset element is defined for table");
-                return;
-            }
-        } else {
-            xml.raiseError("Unexpected element");
-            return;
+void Main::loadTable(const toml::table& table)
+{
+    const auto id = toml::get<std::size_t>(table.at("id"));
+    
+    TableType tabletype = [&](const std::string &type) {
+        if (type == "1d") {
+            return TableType::One;
         }
+        if (type == "2d") {
+            return TableType::Two;
+        }
+        
+        throw std::runtime_error("invalid table type: '" + type + "'");
+    }(toml::get<std::string>(table.at("type")));
+    
+    const auto &name = toml::get<std::string>(table.at("name"));
+    const auto &description = toml::get<std::string>(table.at("description"));
+    
+    const auto &category = [&] (const toml::value &v) {
+        if (v.is<toml::string>()) {
+            return toml::get<std::string>(v);
+        }
+        return std::string("Miscellaneous");
+    }(table.at("category"));
+    
+    DataType datatype = [&](const std::string &type) {
+        if (type == "float") {
+            return DataType::Float;
+        }
+        if (type == "uint8") {
+            return DataType::Uint8;
+        }
+        if (type == "uint16") {
+            return DataType::Uint16;
+        }
+        if (type == "uint32") {
+            return DataType::Uint32;
+        }
+        if (type == "int8") {
+            return DataType::Int8;
+        }
+        if (type == "int16") {
+            return DataType::Int16;
+        }
+        if (type == "int32") {
+            return DataType::Int32;
+        }
+        
+        throw std::runtime_error("invalid datatype");
+    }(toml::get<std::string>(table.at("datatype")));
+    
+    size_t sizex, sizey;
+    
+    if (tabletype == TableType::One) {
+        sizex = toml::get<std::size_t>(table.at("size"));
+    } else {
+        // 2D
+        sizex = toml::get<std::size_t>(table.at("sizex"));
+        sizey = toml::get<std::size_t>(table.at("sizey"));
     }
+    
+    const auto opt_string = [&](const toml::value &v) {
+        if (v.is<toml::string>()) {
+            return toml::get<std::string>(v);
+        }
+        return std::string();
+    };
+    
+    std::string axisx = opt_string(table.at("axisx"));
+    std::string axisy = opt_string(table.at("axisy"));
+    
+    const auto opt_double = [&](const toml::value &v, double def) {
+        if (v.is<double>()) {
+            return toml::get<double>(v);
+        }
+        return def;
+    };
+    
+    double minimum = opt_double(table.at("minimum"), std::numeric_limits<double>::min());
+    double maximum = opt_double(table.at("maximum"), std::numeric_limits<double>::max());
 }
 
-void SubDefinition::loadIdentifiers(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "identifier") {
-            QXmlStreamAttributes attributes = xml.attributes();
-            if (!attributes.hasAttribute("offset")) {
-                xml.raiseError("No offset attribute defined for identifier");
-                return;
-            }
 
-            bool ok;
-            uint32_t offset = attributes.value("offset").toUInt(&ok, 16);
-            if (!ok) {
-                xml.raiseError("Invalid offset: not a number");
-                return;
-            }
 
-            // Find the data
-            std::vector<uint8_t> data;
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "text") {
-                    QByteArray sData = xml.readElementText().toUtf8();
-                    data.insert(data.end(), sData.begin(), sData.end());
-                } else {
-                    xml.raiseError("Unexpected element");
-                    return;
-                }
-            }
 
-            identifiers_.emplace_back(offset, data.data(), data.size());
-        } else {
-            xml.raiseError("Unexpected element");
-            return;
-        }
-    }
-}
-
-void SubDefinition::loadChecksums(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "checksum") {
-            QXmlStreamAttributes attributes = xml.attributes();
-            if (!attributes.hasAttribute("mode")) {
-                xml.raiseError("No mode attribute defined in checksum");
-                return;
-            }
-            if (!attributes.hasAttribute("offset")) {
-                xml.raiseError("No offset attribute defined in checksum");
-                return;
-            }
-            if (!attributes.hasAttribute("size")) {
-                xml.raiseError("No size attribute defined in checksum");
-                return;
-            }
-            if (!attributes.hasAttribute("target")) {
-                xml.raiseError("No target attribute defined in checksum");
-                return;
-            }
-            QStringRef sMode = attributes.value("mode");
-            bool ok;
-            uint32_t offset = attributes.value("offset").toUInt(&ok, 16);
-            if (!ok) {
-                xml.raiseError("Invalid offset: not a number");
-                return;
-            }
-            uint32_t size = attributes.value("size").toUInt(&ok, 16);
-            if (!ok) {
-                xml.raiseError("Invalid size: not a number");
-                return;
-            }
-            uint32_t target = attributes.value("target").toUInt(&ok, 16);
-            if (!ok) {
-                xml.raiseError("Invalid target: not a number");
-                return;
-            }
-
-            Checksum *checksum;
-            if (sMode == "basic") {
-                checksum = checksums_.addBasic(offset, size, target);
-            } else {
-                xml.raiseError("Invalid mode attribute");
-                return;
-            }
-
-            // Read modifiable regions
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "modify") {
-                    attributes = xml.attributes();
-                    if (!attributes.hasAttribute("offset")) {
-                        xml.raiseError(
-                            "No offset attribute defined for modify element");
-                        return;
-                    }
-                    if (!attributes.hasAttribute("size")) {
-                        xml.raiseError(
-                            "No size attribute defined for modify element");
-                        return;
-                    }
-
-                    offset = attributes.value("offset").toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid offset: not a number");
-                        return;
-                    }
-                    size = attributes.value("size").toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid size: not a number");
-                        return;
-                    }
-
-                    checksum->addModifiable(offset, size);
-                }
-            }
-        } else {
-            xml.raiseError("Unexpected element");
-        }
-    }
-}
-
+/*
 uint32_t SubDefinition::getAxisLocation(int axisId, bool *ok) {
     assert(axisId >= 0);
     if (axisId >= axesOffsets_.size()) {
@@ -657,4 +624,7 @@ bool Definition::matchVin(const std::string &vin) {
     return std::any_of(vins_.begin(), vins_.end(), [&vin](const auto &pattern) {
         return std::regex_match(vin, pattern);
     });
+}
+*/
+
 }

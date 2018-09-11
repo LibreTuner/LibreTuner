@@ -26,7 +26,7 @@
 
 #include <QString>
 
-#include <boost/property_tree/ptree.hpp>
+#include <toml/toml.hpp>
 
 #include "checksummanager.h"
 #include "downloadinterface.h"
@@ -42,8 +42,9 @@ struct Main;
 /* Used to identify subtypes */
 class Identifier {
 public:
-    Identifier(uint32_t offset, const uint8_t *data, size_t length)
-        : offset_(offset), data_(data, data + length) {}
+    template<class InputIt>
+    Identifier(uint32_t offset, InputIt first, InputIt end)
+        : offset_(offset), data_(first, end) {}
 
     uint32_t offset() const { return offset_; }
 
@@ -57,37 +58,28 @@ private:
 };
 
 
-struct Tables {
-    /* Table offsets */
-    std::vector<uint32_t> locations;
-    std::vector<uint32_t> axesOffsets;
-    std::vector<Identifier> identifiers;
-    
-    
-};
-
-
 /* Model definition. Includes the table locations */
-class Model {
+struct Model {
+public:
     Model(const Main &main);
     
-    void load(const boost::property_tree::ptree &pt);
-    
-    const std::string &id() const { return id_; }
-    const std::string &name() const { return name_; }
-    const Tables &tables() const { return tables_; }
-    
-    
-
-    // Assign an id (automatically) to each axis for easy lookup?
-    
-private:
     const Main &main_;
     std::string id_;
     std::string name_;
-    Tables tables_;
     ChecksumManager checksums_;
-
+    
+    /* Table offsets */
+    std::vector<std::size_t> tables_;
+    
+    std::unordered_map<std::string, std::size_t> axisOffsets_;
+    std::vector<Identifier> identifiers_;
+    
+    
+    void load(const toml::table &file);
+    void loadTable(const toml::table &table);
+    void loadAxis(const toml::table &axis);
+    void loadIdentifier(const toml::table &identifier);
+    void loadChecksum(const toml::table &checksum);
 };
 using ModelPtr = std::shared_ptr<Model>;
 
@@ -118,13 +110,17 @@ struct Main {
     Endianness endianness;
 
     int lastAxisId = 0;
-    uint32_t size;
+    uint32_t romsize;
 
     TableDefinitions tables;
     PidDefinitions pids;
     std::unordered_map<std::string, TableAxisPtr> axes;
     std::vector<ModelPtr> models;
     std::vector<std::regex> vins;
+    
+    
+    void load(const toml::table &file);
+    void loadTable(const toml::table &table);
 };
 
 /* Returns true if the supplied VIN matches any pattern in vins */

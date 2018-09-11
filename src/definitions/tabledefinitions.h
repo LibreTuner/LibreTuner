@@ -27,25 +27,25 @@
 
 #define MAX_TABLEID 1000
 
-enum TableType {
-    TABLE_1D,
-    TABLE_2D,
-    TABLE_3D, // Do ECUs ever use these?
+enum class TableType {
+    One,
+    Two,
+    Three, // Do ECUs ever use these?
 };
 
-enum TableCategory {
-    TCAT_LIMITER, // Any type of limiter (RPM limiter, speed limiter)
-    TCAT_MISC,
+enum class TableCategory {
+    Limiter, // Any type of limiter (RPM limiter, speed limiter)
+    Miscellaneous,
 };
 
-enum DataType {
-    TDATA_UINT8,
-    TDATA_UINT16,
-    TDATA_UINT32,
-    TDATA_FLOAT,
-    TDATA_INT8,
-    TDATA_INT16,
-    TDATA_INT32,
+enum class DataType {
+    Uint8,
+    Uint16,
+    Uint32,
+    Float,
+    Int8,
+    Int16,
+    Int32,
 };
 
 class Definition;
