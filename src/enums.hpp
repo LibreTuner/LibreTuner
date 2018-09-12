@@ -28,6 +28,14 @@ enum class TableType {
 };
 
 
+
+enum class LogMode {
+    None,
+    Uds,
+};
+
+
+
 inline std::size_t tableTypeSize(TableType type) {
     switch (type) {
         case TableType::Float:

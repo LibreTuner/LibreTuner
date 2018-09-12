@@ -139,11 +139,6 @@ public:
 };
 using ModelPtr = std::shared_ptr<Model>;
 
-enum class LogMode {
-    None,
-    Uds,
-};
-
 /**
  * An ECU definition
  */
