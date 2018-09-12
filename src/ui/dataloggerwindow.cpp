@@ -31,7 +31,7 @@
 #include "definitions/definition.h"
 #include "libretuner.h"
 
-DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, DefinitionPtr definition, QWidget *parent) : StyledWindow(parent), log_(log), logger_(std::move(logger)), definition_(definition)
+DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, const definition::MainPtr &definition, QWidget *parent) : StyledWindow(parent), log_(log), logger_(std::move(logger)), definition_(definition)
 {
     Expects(logger_);
     Expects(log_);

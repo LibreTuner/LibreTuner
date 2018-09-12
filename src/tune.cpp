@@ -33,12 +33,7 @@
 #include "util.hpp"
 #include <cassert>
 
-Tune::Tune(const TuneMeta &tune) : meta_(tune) {
-    // Locate the base rom from the id
-    rom_ = RomManager::get()->loadId(meta_.baseId);
-
-    tables_ = std::make_shared<TableGroup>(rom_);
-
+Tune::Tune(const TuneMeta &tune) : meta_(tune), rom_(RomManager::get()->loadId(meta_.baseId)), tables_(rom_) {
     // Load tables
     QFile file(LibreTuner::get()->home() + "/tunes/" +
                QString::fromStdString(meta_.path));
@@ -114,7 +109,7 @@ void Tune::save() {
     xml.writeStartElement("tables");
 
     for (int i = 0; i < tables_->count(); ++i) {
-        TablePtr table = tables_->get(i, false);
+        const Table &table = tables_->get(i, false);
         if (table && table->modified()) {
             xml.writeStartElement("table");
             xml.writeAttribute("id", QString::number(i));

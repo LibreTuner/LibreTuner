@@ -42,7 +42,7 @@ class DataLoggerWindow : public StyledWindow
 public:
     explicit DataLoggerWindow(const DataLogPtr &log,
                               std::unique_ptr<DataLogger> &&logger,
-                              DefinitionPtr definition,
+                              const definition::MainPtr &definition,
                               QWidget *parent = nullptr);
     virtual ~DataLoggerWindow();
 
@@ -60,7 +60,7 @@ public slots:
 private:
     DataLogPtr log_;
     std::unique_ptr<DataLogger> logger_;
-    DefinitionPtr definition_;
+    definition::MainPtr definition_;
 
     QListWidget *pidList_;
     QTreeWidget *logOutput_;

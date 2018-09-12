@@ -25,8 +25,7 @@
 
 #include <QXmlStreamReader>
 
-class TableGroup;
-typedef std::shared_ptr<TableGroup> TableGroupPtr;
+#include "tablegroup.h"
 
 class Rom;
 
@@ -49,7 +48,7 @@ public:
      * Returns false on error and sets lastError. */
     void apply(gsl::span<uint8_t> data);
 
-    TableGroupPtr tables() { return tables_; }
+    TableGroup tables() { return tables_; }
 
     const std::shared_ptr<Rom> &rom() { return rom_; }
 
@@ -60,7 +59,7 @@ private:
 
     std::shared_ptr<Rom> rom_;
 
-    TableGroupPtr tables_;
+    TableGroup tables_;
 
     void readTables(QXmlStreamReader &xml);
 };

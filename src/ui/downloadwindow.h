@@ -61,7 +61,7 @@ private:
     Ui::DownloadWindow *ui;
     std::unique_ptr<DownloadInterface> downloadInterface_;
     std::string name_;
-    DefinitionPtr definition_;
+    definition::MainPtr definition_;
 
     std::chrono::steady_clock::time_point lastUpdate_;
 
