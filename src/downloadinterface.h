@@ -29,10 +29,6 @@
 #include "asyncroutine.h"
 #include "udsauthenticator.h"
 
-enum DownloadMode {
-    DM_NONE = 0,
-    DM_MAZDA23,
-};
 
 class CanInterface;
 

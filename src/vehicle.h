@@ -22,9 +22,10 @@
 #include <memory>
 #include <string>
 
-
-class Definition;
-using DefinitionPtr = std::shared_ptr<Definition>;
+namespace definition {
+struct Main;
+using MainPtr = std::shared_ptr<Main>;
+}
 
 class DataLogger;
 using DataLoggerPtr = std::shared_ptr<DataLogger>;
@@ -54,7 +55,7 @@ using CanInterfacePtr = std::shared_ptr<CanInterface>;
 struct Vehicle {
     std::string name;
     std::string vin;
-    DefinitionPtr definition;
+    definition::MainPtr definition;
 
     bool valid() const { return !vin.empty(); }
 

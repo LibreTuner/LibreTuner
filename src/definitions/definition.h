@@ -29,13 +29,16 @@
 #include <toml/toml.hpp>
 
 #include "checksummanager.h"
-#include "downloadinterface.h"
 #include "endian.h"
-#include "flasher.h"
-#include "piddefinitions.h"
-#include "tabledefinitions.h"
+#include "enums.hpp"
 
 namespace definition {
+    
+enum class TableCategory {
+    Limiter, // Any type of limiter (RPM limiter, speed limiter)
+    Miscellaneous,
+};
+
 
 struct Main;
 
@@ -58,21 +61,74 @@ private:
 };
 
 
+
+class AxisData {
+public:
+    virtual ~AxisData() = default;
+    
+    /* Returns the label for the given axis position. */
+    virtual double label(std::size_t idx) const =0;
+};
+
+
+
+class LinearAxis : public AxisData {
+public:
+    LinearAxis(double start, double increment);
+    
+    virtual double label(std::size_t idx) const override;
+    
+private:
+    double start_;
+    double increment_;
+};
+
+
+
+struct Axis {
+    std::string name;
+    std::string id;
+    
+    std::unique_ptr<AxisData> data;
+};
+
+
+
+struct Table {
+    int id;
+    std::string name;
+    std::string description;
+    TableType type;
+    TableCategory category;
+    TableType dataType;
+    std::size_t sizeX;
+    std::size_t sizeY;
+    double maximum;
+    double minimum;
+    std::string axisXId;
+    std::string axisYId;
+    
+    /* Returns the raw size in bytes */
+    std::size_t rawSize() const;
+};
+
+
+
 /* Model definition. Includes the table locations */
 struct Model {
 public:
     Model(const Main &main);
     
-    const Main &main_;
-    std::string id_;
-    std::string name_;
-    ChecksumManager checksums_;
+    const Main &main;
+    std::string id;
+    std::string name;
+    ChecksumManager checksums;
     
     /* Table offsets */
-    std::vector<std::size_t> tables_;
+    std::vector<std::size_t> tables;
     
-    std::unordered_map<std::string, std::size_t> axisOffsets_;
-    std::vector<Identifier> identifiers_;
+    std::unordered_map<std::string, std::size_t> axisOffsets;
+    std::vector<Identifier> identifiers;
     
     
     void load(const toml::table &file);
@@ -112,27 +168,30 @@ struct Main {
     int lastAxisId = 0;
     uint32_t romsize;
 
-    TableDefinitions tables;
-    PidDefinitions pids;
-    std::unordered_map<std::string, TableAxisPtr> axes;
+    std::vector<Table> tables;
+    //PidDefinitions pids;
+    std::unordered_map<std::string, std::unique_ptr<Axis>> axes;
     std::vector<ModelPtr> models;
     std::vector<std::regex> vins;
     
+    void load(const std::string &dirPath);
     
     void load(const toml::table &file);
     void loadTable(const toml::table &table);
+    void loadAxis(const toml::table &axis);
+    
+    /* Returns true if the supplied VIN matches any pattern in vins */
+    bool matchVin(const std::string &vin);
+    
+    /* Searched for a model definition from an id. Returns nullptr
+    * if the id does not match a model. */
+    const ModelPtr &findModel(const std::string &id);
+    
+    /* Attempts to determine the model of the data. Returns
+    * nullptr if no models match. */
+    const ModelPtr &identify(gsl::span<const uint8_t> data);
 };
 
-/* Returns true if the supplied VIN matches any pattern in vins */
-bool match_vin(const std::vector<std::regex> &vins, const std::string &vin);
-
-/* Searched for a model definition from an id. Returns nullptr
- * if the id does not match a model. */
-const ModelPtr &find_subtype(const std::vector<ModelPtr> &models, const std::string &id);
-
-/* Attempts to determine the model of the data. Returns
- * nullptr if no models match. */
-const ModelPtr &identify(const std::vector<ModelPtr> &models, gsl::span<const uint8_t> data);
 
 typedef std::shared_ptr<Main> MainPtr;
 }

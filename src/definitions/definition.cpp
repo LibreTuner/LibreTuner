@@ -28,8 +28,8 @@
 namespace definition {
 
 void Model::load(const toml::table& file) {
-    name_ = toml::get<std::string>(file.at("name"));
-    id_ = toml::get<std::string>(file.at("id"));
+    name = toml::get<std::string>(file.at("name"));
+    id = toml::get<std::string>(file.at("id"));
     
     // Load tables
     const auto &tables = toml::get<std::vector<toml::table>>(file.at("table"));
@@ -54,10 +54,10 @@ void Model::loadTable(const toml::table &table) {
     const auto id = toml::get<std::size_t>(table.at("id"));
     const auto offset = toml::get<std::size_t>(table.at("offset"));
     
-    if (tables_.size() <= id) {
-        tables_.resize(id + 1);
+    if (tables.size() <= id) {
+        tables.resize(id + 1);
     }
-    tables_[id] = offset;
+    tables[id] = offset;
 }
 
 
@@ -66,7 +66,7 @@ void Model::loadAxis(const toml::table &axis) {
     const auto &id = toml::get<std::string>(axis.at("id"));
     const auto offset = toml::get<std::size_t>(axis.at("offset"));
     
-    axisOffsets_.emplace(id, offset);
+    axisOffsets.emplace(id, offset);
 }
 
 
@@ -75,7 +75,7 @@ void Model::loadIdentifier(const toml::table &identifier) {
     const auto offset = toml::get<std::size_t>(identifier.at("offset"));
     const auto &data = toml::get<std::string>(identifier.at("data"));
     
-    identifiers_.emplace_back(offset, data.begin(), data.end());
+    identifiers.emplace_back(offset, data.begin(), data.end());
 }
 
 
@@ -88,7 +88,7 @@ void Model::loadChecksum(const toml::table &checksum) {
     
     Checksum *sum;
     if (mode == "basic") {
-        sum = checksums_.addBasic(offset, size, target);
+        sum = checksums.addBasic(offset, size, target);
     } else {
         throw std::runtime_error("invalid mode for checksum");
     }
@@ -100,8 +100,40 @@ void Model::loadChecksum(const toml::table &checksum) {
 
 
 
-Model::Model(const definition::Main& main) : main_(main)
+Model::Model(const Main& m) : main(m)
 {
+}
+
+
+
+void Main::load(const std::string& dirPath)
+{
+    QDir dir(QString::fromStdString(dirPath));
+
+    if (QFile::exists(QString::fromStdString(dirPath + "/main.xml"))) {
+        std::ifstream file(dirPath + "/main.xml");
+        if (!file.good()) {
+            throw std::runtime_error("failed to open " + dirPath + "/main.xml");
+        }
+        load(toml::parse(file));
+    } else {
+        throw std::runtime_error(std::string("No main.xml file in ") + dirPath);
+    }
+
+    for (QFileInfo &info :
+        dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::NoSort)) {
+        if (info.isFile()) {
+            if (info.fileName().toLower() != "main.xml") {
+                // Model
+                ModelPtr model = std::make_shared<Model>(*this);
+                std::ifstream file(info.filePath().toStdString());
+                if (!file.good()) {
+                    throw std::runtime_error("failed to open " + dirPath + "/main.xml");
+                }
+                model->load(toml::parse(file));
+            }
+        }
+    }
 }
 
 
@@ -119,17 +151,17 @@ void Main::load(const toml::table& file)
         flashMode = [&](std::string mode) {
             std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
             if (mode == "mazdat1") {
-                return FLASH_T1;
+                return FlashMode::T1;
             }
-            return FLASH_NONE;
+            return FlashMode::None;
         }(toml::get<std::string>(transfer.at("flashmode")));
         
         downloadMode = [&](std::string mode) {
             std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
             if (mode == "mazda23") {
-                return DM_MAZDA23;
+                return DownloadMode::Mazda23;
             }
-            return DM_NONE;
+            return DownloadMode::None;
         }(toml::get<std::string>(transfer.at("downloadmode")));
         
         key = toml::get<std::string>(transfer.at("key"));
@@ -145,27 +177,22 @@ void Main::load(const toml::table& file)
     for (const auto &table : toml::get<std::vector<toml::table>>(file.at("table"))) {
         loadTable(table);
     }
+    
+    // Load axes
+    for (const auto &axis : toml::get<std::vector<toml::table>>(file.at("axis"))) {
+        loadAxis(axis);
+    }
 }
 
 
 
 void Main::loadTable(const toml::table& table)
 {
-    const auto id = toml::get<std::size_t>(table.at("id"));
+    Table definition;
+    definition.id = toml::get<std::size_t>(table.at("id"));
     
-    TableType tabletype = [&](const std::string &type) {
-        if (type == "1d") {
-            return TableType::One;
-        }
-        if (type == "2d") {
-            return TableType::Two;
-        }
-        
-        throw std::runtime_error("invalid table type: '" + type + "'");
-    }(toml::get<std::string>(table.at("type")));
-    
-    const auto &name = toml::get<std::string>(table.at("name"));
-    const auto &description = toml::get<std::string>(table.at("description"));
+    definition.name = toml::get<std::string>(table.at("name"));
+    definition.description = toml::get<std::string>(table.at("description"));
     
     const auto &category = [&] (const toml::value &v) {
         if (v.is<toml::string>()) {
@@ -174,41 +201,42 @@ void Main::loadTable(const toml::table& table)
         return std::string("Miscellaneous");
     }(table.at("category"));
     
-    DataType datatype = [&](const std::string &type) {
+    definition.dataType = [&](const std::string &type) {
         if (type == "float") {
-            return DataType::Float;
+            return TableType::Float;
         }
         if (type == "uint8") {
-            return DataType::Uint8;
+            return TableType::Uint8;
         }
         if (type == "uint16") {
-            return DataType::Uint16;
+            return TableType::Uint16;
         }
         if (type == "uint32") {
-            return DataType::Uint32;
+            return TableType::Uint32;
         }
         if (type == "int8") {
-            return DataType::Int8;
+            return TableType::Int8;
         }
         if (type == "int16") {
-            return DataType::Int16;
+            return TableType::Int16;
         }
         if (type == "int32") {
-            return DataType::Int32;
+            return TableType::Int32;
         }
         
         throw std::runtime_error("invalid datatype");
     }(toml::get<std::string>(table.at("datatype")));
     
-    size_t sizex, sizey;
+    const auto opt_size = [&](const toml::value &v) -> std::size_t {
+        if (v.is<toml::integer>()) {
+            return toml::get<std::size_t>(v);
+        }
+        return 1;
+    };
     
-    if (tabletype == TableType::One) {
-        sizex = toml::get<std::size_t>(table.at("size"));
-    } else {
-        // 2D
-        sizex = toml::get<std::size_t>(table.at("sizex"));
-        sizey = toml::get<std::size_t>(table.at("sizey"));
-    }
+
+    definition.sizeX = opt_size(table.at("sizex"));
+    definition.sizeY = opt_size(table.at("sizey"));
     
     const auto opt_string = [&](const toml::value &v) {
         if (v.is<toml::string>()) {
@@ -217,8 +245,8 @@ void Main::loadTable(const toml::table& table)
         return std::string();
     };
     
-    std::string axisx = opt_string(table.at("axisx"));
-    std::string axisy = opt_string(table.at("axisy"));
+    definition.axisXId = opt_string(table.at("axisx"));
+    definition.axisYId = opt_string(table.at("axisy"));
     
     const auto opt_double = [&](const toml::value &v, double def) {
         if (v.is<double>()) {
@@ -227,11 +255,51 @@ void Main::loadTable(const toml::table& table)
         return def;
     };
     
-    double minimum = opt_double(table.at("minimum"), std::numeric_limits<double>::min());
-    double maximum = opt_double(table.at("maximum"), std::numeric_limits<double>::max());
+    definition.minimum = opt_double(table.at("minimum"), std::numeric_limits<double>::min());
+    definition.maximum = opt_double(table.at("maximum"), std::numeric_limits<double>::max());
+    
+    tables.emplace_back(std::move(definition));
 }
 
 
+
+void Main::loadAxis(const toml::table& axis)
+{
+    Axis definition;
+    
+    definition.name = toml::get<std::string>(axis.at("name"));
+    definition.id = toml::get<std::string>(axis.at("id"));
+    
+    const std::string &type = toml::get<std::string>(axis.at("type"));
+    if (type == "linear") {
+        double start = toml::get<double>(axis.at("minimum"));
+        double increment = toml::get<double>(axis.at("increment"));
+        
+        axes.emplace(definition.id, std::make_unique<LinearAxis>(start, increment));
+    } else {
+        throw std::runtime_error("invalid axis type");
+    }
+}
+
+
+
+LinearAxis::LinearAxis(double start, double increment) : start_(start), increment_(increment)
+{
+}
+
+
+
+double LinearAxis::label(std::size_t idx) const
+{
+    return start_ + (idx * increment_);
+}
+
+
+
+std::size_t Table::rawSize() const
+{
+    return tableTypeSize(type) * sizeX * sizeY;
+}
 
 
 /*

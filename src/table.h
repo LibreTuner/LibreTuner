@@ -22,11 +22,13 @@
 /* Because this file includes function definitions, only include
  * it if absolutely necessary to decrease compile times. */
 
-#include "definitions/tabledefinitions.h"
 #include "endian.h"
 #include "util.hpp"
+#include "enums.hpp"
 
 #include <cassert>
+#include <vector>
+#include <variant>
 #include <gsl/span>
 #include <memory>
 
@@ -35,42 +37,215 @@
 #include <QColor>
 #include <QFont>
 
-class Table;
-typedef std::shared_ptr<Table> TablePtr;
 
-/**
- * @todo write docs
- */
 class Table : public QAbstractTableModel {
+public:
+    virtual std::size_t width() const =0;
+    virtual std::size_t height() const =0;
+    
+    // Returns true if the data at (x, y) has been modified
+    virtual bool modified(std::size_t x, std::size_t y) const =0;
+    
+    virtual TableType dataType() const =0;
+    
+    // QAbstractTableModel overrides
+    int columnCount(const QModelIndex & parent) const override { return width(); }
+    int rowCount(const QModelIndex & parent) const override { return height(); }
+};
+
+
+
+template<typename DataType>
+class TableBase : public Table {
+public:
+    template<class InputIt>
+    TableBase(InputIt begin, InputIt end, std::size_t height = 1);
+    template<class InputIt>
+    TableBase(InputIt begin, InputIt end, Endianness endianness, std::size_t height = 1);
+    TableBase(std::size_t width, std::size_t height);
+    
+    std::size_t height() const override { return data_.size() / width_; }
+    std::size_t width() const override { return width_; }
+    
+    DataType minimum() const { return minimum_; };
+    DataType maximum() const { return maximum_; };
+    
+    DataType get(std::size_t x, std::size_t y) const;
+    void set(std::size_t x, std::size_t y, DataType data);
+    bool modified(std::size_t x, std::size_t y) const override;
+    bool dirty() const { return dirty_; }
+    TableType dataType() const override;
+    
+    QVariant data(const QModelIndex & index, int role) const override;
+
+private:
+    std::vector<DataType> data_;
+    std::vector<bool> modified_;
+    bool dirty_ {false};
+    std::size_t width_;
+    DataType minimum_, maximum_;
+};
+
+
+
+template<>
+TableType TableBase<float>::dataType() const {
+    return TableType::Float;
+}
+
+
+
+template<typename DataType>
+QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
+{
+    if (index.row() < 0 || index.column() < 0 || index.row() >= height() || index.column() >= width()) {
+        return QVariant();
+    }
+
+    if (role == Qt::FontRole) {
+        QFont font = QApplication::font("QTableView");
+        if (modified(index.column(), index.row())) {
+            // Value has been modified
+            font.setWeight(QFont::Medium);
+        } else {
+            font.setWeight(QFont::Normal);
+        }
+        return font;
+    }
+    if (role == Qt::ForegroundRole) {
+        if (width() == 1 && height() == 1) {
+            // TODO: replace this with a check of the background color
+            return QVariant();
+        }
+        return QColor::fromRgb(0, 0, 0);
+    }
+
+    if (role == Qt::BackgroundColorRole) {
+        double ratio =
+            static_cast<double>(get(index.column()) - minimum()) /
+            (maximum() - minimum());
+        if (ratio < 0.0) {
+            return QVariant();
+        }
+        return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
+    }
+
+    if (role != Qt::DisplayRole && role != Qt::EditRole) {
+        return QVariant();
+    }
+
+    return std::to_string(get(index.column(), index.row()));
+}
+
+
+
+template <typename DataType>
+template <typename InputIt>
+TableBase<DataType>::TableBase(InputIt begin, InputIt end, std::size_t width) : data_(begin, end), modified_(std::distance(begin, end)), width_(width)
+{
+    if (std::distance(begin, end) % width == 0) {
+        throw std::runtime_error("table does not fit in given width (size % width != 0)");
+    }
+}
+
+
+
+template <typename DataType>
+template <typename InputIt>
+TableBase<DataType>::TableBase(InputIt begin, InputIt end, Endianness endianness, std::size_t width) : modified_(std::distance(begin, end) / sizeof(DataType)), width_(width)
+{
+    if ((std::distance(begin, end) / sizeof(DataType)) % width == 0) {
+        throw std::runtime_error("table does not fit in given width (size % width != 0)");
+    }
+    
+    // Start deserializing
+    switch (endianness) {
+    case Endianness::Big:
+        for (auto it = begin; it != end; it += sizeof(DataType)) {
+            DataType data = readBE<DataType>(gsl::make_span(it, sizeof(DataType)));
+            data_.emplace_back(data);
+        }
+        break;
+    case Endianness::Little:
+        for (auto it = begin; it != end; it += sizeof(DataType)) {
+            DataType data = readLE<DataType>(gsl::make_span(it, sizeof(DataType)));
+            data_.emplace_back(data);
+        }
+        break;
+    }
+}
+
+
+
+template<typename DataType>
+TableBase<DataType>::TableBase(std::size_t width, std::size_t height) : data_(width * height), modified_(width * height), width_(width)
+{
+}
+
+
+
+template<typename DataType>
+DataType TableBase<DataType>::get(std::size_t x, std::size_t y) const
+{
+    if (x >= width() || y >= height()) {
+        throw std::runtime_error("out of bounds");
+    }
+    return data_[y * width() + x];
+}
+
+
+
+template<typename DataType>
+void TableBase<DataType>::set(std::size_t x, std::size_t y, DataType data)
+{
+    if (x >= width() || y >= height()) {
+        throw std::runtime_error("out of bounds");
+    }
+    modified_[y * width() + x] = true;
+    data_[y * width() + x] = data;
+}
+
+
+
+template<typename DataType>
+bool TableBase<DataType>::modified(std::size_t x, std::size_t y) const
+{
+    if (x >= width() || y >= height()) {
+        return false;
+    }
+    return modified_[y * width() + x];
+}
+
+
+
+/*Table : public QAbstractTableModel {
     Q_OBJECT
 public:
     virtual TableType type() const = 0;
 
     DataType dataType() const { return definition_->dataType(); }
 
-    const TableDefinition *definition() const { return definition_; }
-
-    /* Returns true if the table has been modified
-     * from the base */
+    // Returns true if the table has been modified
+    //from the base
     bool modified() const { return modified_; }
 
     void setModified(bool modified) { modified_ = modified; }
 
     ~Table() override = default;
 
-    /* Used to set the editable flag */
+    // Used to set the editable flag
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const override;
 
-    /* Serializes raw data. Returns false if the buffer is too small. */
+    // Serializes raw data. Returns false if the buffer is too small.
     virtual bool serialize(gsl::span<uint8_t> data,
                            Endianness endian = Endianness::Big) = 0;
 
-    /* Returns the minimum buffer size for serialization */
+    // Returns the minimum buffer size for serialization
     virtual size_t rawSize() = 0;
 
-    /* Sets modified data depending on the difference with another table */
+    // Sets modified data depending on the difference with another table
     virtual void calcDifference(const TablePtr &table) = 0;
 
     static std::shared_ptr<Table> create(TableType tableType, DataType dataType,
@@ -101,102 +276,10 @@ protected:
 signals:
     void onModified();
 };
-
+*/
+    
 /* One dimensional table */
-template <typename T> class Table1d : public Table {
-public:
-    /* Constructs a new table using an array of T */
-    /*Table1d(const TableDefinition *definition, const T *data, size_t length)
-        : data_(data, data + length), modifiedv_(definition->sizeX()) {}*/
-
-    /* Constructs a new table using raw data.
-     * data should be at least (sizeof(T) * length) bytes large */
-    Table1d(const TableDefinition *definition, Endianness endian,
-            gsl::span<const uint8_t> data);
-
-    T at(int idx) const { return data_[idx]; }
-
-    void set(int idx, T t) {
-        if (at(idx) == t) {
-            return;
-        }
-        data_[idx] = t;
-        modifiedv_[idx] = true;
-        modified_ = true;
-        emit onModified();
-    }
-
-    T &operator[](int idx) { return data_[idx]; }
-
-    TableType type() const override { return TABLE_1D; }
-
-    void calcDifference(const TablePtr &table) override;
-
-    bool serialize(gsl::span<uint8_t> data,
-                   Endianness endian = Endianness::Big) override;
-
-    size_t rawSize() override;
-
-    /* Qt model functions */
-    int columnCount(const QModelIndex &parent) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    int rowCount(const QModelIndex &parent) const override;
-    bool setData(const QModelIndex &index, const QVariant &value,
-                 int role) override;
-
-private:
-    std::vector<T> data_;
-    /* Tracks modified values. */
-    std::vector<bool> modifiedv_;
-};
-
-/* Two dimensional table */
-template <typename T> class Table2d : public Table {
-public:
-    /* Constructs a new table using an array of T */
-    /*Table2d(const TableDefinition *definition, const T **data, size_t width,
-    size_t height) : data_(data, data + length)
-    {
-    }*/
-
-    /* Constructs a new table using raw data.
-     * data should be at least (sizeof(T) * sizeX * sizeY) bytes large */
-    Table2d(const TableDefinition *definition, Endianness endian,
-            gsl::span<const uint8_t> data);
-
-    T at(int x, int y) const { return data_[y][x]; }
-
-    void set(int x, int y, T t) {
-        if (at(x, y) == t) {
-            return;
-        }
-        data_[y][x] = t;
-        modifiedv_[y][x] = true;
-        modified_ = true;
-        emit onModified();
-    }
-
-    TableType type() const override { return TABLE_2D; }
-
-    void calcDifference(const TablePtr &table) override;
-
-    bool serialize(gsl::span<uint8_t> data,
-                   Endianness endian = Endianness::Big) override;
-
-    size_t rawSize() override;
-
-    /* Qt model functions */
-    int columnCount(const QModelIndex &parent) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    int rowCount(const QModelIndex &parent) const override;
-    bool setData(const QModelIndex &index, const QVariant &value,
-                 int role) override;
-
-private:
-    std::vector<std::vector<T>> data_;
-    /* Tracks modified values. */
-    std::vector<std::vector<bool>> modifiedv_;
-};
+/*
 
 template <typename T>
 Table2d<T>::Table2d(const TableDefinition *definition, Endianness endian,
@@ -432,7 +515,7 @@ bool Table1d<T>::setData(const QModelIndex &index, const QVariant &value,
     return true;
 }
 
-/* Table */
+
 template <typename T>
 void Table::readRow(std::vector<T> &data, Endianness endian,
                     gsl::span<const uint8_t> raw) {
@@ -489,7 +572,7 @@ template <typename T> T Table::fromVariant(const QVariant &v, bool &success) {
 template <>
 inline float Table::fromVariant<float>(const QVariant &v, bool &success) {
     return v.toFloat(&success);
-}
+}*/
 
 
 #endif // TABLE_H

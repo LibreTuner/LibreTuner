@@ -20,6 +20,8 @@
 #include "definition.h"
 #include "libretuner.h"
 
+#include <toml/toml.hpp>
+
 #include <QDir>
 #include <QFile>
 #include <QString>
@@ -31,22 +33,22 @@ DefinitionManager *DefinitionManager::get() {
 
 DefinitionManager::DefinitionManager() = default;
 
-DefinitionPtr DefinitionManager::getDefinition(const std::string &id) {
-    for (auto it = definitions_.begin(); it != definitions_.end(); ++it) {
-        if ((*it)->id() == id) {
-            return *it;
+definition::MainPtr DefinitionManager::find(const std::string &id) {
+    for (const definition::MainPtr &def : definitions_) {
+        if (def->id == id) {
+            return def;
         }
     }
     return nullptr;
 }
 
-bool DefinitionManager::load() {
+void DefinitionManager::load() {
     LibreTuner::get()->checkHome();
 
     QString listPath = LibreTuner::get()->home() + "/definitions";
 
     if (!QFile::exists(listPath)) {
-        return true;
+        return;
     }
 
     QDir defsDir(listPath);
@@ -54,20 +56,19 @@ bool DefinitionManager::load() {
     for (QFileInfo &info : defsDir.entryInfoList(
              QDir::NoDotAndDotDot | QDir::Dirs, QDir::NoSort)) {
         if (info.isDir()) {
-            DefinitionPtr def = std::make_shared<Definition>();
-            if (!def->load(info.filePath())) {
-                lastError_ = def->lastError();
-                return false;
+            definition::MainPtr def = std::make_shared<definition::Main>();
+            std::ifstream file(info.filePath().toStdString());
+            if (!file.good()) {
+                throw std::runtime_error("Failed to open definition file");
             }
+            def->load(file);
             definitions_.push_back(def);
         }
     }
-
-    return true;
 }
 
-DefinitionPtr DefinitionManager::fromVin(const std::string &vin) const {
-    for (const DefinitionPtr &def : definitions_) {
+definition::MainPtr DefinitionManager::fromVin(const std::string &vin) const {
+    for (const definition::MainPtr &def : definitions_) {
         if (def->matchVin(vin)) {
             return def;
         }

@@ -23,18 +23,21 @@
 #include <string>
 #include <vector>
 
-class Definition;
-typedef std::shared_ptr<Definition> DefinitionPtr;
+namespace definition {
+struct Model;
+using ModelPtr = std::shared_ptr<Model>;
 
-class SubDefinition;
-typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
+struct Table;
+}
+
+class Table;
 
 /* ROM Metadata */
 struct RomMeta {
     std::string name;
     std::string path;
     std::string definitionId;
-    std::string subDefinitionId;
+    std::string modelId;
     int id;
 };
 
@@ -43,22 +46,24 @@ class Rom {
 public:
     explicit Rom(const RomMeta &rom);
 
-    const std::vector<uint8_t> data() { return data_; }
+    /* Returns the raw ROM */
+    const std::vector<uint8_t> &data() { return data_; }
 
     std::string name() { return name_; }
 
-    DefinitionPtr definition() const { return definition_; }
-
-    SubDefinitionPtr subDefinition() const { return subDefinition_; }
+    definition::ModelPtr definition() const { return definition_; }
 
 private:
     std::string name_;
 
-    DefinitionPtr definition_;
-    SubDefinitionPtr subDefinition_;
+    definition::ModelPtr definition_;
 
     /* Raw firmware data */
     std::vector<uint8_t> data_;
 };
+
+/* Loads a table from the definition. Returns nullptr if the
+   table does not exist. */
+std::unique_ptr<Table> loadTable(Rom &rom, std::size_t tableId);
 
 #endif // ROM_H

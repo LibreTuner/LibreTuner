@@ -23,7 +23,7 @@
 #include <cassert>
 
 TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
-    tables_.resize(base->definition()->tables()->count());
+    tables_.resize(base->definition()->);
 }
 
 Table *TableGroup::get(size_t idx, bool create) {

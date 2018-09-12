@@ -27,13 +27,13 @@
 #include <QFile>
 
 Rom::Rom(const RomMeta &meta) : name_(meta.name) {
-    definition_ = DefinitionManager::get()->getDefinition(meta.definitionId);
-    if (!definition_) {
+    definition::MainPtr main = DefinitionManager::get()->find(meta.modelId);
+    if (!main) {
         throw std::runtime_error("definition does not exist");
     }
-    subDefinition_ = definition_->findSubtype(meta.subDefinitionId);
-    if (!subDefinition_) {
-        throw std::runtime_error("sub-definition '" + meta.subDefinitionId +
+    definition_ = main->findModel(meta.modelId);
+    if (!definition_) {
+        throw std::runtime_error("sub-definition '" + meta.modelId +
                                  "' does not exist");
     }
 
@@ -51,53 +51,41 @@ Rom::Rom(const RomMeta &meta) : name_(meta.name) {
 
 
 
-TablePtr Rom::getTable(int idx) {
-    const TableDefinition *def = definition_->tables()->at(idx);
-    if (!def->valid()) {
+std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
+{
+    if (tableId >= rom.definition()->tables.size()) {
         return nullptr;
     }
-
-    // Check if the table location is within the data region
-    bool ok;
-    uint32_t location = subDefinition_->getTableLocation(idx, &ok);
-    if (!ok) {
-        return nullptr;
+    
+    const definition::Table &tableDef = rom.definition()->main.tables[tableId];
+    std::size_t offset = rom.definition()->tables[tableId];
+    
+    const std::vector<uint8_t> &data = rom.data();
+    
+    // Verify the size of the rom
+    auto begin = data.begin() + offset;
+    auto end = begin + tableDef.rawSize();
+    
+    if (end > data.end()) {
+        throw std::runtime_error("end of table exceeds ROM data");
     }
-
-    if (location > data_.size()) {
-        // out-of-range
-        return nullptr;
+    
+    switch (tableDef.type) {
+        case TableType::Float:
+            return std::make_unique<TableBase<float>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Uint8:
+            return std::make_unique<TableBase<uint8_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Uint16:
+            return std::make_unique<TableBase<uint16_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Uint32:
+            return std::make_unique<TableBase<uint32_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Int8:
+            return std::make_unique<TableBase<int8_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Int16:
+            return std::make_unique<TableBase<int16_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+        case TableType::Int32:
+            return std::make_unique<TableBase<int32_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
     }
-
-    return Table::create(def->type(), def->dataType(), def,
-                         definition_->endianness(),
-                         gsl::make_span(data_).subspan(location));
-
-    try {
-        switch (def->type()) {
-        case TABLE_1D:
-            switch (def->dataType()) {
-            case TDATA_FLOAT: {
-                return std::make_shared<Table1d<float>>(
-                    def, definition_->endianness(),
-                    gsl::make_span(data_).subspan(location));
-            }
-            }
-        case TABLE_2D:
-            switch (def->dataType()) {
-            case TDATA_FLOAT: {
-                return std::make_shared<Table2d<float>>(
-                    def, definition_->endianness(),
-                    gsl::make_span(data_).subspan(location));
-            }
-            }
-        }
-    } catch (const std::out_of_range &err) {
-        Logger::warning(err.what());
-        // TODO: log this
-        return nullptr;
-    }
-
-    assert(false && "unimplemented");
-    return nullptr;
+    
+    assert(false && "loadTable() unimplemented");
 }

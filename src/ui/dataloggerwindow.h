@@ -35,9 +35,6 @@ class QListWidget;
 class VehicleLink;
 using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
-class Definition;
-using DefinitionPtr = std::shared_ptr<Definition>;
-
 
 class DataLoggerWindow : public StyledWindow
 {

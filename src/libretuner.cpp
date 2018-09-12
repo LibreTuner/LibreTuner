@@ -75,11 +75,13 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 #endif
     TimerRunLoop::get().startWorker();
 
-    if (!DefinitionManager::get()->load()) {
+    try {
+        DefinitionManager::get()->load();
+    } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setText(
             "Could not load definitions: " +
-            QString::fromStdString(DefinitionManager::get()->lastError()));
+            QStringLiteral(e.what()));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.setWindowTitle("DefinitionManager error");
         msgBox.exec();
@@ -344,3 +346,4 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
 
 
 LibreTuner::~LibreTuner() { _global = nullptr; }
+

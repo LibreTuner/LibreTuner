@@ -27,8 +27,8 @@
 Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
     assert(tune);
     std::shared_ptr<Rom> rom = tune->rom();
-    definition_ = rom->subDefinition();
-    offset_ = rom->definition()->flashOffset();
+    definition_ = rom->definition();
+    offset_ = definition_->main.flashOffset;
 
     data_ = rom->data();
 
@@ -37,5 +37,5 @@ Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
 
     // Reassign to flash region
     data_.assign(data_.data() + offset_,
-                 data_.data() + offset_ + rom->definition()->flashSize());
+                 data_.data() + offset_ + definition_->main.flashSize);
 }

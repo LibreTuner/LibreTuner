@@ -18,7 +18,7 @@
 
 #include "table.h"
 #include "util.hpp"
-
+/*
 Table::Table(const TableDefinition *definition) : definition_(definition) {}
 
 Qt::ItemFlags Table::flags(const QModelIndex &index) const {
@@ -84,3 +84,4 @@ std::shared_ptr<Table> Table::create(TableType tableType, DataType dataType,
     }
     return nullptr;
 }
+*/

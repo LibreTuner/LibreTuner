@@ -32,6 +32,11 @@
 
 #include "rom.h"
 
+namespace definition {
+class Main;
+using MainPtr = std::shared_ptr<Main>;
+}
+
 /**
  * Manages ROM files and metadata
  */
@@ -51,7 +56,7 @@ public:
 
     const std::vector<RomMeta> &roms() { return roms_; }
 
-    void addRom(const std::string &name, const DefinitionPtr &definition,
+    void addRom(const std::string &name, const definition::MainPtr &definition,
                 gsl::span<const uint8_t> data);
 
     /* Returns the ROM with id or nullptr if the ROM does

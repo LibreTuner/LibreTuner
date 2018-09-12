@@ -25,8 +25,10 @@
 
 #include <QString>
 
-class Definition;
-typedef std::shared_ptr<Definition> DefinitionPtr;
+namespace definition {
+struct Main;
+using MainPtr = std::shared_ptr<Main>;
+}
 
 /**
  * @todo write docs
@@ -37,24 +39,22 @@ public:
 
     /* Returns the definition with the specified id. Returns
      * nullptr is no such definition exists. */
-    DefinitionPtr getDefinition(const std::string &id);
+    definition::MainPtr find(const std::string &id);
 
     /* Loads rom list and metadata. Returns true if no errors
      * occurred */
-    bool load();
+    void load();
 
     /* Attempts to find a definition that matches the vin.
      * Returns nullptr if no definition exists. */
-    DefinitionPtr fromVin(const std::string &vin) const;
+    definition::MainPtr fromVin(const std::string &vin) const;
 
-    DefinitionPtr *definitions() { return definitions_.data(); }
-
-    size_t count() const { return definitions_.size(); }
+    const std::vector<definition::MainPtr> &definitions() const { return definitions_; }
 
 private:
     DefinitionManager();
 
-    std::vector<DefinitionPtr> definitions_;
+    std::vector<definition::MainPtr> definitions_;
 };
 
 #endif // DEFINITIONMANAGER_H

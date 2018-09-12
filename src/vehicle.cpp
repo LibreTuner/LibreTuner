@@ -31,9 +31,9 @@
 
 
 Vehicle Vehicle::fromVin(const std::string &vin) {
-    DefinitionPtr def = DefinitionManager::get()->fromVin(vin);
+    std::shared_ptr<definition::Main> def = DefinitionManager::get()->fromVin(vin);
     if (def) {
-        return Vehicle{def->name(), vin, std::move(def)};
+        return Vehicle{def->name, vin, std::move(def)};
     }
     return Vehicle{vin, vin, nullptr};
 }
@@ -46,7 +46,7 @@ std::unique_ptr<DataLogger> VehicleLink::logger() const {
         return nullptr;
     }
 
-    switch (vehicle_.definition->logMode()) {
+    switch (vehicle_.definition->logMode) {
     case LogMode::Uds: {
         if (auto interface = uds()) {
             return std::make_unique<UdsDataLogger>(std::move(interface));

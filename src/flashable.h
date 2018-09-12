@@ -23,13 +23,11 @@
 #include <string>
 #include <vector>
 
-enum FlashMode {
-    FLASH_NONE = 0,
-    FLASH_T1, // Uses a CAN interface. Supported: Mazdaspeed 6
-};
 
-class SubDefinition;
-typedef std::shared_ptr<SubDefinition> SubDefinitionPtr;
+namespace definition {
+struct Model;
+using ModelPtr = std::shared_ptr<Model>;
+}
 
 class Tune;
 
@@ -45,12 +43,12 @@ public:
 
     const std::vector<uint8_t> &data() const { return data_; }
 
-    SubDefinitionPtr definition() const { return definition_; }
+    definition::ModelPtr definition() const { return definition_; }
 
 private:
     std::vector<uint8_t> data_;
     size_t offset_;
-    SubDefinitionPtr definition_;
+    definition::ModelPtr definition_;
 };
 
 #endif // FLASHABLE_H

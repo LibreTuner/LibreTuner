@@ -27,7 +27,7 @@
 
 #include "tune.h"
 
-class RomMeta;
+struct RomMeta;
 
 /**
  * Manages tunes and tune metadata
