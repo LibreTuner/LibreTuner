@@ -19,11 +19,12 @@
 #ifndef TABLEGROUP_H
 #define TABLEGROUP_H
 
-#include "definitions/tabledefinitions.h"
+#include "definitions/definition.h"
 #include "rom.h"
 
-#include <gsl/span>
 #include <vector>
+#include <memory>
+#include <gsl/span>
 
 class Table;
 

@@ -23,7 +23,7 @@
 #include <cassert>
 
 TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
-    tables_.resize(base->definition()->);
+    tables_.resize(base->definition()->tables.size());
 }
 
 Table *TableGroup::get(size_t idx, bool create) {
@@ -31,10 +31,10 @@ Table *TableGroup::get(size_t idx, bool create) {
 
     std::unique_ptr<Table> &table = tables_[idx];
     if (!table && create) {
-        table = base_->getTable(idx);
+        table = loadTable(*base_, idx);
     }
 
-    return &table;
+    return table.get();
 }
 
 void TableGroup::set(size_t idx,
