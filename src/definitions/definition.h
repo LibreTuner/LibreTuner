@@ -24,13 +24,13 @@
 #include <string>
 #include <unordered_map>
 
-#include <QString>
-
-#include <toml/toml.hpp>
-
 #include "checksummanager.h"
 #include "endian.h"
 #include "enums.hpp"
+
+namespace toml {
+struct table;
+}
 
 namespace definition {
     

@@ -20,6 +20,8 @@
 #include "piddefinitions.h"
 #include "tabledefinitions.h"
 
+#include <toml/toml.hpp>
+
 #include <QDir>
 
 #include <algorithm>
