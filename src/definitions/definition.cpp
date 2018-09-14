@@ -21,60 +21,61 @@
 #include "tabledefinitions.h"
 #include "logger.h"
 
-#include <toml/toml.hpp>
-
 #include <QDir>
 
 #include <algorithm>
 #include <cassert>
+#include <fstream>
 
 namespace definition {
 
-void Model::load(const toml::table& file) {
-    name = toml::get<std::string>(file.at("name"));
-    id = toml::get<std::string>(file.at("id"));
+void Model::load(const YAML::Node& file) {
+    name = file["name"].as<std::string>();
+    id = file["id"].as<std::string>();
     
     // Load tables
-    const auto &tables = toml::get<std::vector<toml::table>>(file.at("table"));
+    
+    const auto &tables = file["tables"];
     std::for_each(tables.begin(), tables.end(), [&](const auto &table) { loadTable(table); });
     
     // Load axes
-    const auto &axes = toml::get<std::vector<toml::table>>(file.at("axis"));
+    const auto &axes = file["axes"];
     std::for_each(axes.begin(), axes.end(), [&](const auto &axis) { loadAxis(axis); });
     
     // Load identifiers
-    const auto &identifiers = toml::get<std::vector<toml::table>>(file.at("identifier"));
+    const auto &identifiers = file["identifiers"];
     std::for_each(identifiers.begin(), identifiers.end(), [&](const auto &identifier) { loadIdentifier(identifier); });
     
     // Load checksums
-    const auto &checksums = toml::get<std::vector<toml::table>>(file.at("checksum"));
+    const auto &checksums = file["checksums"];
     std::for_each(checksums.begin(), checksums.end(), [&](const auto &checksum) { loadChecksum(checksum); });
+    
 }
 
 
 
-void Model::loadTable(const toml::table &table) {
-    const auto id = toml::get<std::size_t>(table.at("id"));
+void Model::loadTable(const YAML::Node &table) {
+    /*const auto id = toml::get<std::size_t>(table.at("id"));
     const auto offset = toml::get<std::size_t>(table.at("offset"));
     
     if (tables.size() <= id) {
         tables.resize(id + 1);
     }
-    tables[id] = offset;
+    tables[id] = offset;*/
 }
 
 
 
-void Model::loadAxis(const toml::table &axis) {
-    const auto &id = toml::get<std::string>(axis.at("id"));
+void Model::loadAxis(const YAML::Node &axis) {
+    /*const auto &id = toml::get<std::string>(axis.at("id"));
     const auto offset = toml::get<std::size_t>(axis.at("offset"));
     
-    axisOffsets.emplace(id, offset);
+    axisOffsets.emplace(id, offset);*/
 }
 
 
 
-void Model::loadIdentifier(const toml::table &identifier) {
+void Model::loadIdentifier(const YAML::Node &identifier) {
     const auto offset = toml::get<std::size_t>(identifier.at("offset"));
     const auto &data = toml::get<std::string>(identifier.at("data"));
     
@@ -83,8 +84,8 @@ void Model::loadIdentifier(const toml::table &identifier) {
 
 
 
-void Model::loadChecksum(const toml::table &checksum) {
-    const auto &mode = toml::get<std::string>(checksum.at("mode"));
+void Model::loadChecksum(const YAML::Node &checksum) {
+    /*const auto &mode = toml::get<std::string>(checksum.at("mode"));
     const auto offset = toml::get<std::size_t>(checksum.at("offset"));
     const auto size = toml::get<std::size_t>(checksum.at("size"));
     const auto target = toml::get<std::size_t>(checksum.at("target"));
@@ -96,9 +97,9 @@ void Model::loadChecksum(const toml::table &checksum) {
         throw std::runtime_error("invalid mode for checksum");
     }
     
-    for (const auto &modify : toml::get<std::vector<toml::table>>(checksum.at("modify"))) {
+    for (const auto &modify : toml::get<std::vector<YAML::Node>>(checksum.at("modify"))) {
         sum->addModifiable(toml::get<std::size_t>(modify.at("offset")), toml::get<std::size_t>(modify.at("size")));
-    }
+    }*/
 }
 
 
@@ -113,12 +114,12 @@ void Main::load(const std::string& dirPath)
 {
     QDir dir(QString::fromStdString(dirPath));
 
-    if (QFile::exists(QString::fromStdString(dirPath + "/main.toml"))) {
-        std::ifstream file(dirPath + "/main.toml");
+    if (QFile::exists(QString::fromStdString(dirPath + "/main.yaml"))) {
+        std::ifstream file(dirPath + "/main.yaml");
         if (!file.good()) {
-            throw std::runtime_error("failed to open " + dirPath + "/main.toml");
+            throw std::runtime_error("failed to open " + dirPath + "/main.yaml");
         }
-        load(toml::parse(file));
+        load(YAML::Load(file));
     } else {
         throw std::runtime_error(std::string("No main.toml file in ") + dirPath);
     }
@@ -126,14 +127,14 @@ void Main::load(const std::string& dirPath)
     for (QFileInfo &info :
         dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::NoSort)) {
         if (info.isFile()) {
-            if (info.fileName().toLower() != "main.toml") {
+            if (info.fileName().toLower() != "main.yaml") {
                 // Model
                 ModelPtr model = std::make_shared<Model>(*this);
                 std::ifstream file(info.filePath().toStdString());
                 if (!file.good()) {
-                    throw std::runtime_error("failed to open " + dirPath + "/main.toml");
+                    throw std::runtime_error("failed to open " + dirPath + "/main.yaml");
                 }
-                model->load(toml::parse(file));
+                model->load(YAML::Load(file));
             }
         }
     }
@@ -141,23 +142,23 @@ void Main::load(const std::string& dirPath)
 
 
 
-void Main::load(const toml::table& file)
+void Main::load(const YAML::Node& file)
 {
-    name = toml::get<std::string>(file.at("name"));
-    id = toml::get<std::string>(file.at("id"));
-    romsize = toml::get<std::size_t>(file.at("romsize"));
-    baudrate = toml::get<std::size_t>(file.at("baudrate"));
+    name = file["name"].as<std::string>();
+    id = file["id"].as<std::string>();
+    romsize = file["romsize"].as<std::size_t>();
+    baudrate = file["baudrate"].as<std::size_t>();
     
     // Load transfer
     {
-        const auto &transfer = toml::get<toml::table>(file.at("transfer"));
+        const auto &transfer = file["transfer"];
         flashMode = [&](std::string mode) {
             std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
             if (mode == "mazdat1") {
                 return FlashMode::T1;
             }
             return FlashMode::None;
-        }(toml::get<std::string>(transfer.at("flashmode")));
+        }(transfer["flashmode"].as<std::string>());
         
         downloadMode = [&](std::string mode) {
             std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
@@ -165,64 +166,61 @@ void Main::load(const toml::table& file)
                 return DownloadMode::Mazda23;
             }
             return DownloadMode::None;
-        }(toml::get<std::string>(transfer.at("downloadmode")));
+        }(transfer["downloadmode"].as<std::string>());
         
-        key = toml::get<std::string>(transfer.at("key"));
-        serverId = toml::get<std::size_t>(transfer.at("serverid"));
+        key = transfer["key"].as<std::string>();
+        serverId = transfer["serverid"].as<std::size_t>();
     }
     
     // Load VIN patterns
-    for (const auto &vin : toml::get<std::vector<std::string>>(file.at("vins"))) {
-        vins.emplace_back(vin);
+    for (const auto &vin : file["vins"]) {
+        vins.emplace_back(vin.as<std::string>());
     }
     
     // Load tables
-    for (const auto &table : toml::get<std::vector<toml::table>>(file.at("table"))) {
+    for (const auto &table : file["tables"]) {
         loadTable(table);
     }
     
     // Load axes
-    for (const auto &axis : toml::get<std::vector<toml::table>>(file.at("axis"))) {
+    for (const auto &axis : file["axes"]) {
         loadAxis(axis);
     }
     
-    for (const auto &pid : toml::get<std::vector<toml::table>>(file.at("pid"))) {
+    for (const auto &pid : file["pids"]) {
         loadPid(pid);
     }
 }
 
 
 
-void Main::loadPid(const toml::table& pid)
+void Main::loadPid(const YAML::Node& pid)
 {
     Pid definition;
-    definition.id = toml::get<std::size_t>(pid.at("id"));
+    definition.id = pid["id"].as<std::size_t>();
     
-    definition.name = toml::get<std::string>(pid.at("name"));
-    definition.description = toml::get<std::string>(pid.at("description"));
-    definition.code = toml::get<std::size_t>(pid.at("code"));
-    definition.formula = toml::get<std::string>(pid.at("formula"));
-    definition.unit = toml::get<std::string>(pid.at("unit"));
+    definition.name = pid["name"].as<std::string>();
+    definition.description = pid["description"].as<std::string>();
+    definition.code = pid["code"].as<std::size_t>();
+    definition.formula = pid["formula"].as<std::string>();
+    definition.unit = pid["unit"].as<std::string>();
     
     pids.emplace_back(std::move(definition));
 }
 
 
 
-void Main::loadTable(const toml::table& table)
+void Main::loadTable(const YAML::Node& table)
 {
     Table definition;
-    definition.id = toml::get<std::size_t>(table.at("id"));
+    definition.id = table["id"].as<std::size_t>();
     
-    definition.name = toml::get<std::string>(table.at("name"));
-    definition.description = toml::get<std::string>(table.at("description"));
+    definition.name = table["name"].as<std::string>();
+    definition.description = table["description"].as<std::string>();
     
-    definition.category = [&] (const toml::value &v) {
-        if (v.is<toml::string>()) {
-            return toml::get<std::string>(v);
-        }
-        return std::string("Miscellaneous");
-    }(table.at("category"));
+    if (table["category"]) {
+        definition.category = table["category"].as<std::string>();
+    }
     
     definition.dataType = [&](const std::string &type) {
         if (type == "float") {
@@ -248,7 +246,7 @@ void Main::loadTable(const toml::table& table)
         }
         
         throw std::runtime_error("invalid datatype");
-    }(toml::get<std::string>(table.at("datatype")));
+    }(table["datatype"].as<std::string>());
     
     const auto opt_size = [&](const std::string &name) -> std::size_t {
         auto it = table.find(name);
@@ -261,9 +259,13 @@ void Main::loadTable(const toml::table& table)
         return 1;
     };
     
- 
-    definition.sizeX = opt_size("sizex");
-    definition.sizeY = opt_size("sizey");
+    if (table["sizex"]) {
+        definition.sizeX = table["sizex"].as<std::size_t>();
+    }
+    if (table["sizey"]) {
+        definition.sizeY = table["sizey"].as<std::size_t>();
+    }
+
     
     const auto opt_string = [&](const std::string &name) {
         auto it = table.find(name);
@@ -298,7 +300,7 @@ void Main::loadTable(const toml::table& table)
 
 
 
-void Main::loadAxis(const toml::table& axis)
+void Main::loadAxis(const YAML::Node& axis)
 {
     Axis definition;
     

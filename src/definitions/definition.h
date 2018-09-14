@@ -24,7 +24,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <toml/types.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include "checksummanager.h"
 #include "endian.h"
@@ -144,11 +144,11 @@ public:
     
     
     
-    void load(const toml::table &file);
-    void loadTable(const toml::table &table);
-    void loadAxis(const toml::table &axis);
-    void loadIdentifier(const toml::table &identifier);
-    void loadChecksum(const toml::table &checksum);
+    void load(const YAML::Node &file);
+    void loadTable(const YAML::Node &table);
+    void loadAxis(const YAML::Node &axis);
+    void loadIdentifier(const YAML::Node &identifier);
+    void loadChecksum(const YAML::Node &checksum);
 };
 using ModelPtr = std::shared_ptr<Model>;
 
@@ -186,10 +186,10 @@ struct Main {
     
     void load(const std::string &dirPath);
     
-    void load(const toml::table &file);
-    void loadTable(const toml::table &table);
-    void loadAxis(const toml::table &axis);
-    void loadPid(const toml::table &pid);
+    void load(const YAML::Node &file);
+    void loadTable(const YAML::Node &table);
+    void loadAxis(const YAML::Node &axis);
+    void loadPid(const YAML::Node &pid);
     
     /* Returns true if the supplied VIN matches any pattern in vins */
     bool matchVin(const std::string &vin);

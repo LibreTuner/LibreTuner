@@ -7,6 +7,6 @@
 [submodule "lib/cparse"]
 	path = lib/cparse
 	url = https://github.com/LibreTuner/cparse.git
-[submodule "lib/toml"]
-	path = lib/toml
-	url = https://github.com/ToruNiina/Boost.toml.git
+[submodule "lib/yaml"]
+	path = lib/yaml
+	url = https://github.com/jbeder/yaml-cpp.git

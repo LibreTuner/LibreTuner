@@ -13,8 +13,7 @@ option(Test "Build all tests." OFF)
 
 add_subdirectory(lib/GSL)
 add_subdirectory(lib/cparse)
-
-set(toml_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/lib/toml)
+add_subdirectory(lib/yaml)
 
 add_subdirectory(src)
 
