@@ -76,6 +76,8 @@ public:
     int columnCount(const QModelIndex & parent) const override { return width(); }
     int rowCount(const QModelIndex & parent) const override { return height(); }
     
+    Qt::ItemFlags flags(const QModelIndex &index) const override { return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable; }
+    
 private:
     TableMeta meta_;
 };
@@ -107,6 +109,7 @@ public:
     std::size_t byteSize() const override;
     
     QVariant data(const QModelIndex & index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 private:
     std::vector<DataType> data_;
@@ -203,6 +206,27 @@ inline std::size_t TableBase<DataType>::byteSize() const
     return sizeof(DataType) * data_.size();
 }
 
+
+
+template<typename DataType>
+bool TableBase<DataType>::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if (role != Qt::EditRole) {
+        return false;
+    }
+    
+    bool success;
+    
+    if (!value.canConvert<DataType>()) {
+        return false;
+    }
+    
+    DataType res = value.value<DataType>();
+
+    set(index.column(), index.row(), res);
+    emit dataChanged(index, index);
+    return true;
+}
 
 
 
