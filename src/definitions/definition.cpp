@@ -369,7 +369,7 @@ double LinearAxis::label(std::size_t idx) const
 
 std::size_t Table::rawSize() const
 {
-    return tableTypeSize(type) * sizeX * sizeY;
+    return tableTypeSize(dataType) * sizeX * sizeY;
 }
 
 

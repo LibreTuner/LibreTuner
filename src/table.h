@@ -86,9 +86,9 @@ template<typename DataType>
 class TableBase : public Table {
 public:
     template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t height = 1);
+    TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t width, DataType minimum, DataType maximum);
     template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t height = 1);
+    TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t width, DataType minimum, DataType maximum);
     TableBase(std::size_t width, std::size_t height);
     
     std::size_t height() const override { return data_.size() / width_; }
@@ -255,19 +255,19 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 {
     switch (definition.dataType) {
         case TableType::Float:
-            return std::make_unique<TableBase<float>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<float>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Uint8:
-            return std::make_unique<TableBase<uint8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<uint8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Uint16:
-            return std::make_unique<TableBase<uint16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<uint16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Uint32:
-            return std::make_unique<TableBase<uint32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<uint32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Int8:
-            return std::make_unique<TableBase<int8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<int8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Int16:
-            return std::make_unique<TableBase<int16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<int16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
         case TableType::Int32:
-            return std::make_unique<TableBase<int32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY);
+            return std::make_unique<TableBase<int32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
     }
     return nullptr;
 }
@@ -276,9 +276,9 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 
 template <typename DataType>
 template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t width) : Table(meta), data_(begin, end), modified_(std::distance(begin, end)), width_(width)
+TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t width, DataType minimum, DataType maximum) : Table(meta), data_(begin, end), modified_(std::distance(begin, end)), width_(width), minimum_(minimum), maximum_(maximum)
 {
-    if (std::distance(begin, end) % width == 0) {
+    if (std::distance(begin, end) % width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
     }
 }
@@ -287,9 +287,9 @@ TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end
 
 template <typename DataType>
 template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t width) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(width)
+TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t width, DataType minimum, DataType maximum) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(width), minimum_(minimum), maximum_(maximum)
 {
-    if ((std::distance(begin, end) / sizeof(DataType)) % width == 0) {
+    if ((std::distance(begin, end) / sizeof(DataType)) % width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
     }
     

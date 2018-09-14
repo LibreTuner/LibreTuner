@@ -27,13 +27,13 @@
 #include <QFile>
 
 Rom::Rom(const RomMeta &meta) : name_(meta.name) {
-    definition::MainPtr main = DefinitionManager::get()->find(meta.modelId);
+    definition::MainPtr main = DefinitionManager::get()->find(meta.definitionId);
     if (!main) {
         throw std::runtime_error("definition does not exist");
     }
     definition_ = main->findModel(meta.modelId);
     if (!definition_) {
-        throw std::runtime_error("sub-definition '" + meta.modelId +
+        throw std::runtime_error("model definition '" + meta.modelId +
                                  "' does not exist");
     }
 
@@ -70,21 +70,21 @@ std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
         throw std::runtime_error("end of table exceeds ROM data");
     }
     
-    switch (tableDef.type) {
+    switch (tableDef.dataType) {
         case TableType::Float:
-            return std::make_unique<TableBase<float>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<float>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Uint8:
-            return std::make_unique<TableBase<uint8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Uint16:
-            return std::make_unique<TableBase<uint16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Uint32:
-            return std::make_unique<TableBase<uint32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Int8:
-            return std::make_unique<TableBase<int8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Int16:
-            return std::make_unique<TableBase<int16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Int32:
-            return std::make_unique<TableBase<int32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
     }
     
     assert(false && "loadTable() unimplemented");

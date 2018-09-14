@@ -97,11 +97,10 @@ struct Table {
     int id;
     std::string name;
     std::string description;
-    TableType type;
     std::string category;
     TableType dataType;
-    std::size_t sizeX;
-    std::size_t sizeY;
+    std::size_t sizeX{1};
+    std::size_t sizeY{1};
     double maximum;
     double minimum;
     std::string axisXId;

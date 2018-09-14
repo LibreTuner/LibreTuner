@@ -73,6 +73,7 @@ TuneEditor::TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent)
 
         if (par == nullptr) {
             par = new QTreeWidgetItem(ui->treeTables);
+            par->setText(0, QString::fromStdString(def.category));
 
             categories_.emplace_back(def.category, par);
         }
