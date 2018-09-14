@@ -30,6 +30,8 @@ void J2534::init() { load(); }
 DevicePtr J2534::open(char *port) {
     assert(initialized());
 
+    Logger::debug("Opening J2534 device");
+
     uint32_t deviceId;
     long res;
     if ((res = PassThruOpen(port, &deviceId)) != 0) {

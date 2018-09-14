@@ -33,7 +33,7 @@ class IsoTpInterface;
 class IsoTpTest;
 
 class TuneEditor;
-class TuneMeta;
+struct TuneMeta;
 
 class VehicleLink;
 

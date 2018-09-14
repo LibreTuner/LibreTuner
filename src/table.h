@@ -29,7 +29,6 @@
 
 #include <cassert>
 #include <vector>
-#include <variant>
 #include <gsl/span>
 #include <memory>
 
@@ -67,8 +66,8 @@ public:
     
     virtual std::size_t byteSize() const =0;
     
-    const std::string name() const { return meta_.name; };
-    const std::string description() const { return meta_.description; };
+    const std::string name() const { return meta_.name; }
+    const std::string description() const { return meta_.description; }
     
     bool isTwoDimensional() const { return height() > 1; }
     bool isOneDimensional() const { return height() == 1; }

@@ -26,7 +26,7 @@
 
 class QPushButton;
 
-class RomMeta;
+struct RomMeta;
 
 /**
  * Widget for the ROM list

@@ -33,7 +33,7 @@
 #include "rom.h"
 
 namespace definition {
-class Main;
+struct Main;
 using MainPtr = std::shared_ptr<Main>;
 }
 

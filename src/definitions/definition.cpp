@@ -35,19 +35,19 @@ void Model::load(const YAML::Node& file) {
     
     // Load tables
     const auto &tables = file["tables"];
-    std::for_each(tables.begin(), tables.end(), [&](const auto &table) { loadTable(table); });
+    std::for_each(tables.begin(), tables.end(), [&](const YAML::Node &table) { loadTable(table); });
     
     // Load axes
     const auto &axes = file["axes"];
-    std::for_each(axes.begin(), axes.end(), [&](const auto &axis) { loadAxis(axis); });
+    std::for_each(axes.begin(), axes.end(), [&](const YAML::Node &axis) { loadAxis(axis); });
     
     // Load identifiers
     const auto &identifiers = file["identifiers"];
-    std::for_each(identifiers.begin(), identifiers.end(), [&](const auto &identifier) { loadIdentifier(identifier); });
+    std::for_each(identifiers.begin(), identifiers.end(), [&](const YAML::Node &identifier) { loadIdentifier(identifier); });
     
     // Load checksums
     const auto &checksums = file["checksums"];
-    std::for_each(checksums.begin(), checksums.end(), [&](const auto &checksum) { loadChecksum(checksum); });
+    std::for_each(checksums.begin(), checksums.end(), [&](const YAML::Node &checksum) { loadChecksum(checksum); });
     
 }
 
@@ -137,6 +137,7 @@ void Main::load(const std::string& dirPath)
                     throw std::runtime_error("failed to open " + dirPath + "/main.yaml");
                 }
                 model->load(YAML::Load(file));
+                models.emplace_back(std::move(model));
             }
         }
     }
