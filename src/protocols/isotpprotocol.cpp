@@ -403,7 +403,7 @@ void Protocol::recv(Packet &result) {
     }
 
     // recvFrame timed out
-    throw std::runtime_error("recv timed out");
+    throw std::runtime_error("recvFrame timed out");
 }
 
 

@@ -8,7 +8,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -49,7 +49,7 @@ bool SocketCanInterface::recv(CanMessage &message,
     Expects(socket_ != 0);
     can_frame frame;
 
-    int nbytes = ::recv(socket_, &frame, sizeof(can_frame), MSG_DONTWAIT);
+    int nbytes = ::recv(socket_, &frame, sizeof(can_frame), 0);
     if (nbytes < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             message.invalidate();
@@ -101,7 +101,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
 
     strcpy(ifr.ifr_name, ifname.c_str());
     if (ioctl(socket_, SIOCGIFINDEX, &ifr) != 0) {
-        throw std::runtime_error("Failed to find socketcan interface: " +
+        throw std::runtime_error("Failed to find socketcan interface " + ifname + ": " +
                                  std::string(strerror(errno)));
     }
 

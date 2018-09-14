@@ -70,12 +70,12 @@ public:
 
 private:
     std::shared_ptr<SocketCanInterface> socketcan_;
-    std::string name_;
+    std::string interface_;
 };
 
 SocketCanDataLink::SocketCanDataLink(
     const std::shared_ptr<SocketCanSettings> &settings) {
-    name_ = settings->name();
+    interface_ = settings->interface();
     protocols_ = DataLinkProtocol::Can;
     defaultProtocol_ = DataLinkProtocol::Can;
 }
@@ -83,7 +83,7 @@ SocketCanDataLink::SocketCanDataLink(
 Vehicle SocketCanDataLink::queryVehicle() { return query_can(can(500000)); }
 
 std::unique_ptr<CanInterface> SocketCanDataLink::can(uint32_t baudrate) {
-    return std::make_unique<SocketCanInterface>(name_);
+    return std::make_unique<SocketCanInterface>(interface_);
 }
 #endif
 

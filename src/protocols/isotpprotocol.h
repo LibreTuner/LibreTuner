@@ -30,7 +30,7 @@
 namespace isotp {
 struct Options {
     unsigned sourceId = 0x7E0, destId = 0x7E8;
-    std::chrono::milliseconds timeout{100};
+    std::chrono::milliseconds timeout{10000};
 };
 
 class Packet {
