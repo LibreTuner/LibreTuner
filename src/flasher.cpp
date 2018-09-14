@@ -66,8 +66,8 @@ bool MazdaT1Flasher::do_request_download() {
     // Send address...size
     std::array<uint8_t, 9> msg{};
     msg[0] = UDS_REQ_REQUESTDOWNLOAD;
-    writeBE<int32_t>(flash_->offset(), gsl::make_span(msg).subspan(1));
-    writeBE<int32_t>(flash_->data().size(), gsl::make_span(msg).subspan(5));
+    writeBE<int32_t>(flash_->offset(), msg.begin() + 1, msg.end());
+    writeBE<int32_t>(flash_->data().size(), msg.begin() + 5, msg.end());
 
     uds::Packet _response;
     // Send download request

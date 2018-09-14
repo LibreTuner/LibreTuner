@@ -59,20 +59,13 @@ TuneEditor::TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent)
     connect(ui->treeTables, &QTreeWidget::itemActivated, this,
             &TuneEditor::on_treeTables_itemActivated);
 
-    std::vector<std::pair<TableCategory, QTreeWidgetItem *>> categories_;
+    std::vector<std::pair<std::string, QTreeWidgetItem *>> categories_;
 
-    TableDefinitions *tables = tune_->rom()->definition()->tables();
-
-    for (int i = 0; i < tables->count(); ++i) {
-        const TableDefinition *def = tables->at(i);
-        if (!def->valid()) {
-            continue;
-        }
-
+    for (const definition::Table &def : tune_->rom()->definition()->main.tables) {
         QTreeWidgetItem *par = nullptr;
 
         for (auto &cat : categories_) {
-            if (cat.first == def->category()) {
+            if (cat.first == def.category) {
                 par = cat.second;
                 break;
             }
@@ -80,21 +73,13 @@ TuneEditor::TuneEditor(const std::shared_ptr<Tune> &tune, QWidget *parent)
 
         if (par == nullptr) {
             par = new QTreeWidgetItem(ui->treeTables);
-            switch (def->category()) {
-            case TCAT_LIMITER:
-                par->setText(0, tr("Limits"));
-                break;
-            case TCAT_MISC:
-                par->setText(0, tr("Miscellaneous"));
-                break;
-            }
 
-            categories_.emplace_back(def->category(), par);
+            categories_.emplace_back(def.category, par);
         }
 
         auto *item = new QTreeWidgetItem(par);
-        item->setText(0, QString::fromStdString(def->name()));
-        item->setData(0, Qt::UserRole, QVariant(i));
+        item->setText(0, QString::fromStdString(def.name));
+        item->setData(0, Qt::UserRole, QVariant(def.id));
     }
 
     setWindowFlag(Qt::Window);
@@ -111,32 +96,33 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
         return;
     }
 
-    if (currentTable_) {
-        disconnect(currentTable_.get(), &Table::onModified, this,
-                   &TuneEditor::onTableModified);
+    if (currentTable_.table) {
+        //disconnect(currentTable_.get(), &Table::onModified, this,
+        //           &TuneEditor::onTableModified);
     }
 
-    currentTable_ = tune_->tables()->get(index);
-    if (!currentTable_) {
+    currentTable_.table = tune_->tables().get(index);
+    if (!currentTable_.table) {
         return;
     }
-    connect(currentTable_.get(), &Table::onModified, this,
-            &TuneEditor::onTableModified);
+    currentTable_.id = index;
+    //connect(currentTable_, &Table::onModified, this,
+    //        &TuneEditor::onTableModified);
 
-    ui->tableEdit->setModel(currentTable_.get());
+    ui->tableEdit->setModel(currentTable_.table);
 
     // This is not elegant. Maybe the class structure should be changed
     ui->labelMemory->setText(
         QStringLiteral("0x") +
-        QString::number(tune_->rom()->subDefinition()->getTableLocation(
-                            currentTable_->definition()->id()),
+        QString::number(tune_->rom()->definition()->tables[
+                            currentTable_.id],
                         16));
     ui->infoName->setText(
-        QString::fromStdString(currentTable_->definition()->name()));
+        QString::fromStdString(currentTable_.table->name()));
     ui->infoDesc->setText(
-        QString::fromStdString(currentTable_->definition()->description()));
+        QString::fromStdString(currentTable_.table->description()));
 
-    const TableAxis *axis = currentTable_->definition()->axisX();
+    /*const TableAxis *axis = currentTable_.table->definition()->axisX();
     if (axis != nullptr) {
         ui->labelAxisX->setText(QString::fromStdString(axis->label()));
         ui->labelAxisX->setVisible(true);
@@ -146,7 +132,7 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
         ui->tableEdit->horizontalHeader()->setVisible(false);
     }
 
-    axis = currentTable_->definition()->axisY();
+    axis = currentTable_.table->definition()->axisY();
     if (axis != nullptr) {
         ui->labelAxisY->setText(QString::fromStdString(axis->label()));
         ui->labelAxisY->setVisible(true);
@@ -154,9 +140,9 @@ void TuneEditor::on_treeTables_itemActivated(QTreeWidgetItem *item,
     } else {
         ui->labelAxisY->setVisible(false);
         ui->tableEdit->verticalHeader()->setVisible(false);
-    }
+    }*/
 
-    emit tableChanged(currentTable_);
+    emit tableChanged(currentTable_.table);
 }
 
 

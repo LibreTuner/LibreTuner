@@ -48,7 +48,7 @@ public:
      * Returns false on error and sets lastError. */
     void apply(gsl::span<uint8_t> data);
 
-    TableGroup tables() { return tables_; }
+    TableGroup &tables() { return tables_; }
 
     const std::shared_ptr<Rom> &rom() { return rom_; }
 

@@ -19,6 +19,7 @@
 #include "definitionmanager.h"
 #include "definition.h"
 #include "libretuner.h"
+#include "logger.h"
 
 #include <toml/toml.hpp>
 
@@ -50,6 +51,8 @@ void DefinitionManager::load() {
     if (!QFile::exists(listPath)) {
         return;
     }
+    
+    Logger::debug("Loading definitions");
 
     QDir defsDir(listPath);
     defsDir.setFilter(QDir::NoFilter);
@@ -57,12 +60,8 @@ void DefinitionManager::load() {
              QDir::NoDotAndDotDot | QDir::Dirs, QDir::NoSort)) {
         if (info.isDir()) {
             definition::MainPtr def = std::make_shared<definition::Main>();
-            std::ifstream file(info.filePath().toStdString());
-            if (!file.good()) {
-                throw std::runtime_error("Failed to open definition file");
-            }
-            def->load(file);
-            definitions_.push_back(def);
+            def->load(info.filePath().toStdString());
+            definitions_.emplace_back(std::move(def));
         }
     }
 }

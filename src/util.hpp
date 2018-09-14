@@ -19,151 +19,165 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <gsl/gsl>
+#include <cstdint>
+#include <utility>
+#include <iterator>
 
 namespace util {
 template <typename T, int Size> class SConverter {};
 
 template <typename T> class SConverter<T, 1> {
 public:
-    static T readBE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readBE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
-        uint8_t n = data[0];
+        uint8_t n = *begin;
         return *reinterpret_cast<T *>(&n);
     }
 
-    static void writeBE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeBE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
-        data[0] = *reinterpret_cast<uint8_t *>(&t);
+        *begin = *reinterpret_cast<uint8_t *>(&t);
     }
 
-    static void writeLE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeLE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
-        data[0] = *reinterpret_cast<uint8_t *>(&t);
+        *begin = *reinterpret_cast<uint8_t *>(&t);
     }
 
-    static T readLE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readLE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
-        uint8_t n = data[0];
+        uint8_t n = *begin;
         return *reinterpret_cast<T *>(&n);
     }
 };
 
 template <typename T> class SConverter<T, 2> {
 public:
-    static T readBE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readBE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
-        uint16_t n = (data[0] << 8) | data[1];
+        uint16_t n = (*begin << 8) | *(begin + 1);
         return *reinterpret_cast<T *>(&n);
     }
 
-    static void writeBE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeBE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
         uint16_t n = *reinterpret_cast<uint16_t *>(&t);
-        data[0] = n >> 8;
-        data[1] = n & 0xFF;
+        *begin = n >> 8;
+        *(begin + 1) = n & 0xFF;
     }
 
-    static void writeLE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeLE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
         uint16_t n = *reinterpret_cast<uint16_t *>(&t);
-        data[1] = n >> 8;
-        data[0] = n & 0xFF;
+        *(begin + 1) = n >> 8;
+        *begin = n & 0xFF;
     }
 
-    static T readLE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readLE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
-        uint16_t n = (data[1] << 8) | data[0];
+        uint16_t n = (*(begin + 1) << 8) | *begin;
         return *reinterpret_cast<T *>(&n);
     }
 };
 
 template <typename T> class SConverter<T, 4> {
 public:
-    static T readBE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readBE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
         uint32_t n =
-            (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+            (*begin << 24) | (*(begin + 1) << 16) | (*(begin + 2) << 8) | *(begin + 3);
         return *reinterpret_cast<T *>(&n);
     }
 
-    static void writeBE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeBE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
         uint32_t n = *reinterpret_cast<uint32_t *>(&t);
-        data[0] = n >> 24;
-        data[1] = (n >> 16) & 0xFF;
-        data[2] = (n >> 8) & 0xFF;
-        data[3] = n & 0xFF;
+        *begin = n >> 24;
+        *(begin + 1) = (n >> 16) & 0xFF;
+        *(begin + 2) = (n >> 8) & 0xFF;
+        *(begin + 3) = n & 0xFF;
     }
 
-    static void writeLE(T t, gsl::span<uint8_t> &data) {
+    template<class OutputIt>
+    static void writeLE(T t, OutputIt begin, OutputIt end) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
         uint32_t n = *reinterpret_cast<uint32_t *>(&t);
-        data[3] = n >> 24;
-        data[2] = (n >> 16) & 0xFF;
-        data[1] = (n >> 8) & 0xFF;
-        data[0] = n & 0xFF;
+        *(begin + 3) = n >> 24;
+        *(begin + 2) = (n >> 16) & 0xFF;
+        *(begin + 1) = (n >> 8) & 0xFF;
+        *begin = n & 0xFF;
     }
 
-    static T readLE(gsl::span<const uint8_t> data) {
+    template<class InputIt>
+    static T readLE(InputIt begin, InputIt end) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
         uint32_t n =
-            (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+            (*(begin + 3) << 24) | (*(begin + 2) << 16) | (*(begin + 1) << 8) | *begin;
         return *reinterpret_cast<T *>(&n);
     }
 };
 } // namespace util
 
-template <typename T> static T readBE(gsl::span<const uint8_t> data) {
-    if (data.size() < sizeof(T)) {
+template <typename T, class InputIt> static T readBE(InputIt begin, InputIt end) {
+    if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::readBE(data);
+    return util::SConverter<T, sizeof(T)>::readBE(std::forward<InputIt>(begin), std::forward<InputIt>(end));
 }
 
-template <typename T> static T readLE(gsl::span<const uint8_t> data) {
-    if (data.size() < sizeof(T)) {
+template <typename T, class InputIt> static T readLE(InputIt begin, InputIt end) {
+    if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::readLE(data);
+    return util::SConverter<T, sizeof(T)>::readLE(std::forward<InputIt>(begin), std::forward<InputIt>(end));
 }
 
-template <typename T> static void writeBE(T t, gsl::span<uint8_t> data) {
-    if (data.size() < sizeof(T)) {
+template <typename T, class OutputIt> static void writeBE(T t, OutputIt begin, OutputIt end) {
+    if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::writeBE(t, data);
+    return util::SConverter<T, sizeof(T)>::writeBE(t, std::forward<OutputIt>(begin), std::forward<OutputIt>(end));
 }
 
-template <typename T> static void writeLE(T t, gsl::span<uint8_t> data) {
-    if (data.size() < sizeof(T)) {
+template <typename T, class OutputIt> static void writeLE(T t, OutputIt begin, OutputIt end) {
+    if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::writeLE(t, data);
+    return util::SConverter<T, sizeof(T)>::writeLE(t, std::forward<OutputIt>(begin), std::forward<OutputIt>(end));
 }
 
 template <class T> struct make_shared_enabler : public T {

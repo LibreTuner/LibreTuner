@@ -34,7 +34,13 @@ class TuneEditor;
 class Tune;
 
 class Table;
-typedef std::shared_ptr<Table> TablePtr;
+using TablePtr = std::shared_ptr<Table>;
+
+
+struct EditTable {
+    Table *table {nullptr};
+    std::size_t id;
+};
 
 /**
  * Tune editor window
@@ -51,7 +57,7 @@ public:
 private:
     std::shared_ptr<Tune> tune_;
     Ui::TuneEditor *ui;
-    TablePtr currentTable_;
+    EditTable currentTable_;
 
     /* Set to true if a table has been modified */
     bool changed_ = false;
@@ -61,7 +67,7 @@ private slots:
     void onTableModified();
 
 signals:
-    void tableChanged(TablePtr table);
+    void tableChanged(Table *table);
 };
 
 #endif // TUNEEDITOR_H

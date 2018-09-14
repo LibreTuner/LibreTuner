@@ -70,8 +70,8 @@ set(libretuner_SRC
     definitions/definitionmanager.h
     definitions/definition.cpp
     definitions/definition.h
-    definitions/tabledefinitions.cpp
-    definitions/tabledefinitions.h
+    #definitions/tabledefinitions.cpp
+    #definitions/tabledefinitions.h
     definitions/checksummanager.cpp
     definitions/checksummanager.h
     definitions/piddefinitions.cpp

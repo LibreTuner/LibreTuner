@@ -33,6 +33,8 @@
 #include "util.hpp"
 #include <cassert>
 
+
+
 Tune::Tune(const TuneMeta &tune) : meta_(tune), rom_(RomManager::get()->loadId(meta_.baseId)), tables_(rom_) {
     // Load tables
     QFile file(LibreTuner::get()->home() + "/tunes/" +
@@ -59,6 +61,8 @@ Tune::Tune(const TuneMeta &tune) : meta_(tune), rom_(RomManager::get()->loadId(m
     }
 }
 
+
+
 void Tune::readTables(QXmlStreamReader &xml) {
     assert(xml.isStartElement() && xml.name() == "tables");
 
@@ -80,7 +84,7 @@ void Tune::readTables(QXmlStreamReader &xml) {
             return;
         }
 
-        if (id >= tables_->count()) {
+        if (id >= tables_.count()) {
             xml.raiseError("id is out of range");
             return;
         }
@@ -88,10 +92,11 @@ void Tune::readTables(QXmlStreamReader &xml) {
         QByteArray data =
             QByteArray::fromBase64(xml.readElementText().toLatin1());
 
-        tables_->set(id, gsl::make_span(reinterpret_cast<const uint8_t *>(data.data()),
-                               data.size()));
+        tables_.set(id, deserializeTable(rom_->definition()->main.tables[id], rom_->definition()->main.endianness, data.begin(), data.end()));
     }
 }
+
+
 
 void Tune::save() {
     QFile file(LibreTuner::get()->home() + "/tunes/" +
@@ -108,14 +113,14 @@ void Tune::save() {
     xml.writeDTD("<!DOCTYPE tune>");
     xml.writeStartElement("tables");
 
-    for (int i = 0; i < tables_->count(); ++i) {
-        const Table &table = tables_->get(i, false);
-        if (table && table->modified()) {
+    for (int i = 0; i < tables_.count(); ++i) {
+        const Table *table = tables_.get(i, false);
+        if (table && table->dirty()) {
             xml.writeStartElement("table");
             xml.writeAttribute("id", QString::number(i));
             std::vector<uint8_t> data;
-            data.resize(table->rawSize());
-            assert(table->serialize(data));
+            data.resize(table->byteSize());
+            table->serialize(data, rom_->definition()->main.endianness);
             xml.writeCharacters(
                 QString(QByteArray(reinterpret_cast<const char *>(data.data()),
                                    data.size())
@@ -131,9 +136,11 @@ void Tune::save() {
     }
 }
 
+
+
 void Tune::apply(gsl::span<uint8_t> data) {
-    tables_->apply(data);
+    tables_.apply(data, rom_->definition()->main.endianness);
 
     // Checksums
-    rom_->subDefinition()->checksums()->correct(data);
+    rom_->definition()->checksums.correct(data);
 }

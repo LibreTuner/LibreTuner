@@ -114,7 +114,7 @@ void DataLoggerWindow::reset()
     // TODO: set error handler
     logger_->setLog(log_);
 
-    for (const PidDefinition &pid : definition_->pids().pids()) {
+    for (const definition::Pid &pid : definition_->pids) {
         if (!pid.valid) {
             continue;
         }

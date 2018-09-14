@@ -72,19 +72,19 @@ std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
     
     switch (tableDef.type) {
         case TableType::Float:
-            return std::make_unique<TableBase<float>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<float>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Uint8:
-            return std::make_unique<TableBase<uint8_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Uint16:
-            return std::make_unique<TableBase<uint16_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Uint32:
-            return std::make_unique<TableBase<uint32_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<uint32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Int8:
-            return std::make_unique<TableBase<int8_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int8_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Int16:
-            return std::make_unique<TableBase<int16_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
         case TableType::Int32:
-            return std::make_unique<TableBase<int32_t>>(begin, end, rom.definition()->main.endianness, tableDef.sizeY);
+            return std::make_unique<TableBase<int32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeY);
     }
     
     assert(false && "loadTable() unimplemented");

@@ -21,12 +21,11 @@
 
 #include "definitions/definition.h"
 #include "rom.h"
+#include "table.h"
 
 #include <vector>
 #include <memory>
 #include <gsl/span>
-
-class Table;
 
 
 /**
@@ -35,8 +34,12 @@ class Table;
 class TableGroup {
 public:
     explicit TableGroup(const std::shared_ptr<Rom> &base);
+    
+    TableGroup(const TableGroup&) = delete;
+    TableGroup &operator=(const TableGroup&) = delete;
+    ~TableGroup() = default;
 
-    size_t count() const { return tables_.size(); }
+    size_t count() const;
 
     /* Returns a table from a table id. If create is true and
      * a table does not exist, creates a new table
@@ -44,11 +47,11 @@ public:
      * and the table does not exist. */
     Table *get(size_t idx, bool create = true);
 
-    /* Creates a new table from data. May throw exception. */
-    void set(size_t idx, gsl::span<const uint8_t> data);
+    /* Sets a table. May throw exception. */
+    void set(size_t idx, std::unique_ptr<Table> &&table);
 
     /* Applies table modifications to rom data */
-    void apply(gsl::span<uint8_t> data);
+    void apply(gsl::span<uint8_t> data, Endianness endianness);
 
 private:
     std::shared_ptr<Rom> base_;

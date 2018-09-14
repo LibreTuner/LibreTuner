@@ -24,13 +24,12 @@
 #include <string>
 #include <unordered_map>
 
+#include <toml/types.hpp>
+
 #include "checksummanager.h"
 #include "endian.h"
 #include "enums.hpp"
 
-namespace toml {
-struct table;
-}
 
 namespace definition {
     
@@ -99,7 +98,7 @@ struct Table {
     std::string name;
     std::string description;
     TableType type;
-    TableCategory category;
+    std::string category;
     TableType dataType;
     std::size_t sizeX;
     std::size_t sizeY;
@@ -110,6 +109,19 @@ struct Table {
     
     /* Returns the raw size in bytes */
     std::size_t rawSize() const;
+};
+
+
+
+struct Pid {
+    std::string name;
+    std::string description;
+    std::string formula;
+    std::string unit;
+    uint32_t id;
+    uint16_t code;
+
+    bool valid = false;
 };
 
 
@@ -131,6 +143,7 @@ public:
     std::vector<Identifier> identifiers;
     
     
+    
     void load(const toml::table &file);
     void loadTable(const toml::table &table);
     void loadAxis(const toml::table &axis);
@@ -138,6 +151,8 @@ public:
     void loadChecksum(const toml::table &checksum);
 };
 using ModelPtr = std::shared_ptr<Model>;
+
+bool checkModel(const Model &model, gsl::span<const uint8_t> data);
 
 /**
  * An ECU definition
@@ -164,8 +179,8 @@ struct Main {
     uint32_t romsize;
 
     std::vector<Table> tables;
-    //PidDefinitions pids;
-    std::unordered_map<std::string, std::unique_ptr<Axis>> axes;
+    std::vector<Pid> pids;
+    std::unordered_map<std::string, Axis> axes;
     std::vector<ModelPtr> models;
     std::vector<std::regex> vins;
     
@@ -174,17 +189,18 @@ struct Main {
     void load(const toml::table &file);
     void loadTable(const toml::table &table);
     void loadAxis(const toml::table &axis);
+    void loadPid(const toml::table &pid);
     
     /* Returns true if the supplied VIN matches any pattern in vins */
     bool matchVin(const std::string &vin);
     
     /* Searched for a model definition from an id. Returns nullptr
     * if the id does not match a model. */
-    const ModelPtr &findModel(const std::string &id);
+    ModelPtr findModel(const std::string &id);
     
     /* Attempts to determine the model of the data. Returns
     * nullptr if no models match. */
-    const ModelPtr &identify(gsl::span<const uint8_t> data);
+    ModelPtr identify(gsl::span<const uint8_t> data);
 };
 
 

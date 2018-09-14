@@ -28,7 +28,6 @@
 #include <memory>
 
 class Table;
-typedef std::shared_ptr<Table> TablePtr;
 
 /**
  * @todo write docs
@@ -39,10 +38,10 @@ public:
     ~GraphWidget() override;
 
 public slots:
-    void tableChanged(const TablePtr &table);
+    void tableChanged(Table *table);
 
 private:
-    TablePtr table_;
+    Table *table_ {nullptr};
     QtDataVisualization::Q3DSurface *surface_;
     QWidget *container_;
     QtCharts::QChart *chart_;

@@ -81,7 +81,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         QMessageBox msgBox;
         msgBox.setText(
             "Could not load definitions: " +
-            QStringLiteral(e.what()));
+            QString(e.what()));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.setWindowTitle("DefinitionManager error");
         msgBox.exec();
@@ -316,10 +316,9 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
         window.mainLayout()->addWidget(label);
 
         QComboBox *combo = new QComboBox;
-        for (int i = 0; i < DefinitionManager::get()->count(); ++i) {
-            const DefinitionPtr &def =
-                DefinitionManager::get()->definitions()[i];
-            combo->addItem(QString::fromStdString(def->name()), QVariant(i));
+        int id = 0;
+        for (const definition::MainPtr &def : DefinitionManager::get()->definitions()) {
+            combo->addItem(QString::fromStdString(def->name), QVariant(id++));
         }
         combo->setItemDelegate(new QStyledItemDelegate());
         window.mainLayout()->addWidget(combo);
@@ -329,9 +328,9 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
         connect(button, &QPushButton::clicked, [&v, combo, &window] {
             QVariant data = combo->currentData();
             if (!data.isNull()) {
-                const DefinitionPtr &def =
+                const definition::MainPtr &def =
                     DefinitionManager::get()->definitions()[data.toInt()];
-                v = Vehicle{def->name(), "unknown", def};
+                v = Vehicle{def->name, "unknown", def};
             }
             window.close();
         });

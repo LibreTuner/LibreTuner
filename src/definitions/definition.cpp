@@ -19,6 +19,7 @@
 #include "definition.h"
 #include "piddefinitions.h"
 #include "tabledefinitions.h"
+#include "logger.h"
 
 #include <toml/toml.hpp>
 
@@ -112,25 +113,25 @@ void Main::load(const std::string& dirPath)
 {
     QDir dir(QString::fromStdString(dirPath));
 
-    if (QFile::exists(QString::fromStdString(dirPath + "/main.xml"))) {
-        std::ifstream file(dirPath + "/main.xml");
+    if (QFile::exists(QString::fromStdString(dirPath + "/main.toml"))) {
+        std::ifstream file(dirPath + "/main.toml");
         if (!file.good()) {
-            throw std::runtime_error("failed to open " + dirPath + "/main.xml");
+            throw std::runtime_error("failed to open " + dirPath + "/main.toml");
         }
         load(toml::parse(file));
     } else {
-        throw std::runtime_error(std::string("No main.xml file in ") + dirPath);
+        throw std::runtime_error(std::string("No main.toml file in ") + dirPath);
     }
 
     for (QFileInfo &info :
         dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::NoSort)) {
         if (info.isFile()) {
-            if (info.fileName().toLower() != "main.xml") {
+            if (info.fileName().toLower() != "main.toml") {
                 // Model
                 ModelPtr model = std::make_shared<Model>(*this);
                 std::ifstream file(info.filePath().toStdString());
                 if (!file.good()) {
-                    throw std::runtime_error("failed to open " + dirPath + "/main.xml");
+                    throw std::runtime_error("failed to open " + dirPath + "/main.toml");
                 }
                 model->load(toml::parse(file));
             }
@@ -184,6 +185,26 @@ void Main::load(const toml::table& file)
     for (const auto &axis : toml::get<std::vector<toml::table>>(file.at("axis"))) {
         loadAxis(axis);
     }
+    
+    for (const auto &pid : toml::get<std::vector<toml::table>>(file.at("pid"))) {
+        loadPid(pid);
+    }
+}
+
+
+
+void Main::loadPid(const toml::table& pid)
+{
+    Pid definition;
+    definition.id = toml::get<std::size_t>(pid.at("id"));
+    
+    definition.name = toml::get<std::string>(pid.at("name"));
+    definition.description = toml::get<std::string>(pid.at("description"));
+    definition.code = toml::get<std::size_t>(pid.at("code"));
+    definition.formula = toml::get<std::string>(pid.at("formula"));
+    definition.unit = toml::get<std::string>(pid.at("unit"));
+    
+    pids.emplace_back(std::move(definition));
 }
 
 
@@ -196,7 +217,7 @@ void Main::loadTable(const toml::table& table)
     definition.name = toml::get<std::string>(table.at("name"));
     definition.description = toml::get<std::string>(table.at("description"));
     
-    const auto &category = [&] (const toml::value &v) {
+    definition.category = [&] (const toml::value &v) {
         if (v.is<toml::string>()) {
             return toml::get<std::string>(v);
         }
@@ -229,36 +250,48 @@ void Main::loadTable(const toml::table& table)
         throw std::runtime_error("invalid datatype");
     }(toml::get<std::string>(table.at("datatype")));
     
-    const auto opt_size = [&](const toml::value &v) -> std::size_t {
-        if (v.is<toml::integer>()) {
-            return toml::get<std::size_t>(v);
+    const auto opt_size = [&](const std::string &name) -> std::size_t {
+        auto it = table.find(name);
+        if (it != table.end()) {
+            const toml::value &v = it->second;
+            if (v.is<toml::integer>()) {
+                return toml::get<std::size_t>(v);
+            }
         }
         return 1;
     };
     
-
-    definition.sizeX = opt_size(table.at("sizex"));
-    definition.sizeY = opt_size(table.at("sizey"));
+ 
+    definition.sizeX = opt_size("sizex");
+    definition.sizeY = opt_size("sizey");
     
-    const auto opt_string = [&](const toml::value &v) {
-        if (v.is<toml::string>()) {
-            return toml::get<std::string>(v);
+    const auto opt_string = [&](const std::string &name) {
+        auto it = table.find(name);
+        if (it != table.end()) {
+            const toml::value &v = it->second;
+            if (v.is<toml::string>()) {
+                return toml::get<std::string>(v);
+            }
         }
         return std::string();
     };
     
-    definition.axisXId = opt_string(table.at("axisx"));
-    definition.axisYId = opt_string(table.at("axisy"));
+    definition.axisXId = opt_string("axisx");
+    definition.axisYId = opt_string("axisy");
     
-    const auto opt_double = [&](const toml::value &v, double def) {
-        if (v.is<double>()) {
-            return toml::get<double>(v);
+    const auto opt_double = [&](const std::string &name, double def) {
+         auto it = table.find(name);
+        if (it != table.end()) {
+            const toml::value &v = it->second;
+            if (v.is<double>()) {
+                return toml::get<double>(v);
+            }
         }
         return def;
     };
     
-    definition.minimum = opt_double(table.at("minimum"), std::numeric_limits<double>::min());
-    definition.maximum = opt_double(table.at("maximum"), std::numeric_limits<double>::max());
+    definition.minimum = opt_double("minimum", std::numeric_limits<double>::min());
+    definition.maximum = opt_double("maximum", std::numeric_limits<double>::max());
     
     tables.emplace_back(std::move(definition));
 }
@@ -272,15 +305,75 @@ void Main::loadAxis(const toml::table& axis)
     definition.name = toml::get<std::string>(axis.at("name"));
     definition.id = toml::get<std::string>(axis.at("id"));
     
+    auto get_double = [&](const toml::value &v) -> double {
+        if (v.is<double>()) {
+            return toml::get<double>(v);
+        }
+        return toml::get<toml::integer>(v);
+    };
+    
     const std::string &type = toml::get<std::string>(axis.at("type"));
     if (type == "linear") {
-        double start = toml::get<double>(axis.at("minimum"));
-        double increment = toml::get<double>(axis.at("increment"));
+        double start = get_double(axis.at("minimum"));
+        double increment = get_double(axis.at("increment"));
         
-        axes.emplace(definition.id, std::make_unique<LinearAxis>(start, increment));
+        definition.data = std::make_unique<LinearAxis>(start, increment);
+        
+        axes.emplace(definition.id, std::move(definition));
     } else {
         throw std::runtime_error("invalid axis type");
     }
+}
+
+
+
+definition::ModelPtr Main::identify(gsl::span<const uint8_t> data)
+{
+    for (const definition::ModelPtr &def : models) {
+        if (checkModel(*def, data)) {
+            return def;
+        }
+    }
+    return nullptr;
+}
+
+
+
+definition::ModelPtr Main::findModel(const std::string& id)
+{
+    for (const definition::ModelPtr &model : models) {
+        if (model->id == id) {
+            return model;
+        }
+    }
+    return nullptr;
+}
+
+
+
+bool Main::matchVin(const std::string& vin)
+{
+    return std::any_of(vins.begin(), vins.end(), [&vin](const auto &pattern) {
+        return std::regex_match(vin, pattern);
+    });
+}
+
+
+
+bool checkModel(const definition::Model& model, gsl::span<const uint8_t> data)
+{
+    for (const Identifier &identifier : model.identifiers) {
+        if (identifier.offset() + identifier.size() > data.size()) {
+            return false;
+        }
+
+        if (std::equal(data.begin() + identifier.offset(), data.end(),
+                       identifier.data(),
+                       identifier.data() + identifier.size()) != 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
 

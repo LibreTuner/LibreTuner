@@ -91,16 +91,16 @@ void RomManager::readRoms(QXmlStreamReader &xml) {
                 rom.path = xml.readElementText().trimmed().toStdString();
             } else if (xml.name() == "type") {
                 QString type = xml.readElementText().toLower();
-                DefinitionPtr def =
-                    DefinitionManager::get()->getDefinition(type.toStdString());
+                definition::MainPtr def =
+                    DefinitionManager::get()->find(type.toStdString());
                 if (!def) {
                     xml.raiseError("Invalid ROM type");
                     break;
                 }
-                rom.definitionId = def->id();
+                rom.definitionId = def->id;
             } else if (xml.name() == "subtype") {
                 QString type = xml.readElementText().toLower();
-                rom.subDefinitionId = type.toStdString();
+                rom.modelId = type.toStdString();
                 // TODO: check if this subtype exists
             } else if (xml.name() == "id") {
                 bool ok;
@@ -125,7 +125,7 @@ void RomManager::readRoms(QXmlStreamReader &xml) {
             if (rom.definitionId.empty()) {
                 xml.raiseError("ROM type is empty");
             }
-            if (rom.subDefinitionId.empty()) {
+            if (rom.modelId.empty()) {
                 xml.raiseError("ROM subtype is empty");
             }
             if (rom.id < 0) {
@@ -165,7 +165,7 @@ void RomManager::save() {
         xml.writeTextElement("id", QString::number(rom.id));
         xml.writeTextElement("type", QString::fromStdString(rom.definitionId));
         xml.writeTextElement("subtype",
-                             QString::fromStdString(rom.subDefinitionId));
+                             QString::fromStdString(rom.modelId));
         xml.writeEndElement();
     }
     xml.writeEndElement();
@@ -173,7 +173,7 @@ void RomManager::save() {
 }
 
 void RomManager::addRom(const std::string &name,
-                        const DefinitionPtr &definition,
+                        const definition::MainPtr &definition,
                         gsl::span<const uint8_t> data) {
     LibreTuner::get()->checkHome();
 
@@ -192,7 +192,7 @@ void RomManager::addRom(const std::string &name,
     file.close();
 
     // Determine the subtype
-    SubDefinitionPtr subtype = definition->identifySubtype(data);
+    definition::ModelPtr subtype = definition->identify(data);
     if (!subtype) {
         throw std::runtime_error(
             "unknown firmware version or this is the wrong vehicle. If "
@@ -203,8 +203,8 @@ void RomManager::addRom(const std::string &name,
     RomMeta meta;
     meta.name = name;
     meta.path = path.toStdString();
-    meta.definitionId = definition->id();
-    meta.subDefinitionId = subtype->id();
+    meta.definitionId = definition->id;
+    meta.modelId = subtype->id;
     meta.id = nextId_++;
     roms_.emplace_back(std::move(meta));
 

@@ -36,7 +36,7 @@ uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
     uint32_t sum = 0;
     // Add up the big endian int32s
     for (int i = 0; i < size_ / 4; ++i, data = data.subspan(4)) {
-        sum += readBE<int32_t>(data);
+        sum += readBE<int32_t>(data.begin(), data.end());
     }
 
     if (ok != nullptr) {
@@ -67,13 +67,13 @@ void ChecksumBasic::correct(gsl::span<uint8_t> data) const {
     }
 
     // Zero the region
-    writeBE<int32_t>(0, data.subspan(offset_ + modifiableOffset));
+    writeBE<int32_t>(0, data.begin() + offset_ + modifiableOffset, data.end());
 
     // compute should never fail after the check above
     uint32_t oSum = compute(data);
 
     uint32_t val = target_ - oSum;
-    writeBE<int32_t>(val, data.subspan(offset_ + modifiableOffset));
+    writeBE<int32_t>(val, data.begin() + offset_ + modifiableOffset, data.end());
 
     // Check if the correction was successful
     if (compute(data) != target_) {

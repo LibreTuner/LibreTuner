@@ -2,6 +2,7 @@
 #define L_ENUMS_H
 
 #include <cstdint>
+#include <cassert>
 
 enum class DownloadMode {
     None = 0,

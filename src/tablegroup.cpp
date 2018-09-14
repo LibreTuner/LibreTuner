@@ -26,6 +26,15 @@ TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
     tables_.resize(base->definition()->tables.size());
 }
 
+
+
+size_t TableGroup::count() const
+{
+    return tables_.size();
+}
+
+
+
 Table *TableGroup::get(size_t idx, bool create) {
     assert(idx < tables_.size());
 
@@ -37,11 +46,14 @@ Table *TableGroup::get(size_t idx, bool create) {
     return table.get();
 }
 
-void TableGroup::set(size_t idx,
-                                             gsl::span<const uint8_t> data) {
-    assert(idx < tables_.size());
-    assert(data.size() >= 0);
 
+
+void TableGroup::set(size_t idx, std::unique_ptr<Table> &&table) {
+    assert(idx < tables_.size());
+    
+    tables_[idx] = std::move(table);
+
+    /*
     const TableDefinition *definition = base_->definition()->tables()->at(idx);
 
     TableType type = definition->type();
@@ -82,17 +94,20 @@ void TableGroup::set(size_t idx,
         table->setModified(true);
         table->calcDifference(base_->getTable(idx));
         tables_[idx] = table;
-    }
+    }*/
 }
 
-void TableGroup::apply(gsl::span<uint8_t> data) {
+
+
+void TableGroup::apply(gsl::span<uint8_t> data, Endianness endianness) {
     std::vector<uint8_t> res;
-    for (const TablePtr &table : tables_) {
-        if (table && table->modified()) {
-            size_t offset = base_->subDefinition()->getTableLocation(
-                table->definition()->id());
+    std::size_t id = 0;
+    for (const std::unique_ptr<Table> &table : tables_) {
+        if (table && table->dirty()) {
+            size_t offset = base_->definition()->tables[id];
             assert(offset < data.size());
-            assert(table->serialize(data.subspan(offset)));
+            table->serialize(data.subspan(offset), endianness);
         }
+        id++;
     }
 }

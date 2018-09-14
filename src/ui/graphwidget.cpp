@@ -65,13 +65,13 @@ GraphWidget::~GraphWidget()
 
 
 
-void GraphWidget::tableChanged(const TablePtr &table) {
+void GraphWidget::tableChanged(Table *table) {
     table_ = table;
     if (table == nullptr) {
         return;
     }
 
-    if (table->type() == TABLE_2D) {
+    /*if (table->isTwoDimensional()) {
         auto *modelProxy =
             new QtDataVisualization::QItemModelSurfaceDataProxy(table.get());
         modelProxy->setUseModelCategories(true);
@@ -98,7 +98,7 @@ void GraphWidget::tableChanged(const TablePtr &table) {
 
         chartView_->setVisible(false);
         container_->setVisible(true);
-    } else if (table->type() == TABLE_1D && table->definition()->axisX()) {
+    } else if (table->isOneDimensional() && table->definition()->axisX()) {
         auto *series = new QLineSeries;
         for (int x = 0; x < table->definition()->sizeX(); ++x) {
             series->append(table->definition()->axisX()->label(x),
@@ -116,5 +116,5 @@ void GraphWidget::tableChanged(const TablePtr &table) {
 
         chartView_->setVisible(true);
         container_->setVisible(false);
-    }
+    }*/
 }

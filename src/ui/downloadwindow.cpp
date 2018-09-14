@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <utility>
 
-Q_DECLARE_METATYPE(DefinitionPtr)
+Q_DECLARE_METATYPE(definition::ModelPtr)
 
 DownloadWindow::DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader,
                                const Vehicle &vehicle, QWidget *parent)
@@ -37,7 +37,7 @@ DownloadWindow::DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader,
       definition_(vehicle.definition) {
     ui->setupUi(this);
 
-    ui->labelVehicle->setText(QString::fromStdString(definition_->name()));
+    ui->labelVehicle->setText(QString::fromStdString(definition_->name));
     ui->vinLineEdit->setText(QString::fromStdString(vehicle.vin));
 }
 
