@@ -15,6 +15,8 @@ add_subdirectory(lib/GSL)
 add_subdirectory(lib/cparse)
 add_subdirectory(lib/yaml)
 
+option(YAML_CPP_BUILD_TESTS OFF)
+
 add_subdirectory(src)
 
 #if (Test)

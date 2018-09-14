@@ -1,7 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
-    <file>definitions/mazdaspeed6/main.toml</file>
-    <file>definitions/mazdaspeed6/l38k.toml</file>
+    <file>definitions/mazdaspeed6/main.yaml</file>
+    <file>definitions/mazdaspeed6/l38k.yaml</file>
 </qresource>
 </RCC>

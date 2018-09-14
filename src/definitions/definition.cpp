@@ -34,7 +34,6 @@ void Model::load(const YAML::Node& file) {
     id = file["id"].as<std::string>();
     
     // Load tables
-    
     const auto &tables = file["tables"];
     std::for_each(tables.begin(), tables.end(), [&](const auto &table) { loadTable(table); });
     
@@ -55,29 +54,29 @@ void Model::load(const YAML::Node& file) {
 
 
 void Model::loadTable(const YAML::Node &table) {
-    /*const auto id = toml::get<std::size_t>(table.at("id"));
-    const auto offset = toml::get<std::size_t>(table.at("offset"));
+    const auto id = table["id"].as<std::size_t>();
+    const auto offset = table["offset"].as<std::size_t>();
     
     if (tables.size() <= id) {
         tables.resize(id + 1);
     }
-    tables[id] = offset;*/
+    tables[id] = offset;
 }
 
 
 
 void Model::loadAxis(const YAML::Node &axis) {
-    /*const auto &id = toml::get<std::string>(axis.at("id"));
-    const auto offset = toml::get<std::size_t>(axis.at("offset"));
+    const auto id = axis["id"].as<std::string>();
+    const auto offset = axis["offset"].as<std::size_t>();
     
-    axisOffsets.emplace(id, offset);*/
+    axisOffsets.emplace(id, offset);
 }
 
 
 
 void Model::loadIdentifier(const YAML::Node &identifier) {
-    const auto offset = toml::get<std::size_t>(identifier.at("offset"));
-    const auto &data = toml::get<std::string>(identifier.at("data"));
+    const auto offset = identifier["offset"].as<std::size_t>();
+    const auto &data = identifier["data"].as<std::string>();
     
     identifiers.emplace_back(offset, data.begin(), data.end());
 }
@@ -85,10 +84,10 @@ void Model::loadIdentifier(const YAML::Node &identifier) {
 
 
 void Model::loadChecksum(const YAML::Node &checksum) {
-    /*const auto &mode = toml::get<std::string>(checksum.at("mode"));
-    const auto offset = toml::get<std::size_t>(checksum.at("offset"));
-    const auto size = toml::get<std::size_t>(checksum.at("size"));
-    const auto target = toml::get<std::size_t>(checksum.at("target"));
+    const auto &mode = checksum["mode"].as<std::string>();
+    const auto offset = checksum["offset"].as<std::size_t>();
+    const auto size = checksum["size"].as<std::size_t>();
+    const auto target =  checksum["target"].as<std::size_t>();
     
     Checksum *sum;
     if (mode == "basic") {
@@ -97,9 +96,12 @@ void Model::loadChecksum(const YAML::Node &checksum) {
         throw std::runtime_error("invalid mode for checksum");
     }
     
-    for (const auto &modify : toml::get<std::vector<YAML::Node>>(checksum.at("modify"))) {
-        sum->addModifiable(toml::get<std::size_t>(modify.at("offset")), toml::get<std::size_t>(modify.at("size")));
-    }*/
+    const auto &modify = checksum["modify"];
+    if (modify) {
+        for (auto it = modify.begin(); it != modify.end(); it++) {
+            sum->addModifiable((*it)["offset"].as<std::size_t>(), (*it)["size"].as<std::size_t>());
+        }
+    }
 }
 
 
@@ -121,7 +123,7 @@ void Main::load(const std::string& dirPath)
         }
         load(YAML::Load(file));
     } else {
-        throw std::runtime_error(std::string("No main.toml file in ") + dirPath);
+        throw std::runtime_error(std::string("No main.yaml file in ") + dirPath);
     }
 
     for (QFileInfo &info :
@@ -248,52 +250,29 @@ void Main::loadTable(const YAML::Node& table)
         throw std::runtime_error("invalid datatype");
     }(table["datatype"].as<std::string>());
     
-    const auto opt_size = [&](const std::string &name) -> std::size_t {
-        auto it = table.find(name);
-        if (it != table.end()) {
-            const toml::value &v = it->second;
-            if (v.is<toml::integer>()) {
-                return toml::get<std::size_t>(v);
-            }
-        }
-        return 1;
-    };
-    
     if (table["sizex"]) {
         definition.sizeX = table["sizex"].as<std::size_t>();
     }
     if (table["sizey"]) {
         definition.sizeY = table["sizey"].as<std::size_t>();
     }
-
     
-    const auto opt_string = [&](const std::string &name) {
-        auto it = table.find(name);
-        if (it != table.end()) {
-            const toml::value &v = it->second;
-            if (v.is<toml::string>()) {
-                return toml::get<std::string>(v);
-            }
-        }
-        return std::string();
-    };
+    if (table["axisx"]) {
+        definition.axisXId = table["axisx"].as<std::string>();
+    }
+    if (table["axisy"]) {
+        definition.axisYId = table["axisy"].as<std::string>();
+    }
     
-    definition.axisXId = opt_string("axisx");
-    definition.axisYId = opt_string("axisy");
-    
-    const auto opt_double = [&](const std::string &name, double def) {
-         auto it = table.find(name);
-        if (it != table.end()) {
-            const toml::value &v = it->second;
-            if (v.is<double>()) {
-                return toml::get<double>(v);
-            }
+    const auto opt_double = [&](const YAML::Node &node, double def) {
+        if (node) {
+            return node.as<double>();
         }
         return def;
     };
     
-    definition.minimum = opt_double("minimum", std::numeric_limits<double>::min());
-    definition.maximum = opt_double("maximum", std::numeric_limits<double>::max());
+    definition.minimum = opt_double(table["minimum"], std::numeric_limits<double>::min());
+    definition.maximum = opt_double(table["maximum"], std::numeric_limits<double>::max());
     
     tables.emplace_back(std::move(definition));
 }
@@ -304,20 +283,14 @@ void Main::loadAxis(const YAML::Node& axis)
 {
     Axis definition;
     
-    definition.name = toml::get<std::string>(axis.at("name"));
-    definition.id = toml::get<std::string>(axis.at("id"));
+    definition.name = axis["name"].as<std::string>();
+    definition.id = axis["id"].as<std::string>();
+
     
-    auto get_double = [&](const toml::value &v) -> double {
-        if (v.is<double>()) {
-            return toml::get<double>(v);
-        }
-        return toml::get<toml::integer>(v);
-    };
-    
-    const std::string &type = toml::get<std::string>(axis.at("type"));
+    std::string type = axis["type"].as<std::string>();
     if (type == "linear") {
-        double start = get_double(axis.at("minimum"));
-        double increment = get_double(axis.at("increment"));
+        double start = axis["minimum"].as<double>();
+        double increment = axis["increment"].as<double>();
         
         definition.data = std::make_unique<LinearAxis>(start, increment);
         
