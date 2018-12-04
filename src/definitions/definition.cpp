@@ -127,7 +127,7 @@ void Main::load(const std::string& dirPath)
     }
 
     for (QFileInfo &info :
-        dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::NoSort)) {
+        dir.entryInfoList(QDir::Filters(QDir::NoDotAndDotDot) | QDir::Files, QDir::NoSort)) {
         if (info.isFile()) {
             if (info.fileName().toLower() != "main.yaml") {
                 // Model
@@ -304,10 +304,10 @@ void Main::loadAxis(const YAML::Node& axis)
 
 
 
-definition::ModelPtr Main::identify(gsl::span<const uint8_t> data)
+definition::ModelPtr Main::identify(const uint8_t *data, size_t size)
 {
     for (const definition::ModelPtr &def : models) {
-        if (checkModel(*def, data)) {
+        if (checkModel(*def, data, size)) {
             return def;
         }
     }
@@ -337,14 +337,14 @@ bool Main::matchVin(const std::string& vin)
 
 
 
-bool checkModel(const definition::Model& model, gsl::span<const uint8_t> data)
+bool checkModel(const definition::Model& model, const uint8_t *data, size_t size)
 {
     for (const Identifier &identifier : model.identifiers) {
-        if (identifier.offset() + identifier.size() > data.size()) {
+        if (identifier.offset() + identifier.size() > size) {
             return false;
         }
 
-        if (std::equal(data.begin() + identifier.offset(), data.end(),
+        if (std::equal(data + identifier.offset(), data + size,
                        identifier.data(),
                        identifier.data() + identifier.size()) != 0) {
             return false;

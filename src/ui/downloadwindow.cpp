@@ -117,8 +117,9 @@ void DownloadWindow::mainOnCompletion(bool success, const QString &error) {
 
 void DownloadWindow::onCompletion() {
     try {
+        auto data = downloadInterface_->data();
         RomManager::get()->addRom(ui->lineName->text().toStdString(),
-                                  definition_, downloadInterface_->data());
+                                  definition_, data.first, data.second);
         QMetaObject::invokeMethod(this, "mainOnCompletion",
                                   Qt::QueuedConnection, Q_ARG(bool, true),
                                   Q_ARG(QString, QString()));

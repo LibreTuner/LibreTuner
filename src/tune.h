@@ -19,7 +19,6 @@
 #ifndef TUNE_H
 #define TUNE_H
 
-#include <gsl/span>
 #include <memory>
 #include <string>
 
@@ -46,7 +45,7 @@ public:
 
     /* Applies table modifications to data and computes checksums.
      * Returns false on error and sets lastError. */
-    void apply(gsl::span<uint8_t> data);
+    void apply(uint8_t *data, size_t size);
 
     TableGroup &tables() { return tables_; }
 

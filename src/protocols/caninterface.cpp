@@ -22,11 +22,11 @@
 #include <cstring>
 #include <sstream>
 
-void CanMessage::setMessage(uint32_t id, gsl::span<const uint8_t> data) {
-    Expects(data.size() <= 8);
+void CanMessage::setMessage(uint32_t id, const uint8_t *data, size_t size) {
+    assert(size <= 8);
     id_ = id;
-    messageLength_ = static_cast<uint8_t>(data.size());
-    std::copy(data.begin(), data.end(), message_);
+    messageLength_ = static_cast<uint8_t>(size);
+    std::copy(data, data + size, message_);
 }
 
 std::string CanMessage::strMessage() const {
@@ -43,13 +43,13 @@ std::string CanMessage::strMessage() const {
 
 CanMessage::CanMessage() : id_(0), message_{0}, messageLength_(0) {}
 
-CanMessage::CanMessage(uint32_t id, gsl::span<const uint8_t> data) {
-    setMessage(id, data);
+CanMessage::CanMessage(uint32_t id, const uint8_t *data, size_t size) {
+    setMessage(id, data, size);
 }
 
 // CanInterface::CanInterface() : signal_(SignalType::create()) {}
 CanInterface::CanInterface() {}
 
-void CanInterface::send(int id, gsl::span<const uint8_t> data) {
-    send(CanMessage(id, data));
+void CanInterface::send(int id, const uint8_t *data, size_t size) {
+    send(CanMessage(id, data, size));
 }

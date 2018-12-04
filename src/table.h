@@ -29,7 +29,6 @@
 
 #include <cassert>
 #include <vector>
-#include <gsl/span>
 #include <memory>
 
 #include <QAbstractTableModel>
@@ -74,7 +73,7 @@ public:
     
     virtual bool dirty() const =0;
     
-    virtual void serialize(gsl::span<uint8_t> data, Endianness endianness) const =0;
+    virtual void serialize(uint8_t *data, size_t len, Endianness endianness) const =0;
     
     virtual TableType dataType() const =0;
     
@@ -90,7 +89,7 @@ public:
     int columnCount(const QModelIndex & parent) const override { return width(); }
     int rowCount(const QModelIndex & parent) const override { return height(); }
     
-    Qt::ItemFlags flags(const QModelIndex &index) const override { return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable; }
+    Qt::ItemFlags flags(const QModelIndex &index) const override { return Qt::ItemFlags(Qt::ItemIsEnabled) | Qt::ItemIsSelectable | Qt::ItemIsEditable; }
     
 private:
     TableMeta meta_;
@@ -119,10 +118,10 @@ public:
     std::size_t height() const override { return data_.size() / width_; }
     std::size_t width() const override { return width_; }
     
-    DataType minimum() const { return minimum_; };
-    DataType maximum() const { return maximum_; };
+    DataType minimum() const { return minimum_; }
+    DataType maximum() const { return maximum_; }
     
-    void serialize(gsl::span<uint8_t> data, Endianness endianness) const override;
+    void serialize(uint8_t *data, size_t len, Endianness endianness) const override;
     
     DataType get(std::size_t x, std::size_t y) const;
     void set(std::size_t x, std::size_t y, DataType data);
@@ -201,25 +200,25 @@ inline TableType TableBase<int32_t>::dataType() const {
 
 
 template<typename DataType>
-void TableBase<DataType>::serialize(gsl::span<uint8_t> data, Endianness endianness) const
+void TableBase<DataType>::serialize(uint8_t *buffer, size_t len, Endianness endianness) const
 {
-    if (data.size() < byteSize()) {
+    if (len < byteSize()) {
         throw std::runtime_error("data array is too small to serialize table into");
     }
-    
-    auto pos = data.begin();
+
+    uint8_t *end = buffer + len;
     
     if (endianness == Endianness::Big) {
         for (DataType data : data_) {
-            writeBE<DataType>(data, pos, pos + sizeof(DataType));
-            pos += sizeof(DataType);
+            writeBE<DataType>(data, buffer, end);
+            buffer += sizeof(DataType);
         }
     } else {
-        for (DataType data : data_) {
-            writeLE<DataType>(data, pos, pos + sizeof(DataType));
-            pos += sizeof(DataType);
-        }
         // Little endian
+        for (DataType data : data_) {
+            writeLE<DataType>(data, buffer, end);
+            buffer += sizeof(DataType);
+        }
     }
 }
 
@@ -306,7 +305,7 @@ public:
 
     template<typename T>
     std::unique_ptr<Table> deserialize() {
-        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), TableInfo{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
+        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
     }
 
 private:

@@ -47,7 +47,7 @@ void Authenticator::do_request_seed() {
     std::vector<uint8_t> seed = uds_->requestSecuritySeed();
 
     // Generate key from seed
-    uint32_t key = generateKey(0xC541A9, seed);
+    uint32_t key = generateKey(0xC541A9, seed.data(), seed.size());
     do_send_key(key);
 }
 
@@ -60,14 +60,14 @@ void Authenticator::do_send_key(uint32_t key) {
     kData[1] = (key & 0xFF00) >> 8;
     kData[2] = (key & 0xFF0000) >> 16;
 
-    uds_->requestSecurityKey(kData);
+    uds_->requestSecurityKey(kData, 3);
 }
 
 
 
 uint32_t Authenticator::generateKey(uint32_t parameter,
-                                    gsl::span<const uint8_t> seed) {
-    std::vector<uint8_t> nseed(seed.begin(), seed.end());
+                                    const uint8_t *seed, size_t size) {
+    std::vector<uint8_t> nseed(seed, seed + size);
     nseed.insert(nseed.end(), key_.begin(), key_.end());
 
     // This is Mazda's key generation algorithm reverse engineered from a

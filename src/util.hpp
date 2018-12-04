@@ -29,7 +29,7 @@ template <typename T, int Size> class SConverter {};
 template <typename T> class SConverter<T, 1> {
 public:
     template<class InputIt>
-    static T readBE(InputIt begin, InputIt end) {
+    static T readBE(InputIt begin) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
@@ -38,7 +38,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeBE(T t, OutputIt begin, OutputIt end) {
+    static void writeBE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
@@ -46,7 +46,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeLE(T t, OutputIt begin, OutputIt end) {
+    static void writeLE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
@@ -54,7 +54,7 @@ public:
     }
 
     template<class InputIt>
-    static T readLE(InputIt begin, InputIt end) {
+    static T readLE(InputIt begin) {
         static_assert(
             sizeof(T) == 1,
             "type parameter of this class must have a size of 1 byte");
@@ -66,7 +66,7 @@ public:
 template <typename T> class SConverter<T, 2> {
 public:
     template<class InputIt>
-    static T readBE(InputIt begin, InputIt end) {
+    static T readBE(InputIt begin) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
@@ -75,7 +75,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeBE(T t, OutputIt begin, OutputIt end) {
+    static void writeBE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
@@ -85,7 +85,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeLE(T t, OutputIt begin, OutputIt end) {
+    static void writeLE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
@@ -95,7 +95,7 @@ public:
     }
 
     template<class InputIt>
-    static T readLE(InputIt begin, InputIt end) {
+    static T readLE(InputIt begin) {
         static_assert(
             sizeof(T) == 2,
             "type parameter of this class must have a size of 2 bytes");
@@ -107,7 +107,7 @@ public:
 template <typename T> class SConverter<T, 4> {
 public:
     template<class InputIt>
-    static T readBE(InputIt begin, InputIt end) {
+    static T readBE(InputIt begin) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
@@ -117,7 +117,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeBE(T t, OutputIt begin, OutputIt end) {
+    static void writeBE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
@@ -129,7 +129,7 @@ public:
     }
 
     template<class OutputIt>
-    static void writeLE(T t, OutputIt begin, OutputIt end) {
+    static void writeLE(T t, OutputIt begin) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
@@ -141,7 +141,7 @@ public:
     }
 
     template<class InputIt>
-    static T readLE(InputIt begin, InputIt end) {
+    static T readLE(InputIt begin) {
         static_assert(
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
@@ -156,28 +156,28 @@ template <typename T, class InputIt> static T readBE(InputIt begin, InputIt end)
     if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::readBE(std::forward<InputIt>(begin), std::forward<InputIt>(end));
+    return util::SConverter<T, sizeof(T)>::readBE(std::forward<InputIt>(begin));
 }
 
 template <typename T, class InputIt> static T readLE(InputIt begin, InputIt end) {
     if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::readLE(std::forward<InputIt>(begin), std::forward<InputIt>(end));
+    return util::SConverter<T, sizeof(T)>::readLE(std::forward<InputIt>(begin));
 }
 
 template <typename T, class OutputIt> static void writeBE(T t, OutputIt begin, OutputIt end) {
     if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::writeBE(t, std::forward<OutputIt>(begin), std::forward<OutputIt>(end));
+    return util::SConverter<T, sizeof(T)>::writeBE(t, std::forward<OutputIt>(begin));
 }
 
 template <typename T, class OutputIt> static void writeLE(T t, OutputIt begin, OutputIt end) {
     if (std::distance(begin, end) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
-    return util::SConverter<T, sizeof(T)>::writeLE(t, std::forward<OutputIt>(begin), std::forward<OutputIt>(end));
+    return util::SConverter<T, sizeof(T)>::writeLE(t, std::forward<OutputIt>(begin));
 }
 
 template <class T> struct make_shared_enabler : public T {

@@ -120,7 +120,7 @@ void Tune::save() {
             xml.writeAttribute("id", QString::number(i));
             std::vector<uint8_t> data;
             data.resize(table->byteSize());
-            table->serialize(data, rom_->definition()->main.endianness);
+            table->serialize(data.data(), data.size(), rom_->definition()->main.endianness);
             xml.writeCharacters(
                 QString(QByteArray(reinterpret_cast<const char *>(data.data()),
                                    data.size())
@@ -138,9 +138,9 @@ void Tune::save() {
 
 
 
-void Tune::apply(gsl::span<uint8_t> data) {
-    tables_.apply(data, rom_->definition()->main.endianness);
+void Tune::apply(uint8_t *data, size_t size) {
+    tables_.apply(data, size, rom_->definition()->main.endianness);
 
     // Checksums
-    rom_->definition()->checksums.correct(data);
+    rom_->definition()->checksums.correct(data, size);
 }

@@ -33,7 +33,7 @@ Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
     data_ = rom->data();
 
     // Apply tune on top of ROM
-    tune->apply(data_);
+    tune->apply(data_.data(), data_.size());
 
     // Reassign to flash region
     data_.assign(data_.data() + offset_,

@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <memory>
-#include <gsl/span>
 
 
 /**
@@ -51,7 +50,7 @@ public:
     void set(size_t idx, std::unique_ptr<Table> &&table);
 
     /* Applies table modifications to rom data */
-    void apply(gsl::span<uint8_t> data, Endianness endianness);
+    void apply(uint8_t *data, size_t size, Endianness endianness);
 
 private:
     std::shared_ptr<Rom> base_;

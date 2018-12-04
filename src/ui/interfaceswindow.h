@@ -4,7 +4,6 @@
 #include <QAbstractItemModel>
 #include <QListWidgetItem>
 #include <QWidget>
-#include <gsl/span>
 
 #include "interfacemanager.h"
 #include "styledwindow.h"

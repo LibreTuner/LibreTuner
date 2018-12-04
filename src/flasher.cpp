@@ -52,7 +52,7 @@ void MazdaT1Flasher::cancel() { canceled_ = true; }
 bool MazdaT1Flasher::do_erase() {
     std::array<uint8_t, 4> eraseRequest = {0xB1, 0x00, 0xB2, 0x00};
     uds::Packet _response;
-    uds_->request(eraseRequest, 0xF1, _response);
+    uds_->request(eraseRequest.data(), eraseRequest.size(), 0xF1, _response);
     if (canceled_) {
         Logger::warning("Canceled flash after erasing");
         return false;
@@ -71,7 +71,7 @@ bool MazdaT1Flasher::do_request_download() {
 
     uds::Packet _response;
     // Send download request
-    uds_->request(msg, UDS_RES_REQUESTDOWNLOAD, _response);
+    uds_->request(msg.data(), msg.size(), UDS_RES_REQUESTDOWNLOAD, _response);
 
     if (canceled_) {
         Logger::warning("Canceled flash after erasure");
@@ -99,7 +99,7 @@ bool MazdaT1Flasher::sendLoad() {
         left_ -= toSend;
 
         uds::Packet _response;
-        uds_->request(data, UDS_RES_TRANSFERDATA, _response);
+        uds_->request(data.data(), data.size(), UDS_RES_TRANSFERDATA, _response);
 
         notifyProgress(static_cast<double>(sent_) / flash_->data().size());
         if (canceled_) {

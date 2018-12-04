@@ -22,13 +22,11 @@
 #include "logger.h"
 #include "protocols/udsprotocol.h"
 
-#include <gsl/gsl>
-
 
 UdsDiagnosticInterface::UdsDiagnosticInterface(
     std::unique_ptr<uds::Protocol> &&uds)
     : uds_(std::move(uds)) {
-    Expects(uds_);
+    assert(uds_);
 }
 
 
@@ -38,7 +36,7 @@ void UdsDiagnosticInterface::scan(ScanResult &result) {
     uds::Packet response;
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
-    uds_->request(request, 0x43, response);
+    uds_->request(request, 1, 0x43, response);
 
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)

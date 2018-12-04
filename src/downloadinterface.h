@@ -23,7 +23,6 @@
 #include <QString>
 
 #include <atomic>
-#include <gsl/span>
 #include <memory>
 
 #include "asyncroutine.h"
@@ -49,7 +48,7 @@ public:
     virtual void cancel() = 0;
 
     /* Returns the downloaded data */
-    virtual gsl::span<const uint8_t> data() = 0;
+    virtual std::pair<const uint8_t*, size_t> data() = 0;
 };
 using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
 
@@ -62,7 +61,7 @@ public:
 
     bool download() override;
     void cancel() override;
-    virtual gsl::span<const uint8_t> data() override;
+    virtual std::pair<const uint8_t*, size_t> data() override;
 
 private:
     uds::Authenticator auth_;

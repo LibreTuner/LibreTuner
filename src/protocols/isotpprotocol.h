@@ -21,7 +21,6 @@
 
 #include "caninterface.h"
 #include "timer.h"
-#include <gsl/gsl>
 
 // Std
 #include <chrono>
@@ -38,11 +37,11 @@ public:
     Packet();
     Packet(Packet &&) = default;
     Packet &operator=(Packet &&packet);
-    explicit Packet(gsl::span<const uint8_t> data);
+    explicit Packet(const uint8_t *data, size_t size);
 
     /* Sets the packet data and resets the pointer
      * to the beginning */
-    void setData(gsl::span<const uint8_t> data);
+    void setData(const uint8_t *data, size_t size);
 
     /* Returns the next data in the packet up to length max.
      * Increments the pointer */
@@ -55,11 +54,11 @@ public:
     void moveAll(std::vector<uint8_t> &data);
 
     /* Appends data to the packet. Does not use the pointer */
-    void append(gsl::span<const uint8_t> data);
+    void append(const uint8_t *data, size_t size);
 
     std::vector<uint8_t>::size_type size() const { return data_.size(); }
 
-    int remaining() const { return data_.end() - pointer_; }
+    uint16_t remaining() const { return data_.end() - pointer_; }
 
     uint8_t &operator[](int index) { return data_[index]; }
 
@@ -121,9 +120,9 @@ struct Frame {
     Frame() = default;
     explicit Frame(const CanMessage &message);
 
-    static Frame single(gsl::span<const uint8_t> data);
-    static Frame first(uint16_t size, gsl::span<const uint8_t, 6> data);
-    static Frame consecutive(uint8_t index, gsl::span<const uint8_t> data);
+    static Frame single(const uint8_t *data, size_t size);
+    static Frame first(uint16_t size, const uint8_t *data, size_t data_size);
+    static Frame consecutive(uint8_t index, const uint8_t *data, size_t size);
     static Frame flow(const FlowControlFrame &frame);
 
     FrameType type() const;
@@ -173,6 +172,16 @@ public:
     /* Sends a frame to the CAN interface */
     void send(const Frame &frame);
 
+    void send_single_frame(const uint8_t *data, size_t size);
+
+    void send_first_frame(uint16_t size, const uint8_t *data, size_t data_size);
+
+    void send_consecutive_frame(uint8_t index,
+                                const uint8_t *data, size_t size);
+
+    // Sends a flow control frame
+    void send_flow_frame(const FlowControlFrame &frame);
+
 private:
     std::unique_ptr<CanInterface> can_;
     Options options_;
@@ -189,18 +198,6 @@ private:
 
     bool recvFrame(Frame &frame);
 };
-
-
-void send_single_frame(Protocol &protocol, gsl::span<const uint8_t> data);
-
-void send_first_frame(Protocol &protocol, uint16_t size,
-                      gsl::span<const uint8_t, 6> data);
-
-void send_consecutive_frame(Protocol &protocol, uint8_t index,
-                            gsl::span<const uint8_t> data);
-
-// Sends a flow control frame
-void send_flow_frame(Protocol &protocol, const FlowControlFrame &frame);
 
 
 namespace details {

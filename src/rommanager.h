@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include <gsl/span>
-
 #include <QObject>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -57,7 +55,7 @@ public:
     const std::vector<RomMeta> &roms() { return roms_; }
 
     void addRom(const std::string &name, const definition::MainPtr &definition,
-                gsl::span<const uint8_t> data);
+                const uint8_t *data, size_t size);
 
     /* Returns the ROM with id or nullptr if the ROM does
      * not exist. Be careful not to store this reference

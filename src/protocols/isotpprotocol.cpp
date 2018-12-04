@@ -27,17 +27,17 @@ namespace isotp {
 namespace details {
 
 uint8_t calculate_st(std::chrono::microseconds time) {
-    Expects(time.count() >= 0);
+    assert(time.count() >= 0);
     if (time.count() == 0) {
         return 0;
     }
 
     if (time >= std::chrono::milliseconds(1)) {
-        return std::min<long>(
+        return static_cast<uint8_t>(std::min<std::chrono::milliseconds::rep>(
             std::chrono::duration_cast<std::chrono::milliseconds>(time).count(),
-            127);
+            127));
     }
-    uint8_t count = std::max<uint8_t>(time.count() / 100, 1);
+    uint8_t count = static_cast<uint8_t>(std::max<std::chrono::milliseconds::rep>(time.count() / 100, 1));
     return count + 0xF0;
 }
 
@@ -67,38 +67,39 @@ FrameType frame_type(const CanMessage &message) {
 
 
 
-Frame Frame::single(gsl::span<const uint8_t> data) {
-    Expects(data.size() <= 7);
+Frame Frame::single(const uint8_t *data, size_t size) {
+    assert(size <= 7);
     Frame f;
-    f.data[0] = data.size();
-    f.length = data.size() + 1;
-    std::copy(data.begin(), data.end(), f.data.begin() + 1);
+    f.data[0] = static_cast<uint8_t>(size);
+    f.length = size + 1;
+    std::copy(data, data + size, f.data.begin() + 1);
     return f;
 }
 
 
 
-Frame Frame::first(uint16_t size, gsl::span<const uint8_t, 6> data) {
+Frame Frame::first(uint16_t size, const uint8_t *data, size_t data_size) {
+    assert(size <= 6);
     Frame f;
     f.data[0] = 0x10 | ((size >> 8) & 0x0F);
     f.data[1] = static_cast<uint8_t>(size & 0xFF);
-    f.length = data.size() + 2;
+    f.length = data_size + 2;
     // Copy the data into the frame
-    std::copy(data.begin(), data.end(), f.data.begin() + 2);
+    std::copy(data, data + data_size, f.data.begin() + 2);
     return f;
 }
 
 
 
-Frame Frame::consecutive(uint8_t index, gsl::span<const uint8_t> data) {
-    Expects(data.size() <= 7);
-    Expects(index <= 15);
+Frame Frame::consecutive(uint8_t index, const uint8_t *data, size_t size) {
+    assert(size <= 7);
+    assert(index <= 15);
     Frame f;
     // CAN-TP Header
     f.data[0] = 0x20 | index;
-    f.length = data.size() + 1;
+    f.length = size + 1;
     // Copy the data into the frame
-    std::copy(data.begin(), data.end(), f.data.begin() + 1);
+    std::copy(data, data + size, f.data.begin() + 1);
     return f;
 }
 
@@ -186,7 +187,7 @@ void Protocol::sendConsecutiveFrames() {
         while (!packet_.eof()) {
             std::this_thread::sleep_for(fc.separationTime);
             std::vector<uint8_t> data = packet_.next(7);
-            send_consecutive_frame(*this, incrementConsec(), data);
+            send_consecutive_frame(incrementConsec(), data.data(), data.size());
 
             if (fc.blockSize > 0) {
                 if (fc.blockSize == 1) {
@@ -306,7 +307,7 @@ Packet &Packet::operator=(Packet &&packet) {
 
 
 
-Packet::Packet(gsl::span<const uint8_t> data) { setData(data); }
+Packet::Packet(const uint8_t *data, size_t size) { setData(data, size); }
 
 
 
@@ -317,9 +318,10 @@ void Packet::moveAll(std::vector<uint8_t> &data) {
 
 
 
-void Packet::append(gsl::span<const uint8_t> data) {
+void Packet::append(const uint8_t *data, size_t size) {
+    assert(data_.size() + size <= 4095);
     auto pOffset = std::distance(std::begin(data_), pointer_);
-    data_.insert(data_.end(), data.begin(), data.end());
+    data_.insert(data_.end(), data, data + size);
     pointer_ = std::begin(data_) + pOffset;
 }
 
@@ -338,8 +340,8 @@ uint8_t Packet::next() { return *(pointer_++); }
 
 
 
-void Packet::setData(gsl::span<const uint8_t> data) {
-    data_.assign(data.begin(), data.end());
+void Packet::setData(const uint8_t *data, size_t size) {
+    data_.assign(data, data + size);
     pointer_ = std::begin(data_);
 }
 
@@ -381,7 +383,7 @@ void Protocol::recv(Packet &result) {
                 // Malformed
                 throw std::runtime_error("malformed single frame");
             }
-            result.setData(gsl::make_span(sf.data).first(sf.size));
+            result.setData(sf.data.data(), sf.size);
             // Received
             return;
         }
@@ -390,9 +392,9 @@ void Protocol::recv(Packet &result) {
             if (!frame.first(ff)) {
                 throw std::runtime_error("malformed first frame");
             }
-            result.append(gsl::make_span(ff.data).first(ff.data_length));
+            result.append(ff.data.data(), ff.data_length);
             FlowControlFrame fc;
-            send_flow_frame(*this, fc);
+            send_flow_frame(fc);
             // Start receiving consec packets
             recvConsecutiveFrames(result, ff.size - ff.data_length);
             return;
@@ -424,9 +426,9 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining) {
                 throw std::runtime_error("mismatched consecutive frame index");
             }
 
-            auto needed = std::min<int>(cf.data_length, remaining);
+            int needed = std::min<int>(cf.data_length, remaining);
 
-            result.append(gsl::make_span(cf.data).first(needed));
+            result.append(cf.data.data(), needed);
             remaining -= needed;
             if (remaining <= 0) {
                 // Finished
@@ -447,11 +449,11 @@ void Protocol::recvConsecutiveFrames(Packet &result, int remaining) {
 void Protocol::send(Packet &&packet) {
     if (packet.size() <= 7) {
         std::vector<uint8_t> data = packet.next(7);
-        send_single_frame(*this, data);
+        send_single_frame(data.data(), data.size());
     } else {
-        auto remaining = packet.remaining();
+        uint16_t remaining = packet.remaining();
         std::vector<uint8_t> data = packet.next(6);
-        send_first_frame(*this, remaining, data);
+        send_first_frame(remaining, data.data(), data.size());
 
         packet_ = std::move(packet);
         // Start sending consecutive frames
@@ -462,36 +464,34 @@ void Protocol::send(Packet &&packet) {
 
 
 void Protocol::send(const Frame &frame) {
-    Expects(can_);
-    can_->send(options_.sourceId, frame.data);
+    assert(can_);
+    can_->send(options_.sourceId, frame.data.data(), frame.data.size());
 }
 
 
 
-void send_first_frame(isotp::Protocol &protocol, uint16_t size,
-                      gsl::span<const uint8_t, 6> data) {
-    protocol.send(Frame::first(size, data));
+void Protocol::send_first_frame(uint16_t size,
+                      const uint8_t *data, size_t data_size) {
+    send(Frame::first(size, data, data_size));
 }
 
 
 
-void send_consecutive_frame(isotp::Protocol &protocol, uint8_t index,
-                            gsl::span<const uint8_t> data) {
-    protocol.send(Frame::consecutive(index, data));
+void Protocol::send_consecutive_frame(uint8_t index,
+                            const uint8_t *data, size_t size) {
+    send(Frame::consecutive(index, data, size));
 }
 
 
 
-void send_flow_frame(isotp::Protocol &protocol,
-                     const isotp::FlowControlFrame &frame) {
-    protocol.send(Frame::flow(frame));
+void Protocol::send_flow_frame(const isotp::FlowControlFrame &frame) {
+    send(Frame::flow(frame));
 }
 
 
 
-void send_single_frame(isotp::Protocol &protocol,
-                       gsl::span<const uint8_t> data) {
-    protocol.send(Frame::single(data));
+void Protocol::send_single_frame(const uint8_t *data, size_t size) {
+    send(Frame::single(data, size));
 }
 
 } // namespace isotp

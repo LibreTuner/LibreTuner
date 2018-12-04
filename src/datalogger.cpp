@@ -77,7 +77,7 @@ void UdsDataLogger::processNext() {
     }
     data.emplace_back(pid->code() & 0xFF);
     uds::Packet response;
-    uds_->request(data, 0x41, response);
+    uds_->request(data.data(), data.size(), 0x41, response);
     
     
     if (pid->code() > 0xFF) {

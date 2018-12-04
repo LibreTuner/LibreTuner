@@ -24,7 +24,6 @@
 #include "util/signal.h"
 
 #include <functional>
-#include <gsl/span>
 
 class InterfaceList {
 public:
@@ -50,7 +49,7 @@ public:
         return signal_->connect(std::move(call));
     }
 
-    gsl::span<const InterfaceSettingsPtr> settings();
+    std::vector<InterfaceSettingsPtr> &settings();
     std::vector<InterfaceSettingsPtr> &autosettings();
 
     void add(const InterfaceSettingsPtr &iface);

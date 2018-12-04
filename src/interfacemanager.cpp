@@ -26,7 +26,7 @@ InterfaceManager &InterfaceManager::get() {
 
 InterfaceManager::InterfaceManager() : signal_(SignalType::create()) {}
 
-gsl::span<const InterfaceSettingsPtr> InterfaceManager::settings() {
+std::vector<InterfaceSettingsPtr> &InterfaceManager::settings() {
     return settings_;
 }
 

@@ -33,9 +33,9 @@
 
 DataLoggerWindow::DataLoggerWindow(const DataLogPtr &log, std::unique_ptr<DataLogger> &&logger, const definition::MainPtr &definition, QWidget *parent) : StyledWindow(parent), log_(log), logger_(std::move(logger)), definition_(definition)
 {
-    Expects(logger_);
-    Expects(log_);
-    Expects(definition_);
+    assert(logger_);
+    assert(log_);
+    assert(definition_);
     setAttribute( Qt::WA_DeleteOnClose, false );
     setTitle("LibreTuner - Data Logger");
 

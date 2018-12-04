@@ -70,7 +70,7 @@ std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
         throw std::runtime_error("end of table exceeds ROM data");
     }
     
-    switch (tableDef.dataType) {
+   /* switch (tableDef.dataType) {
         case TableType::Float:
             return std::make_unique<TableBase<float>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Uint8:
@@ -85,7 +85,9 @@ std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
             return std::make_unique<TableBase<int16_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
         case TableType::Int32:
             return std::make_unique<TableBase<int32_t>>(TableMeta{tableDef.name, tableDef.description}, begin, end, rom.definition()->main.endianness, tableDef.sizeX, tableDef.minimum, tableDef.maximum);
-    }
+    }*/
+
+    return deserializeTable(tableDef, rom.definition()->main.endianness, begin, end);
     
     assert(false && "loadTable() unimplemented");
 }

@@ -33,7 +33,7 @@ public:
     void auth(const std::string &key, uds::Protocol &uds,
               uint8_t sessionType = 0x87);
 
-    uint32_t generateKey(uint32_t parameter, gsl::span<const uint8_t> seed);
+    uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t size);
 
 private:
     uds::Protocol *uds_;

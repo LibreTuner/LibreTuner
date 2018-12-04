@@ -29,18 +29,16 @@
 #include <string>
 #include <vector>
 
-#include <gsl/span>
-
 struct CanMessage {
 public:
-    void setMessage(uint32_t id, gsl::span<const uint8_t> data);
+    void setMessage(uint32_t id, const uint8_t *data, size_t size);
 
     bool valid() const { return messageLength_ != 0; }
 
     void invalidate() { messageLength_ = 0; }
 
     CanMessage();
-    CanMessage(uint32_t id, gsl::span<const uint8_t> data);
+    CanMessage(uint32_t id, const uint8_t *data, size_t size);
 
     uint32_t id() const { return id_; }
 
@@ -77,7 +75,7 @@ public:
 
     /* Send a CAN message. The size of data must be <= 8
      * Returns true if a message was sent */
-    void send(int id, gsl::span<const uint8_t> data);
+    void send(int id, const uint8_t *data, size_t size);
 
     virtual void send(const CanMessage &message) = 0;
 

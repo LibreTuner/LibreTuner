@@ -34,8 +34,8 @@ FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher,
                          const FlashablePtr &flashable)
     : ui(new Ui::FlashWindow), flashable_(flashable),
       flasher_(std::move(flasher)) {
-    Expects(flashable_);
-    Expects(flasher_);
+    assert(flashable_);
+    assert(flasher_);
 
     ui->setupUi(this);
     ui->comboMode->setItemDelegate(new QStyledItemDelegate());

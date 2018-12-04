@@ -29,9 +29,9 @@
 
 namespace uds {
 
-void IsoTpInterface::request(gsl::span<uint8_t> data, uint8_t expectedId,
+void IsoTpInterface::request(const uint8_t *data, size_t size, uint8_t expectedId,
                              Packet &response) {
-    isotp_->send(isotp::Packet(data));
+    isotp_->send(isotp::Packet(data, size));
     // Receive until we get a non-response-pending packet
     while (true) {
         // Receive response
@@ -77,7 +77,7 @@ IsoTpInterface::IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp)
 std::vector<uint8_t> Protocol::requestSession(uint8_t type) {
     std::array<uint8_t, 2> req = {UDS_REQ_SESSION, type};
     Packet packet;
-    request(req, UDS_RES_SESSION, packet);
+    request(req.data(), req.size(), UDS_RES_SESSION, packet);
 
 
     if (packet.data.empty()) {
@@ -97,7 +97,7 @@ std::vector<uint8_t> Protocol::requestSession(uint8_t type) {
 std::vector<uint8_t> Protocol::requestSecuritySeed() {
     std::array<uint8_t, 2> req = {UDS_REQ_SECURITY, 1};
     Packet packet;
-    request(req, UDS_RES_SECURITY, packet);
+    request(req.data(), req.size(), UDS_RES_SECURITY, packet);
 
     if (packet.data.empty()) {
         throw std::runtime_error("empty SecurityAccess response");
@@ -114,16 +114,16 @@ std::vector<uint8_t> Protocol::requestSecuritySeed() {
 
 
 
-void Protocol::requestSecurityKey(gsl::span<uint8_t> key) {
+void Protocol::requestSecurityKey(const uint8_t *key, size_t size) {
     // Prepare request
-    std::vector<uint8_t> req(key.size() + 2);
+    std::vector<uint8_t> req(size + 2);
     req[0] = UDS_REQ_SECURITY;
     req[1] = 2;
-    std::copy(key.begin(), key.end(), req.begin() + 2);
+    std::copy(key, key + size, req.begin() + 2);
 
     Packet packet;
     // Send
-    request(req, UDS_RES_SECURITY, packet);
+    request(req.data(), req.size(), UDS_RES_SECURITY, packet);
 
     if (packet.data.empty()) {
         throw std::runtime_error("empty SecurityAccess response");
@@ -146,7 +146,7 @@ std::vector<uint8_t> Protocol::requestReadMemoryAddress(uint32_t address,
     req[6] = length & 0xFF;
 
     Packet packet;
-    request(req, UDS_RES_READMEM, packet);
+    request(req.data(), req.size(), UDS_RES_READMEM, packet);
 
     return packet.data;
 }

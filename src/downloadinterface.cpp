@@ -71,6 +71,6 @@ void Uds23DownloadInterface::cancel() { canceled_ = true; }
 
 
 
-gsl::span<const uint8_t> Uds23DownloadInterface::data() {
-    return downloadData_;
+std::pair<const uint8_t*, size_t> Uds23DownloadInterface::data() {
+    return std::make_pair(downloadData_.data(), downloadData_.size());
 }

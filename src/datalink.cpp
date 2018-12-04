@@ -34,7 +34,7 @@ Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
         std::make_unique<isotp::Protocol>(std::move(can)));
 
     uds::Packet packet;
-    up->request(request, 0x49, packet);
+    up->request(request.data(), request.size(), 0x49, packet);
 
     if (packet.data.empty()) {
         throw std::runtime_error("empty uds response while querying VIN");
@@ -110,7 +110,7 @@ private:
 
 
 J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
-    Expects(settings->interface());
+    assert(settings->interface());
     j2534_ = settings->interface();
     if (!j2534_->initialized()) {
         j2534_->init();
@@ -147,7 +147,7 @@ std::unique_ptr<CanInterface> J2534DataLink::can(uint32_t baudrate) {
 
 
 bool J2534DataLink::checkDevice() {
-    Expects(j2534_);
+    assert(j2534_);
     if (device_) {
         return true;
     }
@@ -159,7 +159,7 @@ bool J2534DataLink::checkDevice() {
 DataLink::~DataLink() {}
 
 DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
-    Expects(iface);
+    assert(iface);
     switch (iface->type()) {
 #ifdef WITH_SOCKETCAN
     case InterfaceType::SocketCan:

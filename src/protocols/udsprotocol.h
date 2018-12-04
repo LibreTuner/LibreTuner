@@ -20,7 +20,6 @@
 #define UDSPROTOCOL_H
 
 #include <functional>
-#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
@@ -58,7 +57,7 @@ struct Packet {
 class Protocol {
 public:
     /* Sends a request. May throw an exception. */
-    virtual void request(gsl::span<uint8_t> data, uint8_t expectedId,
+    virtual void request(const uint8_t *data, size_t size, uint8_t expectedId,
                          Packet &response) = 0;
 
     /* All requests may throw an exception */
@@ -67,7 +66,7 @@ public:
 
     std::vector<uint8_t> requestSecuritySeed();
 
-    void requestSecurityKey(gsl::span<uint8_t> key);
+    void requestSecurityKey(const uint8_t *key, size_t size);
 
     /* ReadMemoryByAddress */
     std::vector<uint8_t> requestReadMemoryAddress(uint32_t address,
@@ -82,7 +81,7 @@ class IsoTpInterface : public Protocol {
 public:
     explicit IsoTpInterface(std::unique_ptr<isotp::Protocol> &&isotp);
 
-    void request(gsl::span<uint8_t> data, uint8_t expectedId,
+    void request(const uint8_t *data, size_t size, uint8_t expectedId,
                  Packet &response) override;
 
 private:

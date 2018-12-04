@@ -23,20 +23,21 @@ void Checksum::addModifiable(uint32_t offset, uint32_t size) {
     modifiable_.emplace_back(offset, size);
 }
 
-uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
-    if (data.size() < offset_ + size_) {
+uint32_t ChecksumBasic::compute(const uint8_t *data, size_t size, bool *ok) const {
+    if (size < offset_ + size_) {
         if (ok != nullptr) {
             *ok = false;
         }
         return 0;
     }
 
-    data = data.subspan(offset_);
+    data += offset_;
+    size -= offset_;
 
     uint32_t sum = 0;
     // Add up the big endian int32s
-    for (int i = 0; i < size_ / 4; ++i, data = data.subspan(4)) {
-        sum += readBE<int32_t>(data.begin(), data.end());
+    for (int i = 0; i < size_ / 4; ++i, data += 4) {
+        sum += readBE<int32_t>(data, data + size);
     }
 
     if (ok != nullptr) {
@@ -45,8 +46,8 @@ uint32_t ChecksumBasic::compute(gsl::span<const uint8_t> data, bool *ok) const {
     return sum;
 }
 
-void ChecksumBasic::correct(gsl::span<uint8_t> data) const {
-    if (data.size() < offset_ + size_) {
+void ChecksumBasic::correct(uint8_t *data, size_t size) const {
+    if (size < offset_ + size_) {
         throw std::runtime_error("checksum region exceeds the rom size.");
     }
 
@@ -67,24 +68,24 @@ void ChecksumBasic::correct(gsl::span<uint8_t> data) const {
     }
 
     // Zero the region
-    writeBE<int32_t>(0, data.begin() + offset_ + modifiableOffset, data.end());
+    writeBE<int32_t>(0, data + offset_ + modifiableOffset, data + size);
 
     // compute should never fail after the check above
-    uint32_t oSum = compute(data);
+    uint32_t oSum = compute(data, size);
 
     uint32_t val = target_ - oSum;
-    writeBE<int32_t>(val, data.begin() + offset_ + modifiableOffset, data.end());
+    writeBE<int32_t>(val, data + offset_ + modifiableOffset, data + size);
 
     // Check if the correction was successful
-    if (compute(data) != target_) {
+    if (compute(data, size) != target_) {
         throw std::runtime_error(
             "checksum does not equal target after correction");
     }
 }
 
-void ChecksumManager::correct(gsl::span<uint8_t> data) {
+void ChecksumManager::correct(uint8_t *data, size_t size) {
     for (const ChecksumPtr &checksum : checksums_) {
-        checksum->correct(data);
+        checksum->correct(data, size);
     }
 }
 

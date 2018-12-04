@@ -99,14 +99,14 @@ void TableGroup::set(size_t idx, std::unique_ptr<Table> &&table) {
 
 
 
-void TableGroup::apply(gsl::span<uint8_t> data, Endianness endianness) {
+void TableGroup::apply(uint8_t *data, size_t size, Endianness endianness) {
     std::vector<uint8_t> res;
     std::size_t id = 0;
     for (const std::unique_ptr<Table> &table : tables_) {
         if (table && table->dirty()) {
             size_t offset = base_->definition()->tables[id];
-            assert(offset < data.size());
-            table->serialize(data.subspan(offset), endianness);
+            assert(offset < size);
+            table->serialize(data + offset, size - offset, endianness);
         }
         id++;
     }

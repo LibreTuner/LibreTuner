@@ -174,7 +174,7 @@ void RomManager::save() {
 
 void RomManager::addRom(const std::string &name,
                         const definition::MainPtr &definition,
-                        gsl::span<const uint8_t> data) {
+                        const uint8_t *data, size_t size) {
     LibreTuner::get()->checkHome();
 
     QString romRoot = LibreTuner::get()->home() + "/roms/";
@@ -188,11 +188,11 @@ void RomManager::addRom(const std::string &name,
 
     std::ofstream file((romRoot + path).toStdString(),
                        std::fstream::out | std::fstream::binary);
-    file.write(reinterpret_cast<const char *>(data.data()), data.size());
+    file.write(reinterpret_cast<const char *>(data), size);
     file.close();
 
     // Determine the subtype
-    definition::ModelPtr subtype = definition->identify(data);
+    definition::ModelPtr subtype = definition->identify(data, size);
     if (!subtype) {
         throw std::runtime_error(
             "unknown firmware version or this is the wrong vehicle. If "

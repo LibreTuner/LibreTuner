@@ -20,7 +20,6 @@
 #define CHECKSUMMANAGER_H
 
 #include <cstdint>
-#include <gsl/span>
 #include <memory>
 #include <string>
 #include <vector>
@@ -37,11 +36,11 @@ public:
     void addModifiable(uint32_t offset, uint32_t size);
 
     /* Corrects the checksum for the data using modifiable sections. */
-    virtual void correct(gsl::span<uint8_t> data) const = 0;
+    virtual void correct(uint8_t *data, size_t size) const = 0;
 
     /* Returns the computed checksum. If length is too small,
      * returns 0 and sets ok to false.*/
-    virtual uint32_t compute(gsl::span<const uint8_t> data,
+    virtual uint32_t compute(const uint8_t *data, size_t size,
                              bool *ok = nullptr) const = 0;
 
 protected:
@@ -58,10 +57,10 @@ public:
     ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
         : Checksum(offset, size, target) {}
 
-    uint32_t compute(gsl::span<const uint8_t> data,
+    uint32_t compute(const uint8_t *data, size_t size,
                      bool *ok = nullptr) const override;
 
-    void correct(gsl::span<uint8_t> data) const override;
+    void correct(uint8_t *data, size_t size) const override;
 };
 
 /**
@@ -74,7 +73,7 @@ public:
 
     /* Corrects the checksums for the data using modifiable sections.
      * Returns (false, errmsg) on failure and (true, "") on success. */
-    void correct(gsl::span<uint8_t> data);
+    void correct(uint8_t *data, size_t size);
 
 private:
     std::vector<ChecksumPtr> checksums_;

@@ -19,7 +19,6 @@
 #ifndef DEFINITION_H
 #define DEFINITION_H
 
-#include <gsl/span>
 #include <regex>
 #include <string>
 #include <unordered_map>
@@ -132,7 +131,7 @@ public:
 };
 using ModelPtr = std::shared_ptr<Model>;
 
-bool checkModel(const Model &model, gsl::span<const uint8_t> data);
+bool checkModel(const Model &model, const uint8_t *data, size_t size);
 
 /**
  * An ECU definition
@@ -180,7 +179,7 @@ struct Main {
     
     /* Attempts to determine the model of the data. Returns
     * nullptr if no models match. */
-    ModelPtr identify(gsl::span<const uint8_t> data);
+    ModelPtr identify(const uint8_t *data, size_t size);
 };
 
 
