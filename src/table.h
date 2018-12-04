@@ -45,12 +45,26 @@ struct TableMeta {
 };
 
 
+class Axis {
+public:
+    virtual std::string label(int index) const =0;
+    virtual ~Axis() {}
+};
+
+class LinearAxis : public Axis {
+public:
+    LinearAxis(double start, double increment);
+
+    std::string label(int index) const override;
+private:
+    double start_, increment_;
+};
 
 class Table : public QAbstractTableModel {
 public:
     Table(const TableMeta &meta) : meta_(meta) {}
     
-    virtual ~Table() = default;
+    virtual ~Table() override = default;
     
     virtual std::size_t width() const =0;
     virtual std::size_t height() const =0;
@@ -83,14 +97,23 @@ private:
 };
 
 
+template<typename DataType>
+struct TableInfo {
+    std::size_t width;
+    DataType minimum;
+    DataType maximum;
+    std::shared_ptr<Axis> axisX;
+    std::shared_ptr<Axis> axisY;
+};
+
 
 template<typename DataType>
 class TableBase : public Table {
 public:
     template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t width, DataType minimum, DataType maximum);
+    TableBase(const TableMeta &meta, InputIt begin, InputIt end, const TableInfo<DataType> &info);
     template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t width, DataType minimum, DataType maximum);
+    TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info);
     TableBase(std::size_t width, std::size_t height);
     
     std::size_t height() const override { return data_.size() / width_; }
@@ -117,6 +140,8 @@ private:
     bool dirty_ {false};
     std::size_t width_;
     DataType minimum_, maximum_;
+    std::shared_ptr<Axis> axisX_;
+    std::shared_ptr<Axis> axisY_;
 };
 
 
@@ -273,25 +298,45 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
 }
 
 
+template<class InputIt>
+class TableDeserializer {
+public:
+    TableDeserializer(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end) :
+        definition_(definition), endianness_(endianness), begin_(begin), end_(end) {}
+
+    template<typename T>
+    std::unique_ptr<Table> deserialize() {
+        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), TableInfo{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
+    }
+
+private:
+    const definition::Table &definition_;
+    Endianness endianness_;
+    InputIt begin_;
+    InputIt end_;
+};
+
 
 template<class InputIt>
 std::unique_ptr<Table> deserializeTable(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end)
 {
+    TableDeserializer<InputIt> deserializer(definition, endianness, begin, end);
+
     switch (definition.dataType) {
         case TableType::Float:
-            return std::make_unique<TableBase<float>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<float>();
         case TableType::Uint8:
-            return std::make_unique<TableBase<uint8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<uint8_t>();
         case TableType::Uint16:
-            return std::make_unique<TableBase<uint16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<uint16_t>();
         case TableType::Uint32:
-            return std::make_unique<TableBase<uint32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<uint32_t>();
         case TableType::Int8:
-            return std::make_unique<TableBase<int8_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<int8_t>();
         case TableType::Int16:
-            return std::make_unique<TableBase<int16_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<int16_t>();
         case TableType::Int32:
-            return std::make_unique<TableBase<int32_t>>(TableMeta{definition.name, definition.description}, std::forward<InputIt>(begin), std::forward<InputIt>(end), endianness, definition.sizeY, definition.minimum, definition.maximum);
+            return deserializer.template deserialize<int32_t>();
     }
     return nullptr;
 }
@@ -300,9 +345,9 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 
 template <typename DataType>
 template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, std::size_t width, DataType minimum, DataType maximum) : Table(meta), data_(begin, end), modified_(std::distance(begin, end)), width_(width), minimum_(minimum), maximum_(maximum)
+TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, const TableInfo<DataType> &info) : Table(meta), data_(begin, end), modified_(std::distance(begin, end)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum)
 {
-    if (std::distance(begin, end) % width != 0) {
+    if (std::distance(begin, end) % info.width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
     }
 }
@@ -311,9 +356,9 @@ TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end
 
 template <typename DataType>
 template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, std::size_t width, DataType minimum, DataType maximum) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(width), minimum_(minimum), maximum_(maximum)
+TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum)
 {
-    if ((std::distance(begin, end) / sizeof(DataType)) % width != 0) {
+    if ((std::distance(begin, end) / sizeof(DataType)) % info.width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
     }
     

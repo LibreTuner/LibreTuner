@@ -286,19 +286,20 @@ void Main::loadAxis(const YAML::Node& axis)
     
     definition.name = axis["name"].as<std::string>();
     definition.id = axis["id"].as<std::string>();
-
-    
-    std::string type = axis["type"].as<std::string>();
-    if (type == "linear") {
-        double start = axis["minimum"].as<double>();
-        double increment = axis["increment"].as<double>();
-        
-        definition.data = std::make_unique<LinearAxis>(start, increment);
-        
-        axes.emplace(definition.id, std::move(definition));
-    } else {
+    definition.type = [&] (const std::string &type) -> AxisType {
+        if (type == "linear") {
+            return AxisType::Linear;
+        }
         throw std::runtime_error("invalid axis type");
+    }(axis["type"].as<std::string>());
+
+    switch (definition.type) {
+    case AxisType::Linear:
+        definition.start = axis["minimum"].as<double>();
+        definition.increment = axis["increment"].as<double>();
     }
+
+    axes.emplace(definition.id, std::move(definition));
 }
 
 
@@ -350,19 +351,6 @@ bool checkModel(const definition::Model& model, gsl::span<const uint8_t> data)
         }
     }
     return true;
-}
-
-
-
-LinearAxis::LinearAxis(double start, double increment) : start_(start), increment_(increment)
-{
-}
-
-
-
-double LinearAxis::label(std::size_t idx) const
-{
-    return start_ + (idx * increment_);
 }
 
 

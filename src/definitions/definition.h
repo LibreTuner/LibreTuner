@@ -60,35 +60,16 @@ private:
 };
 
 
-
-class AxisData {
-public:
-    virtual ~AxisData() = default;
-    
-    /* Returns the label for the given axis position. */
-    virtual double label(std::size_t idx) const =0;
+enum class AxisType {
+    Linear,
 };
-
-
-
-class LinearAxis : public AxisData {
-public:
-    LinearAxis(double start, double increment);
-    
-    virtual double label(std::size_t idx) const override;
-    
-private:
-    double start_;
-    double increment_;
-};
-
-
 
 struct Axis {
     std::string name;
     std::string id;
-    
-    std::unique_ptr<AxisData> data;
+    AxisType type;
+    double start;
+    double increment;
 };
 
 
