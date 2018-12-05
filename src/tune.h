@@ -34,7 +34,8 @@ class Rom;
 struct TuneMeta {
     std::string name;
     std::string path;
-    int baseId;
+    std::size_t baseId;
+    std::size_t id;
 };
 
 

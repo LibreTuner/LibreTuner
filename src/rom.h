@@ -39,6 +39,8 @@ struct RomMeta {
     std::string definitionId;
     std::string modelId;
     int id;
+
+    std::vector<int> tunes;
 };
 
 /* The object that actually stores firmware data. */

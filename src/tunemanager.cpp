@@ -64,6 +64,7 @@ TuneMeta *TuneManager::createTune(const RomMeta &base,
     tune.name = name;
     tune.path = path.toStdString();
     tune.baseId = base.id;
+    tune.id = static_cast<int>(tunes_.size());
 
     tunes_.emplace_back(std::move(tune));
     emit updateTunes();
@@ -108,6 +109,7 @@ void TuneManager::readTunes(QXmlStreamReader &xml) {
             }
         }
 
+        tune.id = tunes_.size();
         tunes_.push_back(tune);
     }
 }

@@ -17,6 +17,7 @@
  */
 
 #include "rommanager.h"
+#include "tunemanager.h"
 #include "definitions/definition.h"
 #include "libretuner.h"
 
@@ -172,6 +173,9 @@ void RomManager::save() {
     xml.writeEndDocument();
 }
 
+
+
+
 void RomManager::addRom(const std::string &name,
                         const definition::MainPtr &definition,
                         const uint8_t *data, size_t size) {
@@ -213,6 +217,20 @@ void RomManager::addRom(const std::string &name,
     save();
 }
 
+
+
+void RomManager::addTuneMeta(const TuneManager &tunes)
+{
+    for (const TuneMeta &tune : tunes.tunes()) {
+        RomMeta *rom = fromId(tune.baseId);
+        if (rom) {
+            rom->tunes.push_back(tune.id);
+        }
+    }
+}
+
+
+
 const RomMeta *RomManager::fromId(int id) const {
     for (const RomMeta &rom : roms_) {
         if (rom.id == id) {
@@ -222,6 +240,17 @@ const RomMeta *RomManager::fromId(int id) const {
 
     return nullptr;
 }
+
+RomMeta *RomManager::fromId(int id) {
+    for (RomMeta &rom : roms_) {
+        if (rom.id == id) {
+            return &rom;
+        }
+    }
+
+    return nullptr;
+}
+
 
 
 std::shared_ptr<Rom> RomManager::loadId(int id) {

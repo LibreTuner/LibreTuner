@@ -55,6 +55,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     Q_INIT_RESOURCE(definitions);
     Q_INIT_RESOURCE(stylesheet);
     Q_INIT_RESOURCE(codes);
+    Q_INIT_RESOURCE(style);
 
     home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -111,6 +112,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.exec();
     }
 
+    RomManager::get()->addTuneMeta(*TuneManager::get());
+
     try {
         InterfaceManager::get().load();
     } catch (const std::exception &e) {
@@ -139,7 +142,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
 
 
-void LibreTuner::editTune(const TuneMeta &tune) {
+std::shared_ptr<Tune> LibreTuner::openTune(const TuneMeta &tune)
+{
     std::shared_ptr<Tune> data;
     try {
         data = std::make_shared<Tune>(tune);
@@ -149,31 +153,31 @@ void LibreTuner::editTune(const TuneMeta &tune) {
         msgBox.setText(QStringLiteral("Error opening tune: ") + e.what());
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
-        return;
     }
-    tuneEditor_ = std::make_unique<TuneEditor>(data);
-    tuneEditor_->show();
+    return data;
 }
 
 
 
-void LibreTuner::flashTune(const TuneMeta &tune) {
-    // TODO: Standard way to open tunes (we repeat the same code in editTune and
-    // flashTune... ew)
-    std::shared_ptr<Tune> data;
-    try {
-        data = std::make_shared<Tune>(tune);
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Tune data error");
-        msgBox.setText(QStringLiteral("Error opening tune: ") + e.what());
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
+void LibreTuner::editTune(const TuneMeta &meta) {
+    if (std::shared_ptr<Tune> tune = openTune(meta)) {
+        tuneEditor_ = std::make_unique<TuneEditor>(tune);
+        tuneEditor_->show();
+    }
+}
+
+
+
+void LibreTuner::flashTune(const TuneMeta &meta) {
+    std::shared_ptr<Tune> tune = openTune(meta);
+
+    if (!tune) {
         return;
     }
+
     std::shared_ptr<Flashable> flash;
     try {
-        flash = std::make_shared<Flashable>(data);
+        flash = std::make_shared<Flashable>(tune);
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Flash error");
@@ -231,7 +235,6 @@ void LibreTuner::checkHome() {
         }
     }
 }
-
 
 
 DataLinkPtr LibreTuner::getDataLink() {

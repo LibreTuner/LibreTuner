@@ -36,6 +36,7 @@ class TuneEditor;
 struct TuneMeta;
 
 class VehicleLink;
+class Tune;
 
 class FlashWindow;
 
@@ -57,6 +58,9 @@ public:
     void checkHome();
 
     QString home() { return home_; }
+
+    /* Attempts to open a tune. Shows an error dialog on failure and returns nullptr. */
+    std::shared_ptr<Tune> openTune(const TuneMeta &tune);
 
     /* Open the tune editor */
     void editTune(const TuneMeta &tune);

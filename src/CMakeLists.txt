@@ -120,6 +120,10 @@ set(libretuner_SRC
     ui/logview.h
     ui/diagnosticswidget.cpp
     ui/diagnosticswidget.h
+    ui/sidebarwidget.cpp
+    ui/sidebarwidget.h
+    ui/romswidget.cpp
+    ui/romswidget.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
@@ -170,6 +174,7 @@ qt5_add_resources(libretuner_SRC
     resources/definitions.qrc
     resources/stylesheet.qrc
     resources/codes.qrc
+    resources/qdarkstyle/style.qrc
 )
 
 # Separate the program into a library for testing

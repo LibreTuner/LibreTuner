@@ -18,7 +18,10 @@
 
 #include "logview.h"
 
-LogView::LogView() {}
+LogView::LogView() {
+    setReadOnly(true);
+    setWordWrapMode(QTextOption::NoWrap);
+}
 
 void LogView::setModel(QAbstractItemModel *model) {
     if (model_) {

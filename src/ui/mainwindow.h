@@ -51,16 +51,25 @@ private:
     QComboBox *comboLogVehicles_;
     QListView *listLogs_;
     QMainWindow *main_;
+
+    // Docks
     QDockWidget *logDock_;
+    QDockWidget *tunesDock_;
+    QDockWidget *romsDock_;
+    QDockWidget *overviewDock_;
+    QDockWidget *loggingDock_;
+    QDockWidget *diagnosticsDock_;
+    QDockWidget *sidebarDock_;
 
     void setupMenu();
 
-    QWidget *createOverviewTab();
-    QWidget *createTunesTab();
-    QWidget *createRomsTab();
-    QWidget *createLogsTab();
-    QWidget *createDiagnosticsTab();
-    void createLog();
+    QDockWidget *createOverviewDock();
+    QDockWidget *createTunesDock();
+    QDockWidget *createRomsDock();
+    QDockWidget *createLoggingDock();
+    QDockWidget *createDiagnosticsDock();
+    QDockWidget *createLogDock();
+    QDockWidget *createSidebarDock();
 
 public slots:
     void updateRoms();

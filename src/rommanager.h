@@ -30,6 +30,8 @@
 
 #include "rom.h"
 
+class TuneManager;
+
 namespace definition {
 struct Main;
 using MainPtr = std::shared_ptr<Main>;
@@ -57,10 +59,15 @@ public:
     void addRom(const std::string &name, const definition::MainPtr &definition,
                 const uint8_t *data, size_t size);
 
+    /* Attaches the tune ids to their respective roms */
+    void addTuneMeta(const TuneManager &tunes);
+
     /* Returns the ROM with id or nullptr if the ROM does
      * not exist. Be careful not to store this reference
      * as ROMs can be added or removed. */
     const RomMeta *fromId(int id) const;
+
+    RomMeta *fromId(int id);
 
     /* Loads a ROM from a ROM id. May throw an exception if the id
      * does not exist or if the ROM could not be loaded */

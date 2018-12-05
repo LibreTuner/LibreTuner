@@ -35,7 +35,9 @@ void Model::load(const YAML::Node& file) {
     
     // Load tables
     const auto &tables = file["tables"];
-    std::for_each(tables.begin(), tables.end(), [&](const YAML::Node &table) { loadTable(table); });
+    for (YAML::const_iterator it = tables.begin(); it != tables.end(); ++it) {
+        loadOffset(it->first.as<std::size_t>(), it->second.as<std::size_t>());
+    }
     
     // Load axes
     const auto &axes = file["axes"];
@@ -53,10 +55,7 @@ void Model::load(const YAML::Node& file) {
 
 
 
-void Model::loadTable(const YAML::Node &table) {
-    const auto id = table["id"].as<std::size_t>();
-    const auto offset = table["offset"].as<std::size_t>();
-    
+void Model::loadOffset(std::size_t id, std::size_t offset) {
     if (tables.size() <= id) {
         tables.resize(id + 1);
     }
@@ -181,8 +180,9 @@ void Main::load(const YAML::Node& file)
     }
     
     // Load tables
-    for (const auto &table : file["tables"]) {
-        loadTable(table);
+    YAML::Node tables = file["tables"];
+    for (auto it = tables.begin(); it != tables.end(); ++it) {
+        loadTable(it->first.as<std::size_t>(), it->second);
     }
     
     // Load axes
@@ -213,11 +213,10 @@ void Main::loadPid(const YAML::Node& pid)
 
 
 
-void Main::loadTable(const YAML::Node& table)
+void Main::loadTable(std::size_t id, const YAML::Node& table)
 {
     Table definition;
-    definition.id = table["id"].as<std::size_t>();
-    
+    definition.id = id;
     definition.name = table["name"].as<std::string>();
     definition.description = table["description"].as<std::string>();
     

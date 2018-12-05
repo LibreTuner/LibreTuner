@@ -124,7 +124,7 @@ public:
     
     
     void load(const YAML::Node &file);
-    void loadTable(const YAML::Node &table);
+    void loadOffset(std::size_t id, std::size_t offset);
     void loadAxis(const YAML::Node &axis);
     void loadIdentifier(const YAML::Node &identifier);
     void loadChecksum(const YAML::Node &checksum);
@@ -166,7 +166,7 @@ struct Main {
     void load(const std::string &dirPath);
     
     void load(const YAML::Node &file);
-    void loadTable(const YAML::Node &table);
+    void loadTable(std::size_t id, const YAML::Node &table);
     void loadAxis(const YAML::Node &axis);
     void loadPid(const YAML::Node &pid);
     

@@ -26,6 +26,7 @@
 #include "util.hpp"
 #include "enums.hpp"
 #include "definitions/definition.h"
+#include "logger.h"
 
 #include <cassert>
 #include <vector>
@@ -109,8 +110,6 @@ struct TableInfo {
 template<typename DataType>
 class TableBase : public Table {
 public:
-    template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, const TableInfo<DataType> &info);
     template<class InputIt>
     TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info);
     TableBase(std::size_t width, std::size_t height);
@@ -280,6 +279,9 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
     }
 
     if (role == Qt::BackgroundColorRole) {
+        if (width() == 1 && height() == 1) {
+            return QVariant();
+        }
         double ratio =
             static_cast<double>(get(index.column(), index.row()) - minimum()) /
             (maximum() - minimum());
@@ -305,7 +307,7 @@ public:
 
     template<typename T>
     std::unique_ptr<Table> deserialize() {
-        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
+        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
     }
 
 private:
@@ -341,18 +343,6 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 }
 
 
-
-template <typename DataType>
-template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, const TableInfo<DataType> &info) : Table(meta), data_(begin, end), modified_(std::distance(begin, end)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum)
-{
-    if (std::distance(begin, end) % info.width != 0) {
-        throw std::runtime_error("table does not fit in given width (size % width != 0)");
-    }
-}
-
-
-
 template <typename DataType>
 template <typename InputIt>
 TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum)
@@ -364,13 +354,13 @@ TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end
     // Start deserializing
     switch (endianness) {
     case Endianness::Big:
-        for (auto it = begin; it != end; it += sizeof(DataType)) {
+        for (auto it = begin; it < end; it += sizeof(DataType)) {
             DataType data = readBE<DataType>(it, it + sizeof(DataType));
             data_.emplace_back(data);
         }
         break;
     case Endianness::Little:
-        for (auto it = begin; it != end; it += sizeof(DataType)) {
+        for (auto it = begin; it < end; it += sizeof(DataType)) {
             DataType data = readLE<DataType>(it, it + sizeof(DataType));
             data_.emplace_back(data);
         }
