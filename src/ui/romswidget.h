@@ -5,7 +5,7 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-class RomManager;
+class RomStore;
 class TuneManager;
 
 class RomsModel : public QAbstractItemModel {
@@ -13,7 +13,7 @@ class RomsModel : public QAbstractItemModel {
 public:
     explicit RomsModel(QObject *parent = nullptr);
 
-    void setRoms(RomManager *roms);
+    void setRoms(RomStore *roms);
     void setTunes(TuneManager *tunes);
 
     // QAbstractItemModel interface
@@ -23,10 +23,13 @@ public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 private:
-    RomManager *roms_ = nullptr;
+    RomStore *roms_ = nullptr;
     TuneManager *tunes_ = nullptr;
+
+
 };
 
 

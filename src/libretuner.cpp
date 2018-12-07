@@ -21,13 +21,15 @@
 #include "logger.h"
 #include "rommanager.h"
 #include "timerrunloop.h"
-#include "tune.h"
 #include "tunemanager.h"
 #include "ui/addinterfacedialog.h"
 #include "ui/flashwindow.h"
 #include "ui/styledwindow.h"
 #include "ui/tuneeditor.h"
 #include "vehicle.h"
+
+#include "framelesswindow/framelesswindow.h"
+#include "DarkStyle.h"
 
 #ifdef WITH_SOCKETCAN
 #include "os/sockethandler.h"
@@ -55,7 +57,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     Q_INIT_RESOURCE(definitions);
     Q_INIT_RESOURCE(stylesheet);
     Q_INIT_RESOURCE(codes);
-    Q_INIT_RESOURCE(style);
+    Q_INIT_RESOURCE(darkstyle);
+    Q_INIT_RESOURCE(framelesswindow);
 
     home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -89,7 +92,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     }
 
     try {
-        RomManager::get()->load();
+        RomStore::get()->load();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setText(
@@ -112,7 +115,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.exec();
     }
 
-    RomManager::get()->addTuneMeta(*TuneManager::get());
+    RomStore::get()->addTuneMeta(*TuneManager::get());
 
     try {
         InterfaceManager::get().load();
@@ -125,7 +128,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.exec();
     }
 
-    mainWindow_ = std::make_unique<MainWindow>();
+    mainWindow_ = new MainWindow;
     mainWindow_->setWindowIcon(QIcon(":/icons/LibreTuner.png"));
     mainWindow_->show();
 
@@ -133,11 +136,13 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
     dtcDescriptions_.load();
 
-    QFile file(":/stylesheet.qss");
+    /*QFile file(":/stylesheet.qss");
     if (file.open(QFile::ReadOnly)) {
         setStyleSheet(file.readAll());
         file.close();
-    }
+    }*/
+
+    setStyle(new DarkStyle);
 }
 
 
@@ -155,15 +160,6 @@ std::shared_ptr<Tune> LibreTuner::openTune(const TuneMeta &tune)
         msgBox.exec();
     }
     return data;
-}
-
-
-
-void LibreTuner::editTune(const TuneMeta &meta) {
-    if (std::shared_ptr<Tune> tune = openTune(meta)) {
-        tuneEditor_ = std::make_unique<TuneEditor>(tune);
-        tuneEditor_->show();
-    }
 }
 
 

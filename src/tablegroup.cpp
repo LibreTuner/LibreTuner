@@ -23,7 +23,7 @@
 #include <cassert>
 
 TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
-    tables_.resize(base->definition()->tables.size());
+    tables_.resize(base->platform()->tables.size());
 }
 
 
@@ -52,49 +52,6 @@ void TableGroup::set(size_t idx, std::unique_ptr<Table> &&table) {
     assert(idx < tables_.size());
     
     tables_[idx] = std::move(table);
-
-    /*
-    const TableDefinition *definition = base_->definition()->tables()->at(idx);
-
-    TableType type = definition->type();
-    DataType dataType = definition->dataType();
-
-    TablePtr table;
-
-    switch (type) {
-    case TABLE_1D:
-        switch (dataType) {
-        case TDATA_FLOAT:
-            if (data.size() != (definition->sizeX() * sizeof(float))) {
-                throw std::runtime_error("invalid table size");
-            }
-            table = std::make_shared<Table1d<float>>(definition,
-                                                     Endianness::Big, data);
-            break;
-        }
-        break;
-    case TABLE_2D:
-        switch (dataType) {
-        case TDATA_FLOAT:
-            if (data.size() !=
-                (definition->sizeX() * definition->sizeY() * sizeof(float))) {
-                throw std::runtime_error("invalid table size");
-            }
-            table = std::make_shared<Table2d<float>>(definition,
-                                                     Endianness::Big, data);
-            break;
-        }
-
-        break;
-    case TABLE_3D:
-        break;
-    }
-
-    if (table) {
-        table->setModified(true);
-        table->calcDifference(base_->getTable(idx));
-        tables_[idx] = table;
-    }*/
 }
 
 
@@ -104,7 +61,7 @@ void TableGroup::apply(uint8_t *data, size_t size, Endianness endianness) {
     std::size_t id = 0;
     for (const std::unique_ptr<Table> &table : tables_) {
         if (table && table->dirty()) {
-            size_t offset = base_->definition()->tables[id];
+            size_t offset = base_->model()->tables[id];
             assert(offset < size);
             table->serialize(data + offset, size - offset, endianness);
         }

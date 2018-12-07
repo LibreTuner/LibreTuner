@@ -69,7 +69,7 @@ void RomWidget::paintEvent(QPaintEvent *event) {
 }
 
 void RomWidget::createTuneClicked() {
-    const RomMeta *rom = RomManager::get()->fromId(romId_);
+    const RomMeta *rom = RomStore::get()->fromId(romId_);
     if (rom == nullptr) {
         Logger::warning("ROM no longer exists");
         // We need not return here because CreateTuneDialog can take a nullptr

@@ -30,6 +30,8 @@
 #include "tunewidget.h"
 #include "sidebarwidget.h"
 #include "romswidget.h"
+#include "tableswidget.h"
+#include "editorwidget.h"
 
 #include <QAction>
 #include <QDockWidget>
@@ -43,68 +45,63 @@
 #include <future>
 
 
-MainWindow::MainWindow(QWidget *parent) : StyledWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     resize(QSize(1100, 630));
 
-    setTitle("LibreTuner");
+    setWindowTitle("LibreTuner");
 
-    main_ = new QMainWindow;
-    layout_->addWidget(main_);
+    //main_ = new QMainWindow;
+    //layout_->addWidget(main_);
 
     setupMenu();
 
     // Blank central widget
     QLabel *central = new QLabel("TEST");
-    main_->setCentralWidget(central);
+    setCentralWidget(central);
     central->hide();
 
-    main_->setDockOptions(main_->dockOptions() | QMainWindow::AllowNestedDocks);
-    main_->setDocumentMode(true);
+    setDockOptions(dockOptions() | QMainWindow::AllowNestedDocks);
+    setDocumentMode(true);
 
     // Create docks
     logDock_ = createLogDock();
     overviewDock_ = createOverviewDock();
-    tunesDock_ = createTunesDock();
     romsDock_ = createRomsDock();
     loggingDock_ = createLoggingDock();
     diagnosticsDock_ = createDiagnosticsDock();
     sidebarDock_ = createSidebarDock();
+    tablesDock_ = createTablesDock();
+    editorDock_ = createEditorDock();
 
     // Setup corners
-    main_->setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-    main_->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 
     // Place docks
 
     // Bottom
-    main_->addDockWidget(Qt::BottomDockWidgetArea, logDock_);
+    addDockWidget(Qt::BottomDockWidgetArea, logDock_);
 
     // Roms | Central | Sidebar
-    main_->addDockWidget(Qt::TopDockWidgetArea, romsDock_);
-    main_->splitDockWidget(romsDock_, overviewDock_, Qt::Horizontal);
-    main_->splitDockWidget(overviewDock_, sidebarDock_, Qt::Horizontal);
+    addDockWidget(Qt::TopDockWidgetArea, romsDock_);
+    splitDockWidget(romsDock_, overviewDock_, Qt::Horizontal);
+    splitDockWidget(overviewDock_, sidebarDock_, Qt::Horizontal);
 
     // Left
-    main_->splitDockWidget(romsDock_, tunesDock_, Qt::Vertical);
+    splitDockWidget(romsDock_, tablesDock_, Qt::Vertical);
 
     // Top (central)
 
-    main_->tabifyDockWidget(overviewDock_, loggingDock_);
-    main_->tabifyDockWidget(loggingDock_, diagnosticsDock_);
-
-
-    connect(RomManager::get(), &RomManager::updateRoms, this,
-            &MainWindow::updateRoms);
-    connect(TuneManager::get(), &TuneManager::updateTunes, this,
-            &MainWindow::updateTunes);
-    updateRoms();
-    updateTunes();
+    tabifyDockWidget(overviewDock_, loggingDock_);
+    tabifyDockWidget(overviewDock_, diagnosticsDock_);
+    tabifyDockWidget(overviewDock_, editorDock_);
 }
 
 
 
 QDockWidget *MainWindow::createLoggingDock() {
     QDockWidget *dock = new QDockWidget("Logging", this);
+    QWidget *widget = new QWidget;
     auto *layout = new QVBoxLayout();
 
     auto *hlayout = new QHBoxLayout();
@@ -124,7 +121,8 @@ QDockWidget *MainWindow::createLoggingDock() {
     listLogs_ = new QListView;
     layout->addWidget(listLogs_);
 
-    dock->setLayout(layout);
+    widget->setLayout(layout);
+    dock->setWidget(widget);
     return dock;
 }
 
@@ -158,65 +156,36 @@ QDockWidget *MainWindow::createSidebarDock()
 
 
 
-QDockWidget *MainWindow::createRomsDock() {
-    QDockWidget *dock = new QDockWidget("ROMs", this);
-
-    RomsWidget *roms = new RomsWidget(dock);
-    RomsModel *model = new RomsModel(roms);
-    model->setRoms(RomManager::get());
-    model->setTunes(TuneManager::get());
-    roms->setModel(model);
-    dock->setWidget(roms);
-
-    /*QWidget *widget = new QWidget;
-    auto *layout = new QVBoxLayout();
-
-    auto *area = new QScrollArea;
-    area->setWidgetResizable(true);
-
-    area->setStyleSheet(
-        "QScrollArea { background: transparent; }\n"
-        "QScrollArea > QWidget > QWidget { background: transparent; }\n");
-    layout->addWidget(area);
-
-    QWidget *scrollContents = new QWidget();
-    romsLayout_ = new FlowLayout();
-    scrollContents->setLayout(romsLayout_);
-    area->setWidget(scrollContents);
-
-    QPushButton *buttonDownload = new QPushButton(tr("Download new ROM"));
-    connect(buttonDownload, &QPushButton::clicked, this,
-            &MainWindow::on_buttonDownloadRom_clicked);
-    layout->addWidget(buttonDownload);
-
-    widget->setLayout(layout);
-    dock->setWidget(widget);*/
+QDockWidget *MainWindow::createTablesDock()
+{
+    QDockWidget *dock = new QDockWidget("Tables");
+    tables_ = new TablesWidget(dock);
+    dock->setWidget(tables_);
     return dock;
 }
 
 
 
-QDockWidget *MainWindow::createTunesDock() {
-    QDockWidget *dock = new QDockWidget("Tunes", this);
-    auto *layout = new QVBoxLayout();
+QDockWidget *MainWindow::createEditorDock()
+{
+    QDockWidget *dock = new QDockWidget("Editor");
+    editor_ = new EditorWidget(dock);
+    dock->setWidget(editor_);
+    return dock;
+}
 
-    auto *area = new QScrollArea;
-    area->setWidgetResizable(true);
-    area->setStyleSheet(
-        "QScrollArea { background: transparent; }\n"
-        "QScrollArea > QWidget > QWidget { background: transparent; }\n"
-        "QScrollArea > QWidget > QScrollBar { background: palette(base); }");
-    layout->addWidget(area);
 
-    QWidget *scrollContents = new QWidget();
-    tunesLayout_ = new FlowLayout();
-    scrollContents->setLayout(tunesLayout_);
-    area->setWidget(scrollContents);
 
-    QPushButton *buttonCreateTune = new QPushButton(tr("Create new tune"));
-    layout->addWidget(buttonCreateTune);
+QDockWidget *MainWindow::createRomsDock() {
+    QDockWidget *dock = new QDockWidget("ROMs", this);
 
-    dock->setLayout(layout);
+    RomsWidget *roms = new RomsWidget(dock);
+    RomsModel *model = new RomsModel(roms);
+    model->setRoms(RomStore::get());
+    model->setTunes(TuneManager::get());
+    roms->setModel(model);
+    dock->setWidget(roms);
+
     return dock;
 }
 
@@ -238,33 +207,8 @@ void MainWindow::setupMenu() {
     QAction *interfacesAct = viewMenu->addAction(tr("Interfaces"));
     connect(interfacesAct, &QAction::triggered,
             [this] { interfacesWindow_.show(); });
-    main_->setMenuBar(menuBar);
+    setMenuBar(menuBar);
 }
-
-void MainWindow::updateTunes() {
-    QLayoutItem *child;
-    while ((child = tunesLayout_->takeAt(0)) != nullptr) {
-        delete child;
-    }
-
-    for (const TuneMeta &tune : TuneManager::get()->tunes()) {
-        tunesLayout_->addWidget(new TuneWidget(tune));
-    }
-}
-
-
-
-void MainWindow::updateRoms() {
-    /*QLayoutItem *child;
-    while ((child = romsLayout_->takeAt(0)) != nullptr) {
-        delete child;
-    }
-
-    for (const RomMeta &rom : RomManager::get()->roms()) {
-        romsLayout_->addWidget(new RomWidget(rom));
-    }*/
-}
-
 
 
 void MainWindow::on_buttonDownloadRom_clicked() {

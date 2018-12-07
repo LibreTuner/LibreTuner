@@ -4,9 +4,19 @@
 
 #include "logger.h"
 
+#include <QVBoxLayout>
+#include <QHeaderView>
+
 RomsWidget::RomsWidget(QWidget *parent) : QWidget(parent)
 {
+    QVBoxLayout *layout = new QVBoxLayout;
     treeView_ = new QTreeView(this);
+
+    treeView_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    treeView_->header()->setStretchLastSection(true);
+
+    layout->addWidget(treeView_);
+    setLayout(layout);
 }
 
 
@@ -25,7 +35,7 @@ RomsModel::RomsModel(QObject *parent) : QAbstractItemModel(parent)
 
 
 
-void RomsModel::setRoms(RomManager *roms)
+void RomsModel::setRoms(RomStore *roms)
 {
     roms_ = roms;
 }
@@ -117,10 +127,6 @@ QVariant RomsModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    if (index.column() != 0) {
-        return QVariant();
-    }
-
     auto &roms = roms_->roms();
 
     if (index.internalId() == 0) {
@@ -129,10 +135,23 @@ QVariant RomsModel::data(const QModelIndex &index, int role) const
             return QVariant();
         }
         const RomMeta &rom = roms[index.row()];
-        return QVariant(QString::fromStdString(rom.name));
+        if (index.column() == 0) {
+            return QVariant(QString::fromStdString(rom.name));
+        } else if (index.column() == 1) {
+            return QVariant(QString::fromStdString(rom.definitionId));
+        } else if (index.column() == 2) {
+            return QVariant(QString::fromStdString(rom.modelId));
+        } else {
+            return QVariant();
+        }
     }
 
     // Tune
+
+    if (index.column() != 0) {
+        return QVariant();
+    }
+
     std::size_t rom_id = index.internalId() - 1;
     if (rom_id >= roms.size()) {
         return QVariant();
@@ -154,4 +173,28 @@ QVariant RomsModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant(QString::fromStdString(tunes_->tunes()[tune_id].name));
+}
+
+
+
+QVariant RomsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal) {
+        return QVariant();
+    }
+
+    if (role != Qt::DisplayRole) {
+        return QVariant();
+    }
+
+    switch (section) {
+    case 0:
+        return QVariant("Name");
+    case 1:
+        return QVariant("Platform");
+    case 2:
+        return QVariant("Model");
+    default:
+        return QVariant();
+    }
 }

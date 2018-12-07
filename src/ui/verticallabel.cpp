@@ -20,16 +20,23 @@
 
 #include <QPainter>
 #include <QStyle>
+#include <QPainterPath>
 
 VerticalLabel::VerticalLabel(QWidget *parent) : QLabel(parent) {}
 
+
+
 VerticalLabel::VerticalLabel(const QString &text, QWidget *parent)
     : QLabel(text, parent) {}
+
+
 
 void VerticalLabel::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.setPen(palette().color(QPalette::Foreground));
     painter.setBrush(Qt::Dense1Pattern);
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.translate(0, height());
     painter.rotate(270);
@@ -37,10 +44,14 @@ void VerticalLabel::paintEvent(QPaintEvent *) {
     painter.drawText(0, 0, height(), width(), alignment(), text());
 }
 
+
+
 QSize VerticalLabel::minimumSizeHint() const {
     QSize s = QLabel::minimumSizeHint();
     return {s.height(), s.width()};
 }
+
+
 
 QSize VerticalLabel::sizeHint() const {
     QSize s = QLabel::sizeHint();

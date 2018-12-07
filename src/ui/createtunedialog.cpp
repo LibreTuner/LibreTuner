@@ -31,7 +31,7 @@ CreateTuneDialog::CreateTuneDialog(const RomMeta *base)
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
-    for (const RomMeta &rom : RomManager::get()->roms()) {
+    for (const RomMeta &rom : RomStore::get()->roms()) {
         ui_->comboBase->addItem(QString::fromStdString(rom.name),
                                 QVariant(rom.id));
         if (base != nullptr && rom.id == base->id) {
@@ -48,7 +48,7 @@ CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
 void CreateTuneDialog::on_buttonCreate_clicked() {
     int romId = ui_->comboBase->currentData().toInt();
-    const RomMeta *rom = RomManager::get()->fromId(romId);
+    const RomMeta *rom = RomStore::get()->fromId(romId);
     if (rom == nullptr) {
         Logger::warning("Rom with ID '" + std::to_string(romId) +
                         "' no longer exists");

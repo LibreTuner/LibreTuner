@@ -23,13 +23,15 @@
 #include "dataloggerwindow.h"
 #include "downloadwindow.h"
 #include "interfaceswindow.h"
-#include "styledwindow.h"
 
 #include <QComboBox>
 #include <QLayout>
 #include <QMainWindow>
 
-class MainWindow : public StyledWindow { // public QMainWindow {
+class EditorWidget;
+class TablesWidget;
+
+class MainWindow : public QMainWindow { // public QMainWindow {
     Q_OBJECT
 
 public:
@@ -46,34 +48,32 @@ private:
     InterfacesWindow interfacesWindow_;
     std::unique_ptr<DataLoggerWindow> loggerWindow_;
 
-    QLayout *tunesLayout_;
-    QLayout *romsLayout_;
     QComboBox *comboLogVehicles_;
     QListView *listLogs_;
-    QMainWindow *main_;
+
+    TablesWidget *tables_;
+    EditorWidget *editor_;
 
     // Docks
     QDockWidget *logDock_;
-    QDockWidget *tunesDock_;
     QDockWidget *romsDock_;
     QDockWidget *overviewDock_;
     QDockWidget *loggingDock_;
     QDockWidget *diagnosticsDock_;
     QDockWidget *sidebarDock_;
+    QDockWidget *tablesDock_;
+    QDockWidget *editorDock_;
 
     void setupMenu();
 
     QDockWidget *createOverviewDock();
-    QDockWidget *createTunesDock();
     QDockWidget *createRomsDock();
     QDockWidget *createLoggingDock();
     QDockWidget *createDiagnosticsDock();
     QDockWidget *createLogDock();
     QDockWidget *createSidebarDock();
-
-public slots:
-    void updateRoms();
-    void updateTunes();
+    QDockWidget *createTablesDock();
+    QDockWidget *createEditorDock();
 };
 
 #endif // MAINWINDOW_H

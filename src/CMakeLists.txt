@@ -16,10 +16,6 @@ set(libretuner_SRC
     downloadinterface.h
     rommanager.cpp
     rommanager.h
-    tunemanager.cpp
-    tunemanager.h
-    tune.cpp
-    tune.h
     rom.cpp
     rom.h
     tablegroup.cpp
@@ -124,6 +120,14 @@ set(libretuner_SRC
     ui/sidebarwidget.h
     ui/romswidget.cpp
     ui/romswidget.h
+    ui/tableswidget.cpp
+    ui/tableswidget.h
+    ui/editorwidget.cpp
+    ui/editorwidget.h
+
+    framelesswindow/framelesswindow.cpp
+    framelesswindow/windowdragger.cpp
+    DarkStyle.cpp
 
     protocols/caninterface.cpp
     protocols/caninterface.h
@@ -167,6 +171,8 @@ qt5_wrap_ui(libretuner_SRC
     ui/flashwindow.ui
     ui/interfaceswindow.ui
     ui/addinterfacedialog.ui
+
+    framelesswindow/framelesswindow.ui
 )
 
 qt5_add_resources(libretuner_SRC
@@ -174,7 +180,8 @@ qt5_add_resources(libretuner_SRC
     resources/definitions.qrc
     resources/stylesheet.qrc
     resources/codes.qrc
-    resources/qdarkstyle/style.qrc
+    resources/darkstyle.qrc
+    resources/framelesswindow.qrc
 )
 
 # Separate the program into a library for testing

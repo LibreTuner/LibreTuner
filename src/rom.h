@@ -22,50 +22,92 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <QXmlStreamReader>
+
+#include "tablegroup.h"
 
 namespace definition {
 struct Model;
+struct Main;
 using ModelPtr = std::shared_ptr<Model>;
+using PlatformPtr = std::shared_ptr<Main>;
 
 struct Table;
 }
 
 class Table;
+class Rom;
 
-/* ROM Metadata */
-struct RomMeta {
-    std::string name;
-    std::string path;
-    std::string definitionId;
-    std::string modelId;
-    int id;
-
-    std::vector<int> tunes;
-};
-
-/* The object that actually stores firmware data. */
-class Rom {
+/**
+ * TODO: write docs
+ */
+class Tune {
 public:
-    explicit Rom(const RomMeta &rom);
+    const std::string &name() const { return name_; }
+    const std::string &path() const { return path_; }
+    std::size_t id() const { return id_; }
+    const std::shared_ptr<Rom> &base() const { return base_; }
 
-    /* Returns the raw ROM */
-    const std::vector<uint8_t> &data() { return data_; }
+    void setId(std::size_t id) { id_ = id; }
+    void setName(const std::string &name) { name_ = name; }
+    void setPath(const std::string &path) { path_ = path; }
+    void setBase(const std::shared_ptr<Rom> &rom) { base_ = rom; }
 
-    std::string name() { return name_; }
+    /* Applies table modifications to data and computes checksums.
+     * Returns false on error and sets lastError. */
+    void apply(uint8_t *data, size_t size);
 
-    definition::ModelPtr definition() const { return definition_; }
+    TableGroup &tables() { return tables_; }
+
+    void save();
 
 private:
     std::string name_;
+    std::string path_;
+    std::shared_ptr<Rom> base_;
+    std::size_t id_;
 
-    definition::ModelPtr definition_;
-
-    /* Raw firmware data */
-    std::vector<uint8_t> data_;
+    TableGroup tables_;
+    void readTables(QXmlStreamReader &xml);
 };
 
-/* Loads a table from the definition. Returns nullptr if the
+
+
+/* ROM Metadata */
+class Rom {
+public:
+    Rom();
+
+    const std::string &name() const { return name_; }
+    const std::string &path() const { return path_; }
+    const definition::PlatformPtr &platform() const { return platform_; }
+    const definition::ModelPtr &model() const { return model_; }
+    std::size_t id() const { return id_; }
+    const std::vector<std::shared_ptr<Tune>> &tunes() { return tunes_; }
+
+    void setId(std::size_t id) { id_ = id; }
+    void setName(const std::string &name) { name_ = name; }
+    void setPath(const std::string &path) { path_ = path; }
+    void setPlatform(const definition::PlatformPtr &platform) { platform_ = platform; }
+    void setModel(const definition::ModelPtr &model) { model_ = model; }
+    void addTune(const std::shared_ptr<Tune> &tune) { tunes_.push_back(std::move(tune)); }
+
+
+private:
+    std::string name_;
+    std::string path_;
+    definition::PlatformPtr platform_;
+    definition::ModelPtr model_;
+    std::size_t id_;
+
+    std::vector<std::shared_ptr<Tune>> tunes_;
+};
+
+
+
+/* Loads a table from the rom. Returns nullptr if the
    table does not exist. */
 std::unique_ptr<Table> loadTable(Rom &rom, std::size_t tableId);
+
 
 #endif // ROM_H

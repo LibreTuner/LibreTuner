@@ -62,9 +62,6 @@ public:
     /* Attempts to open a tune. Shows an error dialog on failure and returns nullptr. */
     std::shared_ptr<Tune> openTune(const TuneMeta &tune);
 
-    /* Open the tune editor */
-    void editTune(const TuneMeta &tune);
-
     /* Open tune flasher */
     void flashTune(const TuneMeta &tune);
 
@@ -87,8 +84,7 @@ public:
     Log &log() { return log_; }
 
 private:
-    std::unique_ptr<MainWindow> mainWindow_;
-    std::unique_ptr<TuneEditor> tuneEditor_;
+    MainWindow *mainWindow_;
     std::unique_ptr<FlashWindow> flashWindow_;
     CanLog canLog_;
     Log log_;
