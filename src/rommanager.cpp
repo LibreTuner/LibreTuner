@@ -17,7 +17,6 @@
  */
 
 #include "rommanager.h"
-#include "RomManager.h"
 #include "definitions/definition.h"
 #include "libretuner.h"
 
@@ -85,7 +84,7 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
             return;
         }
 
-        Rom rom;
+        std::shared_ptr<Rom> rom = std::make_shared<Rom>();
         bool foundId = false;
 
         std::string modelId;
@@ -93,9 +92,9 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
         // Read ROM data
         while (xml.readNextStartElement()) {
             if (xml.name() == "name") {
-                rom.setName(xml.readElementText().trimmed().toStdString());
+                rom->setName(xml.readElementText().trimmed().toStdString());
             } else if (xml.name() == "path") {
-                rom.setName(xml.readElementText().trimmed().toStdString());
+                rom->setPath(LibreTuner::get()->home().toStdString() + "/roms/" + xml.readElementText().trimmed().toStdString());
             } else if (xml.name() == "type") {
                 QString type = xml.readElementText().toLower();
                 definition::MainPtr def =
@@ -105,7 +104,7 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
                     break;
                 }
 
-                rom.setPlatform(std::move(def));
+                rom->setPlatform(std::move(def));
             } else if (xml.name() == "subtype") {
                 QString type = xml.readElementText().toLower();
                 // Find model
@@ -113,28 +112,28 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
                 // TODO: check if this subtype exists
             } else if (xml.name() == "id") {
                 bool ok;
-                rom.setId(xml.readElementText().toULong(&ok));
+                rom->setId(xml.readElementText().toULong(&ok));
                 if (!ok) {
                     xml.raiseError("id is not a valid decimal number");
                 }
                 foundId = true;
-                if (rom.id() > nextId_) {
-                    nextId_ = rom.id();
+                if (rom->id() > nextId_) {
+                    nextId_ = rom->id();
                 }
             }
         }
 
         // Verifications
         if (!xml.hasError()) {
-            if (rom.name().empty()) {
+            if (rom->name().empty()) {
                 xml.raiseError("ROM name is empty");
                 return;
             }
-            if (rom.path().empty()) {
+            if (rom->path().empty()) {
                 xml.raiseError("ROM path is empty");
                 return;
             }
-            if (!rom.platform()) {
+            if (!rom->platform()) {
                 xml.raiseError("ROM platform is empty");
                 return;
             }
@@ -143,12 +142,12 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
                 return;
             } else {
                 // Search for the model
-                const definition::ModelPtr &model = rom.platform()->findModel(modelId);
+                const definition::ModelPtr &model = rom->platform()->findModel(modelId);
                 if (!model) {
                     xml.raiseError(QString::fromStdString("No model found with id '" + modelId + "'"));
                     return;
                 }
-                rom.setModel(model);
+                rom->setModel(model);
             }
             if (!foundId) {
                 xml.raiseError("ROM id is empty or negative");
@@ -226,13 +225,13 @@ void RomStore::addRom(const std::string &name,
             "we can add support for this firmware version.");
     }
 
-    Rom meta;
-    meta.setName(name);
-    meta.setPath(path.toStdString());
-    meta.setPlatform(definition);
-    meta.setModel(subtype);
-    meta.setId(nextId_++);
-    roms_.emplace_back(std::move(meta));
+    std::shared_ptr<Rom> rom = std::make_shared<Rom>();
+    rom->setName(name);
+    rom->setPath(path.toStdString());
+    rom->setPlatform(definition);
+    rom->setModel(subtype);
+    rom->setId(nextId_++);
+    roms_.emplace_back(std::move(rom));
 
     emit updateRoms();
 
@@ -316,7 +315,7 @@ void RomStore::readTunes(QXmlStreamReader &xml) {
                 tune->setName(xml.readElementText().toStdString());
             }
             if (xml.name() == "path") {
-                tune->setPath(xml.readElementText().toStdString());
+                tune->setPath(LibreTuner::get()->home().toStdString() + "/tunes/" + xml.readElementText().toStdString());
             }
             if (xml.name() == "base") {
                 // Locate the base rom from the ID

@@ -80,18 +80,10 @@ set(libretuner_SRC
     ui/canviewer.h
     ui/canlogview.cpp
     ui/canlogview.h
-    ui/flowlayout.cpp
-    ui/flowlayout.h
-    ui/romwidget.cpp
-    ui/romwidget.h
     ui/downloadwindow.cpp
     ui/downloadwindow.h
     ui/createtunedialog.cpp
     ui/createtunedialog.h
-    ui/tuneeditor.cpp
-    ui/tuneeditor.h
-    ui/tunewidget.cpp
-    ui/tunewidget.h
     ui/verticallabel.cpp
     ui/verticallabel.h
     ui/graphwidget.cpp
@@ -118,12 +110,12 @@ set(libretuner_SRC
     ui/diagnosticswidget.h
     ui/sidebarwidget.cpp
     ui/sidebarwidget.h
-    ui/romswidget.cpp
-    ui/romswidget.h
     ui/tableswidget.cpp
     ui/tableswidget.h
     ui/editorwidget.cpp
     ui/editorwidget.h
+    ui/romswidget.cpp
+    ui/romswidget.h
 
     framelesswindow/framelesswindow.cpp
     framelesswindow/windowdragger.cpp

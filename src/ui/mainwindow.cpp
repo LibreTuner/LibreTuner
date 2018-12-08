@@ -24,12 +24,9 @@
 #include "diagnosticswidget.h"
 #include "flowlayout.h"
 #include "logview.h"
-#include "romwidget.h"
-#include "titlebar.h"
-#include "tunemanager.h"
-#include "tunewidget.h"
-#include "sidebarwidget.h"
 #include "romswidget.h"
+#include "titlebar.h"
+#include "sidebarwidget.h"
 #include "tableswidget.h"
 #include "editorwidget.h"
 
@@ -41,6 +38,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QWindowStateChangeEvent>
+#include <QSettings>
 
 #include <future>
 
@@ -49,6 +47,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     resize(QSize(1100, 630));
 
     setWindowTitle("LibreTuner");
+    
+    setDocumentMode(false);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     //main_ = new QMainWindow;
     //layout_->addWidget(main_);
@@ -56,9 +57,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setupMenu();
 
     // Blank central widget
-    QLabel *central = new QLabel("TEST");
-    setCentralWidget(central);
-    central->hide();
+    //QLabel *central = new QLabel("TEST");
+    //setCentralWidget(central);
+    //central->hide();
 
     setDockOptions(dockOptions() | QMainWindow::AllowNestedDocks);
     setDocumentMode(true);
@@ -74,27 +75,73 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     editorDock_ = createEditorDock();
 
     // Setup corners
-    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    /*setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);*/
+    
+    
+    //hideAllDocks();
+    restoreDocks();
+    
+    loadSettings();
+}
 
+
+void MainWindow::hideAllDocks()
+{
+    for (auto dock : docks_) {
+        removeDockWidget(dock);
+    }
+}
+
+
+
+void MainWindow::restoreDocks()
+{
     // Place docks
-
-    // Bottom
-    addDockWidget(Qt::BottomDockWidgetArea, logDock_);
 
     // Roms | Central | Sidebar
     addDockWidget(Qt::TopDockWidgetArea, romsDock_);
     splitDockWidget(romsDock_, overviewDock_, Qt::Horizontal);
     splitDockWidget(overviewDock_, sidebarDock_, Qt::Horizontal);
-
-    // Left
-    splitDockWidget(romsDock_, tablesDock_, Qt::Vertical);
-
+    
+    // Bottom
+    addDockWidget(Qt::BottomDockWidgetArea, logDock_);
+    
     // Top (central)
 
     tabifyDockWidget(overviewDock_, loggingDock_);
     tabifyDockWidget(overviewDock_, diagnosticsDock_);
     tabifyDockWidget(overviewDock_, editorDock_);
+
+    // Left
+    splitDockWidget(romsDock_, tablesDock_, Qt::Vertical);
+}
+
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+    QByteArray geo = settings.value("geometry", QByteArray()).toByteArray();
+    restoreGeometry(geo);
+    QByteArray state = settings.value("state", QByteArray()).toByteArray();
+    restoreState(state);
+    QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
+    QSize size = settings.value("size", QSize(400, 400)).toSize();
+    resize(size);
+    move(pos);
+}
+
+
+
+void MainWindow::saveSettings()
+{
+    QSettings settings;
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+    settings.setValue("state", saveState());
 }
 
 
@@ -123,6 +170,7 @@ QDockWidget *MainWindow::createLoggingDock() {
 
     widget->setLayout(layout);
     dock->setWidget(widget);
+    docks_.push_back(dock);
     return dock;
 }
 
@@ -131,6 +179,7 @@ QDockWidget *MainWindow::createLoggingDock() {
 QDockWidget *MainWindow::createDiagnosticsDock() {
     QDockWidget *dock = new QDockWidget("Diagnostics", this);
     dock->setWidget(new DiagnosticsWidget);
+    docks_.push_back(dock);
     return dock;
 }
 
@@ -142,6 +191,8 @@ QDockWidget *MainWindow::createLogDock() {
 
     QDockWidget *dock = new QDockWidget("Log", this);
     dock->setWidget(log);
+    dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    docks_.push_back(dock);
     return dock;
 }
 
@@ -150,7 +201,12 @@ QDockWidget *MainWindow::createLogDock() {
 QDockWidget *MainWindow::createSidebarDock()
 {
     QDockWidget *dock = new QDockWidget("Sidebar", this);
-    dock->setWidget(new SidebarWidget);
+    dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
+    
+    sidebar_ = new SidebarWidget;
+    sidebar_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    dock->setWidget(sidebar_);
+    docks_.push_back(dock);
     return dock;
 }
 
@@ -158,9 +214,21 @@ QDockWidget *MainWindow::createSidebarDock()
 
 QDockWidget *MainWindow::createTablesDock()
 {
-    QDockWidget *dock = new QDockWidget("Tables");
+    QDockWidget *dock = new QDockWidget("Tables", this);
     tables_ = new TablesWidget(dock);
     dock->setWidget(tables_);
+    
+    connect(tables_, &TablesWidget::activated, [this](int index) {
+        Table *table = selectedTune_->tables().get(index, true);
+        
+        if (table) {
+            sidebar_->setTableName(QString::fromStdString(table->name()));
+            sidebar_->setTableOffset(table->offset());
+        }
+        
+        editor_->tableChanged(table);
+    });
+    docks_.push_back(dock);
     return dock;
 }
 
@@ -168,10 +236,63 @@ QDockWidget *MainWindow::createTablesDock()
 
 QDockWidget *MainWindow::createEditorDock()
 {
-    QDockWidget *dock = new QDockWidget("Editor");
+    QDockWidget *dock = new QDockWidget("Editor", this);
     editor_ = new EditorWidget(dock);
     dock->setWidget(editor_);
+    docks_.push_back(dock);
     return dock;
+}
+
+bool MainWindow::changeSelected(const std::shared_ptr<TuneData>& data)
+{
+    if (checkSaveSelected()) {
+        selectedTune_ = data;
+        return true;
+    }
+    return false;
+}
+
+
+
+bool MainWindow::checkSaveSelected()
+{
+    if (!selectedTune_) {
+        return true;
+    }
+    
+    if (selectedTune_->dirty()) {
+        QMessageBox mb;
+        mb.setText(tr("This tune has been modified"));
+        mb.setWindowTitle(tr("Unsaved changes"));
+        mb.setInformativeText(tr("Do you want to save your changes?"));
+        mb.setIcon(QMessageBox::Question);
+        mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard |
+                              QMessageBox::Save);
+        mb.setDefaultButton(QMessageBox::Save);
+        switch (mb.exec()) {
+        case QMessageBox::Save:
+            // Save then accept
+            try {  
+                selectedTune_->save();
+                return true;
+            } catch (const std::runtime_error &err) {
+                QMessageBox msg;
+                msg.setWindowTitle(tr("Error while saving tune"));
+                msg.setText(tr(err.what()));
+                msg.setIcon(QMessageBox::Critical);
+                msg.exec();
+                return false;
+            }
+            
+            return false;
+        case QMessageBox::Discard:
+            return true;
+        case QMessageBox::Cancel:
+        default:
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -182,15 +303,39 @@ QDockWidget *MainWindow::createRomsDock() {
     RomsWidget *roms = new RomsWidget(dock);
     RomsModel *model = new RomsModel(roms);
     model->setRoms(RomStore::get());
-    model->setTunes(TuneManager::get());
     roms->setModel(model);
     dock->setWidget(roms);
-
+    
+    
+    connect(roms, &RomsWidget::activated, [this](const std::shared_ptr<Tune> &tune) {
+        if (!tune) {
+            if (changeSelected(std::shared_ptr<TuneData>())) 
+                tables_->setTables(std::vector<definition::Table>());
+            return;
+        }
+        
+        if (changeSelected(LibreTuner::openTune(tune)))
+            tables_->setTables(tune->base()->platform()->tables);
+    });
+    
+    connect(roms, &RomsWidget::downloadClicked, this, &MainWindow::on_buttonDownloadRom_clicked);
+    
+    connect(roms, &RomsWidget::flashClicked, [this]() {
+        if (selectedTune_) {
+            LibreTuner::get()->flashTune(selectedTune_);
+        }
+    });
+    
+    docks_.push_back(dock);
     return dock;
 }
 
 
-QDockWidget *MainWindow::createOverviewDock() { return new QDockWidget("Overview", this); }
+QDockWidget *MainWindow::createOverviewDock() {
+    QDockWidget *dock = new QDockWidget("Overview", this);
+    docks_.push_back(dock);
+    return dock;
+}
 
 
 
@@ -218,10 +363,18 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     }
 
     if (const auto &link = LibreTuner::get()->getVehicleLink()) {
-        auto di = link->downloader();
-        downloadWindow_ =
-            new DownloadWindow(std::move(di), link->vehicle(), this);
-        downloadWindow_->show();
+        try {
+            auto di = link->downloader();
+            downloadWindow_ =
+                new DownloadWindow(std::move(di), link->vehicle(), this);
+            downloadWindow_->show();
+        } catch (const std::runtime_error &err) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Download error");
+            msgBox.setText(QStringLiteral("Error downloading ROM\n") + err.what());
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+        }
     }
 }
 
@@ -261,7 +414,13 @@ void MainWindow::newLogClicked() {
 
 
 
-void MainWindow::closeEvent(QCloseEvent * /*event*/) {
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (!checkSaveSelected()) {
+        event->ignore();
+        return;
+    }
     canViewer_.close();
     interfacesWindow_.close();
+    
+    saveSettings();
 }

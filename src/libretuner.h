@@ -60,10 +60,10 @@ public:
     QString home() { return home_; }
 
     /* Attempts to open a tune. Shows an error dialog on failure and returns nullptr. */
-    std::shared_ptr<Tune> openTune(const TuneMeta &tune);
+    static std::shared_ptr<TuneData> openTune(const std::shared_ptr<Tune> &tune);
 
     /* Open tune flasher */
-    void flashTune(const TuneMeta &tune);
+    void flashTune(const std::shared_ptr<TuneData> &tune);
 
     /* Returns the default datalink. Queries the user to create one
      * if none exist. May return nullptr */

@@ -29,26 +29,26 @@ struct Model;
 using ModelPtr = std::shared_ptr<Model>;
 }
 
-class Tune;
+class TuneData;
 
 /**
  * A representation of data able to be flashed.
  */
 class Flashable {
 public:
-    explicit Flashable(const std::shared_ptr<Tune> &tune);
+    explicit Flashable(std::vector<uint8_t> data, definition::ModelPtr model);
 
     // The address offset the data should be flashed to
     size_t offset() const { return offset_; }
 
     const std::vector<uint8_t> &data() const { return data_; }
 
-    definition::ModelPtr definition() const { return definition_; }
+    definition::ModelPtr model() const { return model_; }
 
 private:
     std::vector<uint8_t> data_;
-    size_t offset_;
-    definition::ModelPtr definition_;
+    std::size_t offset_;
+    definition::ModelPtr model_;
 };
 
 #endif // FLASHABLE_H

@@ -17,12 +17,3 @@
  */
 
 #include "table.h"
-
-
-LinearAxis::LinearAxis(double start, double increment) : start_(start), increment_(increment) {
-
-}
-
-std::string LinearAxis::label(int index) const {
-    return std::to_string((start_) + index * increment_);
-}

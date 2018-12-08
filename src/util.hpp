@@ -112,7 +112,7 @@ public:
             sizeof(T) == 4,
             "type parameter of this class must have a size of 4 bytes");
         uint32_t n =
-            (*begin << 24) | (*(begin + 1) << 16) | (*(begin + 2) << 8) | *(begin + 3);
+            ((uint32_t)(*begin) << 24) | (*(begin + 1) << 16) | (*(begin + 2) << 8) | *(begin + 3);
         return *reinterpret_cast<T *>(&n);
     }
 

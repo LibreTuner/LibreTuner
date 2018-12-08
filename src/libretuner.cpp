@@ -21,7 +21,6 @@
 #include "logger.h"
 #include "rommanager.h"
 #include "timerrunloop.h"
-#include "tunemanager.h"
 #include "ui/addinterfacedialog.h"
 #include "ui/flashwindow.h"
 #include "ui/styledwindow.h"
@@ -104,7 +103,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     }
 
     try {
-        TuneManager::get()->load();
+        RomStore::get()->loadTunes();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setText(
@@ -114,8 +113,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.setWindowTitle("TuneManager error");
         msgBox.exec();
     }
-
-    RomStore::get()->addTuneMeta(*TuneManager::get());
 
     try {
         InterfaceManager::get().load();
@@ -142,16 +139,18 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         file.close();
     }*/
 
+#ifndef __unix__
     setStyle(new DarkStyle);
+#endif
 }
 
 
 
-std::shared_ptr<Tune> LibreTuner::openTune(const TuneMeta &tune)
+std::shared_ptr<TuneData> LibreTuner::openTune(const std::shared_ptr<Tune> &tune)
 {
-    std::shared_ptr<Tune> data;
+    std::shared_ptr<TuneData> data;
     try {
-        data = std::make_shared<Tune>(tune);
+        data = tune->data();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Tune data error");
@@ -164,40 +163,38 @@ std::shared_ptr<Tune> LibreTuner::openTune(const TuneMeta &tune)
 
 
 
-void LibreTuner::flashTune(const TuneMeta &meta) {
-    std::shared_ptr<Tune> tune = openTune(meta);
-
-    if (!tune) {
+void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
+    if (!data) {
         return;
     }
 
-    std::shared_ptr<Flashable> flash;
+
     try {
-        flash = std::make_shared<Flashable>(tune);
+        Flashable flash = data->flashable();
+        
+        if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
+            std::unique_ptr<Flasher> flasher = link->flasher();
+            if (!flasher) {
+                QMessageBox(QMessageBox::Critical, "Flash failure",
+                            "Failed to get a valid flash interface for the vehicle "
+                            "link. Is a flash mode set in the definition file and "
+                            "does the datalink support it?")
+                    .exec();
+                return;
+            }
+            flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), std::move(flash));
+            flashWindow_->show();
+        }
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Flash error");
-        msgBox.setText(
-            QStringLiteral("Failed to create flashable from tune: ") +
-            e.what());
+        msgBox.setText(e.what());
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         return;
     }
 
-    if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
-        std::unique_ptr<Flasher> flasher = link->flasher();
-        if (!flasher) {
-            QMessageBox(QMessageBox::Critical, "Flash failure",
-                        "Failed to get a valid flash interface for the vehicle "
-                        "link. Is a flash mode set in the definition file and "
-                        "does the datalink support it?")
-                .exec();
-            return;
-        }
-        flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), flash);
-        flashWindow_->show();
-    }
+    
 }
 
 
@@ -251,7 +248,7 @@ DataLinkPtr LibreTuner::getDataLink() {
         return DataLink::create(def);
     } catch (const std::exception &e) {
         QMessageBox msg;
-        msg.setText("Failed to create datalink from default interface: " +
+        msg.setText("Failed to create datalink from default interface\n" +
                     QString(e.what()));
         msg.setWindowTitle("DataLink Error");
         msg.setIcon(QMessageBox::Critical);
@@ -308,6 +305,7 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
     if (!v.valid()) {
         // Ask to manually select a vehicle
         StyledDialog window;
+        window.setWindowTitle("Query platform");
         QLabel *label =
             new QLabel("A vehicle could not automatically be queried.\nPlease "
                        "manually select from the list or cancel.");

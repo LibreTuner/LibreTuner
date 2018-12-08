@@ -30,6 +30,8 @@
 
 class EditorWidget;
 class TablesWidget;
+class TuneData;
+class SidebarWidget;
 
 class MainWindow : public QMainWindow { // public QMainWindow {
     Q_OBJECT
@@ -50,6 +52,7 @@ private:
 
     QComboBox *comboLogVehicles_;
     QListView *listLogs_;
+    SidebarWidget *sidebar_;
 
     TablesWidget *tables_;
     EditorWidget *editor_;
@@ -63,8 +66,19 @@ private:
     QDockWidget *sidebarDock_;
     QDockWidget *tablesDock_;
     QDockWidget *editorDock_;
+    
+    bool changeSelected(const std::shared_ptr<TuneData> &data);
+    
+    // Returns true if it is safe to discard the tune data
+    bool checkSaveSelected();
 
     void setupMenu();
+    
+    void hideAllDocks();
+    void restoreDocks();
+    
+    void saveSettings();
+    void loadSettings();
 
     QDockWidget *createOverviewDock();
     QDockWidget *createRomsDock();
@@ -74,6 +88,10 @@ private:
     QDockWidget *createSidebarDock();
     QDockWidget *createTablesDock();
     QDockWidget *createEditorDock();
+    
+    std::vector<QDockWidget*> docks_;
+    
+    std::shared_ptr<TuneData> selectedTune_;
 };
 
 #endif // MAINWINDOW_H

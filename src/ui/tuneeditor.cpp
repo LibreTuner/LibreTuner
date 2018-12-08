@@ -22,7 +22,6 @@
 #include "graphwidget.h"
 #include "table.h"
 #include "tablegroup.h"
-#include "tune.h"
 #include "ui_tuneeditor.h"
 
 #include <cassert>

@@ -21,20 +21,20 @@
 
 #include "logger.h"
 #include "rommanager.h"
-#include "tunemanager.h"
 #include <QMessageBox>
 #include <QStyledItemDelegate>
+#include <QVariant>
 
-CreateTuneDialog::CreateTuneDialog(const RomMeta *base)
+CreateTuneDialog::CreateTuneDialog(const Rom *base)
     : ui_(new Ui::CreateTuneDialog) {
     ui_->setupUi(this);
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
-    for (const RomMeta &rom : RomStore::get()->roms()) {
-        ui_->comboBase->addItem(QString::fromStdString(rom.name),
-                                QVariant(rom.id));
-        if (base != nullptr && rom.id == base->id) {
+    for (const std::shared_ptr<Rom> &rom : RomStore::get()->roms()) {
+        ui_->comboBase->addItem(QString::fromStdString(rom->name()),
+                                QVariant(static_cast<qulonglong>(rom->id())));
+        if (base != nullptr && rom.get() == base) {
             ui_->comboBase->setCurrentIndex(ui_->comboBase->count() - 1);
         }
     }
@@ -48,15 +48,15 @@ CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
 void CreateTuneDialog::on_buttonCreate_clicked() {
     int romId = ui_->comboBase->currentData().toInt();
-    const RomMeta *rom = RomStore::get()->fromId(romId);
-    if (rom == nullptr) {
+    const std::shared_ptr<Rom> rom = RomStore::get()->fromId(romId);
+    if (!rom) {
         Logger::warning("Rom with ID '" + std::to_string(romId) +
                         "' no longer exists");
         return;
     }
 
     try {
-        TuneManager::get()->createTune(*rom,
+        RomStore::get()->createTune(rom,
                                        ui_->lineName->text().toStdString());
     } catch (const std::exception &e) {
         QMessageBox msgBox;

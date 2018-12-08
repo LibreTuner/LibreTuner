@@ -31,13 +31,15 @@
 #include <QStyledItemDelegate>
 
 FlashWindow::FlashWindow(std::unique_ptr<Flasher> &&flasher,
-                         const FlashablePtr &flashable)
-    : ui(new Ui::FlashWindow), flashable_(flashable),
+                         Flashable &&flashable)
+    : ui(new Ui::FlashWindow), flashable_(std::move(flashable)),
       flasher_(std::move(flasher)) {
-    assert(flashable_);
     assert(flasher_);
 
     ui->setupUi(this);
+    
+    setWindowTitle("Flash tune");
+    
     ui->comboMode->setItemDelegate(new QStyledItemDelegate());
 
     flasher_->setProgressCallback(

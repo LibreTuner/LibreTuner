@@ -36,9 +36,9 @@ MazdaT1Flasher::MazdaT1Flasher(std::string key,
                                std::unique_ptr<uds::Protocol> &&uds)
     : key_(std::move(key)), uds_(std::move(uds)) {}
 
-bool MazdaT1Flasher::flash(FlashablePtr flashable) {
+bool MazdaT1Flasher::flash(Flashable &flashable) {
     canceled_ = false;
-    flash_ = std::move(flashable);
+    flash_ = &flashable;
     auth_.auth(key_, *uds_, 0x85);
     if (canceled_)
         return false;

@@ -19,12 +19,14 @@
 #ifndef TABLEGROUP_H
 #define TABLEGROUP_H
 
+
 #include "definitions/definition.h"
-#include "rom.h"
 #include "table.h"
 
 #include <vector>
 #include <memory>
+
+class RomData;
 
 
 /**
@@ -32,7 +34,7 @@
  */
 class TableGroup {
 public:
-    explicit TableGroup(const std::shared_ptr<Rom> &base);
+    explicit TableGroup(const std::shared_ptr<RomData> &base);
     
     TableGroup(const TableGroup&) = delete;
     TableGroup &operator=(const TableGroup&) = delete;
@@ -51,11 +53,15 @@ public:
 
     /* Applies table modifications to rom data */
     void apply(uint8_t *data, size_t size, Endianness endianness);
+    
+    bool dirty() const { return dirty_; }
 
 private:
-    std::shared_ptr<Rom> base_;
+    std::shared_ptr<RomData> base_;
 
     std::vector<std::unique_ptr<Table>> tables_;
+    
+    bool dirty_;
 };
 typedef std::shared_ptr<TableGroup> TableGroupPtr;
 

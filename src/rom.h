@@ -22,9 +22,12 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <QXmlStreamReader>
+#include <unordered_map>
 
 #include "tablegroup.h"
+#include "flashable.h"
+
+class QXmlStreamReader;
 
 namespace definition {
 struct Model;
@@ -37,12 +40,41 @@ struct Table;
 
 class Table;
 class Rom;
+class RomData;
+
+class TuneData {
+public:
+    TuneData(std::string path, std::shared_ptr<Rom> base, bool open = true);
+    
+    /* Applies table modifications to data and computes checksums.
+     * Returns false on error and sets lastError. */
+    void apply(uint8_t *data, size_t size);
+
+    TableGroup &tables() { return tables_; }
+
+    void save();
+    
+    Flashable flashable();
+    
+    bool dirty() const { return tables_.dirty(); }
+    
+private:
+    void readTables(QXmlStreamReader &xml);
+    
+    std::string path_;
+    std::shared_ptr<Rom> base_;
+    std::shared_ptr<RomData> baseData_;
+    
+    TableGroup tables_;
+};
 
 /**
  * TODO: write docs
  */
 class Tune {
 public:
+    Tune();
+    
     const std::string &name() const { return name_; }
     const std::string &path() const { return path_; }
     std::size_t id() const { return id_; }
@@ -52,29 +84,48 @@ public:
     void setName(const std::string &name) { name_ = name; }
     void setPath(const std::string &path) { path_ = path; }
     void setBase(const std::shared_ptr<Rom> &rom) { base_ = rom; }
-
-    /* Applies table modifications to data and computes checksums.
-     * Returns false on error and sets lastError. */
-    void apply(uint8_t *data, size_t size);
-
-    TableGroup &tables() { return tables_; }
-
-    void save();
+    
+    // Returns the tune data, loading from file if needed. May throw an error.
+    std::shared_ptr<TuneData> data();
 
 private:
     std::string name_;
     std::string path_;
     std::shared_ptr<Rom> base_;
     std::size_t id_;
+    
+    std::weak_ptr<TuneData> data_;
+};
 
-    TableGroup tables_;
-    void readTables(QXmlStreamReader &xml);
+class RomData {
+public:
+    // Tries to open the file and read the rom data. May throw an exception.
+    RomData(std::shared_ptr<Rom> rom);
+    
+    const std::vector<uint8_t> &data() const { return data_; }
+    
+    // Sets the ROM data and saves to file
+    void setData(std::vector<uint8_t> &&data);
+    
+    /* Loads a table from the rom. Returns nullptr if the
+    table does not exist. */
+    std::unique_ptr<Table> loadTable(std::size_t tableId);
+    
+    const std::shared_ptr<Rom> &rom() { return rom_; }
+    
+    // Returns nullptr if an axis with name `name` does not exist
+    TableAxis *getAxis(const std::string &name);
+    
+private:
+    std::shared_ptr<Rom> rom_;
+    std::vector<uint8_t> data_;
+    std::unordered_map<std::string, std::unique_ptr<TableAxis>> axes_;
 };
 
 
 
 /* ROM Metadata */
-class Rom {
+class Rom : public std::enable_shared_from_this<Rom> {
 public:
     Rom();
 
@@ -91,6 +142,10 @@ public:
     void setPlatform(const definition::PlatformPtr &platform) { platform_ = platform; }
     void setModel(const definition::ModelPtr &model) { model_ = model; }
     void addTune(const std::shared_ptr<Tune> &tune) { tunes_.push_back(std::move(tune)); }
+    
+    
+    // Returns the ROM data, loading from file if needed. May throw an error.
+    std::shared_ptr<RomData> data();
 
 
 private:
@@ -101,13 +156,9 @@ private:
     std::size_t id_;
 
     std::vector<std::shared_ptr<Tune>> tunes_;
+    
+    std::weak_ptr<RomData> data_;
 };
-
-
-
-/* Loads a table from the rom. Returns nullptr if the
-   table does not exist. */
-std::unique_ptr<Table> loadTable(Rom &rom, std::size_t tableId);
 
 
 #endif // ROM_H

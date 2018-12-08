@@ -31,38 +31,68 @@
 #include <cassert>
 #include <vector>
 #include <memory>
+#include <cmath>
+#include <sstream>
+#include <iomanip>
 
 #include <QAbstractTableModel>
+#include <QFontDatabase>
 #include <QApplication>
 #include <QColor>
 #include <QFont>
 
 
-
-struct TableMeta {
-    std::string name;
-    std::string description;
+class TableAxis
+ {
+public:
+    virtual QString label(int index) const =0;
+    virtual const std::string &name() const =0;
+    virtual ~TableAxis() {}
 };
 
 
-class Axis {
-public:
-    virtual std::string label(int index) const =0;
-    virtual ~Axis() {}
-};
 
-class LinearAxis : public Axis {
-public:
-    LinearAxis(double start, double increment);
 
-    std::string label(int index) const override;
+template<typename T>
+class LinearAxis : public TableAxis
+{
+public:
+    LinearAxis(std::string name, T start, T increment);
+
+    virtual QString label(int index) const override;
+    virtual const std::string &name() const override;
 private:
-    double start_, increment_;
+    T start_, increment_;
+    std::string name_;
 };
+
+
+
+template<typename T>
+LinearAxis<T>::LinearAxis(std::string name, T start, T increment) : start_(start), increment_(increment), name_(std::move(name)) {
+
+}
+
+
+template<typename T>
+QString LinearAxis<T>::label(int index) const {
+    return QString::number((start_) + index * increment_);
+}
+
+
+template<typename T>
+const std::string &LinearAxis<T>::name() const
+{
+    return name_;
+}
+
+
+
 
 class Table : public QAbstractTableModel {
+Q_OBJECT
 public:
-    Table(const TableMeta &meta) : meta_(meta) {}
+    Table(const definition::Table& definition) : definition_(definition) {}
     
     virtual ~Table() override = default;
     
@@ -80,8 +110,13 @@ public:
     
     virtual std::size_t byteSize() const =0;
     
-    const std::string name() const { return meta_.name; }
-    const std::string description() const { return meta_.description; }
+    virtual TableAxis *axisX() const =0;
+    virtual TableAxis *axisY() const =0;
+    virtual std::size_t offset() const =0;
+    
+    const std::string name() const { return definition_.name; }
+    const std::string description() const { return definition_.description; }
+    const definition::Table& definition() const { return definition_; }
     
     bool isTwoDimensional() const { return height() > 1; }
     bool isOneDimensional() const { return height() == 1; }
@@ -91,9 +126,12 @@ public:
     int rowCount(const QModelIndex & parent) const override { return height(); }
     
     Qt::ItemFlags flags(const QModelIndex &index) const override { return Qt::ItemFlags(Qt::ItemIsEnabled) | Qt::ItemIsSelectable | Qt::ItemIsEditable; }
+
+signals:
+    void onModified();
     
 private:
-    TableMeta meta_;
+    const definition::Table& definition_;
 };
 
 
@@ -102,8 +140,9 @@ struct TableInfo {
     std::size_t width;
     DataType minimum;
     DataType maximum;
-    std::shared_ptr<Axis> axisX;
-    std::shared_ptr<Axis> axisY;
+    TableAxis *axisX = nullptr;
+    TableAxis *axisY = nullptr;
+    std::size_t offset;
 };
 
 
@@ -111,7 +150,7 @@ template<typename DataType>
 class TableBase : public Table {
 public:
     template<class InputIt>
-    TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info);
+    TableBase(const definition::Table& definition, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info);
     TableBase(std::size_t width, std::size_t height);
     
     std::size_t height() const override { return data_.size() / width_; }
@@ -128,8 +167,12 @@ public:
     bool dirty() const override { return dirty_; }
     TableType dataType() const override;
     std::size_t byteSize() const override;
+    virtual TableAxis *axisX() const override { return axisX_; }
+    virtual TableAxis *axisY() const override { return axisY_; }
+    std::size_t offset() const override { return offset_; }
     
     QVariant data(const QModelIndex & index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 private:
@@ -138,8 +181,9 @@ private:
     bool dirty_ {false};
     std::size_t width_;
     DataType minimum_, maximum_;
-    std::shared_ptr<Axis> axisX_;
-    std::shared_ptr<Axis> axisY_;
+    TableAxis *axisX_;
+    TableAxis *axisY_;
+    std::size_t offset_;
 };
 
 
@@ -254,6 +298,36 @@ bool TableBase<DataType>::setData(const QModelIndex& index, const QVariant& valu
 
 
 template<typename DataType>
+QVariant TableBase<DataType>::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (role != Qt::DisplayRole || section < 0) {
+        return QVariant();
+    }
+    
+    if (orientation == Qt::Horizontal) {
+        if (!axisX_) {
+            return QVariant();
+        }
+        
+        if (section >= width()) {
+            return QVariant();
+        }
+        
+        return axisX_->label(section);
+    } else {
+        if (!axisY_) {
+            return QVariant();
+        }
+        
+        if (section >= height()) {
+            return QVariant();
+        }
+        
+        return axisY_->label(section);
+    }
+}
+
+
+template<typename DataType>
 QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
 {
     if (index.row() < 0 || index.column() < 0 || index.row() >= height() || index.column() >= width()) {
@@ -261,10 +335,10 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
     }
 
     if (role == Qt::FontRole) {
-        QFont font = QApplication::font("QTableView");
+        QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
         if (modified(index.column(), index.row())) {
             // Value has been modified
-            font.setWeight(QFont::Medium);
+            font.setWeight(QFont::Bold);
         } else {
             font.setWeight(QFont::Normal);
         }
@@ -294,20 +368,23 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
     if (role != Qt::DisplayRole && role != Qt::EditRole) {
         return QVariant();
     }
+    
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(3) << get(index.column(), index.row());
 
-    return QString::fromStdString(std::to_string(get(index.column(), index.row())));
+    return QString::fromStdString(ss.str());
 }
 
 
 template<class InputIt>
 class TableDeserializer {
 public:
-    TableDeserializer(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end) :
-        definition_(definition), endianness_(endianness), begin_(begin), end_(end) {}
+    TableDeserializer(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end, TableAxis *axisX, TableAxis *axisY, std::size_t offset) :
+        definition_(definition), endianness_(endianness), begin_(begin), end_(end), axisX_(axisX), axisY_(axisY), offset_(offset) {}
 
     template<typename T>
     std::unique_ptr<Table> deserialize() {
-        return std::make_unique<TableBase<T>>(TableMeta{definition_.name, definition_.description}, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, nullptr, nullptr});
+        return std::make_unique<TableBase<T>>(definition_, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, axisX_, axisY_, offset_});
     }
 
 private:
@@ -315,13 +392,15 @@ private:
     Endianness endianness_;
     InputIt begin_;
     InputIt end_;
+    TableAxis *axisX_, *axisY_;
+    std::size_t offset_;
 };
 
 
 template<class InputIt>
-std::unique_ptr<Table> deserializeTable(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end)
+std::unique_ptr<Table> deserializeTable(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end, TableAxis *axisX = nullptr, TableAxis *axisY = nullptr, std::size_t offset = 0)
 {
-    TableDeserializer<InputIt> deserializer(definition, endianness, begin, end);
+    TableDeserializer<InputIt> deserializer(definition, endianness, begin, end, axisX, axisY, offset);
 
     switch (definition.dataType) {
         case TableType::Float:
@@ -345,7 +424,7 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 
 template <typename DataType>
 template <typename InputIt>
-TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info) : Table(meta), modified_(std::distance(begin, end) / sizeof(DataType)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum)
+TableBase<DataType>::TableBase(const definition::Table& definition, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info) : Table(definition), modified_(std::distance(begin, end) / sizeof(DataType)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum), axisX_(info.axisX), axisY_(info.axisY), offset_(info.offset)
 {
     if ((std::distance(begin, end) / sizeof(DataType)) % info.width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
@@ -355,13 +434,13 @@ TableBase<DataType>::TableBase(const TableMeta &meta, InputIt begin, InputIt end
     switch (endianness) {
     case Endianness::Big:
         for (auto it = begin; it < end; it += sizeof(DataType)) {
-            DataType data = readBE<DataType>(it, it + sizeof(DataType));
+            DataType data = readBE<DataType>(it, end);
             data_.emplace_back(data);
         }
         break;
     case Endianness::Little:
         for (auto it = begin; it < end; it += sizeof(DataType)) {
-            DataType data = readLE<DataType>(it, it + sizeof(DataType));
+            DataType data = readLE<DataType>(it, end);
             data_.emplace_back(data);
         }
         break;
@@ -396,6 +475,8 @@ inline void TableBase<DataType>::set(std::size_t x, std::size_t y, DataType data
     }
     modified_[y * width() + x] = true;
     data_[y * width() + x] = data;
+    dirty_ = true;
+    emit onModified();
 }
 
 

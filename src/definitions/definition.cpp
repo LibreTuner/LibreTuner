@@ -33,15 +33,15 @@ void Model::load(const YAML::Node& file) {
     name = file["name"].as<std::string>();
     id = file["id"].as<std::string>();
     
+    // Load axes
+    const auto &axes = file["axes"];
+    std::for_each(axes.begin(), axes.end(), [&](const YAML::Node &axis) { loadAxis(axis); });
+    
     // Load tables
     const auto &tables = file["tables"];
     for (YAML::const_iterator it = tables.begin(); it != tables.end(); ++it) {
         loadOffset(it->first.as<std::size_t>(), it->second.as<std::size_t>());
     }
-    
-    // Load axes
-    const auto &axes = file["axes"];
-    std::for_each(axes.begin(), axes.end(), [&](const YAML::Node &axis) { loadAxis(axis); });
     
     // Load identifiers
     const auto &identifiers = file["identifiers"];
@@ -179,16 +179,17 @@ void Main::load(const YAML::Node& file)
         vins.emplace_back(vin.as<std::string>());
     }
     
+    // Load axes
+    for (const auto &axis : file["axes"]) {
+        loadAxis(axis);
+    }
+    
     // Load tables
     YAML::Node tables = file["tables"];
     for (auto it = tables.begin(); it != tables.end(); ++it) {
         loadTable(it->first.as<std::size_t>(), it->second);
     }
     
-    // Load axes
-    for (const auto &axis : file["axes"]) {
-        loadAxis(axis);
-    }
     
     for (const auto &pid : file["pids"]) {
         loadPid(pid);
@@ -258,10 +259,10 @@ void Main::loadTable(std::size_t id, const YAML::Node& table)
     }
     
     if (table["axisx"]) {
-        definition.axisXId = table["axisx"].as<std::string>();
+        definition.axisX = table["axisx"].as<std::string>();
     }
     if (table["axisy"]) {
-        definition.axisYId = table["axisy"].as<std::string>();
+        definition.axisY = table["axisy"].as<std::string>();
     }
     
     const auto opt_double = [&](const YAML::Node &node, double def) {
@@ -291,6 +292,32 @@ void Main::loadAxis(const YAML::Node& axis)
         }
         throw std::runtime_error("invalid axis type");
     }(axis["type"].as<std::string>());
+    
+    definition.dataType = [&](const std::string &type) {
+        if (type == "float") {
+            return TableType::Float;
+        }
+        if (type == "uint8") {
+            return TableType::Uint8;
+        }
+        if (type == "uint16") {
+            return TableType::Uint16;
+        }
+        if (type == "uint32") {
+            return TableType::Uint32;
+        }
+        if (type == "int8") {
+            return TableType::Int8;
+        }
+        if (type == "int16") {
+            return TableType::Int16;
+        }
+        if (type == "int32") {
+            return TableType::Int32;
+        }
+        
+        throw std::runtime_error("invalid datatype");
+    }(axis["datatype"].as<std::string>());
 
     switch (definition.type) {
     case AxisType::Linear:
@@ -358,6 +385,18 @@ std::size_t Table::rawSize() const
 {
     return tableTypeSize(dataType) * sizeX * sizeY;
 }
+
+
+
+std::size_t Model::getOffset(std::size_t index)
+{
+    if (index >= tables.size()) {
+        return 0;
+    }
+    
+    return tables[index];
+}
+
 
 
 /*

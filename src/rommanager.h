@@ -30,7 +30,6 @@
 
 #include "rom.h"
 
-class TuneManager;
 
 namespace definition {
 struct Main;
@@ -68,8 +67,6 @@ public:
      * If the tune could not be created, throw exception. */
     std::shared_ptr<Tune> createTune(const std::shared_ptr<Rom> &base, const std::string &name);
 
-    void readTunes(QXmlStreamReader &xml);
-
     void saveTunes();
 
     void loadTunes();
@@ -79,6 +76,7 @@ private:
     std::vector<std::shared_ptr<Rom>> roms_;
     std::size_t nextId_{};
 
+    void readTunes(QXmlStreamReader &xml);
     void readRoms(QXmlStreamReader &xml);
 
 signals:

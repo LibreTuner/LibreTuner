@@ -20,22 +20,10 @@
 #include "definitions/definition.h"
 #include "rom.h"
 #include "tablegroup.h"
-#include "tune.h"
 
 #include <cassert>
 
-Flashable::Flashable(const std::shared_ptr<Tune> &tune) {
-    assert(tune);
-    std::shared_ptr<Rom> rom = tune->rom();
-    definition_ = rom->definition();
-    offset_ = definition_->main.flashOffset;
-
-    data_ = rom->data();
-
-    // Apply tune on top of ROM
-    tune->apply(data_.data(), data_.size());
-
-    // Reassign to flash region
-    data_.assign(data_.data() + offset_,
-                 data_.data() + offset_ + definition_->main.flashSize);
+Flashable::Flashable(std::vector<uint8_t> data, definition::ModelPtr model) : data_(std::move(data)), model_(std::move(model)) {
+    assert(model_);
+    offset_ = model_->main.flashOffset;
 }

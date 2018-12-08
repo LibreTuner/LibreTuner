@@ -28,8 +28,8 @@
 #include <QStyleOption>
 #include <QVBoxLayout>
 
-RomWidget::RomWidget(const RomMeta &rom, QWidget *parent)
-    : QWidget(parent), romId_(rom.id) {
+RomWidget::RomWidget(const Rom &rom, QWidget *parent)
+    : QWidget(parent), romId_(rom) {
     auto *vlayout = new QVBoxLayout(this);
     auto *hlayout = new QHBoxLayout();
     auto *buttonLayout = new QVBoxLayout();

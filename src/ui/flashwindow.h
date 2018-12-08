@@ -44,7 +44,7 @@ class FlashWindow : public QDialog {
     Q_OBJECT
 public:
     FlashWindow(std::unique_ptr<Flasher> &&flasher_,
-                const FlashablePtr &flashable);
+                Flashable &&flashable);
 
     virtual ~FlashWindow() override;
 
@@ -60,7 +60,7 @@ private slots:
 
 private:
     Ui::FlashWindow *ui;
-    FlashablePtr flashable_;
+    Flashable flashable_;
     std::unique_ptr<Flasher> flasher_;
     std::thread worker_;
 

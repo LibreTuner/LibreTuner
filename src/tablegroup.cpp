@@ -19,11 +19,12 @@
 #include "tablegroup.h"
 #include "definitions/definition.h"
 #include "table.h"
+#include "rom.h"
 
 #include <cassert>
 
-TableGroup::TableGroup(const std::shared_ptr<Rom> &base) : base_(base) {
-    tables_.resize(base->platform()->tables.size());
+TableGroup::TableGroup(const std::shared_ptr<RomData> &base) : base_(base) {
+    tables_.resize(base->rom()->platform()->tables.size());
 }
 
 
@@ -39,11 +40,16 @@ Table *TableGroup::get(size_t idx, bool create) {
     assert(idx < tables_.size());
 
     std::unique_ptr<Table> &table = tables_[idx];
+    Table *ptr;
     if (!table && create) {
-        table = loadTable(*base_, idx);
+        table = base_->loadTable(idx); //loadTable(*base_, idx);
+        ptr = table.get();
+        set(idx, std::move(table));
+    } else {
+        ptr = table.get();
     }
 
-    return table.get();
+    return ptr;
 }
 
 
@@ -51,6 +57,10 @@ Table *TableGroup::get(size_t idx, bool create) {
 void TableGroup::set(size_t idx, std::unique_ptr<Table> &&table) {
     assert(idx < tables_.size());
     
+    QObject::connect(table.get(), &Table::onModified, [this]() {
+        dirty_ = true;
+    });
+
     tables_[idx] = std::move(table);
 }
 
@@ -61,7 +71,7 @@ void TableGroup::apply(uint8_t *data, size_t size, Endianness endianness) {
     std::size_t id = 0;
     for (const std::unique_ptr<Table> &table : tables_) {
         if (table && table->dirty()) {
-            size_t offset = base_->model()->tables[id];
+            size_t offset = base_->rom()->model()->tables[id];
             assert(offset < size);
             table->serialize(data + offset, size - offset, endianness);
         }

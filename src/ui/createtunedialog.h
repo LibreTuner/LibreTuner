@@ -29,7 +29,7 @@ namespace Ui {
 class CreateTuneDialog;
 }
 
-struct RomMeta;
+struct Rom;
 
 /**
  * @todo write docs
@@ -37,7 +37,7 @@ struct RomMeta;
 class CreateTuneDialog : public QDialog {
     Q_OBJECT
 public:
-    CreateTuneDialog(const RomMeta *base = nullptr);
+    CreateTuneDialog(const Rom *base = nullptr);
 
     ~CreateTuneDialog();
 

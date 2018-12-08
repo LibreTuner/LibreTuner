@@ -67,6 +67,7 @@ struct Axis {
     std::string name;
     std::string id;
     AxisType type;
+    TableType dataType;
     double start;
     double increment;
 };
@@ -83,8 +84,8 @@ struct Table {
     std::size_t sizeY{1};
     double maximum;
     double minimum;
-    std::string axisXId;
-    std::string axisYId;
+    std::string axisX;
+    std::string axisY;
     
     /* Returns the raw size in bytes */
     std::size_t rawSize() const;
@@ -121,7 +122,7 @@ public:
     std::unordered_map<std::string, std::size_t> axisOffsets;
     std::vector<Identifier> identifiers;
     
-    
+    std::size_t getOffset(std::size_t index);
     
     void load(const YAML::Node &file);
     void loadOffset(std::size_t id, std::size_t offset);
@@ -159,6 +160,7 @@ struct Main {
 
     std::vector<Table> tables;
     std::vector<Pid> pids;
+    // axes MUST NOT be added to after initialization
     std::unordered_map<std::string, Axis> axes;
     std::vector<ModelPtr> models;
     std::vector<std::regex> vins;

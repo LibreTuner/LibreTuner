@@ -1,11 +1,11 @@
 #include "romswidget.h"
 #include "rommanager.h"
-#include "tunemanager.h"
 
 #include "logger.h"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QPushButton>
 
 RomsWidget::RomsWidget(QWidget *parent) : QWidget(parent)
 {
@@ -14,15 +14,46 @@ RomsWidget::RomsWidget(QWidget *parent) : QWidget(parent)
 
     treeView_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     treeView_->header()->setStretchLastSection(true);
-
+    
+    QHBoxLayout *layoutButtons = new QHBoxLayout;
+    
+    QPushButton *buttonDownload = new QPushButton(tr("Download ROM"));
+    QPushButton *buttonFlash = new QPushButton(tr("Flash"));
+    buttonFlash->setEnabled(false);
+    
+    layoutButtons->addWidget(buttonDownload);
+    layoutButtons->addWidget(buttonFlash);
+    
     layout->addWidget(treeView_);
+    layout->addLayout(layoutButtons);
     setLayout(layout);
+    
+    connect(treeView_, &QTreeView::activated, [this, buttonFlash](const QModelIndex &index) {
+        if (!model_) {
+            return;
+        }
+        
+        if (index.isValid()) {
+            buttonFlash->setEnabled(true);
+        }
+        
+        emit activated(model_->getTune(index));
+    });
+    
+    connect(buttonDownload, &QPushButton::clicked, [this]() {
+        emit downloadClicked();
+    });
+    
+    connect(buttonFlash, &QPushButton::clicked, [this]() {
+        emit flashClicked();
+    });
 }
 
 
 
-void RomsWidget::setModel(QAbstractItemModel *model)
+void RomsWidget::setModel(RomsModel *model)
 {
+    model_ = model;
     treeView_->setModel(model);
 }
 
@@ -38,11 +69,6 @@ RomsModel::RomsModel(QObject *parent) : QAbstractItemModel(parent)
 void RomsModel::setRoms(RomStore *roms)
 {
     roms_ = roms;
-}
-
-void RomsModel::setTunes(TuneManager *tunes)
-{
-    tunes_ = tunes;
 }
 
 
@@ -105,7 +131,7 @@ int RomsModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return roms[rom_id].tunes.size();
+    return roms[rom_id]->tunes().size();
 }
 
 
@@ -134,13 +160,13 @@ QVariant RomsModel::data(const QModelIndex &index, int role) const
         if (index.row() >= roms.size()) {
             return QVariant();
         }
-        const RomMeta &rom = roms[index.row()];
+        const std::shared_ptr<Rom> &rom = roms[index.row()];
         if (index.column() == 0) {
-            return QVariant(QString::fromStdString(rom.name));
+            return QVariant(QString::fromStdString(rom->name()));
         } else if (index.column() == 1) {
-            return QVariant(QString::fromStdString(rom.definitionId));
+            return QVariant(QString::fromStdString(rom->platform()->id));
         } else if (index.column() == 2) {
-            return QVariant(QString::fromStdString(rom.modelId));
+            return QVariant(QString::fromStdString(rom->model()->id));
         } else {
             return QVariant();
         }
@@ -156,23 +182,55 @@ QVariant RomsModel::data(const QModelIndex &index, int role) const
     if (rom_id >= roms.size()) {
         return QVariant();
     }
-    const RomMeta &rom = roms[rom_id];
-    if (index.row() >= rom.tunes.size()) {
+    const std::shared_ptr<Rom> &rom = roms[rom_id];
+    if (index.row() >= rom->tunes().size()) {
         return QVariant();
     }
 
-    // Find tune id
-    if (!tunes_) {
-        return QVariant();
-    }
 
-    std::size_t tune_id = rom.tunes[index.row()];
-    if (tune_id >= tunes_->tunes().size()) {
+    std::size_t tune_id = index.row();
+    if (tune_id >= rom->tunes().size()) {
         Logger::info("Invalid id: " + std::to_string(tune_id));
         return QVariant();
     }
 
-    return QVariant(QString::fromStdString(tunes_->tunes()[tune_id].name));
+    return QVariant(QString::fromStdString(rom->tunes()[tune_id]->name()));
+}
+
+
+
+std::shared_ptr<Tune> RomsModel::getTune(const QModelIndex& index) const
+{
+    if (!roms_) {
+        return std::shared_ptr<Tune>();
+    }
+
+    auto &roms = roms_->roms();
+
+    if (index.internalId() == 0) {
+        // Rom
+        return std::shared_ptr<Tune>();
+    }
+
+    // Tune
+
+    std::size_t rom_id = index.internalId() - 1;
+    if (rom_id >= roms.size()) {
+        return std::shared_ptr<Tune>();
+    }
+    const std::shared_ptr<Rom> &rom = roms[rom_id];
+    if (index.row() >= rom->tunes().size()) {
+        return std::shared_ptr<Tune>();
+    }
+
+
+    std::size_t tune_id = index.row();
+    if (tune_id >= rom->tunes().size()) {
+        Logger::info("Invalid id: " + std::to_string(tune_id));
+        return std::shared_ptr<Tune>();
+    }
+
+    return rom->tunes()[tune_id];
 }
 
 

@@ -23,95 +23,175 @@
 #include "table.h"
 
 #include <cassert>
+#include <fstream>
 
 #include <QFile>
 
+
 Rom::Rom() {
-    definition::MainPtr main = DefinitionManager::get()->find(meta.definitionId);
-    if (!main) {
-        throw std::runtime_error("definition does not exist");
-    }
-    definition_ = main->findModel(meta.modelId);
-    if (!definition_) {
-        throw std::runtime_error("model definition '" + meta.modelId +
-                                 "' does not exist");
-    }
-
-    QFile file(LibreTuner::get()->home() + "/roms/" +
-               QString::fromStdString(meta.path));
-    if (!file.open(QFile::ReadOnly)) {
-        throw std::runtime_error(file.errorString().toStdString());
-    }
-
-    QByteArray data = file.readAll();
-    data_.assign(data.data(), data.data() + data.size());
-
-    // TODO: add checksum and check data size
 }
 
 
 
-std::unique_ptr<Table> loadTable(Rom& rom, std::size_t tableId)
+RomData::RomData(std::shared_ptr<Rom> rom) : rom_(std::move(rom))
 {
-    if (tableId >= rom.platform()->tables.size()) {
+    std::ifstream file(rom_->path(), std::ios::binary);
+    if (!file.is_open()) {
+        // File does not exist, abort.
+        throw std::runtime_error("ROM '" + rom_->path() + "' does not exist");
+    }
+    
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    
+    data_.resize(size);
+    if (!file.read(reinterpret_cast<char*>(data_.data()), size)) {
+        throw std::runtime_error("Failed to read ROM data");
+    }
+}
+
+
+
+TableAxis * RomData::getAxis(const std::string& name)
+{
+    {
+        auto it = axes_.find(name);
+        if (it != axes_.end()) {
+            return it->second.get();
+        }
+    }
+    auto it = rom_->platform()->axes.find(name);
+    if (it == rom_->platform()->axes.end()) {
         return nullptr;
     }
     
-    const definition::Table &tableDef = rom.platform()->tables[tableId];
-    std::size_t offset = rom.model()->tables[tableId];
+    if (it->second.type == definition::AxisType::Linear) {
+        
+        std::unique_ptr<TableAxis> axis;
+        switch (it->second.dataType) {
+            case TableType::Float:
+                axis = std::make_unique<LinearAxis<float>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Uint8:
+                axis = std::make_unique<LinearAxis<uint8_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Uint16:
+                axis = std::make_unique<LinearAxis<uint16_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Uint32:
+                axis = std::make_unique<LinearAxis<uint32_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Int8:
+                axis = std::make_unique<LinearAxis<int8_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Int16:
+                axis = std::make_unique<LinearAxis<int16_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+            case TableType::Int32:
+                axis = std::make_unique<LinearAxis<int32_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+        }
+        
+        TableAxis *ptr = axis.get();
+        axes_.emplace(name, std::move(axis));
+        return ptr;
+    }
+    return nullptr;
+}
+
+
+
+void RomData::setData(std::vector<uint8_t> && data)
+{
+    data_ = std::move(data);
     
-    const std::vector<uint8_t> &data = rom.data();
+    std::ofstream file(rom_->path(), std::ios::binary);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open '" + rom_->path() + "' for reading");
+        return;
+    }
+    
+    file.write(reinterpret_cast<const char*>(data_.data()), data_.size());
+}
+
+
+
+std::shared_ptr<RomData> Rom::data()
+{
+    if (auto d = data_.lock()) {
+        return d;
+    }
+    
+    std::shared_ptr<RomData> data = std::make_shared<RomData>(shared_from_this());
+    data_ = data;
+    return data;
+}
+
+
+
+std::unique_ptr<Table> RomData::loadTable(std::size_t tableId)
+{
+    if (tableId >= rom_->platform()->tables.size()) {
+        return nullptr;
+    }
+    
+    const definition::Table &tableDef = rom_->platform()->tables[tableId];
+    std::size_t offset = rom_->model()->getOffset(tableId);
     
     // Verify the size of the rom
-    auto begin = data.begin() + offset;
+    auto begin = data_.begin() + offset;
     auto end = begin + tableDef.rawSize();
     
-    if (end > data.end()) {
+    if (end > data_.end()) {
         throw std::runtime_error("end of table exceeds ROM data");
     }
 
-    return deserializeTable(tableDef, rom.platform()->main.endianness, begin, end);
+    return deserializeTable(tableDef, rom_->platform()->endianness, begin, end, getAxis(tableDef.axisX), getAxis(tableDef.axisY), offset);
     
     assert(false && "loadTable() unimplemented");
 }
 
 
 
-
-
-
-
-
-
-Tune::Tune(const TuneMeta &tune) : meta_(tune), rom_(RomStore::get()->loadId(meta_.baseId)), tables_(rom_) {
-    // Load tables
-    QFile file(LibreTuner::get()->home() + "/tunes/" +
-               QString::fromStdString(meta_.path));
-    if (!file.open(QFile::ReadOnly)) {
-        throw std::runtime_error(file.errorString().toStdString());
+std::shared_ptr<TuneData> Tune::data()
+{
+    if (auto d = data_.lock()) {
+        return d;
     }
-
-    QXmlStreamReader xml(&file);
-    if (xml.readNextStartElement()) {
-        if (xml.name() == "tables") {
-            readTables(xml);
-        } else {
-            xml.raiseError(QObject::tr("Unexpected element"));
-        }
-    }
-
-    if (xml.error()) {
-        throw std::runtime_error(QString("%1\nLine %2, column %3")
-                                     .arg(xml.errorString())
-                                     .arg(xml.lineNumber())
-                                     .arg(xml.columnNumber())
-                                     .toStdString());
-    }
+    
+    std::shared_ptr<TuneData> data = std::make_shared<TuneData>(path_, base_);
+    data_ = data;
+    return data;
 }
 
 
 
-void Tune::readTables(QXmlStreamReader &xml) {
+Flashable TuneData::flashable()
+{
+    std::vector<uint8_t> data = baseData_->data();
+
+    // Apply tune on top of ROM
+    apply(data.data(), data.size());
+    
+    std::size_t offset = base_->platform()->flashOffset;
+
+    // Reassign to flash region
+    data.assign(data.data() + offset,
+                data.data() + offset + base_->platform()->flashSize);
+    
+    return Flashable(std::move(data), base_->model());
+}
+
+
+
+
+Tune::Tune() {
+}
+
+
+
+void TuneData::readTables(QXmlStreamReader &xml) {
     assert(xml.isStartElement() && xml.name() == "tables");
 
     while (xml.readNextStartElement()) {
@@ -136,19 +216,24 @@ void Tune::readTables(QXmlStreamReader &xml) {
             xml.raiseError("id is out of range");
             return;
         }
-
+        
         QByteArray data =
-            QByteArray::fromBase64(xml.readElementText().toLatin1());
+            QByteArray::fromBase64(xml.readElementText().toUtf8());
+            
+        Logger::info("Second: " + std::to_string((int)*(data.data() + 4)));
+            
+        const definition::Table &definition = base_->platform()->tables[id];
+        
+        std::unique_ptr<Table> table  = deserializeTable(definition, base_->platform()->endianness, reinterpret_cast<const uint8_t*>(data.begin()), reinterpret_cast<const uint8_t*>(data.end()), baseData_->getAxis(definition.axisX), baseData_->getAxis(definition.axisY), base_->model()->getOffset(id));
 
-        tables_.set(id, deserializeTable(rom_->definition()->main.tables[id], rom_->definition()->main.endianness, data.begin(), data.end()));
+        tables_.set(id, std::move(table));
     }
 }
 
 
 
-void Tune::save() {
-    QFile file(LibreTuner::get()->home() + "/tunes/" +
-               QString::fromStdString(meta_.path));
+void TuneData::save() {
+    QFile file(QString::fromStdString(path_));
     if (!file.open(QFile::WriteOnly)) {
         throw std::runtime_error(file.errorString().toStdString());
     }
@@ -168,7 +253,7 @@ void Tune::save() {
             xml.writeAttribute("id", QString::number(i));
             std::vector<uint8_t> data;
             data.resize(table->byteSize());
-            table->serialize(data.data(), data.size(), rom_->definition()->main.endianness);
+            table->serialize(data.data(), data.size(), base_->platform()->endianness);
             xml.writeCharacters(
                 QString(QByteArray(reinterpret_cast<const char *>(data.data()),
                                    data.size())
@@ -186,9 +271,38 @@ void Tune::save() {
 
 
 
-void Tune::apply(uint8_t *data, size_t size) {
-    tables_.apply(data, size, rom_->definition()->main.endianness);
+void TuneData::apply(uint8_t *data, size_t size) {
+    tables_.apply(data, size, base_->platform()->endianness);
 
     // Checksums
-    rom_->definition()->checksums.correct(data, size);
+    base_->model()->checksums.correct(data, size);
+}
+
+
+
+TuneData::TuneData(std::string path, std::shared_ptr<Rom> base, bool open) : path_(std::move(path)), base_(std::move(base)), baseData_(base_->data()), tables_(baseData_)
+{
+    if (open) {
+        QFile file(QString::fromStdString(path_));
+        if (!file.open(QFile::ReadOnly)) {
+            throw std::runtime_error(file.errorString().toStdString());
+        }
+
+        QXmlStreamReader xml(&file);
+        if (xml.readNextStartElement()) {
+            if (xml.name() == "tables") {
+                readTables(xml);
+            } else {
+                xml.raiseError(QObject::tr("Unexpected element"));
+            }
+        }
+
+        if (xml.error()) {
+            throw std::runtime_error(QString("%1\nLine %2, column %3")
+                                        .arg(xml.errorString())
+                                        .arg(xml.lineNumber())
+                                        .arg(xml.columnNumber())
+                                        .toStdString());
+        }
+    }
 }

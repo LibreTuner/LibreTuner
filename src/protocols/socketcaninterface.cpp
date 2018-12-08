@@ -46,7 +46,6 @@ SocketCanInterface::~SocketCanInterface() {
 
 bool SocketCanInterface::recv(CanMessage &message,
                               std::chrono::milliseconds timeout) {
-    Expects(socket_ != 0);
     can_frame frame;
 
     int nbytes = ::recv(socket_, &frame, sizeof(can_frame), 0);
@@ -60,15 +59,13 @@ bool SocketCanInterface::recv(CanMessage &message,
     }
 
     // TODO: remove EFF/RTR/ERR flags
-    message.setMessage(frame.can_id, gsl::make_span(frame.data, frame.can_dlc));
+    message.setMessage(frame.can_id, frame.data, frame.can_dlc);
     return true;
 }
 
 
 
 void SocketCanInterface::send(const CanMessage &message) {
-    Expects(socket_ != 0);
-
     can_frame frame;
 
     memset(&frame, 0, sizeof(can_frame));
@@ -119,7 +116,7 @@ bool SocketCanInterface::bind(const std::string &ifname) {
 
 
 void SocketCanInterface::close() {
-    Expects(socket_ != 0);
+    assert(socket_ != 0);
     ::close(socket_);
     socket_ = 0;
 }
@@ -133,13 +130,13 @@ void SocketCanInterface::start() { assert(socket_ != 0); }
 int SocketCanInterface::fd() const { return socket_; }
 
 SocketCanInterface::SocketCanInterface(const std::string &ifname) {
-    Expects(bind(ifname));
+    assert(bind(ifname));
 }
 
 
 
 void SocketCanInterface::setNonblocking() {
-    Expects(socket_ != 0);
+    assert(socket_ != 0);
     int flags = fcntl(socket_, F_GETFL, 0);
     fcntl(socket_, F_SETFL, flags | O_NONBLOCK);
 }

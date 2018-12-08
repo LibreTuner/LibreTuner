@@ -47,7 +47,7 @@ public:
     virtual ~Flasher() = default;
 
     /* Flash that shit. Returns false if canceled. */
-    virtual bool flash(FlashablePtr flashable) = 0;
+    virtual bool flash(Flashable &flashable) = 0;
 
     /* Cancels the active flash */
     virtual void cancel() = 0;
@@ -59,14 +59,14 @@ class MazdaT1Flasher : public Flasher {
 public:
     MazdaT1Flasher(std::string key, std::unique_ptr<uds::Protocol> &&uds);
 
-    bool flash(FlashablePtr flashable) override;
+    bool flash(Flashable &flashable) override;
     void cancel() override;
 
 private:
-    std::unique_ptr<uds::Protocol> uds_;
-    FlashablePtr flash_;
-    uds::Authenticator auth_;
     std::string key_;
+    std::unique_ptr<uds::Protocol> uds_;
+    Flashable *flash_;
+    uds::Authenticator auth_;
     std::atomic<bool> canceled_;
 
     size_t left_{}, sent_{};

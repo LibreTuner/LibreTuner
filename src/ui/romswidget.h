@@ -5,8 +5,11 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
+#include <memory>
+
+class Tune;
+
 class RomStore;
-class TuneManager;
 
 class RomsModel : public QAbstractItemModel {
     Q_OBJECT
@@ -14,7 +17,9 @@ public:
     explicit RomsModel(QObject *parent = nullptr);
 
     void setRoms(RomStore *roms);
-    void setTunes(TuneManager *tunes);
+    
+    // Returns the tune from an index or nullptr if no tune is associated with the index
+    std::shared_ptr<Tune> getTune(const QModelIndex &index) const;
 
     // QAbstractItemModel interface
 public:
@@ -27,9 +32,6 @@ public:
 
 private:
     RomStore *roms_ = nullptr;
-    TuneManager *tunes_ = nullptr;
-
-
 };
 
 
@@ -39,14 +41,18 @@ class RomsWidget : public QWidget
 public:
     explicit RomsWidget(QWidget *parent = nullptr);
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(RomsModel *model);
 
 signals:
+    void activated(const std::shared_ptr<Tune> &tune);
+    void downloadClicked();
+    void flashClicked();
 
 public slots:
 
 private:
     QTreeView *treeView_;
+    RomsModel *model_ = nullptr;
 };
 
 #endif // ROMSWIDGET_H
