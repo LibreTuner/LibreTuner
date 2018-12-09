@@ -4,6 +4,7 @@
 #include <QTreeWidget>
 #include <QAbstractItemModel>
 #include <QVBoxLayout>
+#include <QHeaderView>
 
 TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent)
 {
@@ -11,6 +12,7 @@ TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent)
     layout->setContentsMargins(0, 0, 0, 0);
 
     view_ = new QTreeWidget(this);
+    view_->header()->setVisible(false);
 
     layout->addWidget(view_);
     setLayout(layout);

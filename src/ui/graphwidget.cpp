@@ -71,26 +71,27 @@ void GraphWidget::tableChanged(Table *table) {
         return;
     }
 
-    /*if (table->isTwoDimensional()) {
+    if (table->height() > 1) {
+        // Two dimensional
         auto *modelProxy =
-            new QtDataVisualization::QItemModelSurfaceDataProxy(table.get());
+            new QtDataVisualization::QItemModelSurfaceDataProxy(table);
         modelProxy->setUseModelCategories(true);
         series3d_->setDrawMode(
             QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
         series3d_->setDataProxy(modelProxy);
 
-        if (table->definition()->axisX()) {
+        if (table->axisX()) {
             surface_->axisX()->setTitle(
-                QString::fromStdString(table->definition()->axisX()->label()));
+                QString::fromStdString(table->axisX()->name()));
             surface_->axisX()->setTitleVisible(true);
         } else {
             surface_->axisX()->setTitleVisible(false);
         }
 
-        if (table->definition()->axisY()) {
+        if (table->axisY()) {
             surface_->axisZ()->setTitle(
-                QString::fromStdString(table->definition()->axisY()->label()));
+                QString::fromStdString(table->axisY()->name()));
             surface_->axisZ()->setTitleVisible(true);
         } else {
             surface_->axisZ()->setTitleVisible(true);
@@ -98,10 +99,10 @@ void GraphWidget::tableChanged(Table *table) {
 
         chartView_->setVisible(false);
         container_->setVisible(true);
-    } else if (table->isOneDimensional() && table->definition()->axisX()) {
+    } else if (table->isOneDimensional() && table->axisX()) {
         auto *series = new QLineSeries;
-        for (int x = 0; x < table->definition()->sizeX(); ++x) {
-            series->append(table->definition()->axisX()->label(x),
+        for (int x = 0; x < table->width(); ++x) {
+            series->append(table->axisX()->label(x),
                            table->data(table->index(0, x))
                                .toFloat()); // Should always be a float
         }
@@ -112,9 +113,12 @@ void GraphWidget::tableChanged(Table *table) {
 
         chart_->createDefaultAxes();
         chart_->axisX()->setTitleText(
-            QString::fromStdString(table->definition()->axisX()->label()));
+            QString::fromStdString(table->axisX()->name()));
 
         chartView_->setVisible(true);
         container_->setVisible(false);
-    }*/
+    } else {
+        chartView_->setVisible(false);
+        container_->setVisible(false);
+    }
 }

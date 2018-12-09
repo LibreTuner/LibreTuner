@@ -61,7 +61,7 @@ private:
 
     std::vector<std::unique_ptr<Table>> tables_;
     
-    bool dirty_;
+    bool dirty_ = false;
 };
 typedef std::shared_ptr<TableGroup> TableGroupPtr;
 

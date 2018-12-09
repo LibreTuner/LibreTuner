@@ -33,12 +33,12 @@ Rom::Rom() {
 
 
 
-RomData::RomData(std::shared_ptr<Rom> rom) : rom_(std::move(rom))
+RomData::RomData(Rom &rom) : rom_(rom)
 {
-    std::ifstream file(rom_->path(), std::ios::binary);
+    std::ifstream file(rom_.path(), std::ios::binary);
     if (!file.is_open()) {
         // File does not exist, abort.
-        throw std::runtime_error("ROM '" + rom_->path() + "' does not exist");
+        throw std::runtime_error("ROM '" + rom_.path() + "' does not exist");
     }
     
     file.seekg(0, std::ios::end);
@@ -61,8 +61,8 @@ TableAxis * RomData::getAxis(const std::string& name)
             return it->second.get();
         }
     }
-    auto it = rom_->platform()->axes.find(name);
-    if (it == rom_->platform()->axes.end()) {
+    auto it = rom_.platform()->axes.find(name);
+    if (it == rom_.platform()->axes.end()) {
         return nullptr;
     }
     
@@ -106,9 +106,9 @@ void RomData::setData(std::vector<uint8_t> && data)
 {
     data_ = std::move(data);
     
-    std::ofstream file(rom_->path(), std::ios::binary);
+    std::ofstream file(rom_.path(), std::ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open '" + rom_->path() + "' for reading");
+        throw std::runtime_error("Failed to open '" + rom_.path() + "' for reading");
         return;
     }
     
@@ -123,7 +123,7 @@ std::shared_ptr<RomData> Rom::data()
         return d;
     }
     
-    std::shared_ptr<RomData> data = std::make_shared<RomData>(shared_from_this());
+    std::shared_ptr<RomData> data = std::make_shared<RomData>(*this);
     data_ = data;
     return data;
 }
@@ -132,12 +132,12 @@ std::shared_ptr<RomData> Rom::data()
 
 std::unique_ptr<Table> RomData::loadTable(std::size_t tableId)
 {
-    if (tableId >= rom_->platform()->tables.size()) {
+    if (tableId >= rom_.platform()->tables.size()) {
         return nullptr;
     }
     
-    const definition::Table &tableDef = rom_->platform()->tables[tableId];
-    std::size_t offset = rom_->model()->getOffset(tableId);
+    const definition::Table &tableDef = rom_.platform()->tables[tableId];
+    std::size_t offset = rom_.model()->getOffset(tableId);
     
     // Verify the size of the rom
     auto begin = data_.begin() + offset;
@@ -147,7 +147,7 @@ std::unique_ptr<Table> RomData::loadTable(std::size_t tableId)
         throw std::runtime_error("end of table exceeds ROM data");
     }
 
-    return deserializeTable(tableDef, rom_->platform()->endianness, begin, end, getAxis(tableDef.axisX), getAxis(tableDef.axisY), offset);
+    return deserializeTable(tableDef, rom_.platform()->endianness, begin, end, getAxis(tableDef.axisX), getAxis(tableDef.axisY), offset);
     
     assert(false && "loadTable() unimplemented");
 }
@@ -156,11 +156,12 @@ std::unique_ptr<Table> RomData::loadTable(std::size_t tableId)
 
 std::shared_ptr<TuneData> Tune::data()
 {
+    assert(base_);
     if (auto d = data_.lock()) {
         return d;
     }
     
-    std::shared_ptr<TuneData> data = std::make_shared<TuneData>(path_, base_);
+    std::shared_ptr<TuneData> data = std::make_shared<TuneData>(path_, *base_);
     data_ = data;
     return data;
 }
@@ -174,13 +175,13 @@ Flashable TuneData::flashable()
     // Apply tune on top of ROM
     apply(data.data(), data.size());
     
-    std::size_t offset = base_->platform()->flashOffset;
+    std::size_t offset = base_.platform()->flashOffset;
 
     // Reassign to flash region
     data.assign(data.data() + offset,
-                data.data() + offset + base_->platform()->flashSize);
+                data.data() + offset + base_.platform()->flashSize);
     
-    return Flashable(std::move(data), base_->model());
+    return Flashable(std::move(data), base_.model());
 }
 
 
@@ -188,6 +189,17 @@ Flashable TuneData::flashable()
 
 Tune::Tune() {
 }
+
+
+
+Tune *Rom::getTune(std::size_t index)
+{
+    if (index <= tunes_.size()) {
+        return tunes_[index].get();
+    }
+    return nullptr;
+}
+
 
 
 
@@ -220,11 +232,9 @@ void TuneData::readTables(QXmlStreamReader &xml) {
         QByteArray data =
             QByteArray::fromBase64(xml.readElementText().toUtf8());
             
-        Logger::info("Second: " + std::to_string((int)*(data.data() + 4)));
-            
-        const definition::Table &definition = base_->platform()->tables[id];
+        const definition::Table &definition = base_.platform()->tables[id];
         
-        std::unique_ptr<Table> table  = deserializeTable(definition, base_->platform()->endianness, reinterpret_cast<const uint8_t*>(data.begin()), reinterpret_cast<const uint8_t*>(data.end()), baseData_->getAxis(definition.axisX), baseData_->getAxis(definition.axisY), base_->model()->getOffset(id));
+        std::unique_ptr<Table> table  = deserializeTable(definition, base_.platform()->endianness, reinterpret_cast<const uint8_t*>(data.begin()), reinterpret_cast<const uint8_t*>(data.end()), baseData_->getAxis(definition.axisX), baseData_->getAxis(definition.axisY), base_.model()->getOffset(id));
 
         tables_.set(id, std::move(table));
     }
@@ -253,7 +263,7 @@ void TuneData::save() {
             xml.writeAttribute("id", QString::number(i));
             std::vector<uint8_t> data;
             data.resize(table->byteSize());
-            table->serialize(data.data(), data.size(), base_->platform()->endianness);
+            table->serialize(data.data(), data.size(), base_.platform()->endianness);
             xml.writeCharacters(
                 QString(QByteArray(reinterpret_cast<const char *>(data.data()),
                                    data.size())
@@ -272,15 +282,15 @@ void TuneData::save() {
 
 
 void TuneData::apply(uint8_t *data, size_t size) {
-    tables_.apply(data, size, base_->platform()->endianness);
+    tables_.apply(data, size, base_.platform()->endianness);
 
     // Checksums
-    base_->model()->checksums.correct(data, size);
+    base_.model()->checksums.correct(data, size);
 }
 
 
 
-TuneData::TuneData(std::string path, std::shared_ptr<Rom> base, bool open) : path_(std::move(path)), base_(std::move(base)), baseData_(base_->data()), tables_(baseData_)
+TuneData::TuneData(std::string path, Rom &base, bool open) : path_(std::move(path)), base_(base), baseData_(base_.data()), tables_(baseData_)
 {
     if (open) {
         QFile file(QString::fromStdString(path_));

@@ -6,13 +6,18 @@
 #include <QToolButton>
 #include <QTreeWidget>
 
+
+class Table;
+
+class QPlainTextEdit;
+
+
 class SidebarWidget : public QWidget {
     Q_OBJECT
 public:
     explicit SidebarWidget(QWidget *parent = nullptr);
     
-    void setTableName(const QString &name);
-    void setTableOffset(std::size_t offset);
+    void fillTableInfo(const Table *table);
 
 private slots:
     void on_treeToolButton_clicked(bool checked);
@@ -21,8 +26,13 @@ private:
     QToolButton *tableInfoButton_;
     QTreeWidget *tableTreeWidget_;
     
+    QPlainTextEdit *tableDescription_;
+    
     QTreeWidgetItem *tableName_;
     QTreeWidgetItem *tableOffset_;
+    QTreeWidgetItem *tableWidth_;
+    QTreeWidgetItem *tableHeight_;
+    QTreeWidgetItem *tableRange_;
 };
 
 #endif // SIDEBARWIDGET_H

@@ -114,8 +114,10 @@ set(libretuner_SRC
     ui/tableswidget.h
     ui/editorwidget.cpp
     ui/editorwidget.h
-    ui/romswidget.cpp
-    ui/romswidget.h
+    ui/romsview.cpp
+    ui/romsview.h
+    ui/tunedialog.cpp
+    ui/tunedialog.h
 
     framelesswindow/framelesswindow.cpp
     framelesswindow/windowdragger.cpp

@@ -24,7 +24,7 @@
 #include <cassert>
 
 TableGroup::TableGroup(const std::shared_ptr<RomData> &base) : base_(base) {
-    tables_.resize(base->rom()->platform()->tables.size());
+    tables_.resize(base->rom().platform()->tables.size());
 }
 
 
@@ -71,7 +71,7 @@ void TableGroup::apply(uint8_t *data, size_t size, Endianness endianness) {
     std::size_t id = 0;
     for (const std::unique_ptr<Table> &table : tables_) {
         if (table && table->dirty()) {
-            size_t offset = base_->rom()->model()->tables[id];
+            size_t offset = base_->rom().model()->tables[id];
             assert(offset < size);
             table->serialize(data + offset, size - offset, endianness);
         }

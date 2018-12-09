@@ -24,11 +24,12 @@
 #include "diagnosticswidget.h"
 #include "flowlayout.h"
 #include "logview.h"
-#include "romswidget.h"
 #include "titlebar.h"
 #include "sidebarwidget.h"
 #include "tableswidget.h"
 #include "editorwidget.h"
+#include "tunedialog.h"
+#include "graphwidget.h"
 
 #include <QAction>
 #include <QDockWidget>
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     
     setDocumentMode(false);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    
 
     //main_ = new QMainWindow;
     //layout_->addWidget(main_);
@@ -67,12 +69,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Create docks
     logDock_ = createLogDock();
     overviewDock_ = createOverviewDock();
-    romsDock_ = createRomsDock();
     loggingDock_ = createLoggingDock();
     diagnosticsDock_ = createDiagnosticsDock();
     sidebarDock_ = createSidebarDock();
     tablesDock_ = createTablesDock();
     editorDock_ = createEditorDock();
+    graphDock_ = createGraphDock();
 
     // Setup corners
     /*setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
@@ -102,8 +104,8 @@ void MainWindow::restoreDocks()
     // Place docks
 
     // Roms | Central | Sidebar
-    addDockWidget(Qt::TopDockWidgetArea, romsDock_);
-    splitDockWidget(romsDock_, overviewDock_, Qt::Horizontal);
+    addDockWidget(Qt::TopDockWidgetArea, tablesDock_);
+    splitDockWidget(tablesDock_, overviewDock_, Qt::Horizontal);
     splitDockWidget(overviewDock_, sidebarDock_, Qt::Horizontal);
     
     // Bottom
@@ -114,9 +116,7 @@ void MainWindow::restoreDocks()
     tabifyDockWidget(overviewDock_, loggingDock_);
     tabifyDockWidget(overviewDock_, diagnosticsDock_);
     tabifyDockWidget(overviewDock_, editorDock_);
-
-    // Left
-    splitDockWidget(romsDock_, tablesDock_, Qt::Vertical);
+    tabifyDockWidget(overviewDock_, graphDock_);
 }
 
 
@@ -148,6 +148,7 @@ void MainWindow::saveSettings()
 
 QDockWidget *MainWindow::createLoggingDock() {
     QDockWidget *dock = new QDockWidget("Logging", this);
+    dock->setObjectName("logging");
     QWidget *widget = new QWidget;
     auto *layout = new QVBoxLayout();
 
@@ -170,7 +171,7 @@ QDockWidget *MainWindow::createLoggingDock() {
 
     widget->setLayout(layout);
     dock->setWidget(widget);
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -178,8 +179,9 @@ QDockWidget *MainWindow::createLoggingDock() {
 
 QDockWidget *MainWindow::createDiagnosticsDock() {
     QDockWidget *dock = new QDockWidget("Diagnostics", this);
+    dock->setObjectName("diagnostics");
     dock->setWidget(new DiagnosticsWidget);
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -190,9 +192,10 @@ QDockWidget *MainWindow::createLogDock() {
     log->setModel(&LibreTuner::get()->log());
 
     QDockWidget *dock = new QDockWidget("Log", this);
+    dock->setObjectName("log");
     dock->setWidget(log);
     dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -201,12 +204,13 @@ QDockWidget *MainWindow::createLogDock() {
 QDockWidget *MainWindow::createSidebarDock()
 {
     QDockWidget *dock = new QDockWidget("Sidebar", this);
+    dock->setObjectName("dock");
     dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
     
     sidebar_ = new SidebarWidget;
     sidebar_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     dock->setWidget(sidebar_);
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -215,20 +219,18 @@ QDockWidget *MainWindow::createSidebarDock()
 QDockWidget *MainWindow::createTablesDock()
 {
     QDockWidget *dock = new QDockWidget("Tables", this);
+    dock->setObjectName("tables");
     tables_ = new TablesWidget(dock);
     dock->setWidget(tables_);
     
     connect(tables_, &TablesWidget::activated, [this](int index) {
         Table *table = selectedTune_->tables().get(index, true);
         
-        if (table) {
-            sidebar_->setTableName(QString::fromStdString(table->name()));
-            sidebar_->setTableOffset(table->offset());
-        }
-        
+        sidebar_->fillTableInfo(table); 
         editor_->tableChanged(table);
+        graph_->tableChanged(table);
     });
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -237,9 +239,10 @@ QDockWidget *MainWindow::createTablesDock()
 QDockWidget *MainWindow::createEditorDock()
 {
     QDockWidget *dock = new QDockWidget("Editor", this);
+    dock->setObjectName("editor");
     editor_ = new EditorWidget(dock);
     dock->setWidget(editor_);
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -296,18 +299,18 @@ bool MainWindow::checkSaveSelected()
 }
 
 
-
+/*
 QDockWidget *MainWindow::createRomsDock() {
     QDockWidget *dock = new QDockWidget("ROMs", this);
 
-    RomsWidget *roms = new RomsWidget(dock);
+    RomsView *roms = new RomsView (dock);
     RomsModel *model = new RomsModel(roms);
     model->setRoms(RomStore::get());
     roms->setModel(model);
     dock->setWidget(roms);
     
     
-    connect(roms, &RomsWidget::activated, [this](const std::shared_ptr<Tune> &tune) {
+    connect(roms, &RomsView::activated, [this](const std::shared_ptr<Tune> &tune) {
         if (!tune) {
             if (changeSelected(std::shared_ptr<TuneData>())) 
                 tables_->setTables(std::vector<definition::Table>());
@@ -318,7 +321,7 @@ QDockWidget *MainWindow::createRomsDock() {
             tables_->setTables(tune->base()->platform()->tables);
     });
     
-    connect(roms, &RomsWidget::downloadClicked, this, &MainWindow::on_buttonDownloadRom_clicked);
+    connect(roms, &RomsView::downloadClicked, this, &MainWindow::on_buttonDownloadRom_clicked);
     
     connect(roms, &RomsWidget::flashClicked, [this]() {
         if (selectedTune_) {
@@ -326,14 +329,29 @@ QDockWidget *MainWindow::createRomsDock() {
         }
     });
     
-    docks_.push_back(dock);
+    docks_.emplace_back(dock);
     return dock;
-}
+}*/
 
 
 QDockWidget *MainWindow::createOverviewDock() {
     QDockWidget *dock = new QDockWidget("Overview", this);
-    docks_.push_back(dock);
+    dock->setObjectName("overview");
+    docks_.emplace_back(dock);
+    return dock;
+}
+
+
+
+QDockWidget *MainWindow::createGraphDock()
+{
+    QDockWidget *dock = new QDockWidget("Graph", this);
+    
+    graph_ = new GraphWidget(dock);
+    dock->setWidget(graph_);
+    
+    dock->setObjectName("graph");
+    docks_.emplace_back(dock);
     return dock;
 }
 
@@ -345,6 +363,33 @@ void MainWindow::setupMenu() {
     QMenu *editMenu = menuBar->addMenu(tr("&Edit"));
     QMenu *helpMenu = menuBar->addMenu(tr("&Help"));
     QMenu *viewMenu = menuBar->addMenu(tr("&View"));
+    
+    QAction *openTuneAction = new QAction(tr("&Open Tune"), this);
+    fileMenu->addAction(openTuneAction);
+    
+    QAction *downloadAction = new QAction(tr("&Download ROM"), this);
+    fileMenu->addAction(downloadAction);
+    
+    connect(downloadAction, &QAction::triggered, this, &MainWindow::on_buttonDownloadRom_clicked);
+    
+    connect(openTuneAction, &QAction::triggered, [this]() {
+        TuneDialog dlg;
+        dlg.exec();
+        
+        Tune *tune = dlg.selectedTune();
+        if (tune != nullptr) {
+            try {
+                if (changeSelected(tune->data())) {
+                    tables_->setTables(tune->base()->platform()->tables);
+                } else {
+                    tables_->setTables(std::vector<definition::Table>());
+                    editor_->setModel(nullptr);
+                }
+            } catch (const std::runtime_error &err) {
+                QMessageBox(QMessageBox::Critical, "Error", QString("Failed to load tune\n") + err.what()).exec();
+            }
+        }
+    });
 
     QAction *logAct = viewMenu->addAction(tr("CAN Log"));
     connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });

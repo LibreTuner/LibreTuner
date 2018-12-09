@@ -32,6 +32,7 @@ class EditorWidget;
 class TablesWidget;
 class TuneData;
 class SidebarWidget;
+class GraphWidget;
 
 class MainWindow : public QMainWindow { // public QMainWindow {
     Q_OBJECT
@@ -56,16 +57,17 @@ private:
 
     TablesWidget *tables_;
     EditorWidget *editor_;
+    GraphWidget *graph_;
 
     // Docks
     QDockWidget *logDock_;
-    QDockWidget *romsDock_;
     QDockWidget *overviewDock_;
     QDockWidget *loggingDock_;
     QDockWidget *diagnosticsDock_;
     QDockWidget *sidebarDock_;
     QDockWidget *tablesDock_;
     QDockWidget *editorDock_;
+    QDockWidget *graphDock_;
     
     bool changeSelected(const std::shared_ptr<TuneData> &data);
     
@@ -81,13 +83,13 @@ private:
     void loadSettings();
 
     QDockWidget *createOverviewDock();
-    QDockWidget *createRomsDock();
     QDockWidget *createLoggingDock();
     QDockWidget *createDiagnosticsDock();
     QDockWidget *createLogDock();
     QDockWidget *createSidebarDock();
     QDockWidget *createTablesDock();
     QDockWidget *createEditorDock();
+    QDockWidget *createGraphDock();
     
     std::vector<QDockWidget*> docks_;
     

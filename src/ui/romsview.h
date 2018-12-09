@@ -17,9 +17,6 @@ public:
     explicit RomsModel(QObject *parent = nullptr);
 
     void setRoms(RomStore *roms);
-    
-    // Returns the tune from an index or nullptr if no tune is associated with the index
-    std::shared_ptr<Tune> getTune(const QModelIndex &index) const;
 
     // QAbstractItemModel interface
 public:
@@ -35,24 +32,19 @@ private:
 };
 
 
-class RomsWidget : public QWidget
+class RomsView : public QTreeView
 {
     Q_OBJECT
 public:
-    explicit RomsWidget(QWidget *parent = nullptr);
-
-    void setModel(RomsModel *model);
+    explicit RomsView (QWidget *parent = nullptr);
+    
+    Tune *selectedTune();
+    
+private slots:
+    void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) override;
 
 signals:
-    void activated(const std::shared_ptr<Tune> &tune);
-    void downloadClicked();
-    void flashClicked();
-
-public slots:
-
-private:
-    QTreeView *treeView_;
-    RomsModel *model_ = nullptr;
+    void tuneChanged();
 };
 
 #endif // ROMSWIDGET_H

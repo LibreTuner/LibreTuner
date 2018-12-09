@@ -44,7 +44,7 @@ class RomData;
 
 class TuneData {
 public:
-    TuneData(std::string path, std::shared_ptr<Rom> base, bool open = true);
+    TuneData(std::string path, Rom &base, bool open = true);
     
     /* Applies table modifications to data and computes checksums.
      * Returns false on error and sets lastError. */
@@ -62,7 +62,7 @@ private:
     void readTables(QXmlStreamReader &xml);
     
     std::string path_;
-    std::shared_ptr<Rom> base_;
+    Rom &base_;
     std::shared_ptr<RomData> baseData_;
     
     TableGroup tables_;
@@ -78,12 +78,12 @@ public:
     const std::string &name() const { return name_; }
     const std::string &path() const { return path_; }
     std::size_t id() const { return id_; }
-    const std::shared_ptr<Rom> &base() const { return base_; }
+    const Rom *base() const { return base_; }
 
     void setId(std::size_t id) { id_ = id; }
     void setName(const std::string &name) { name_ = name; }
     void setPath(const std::string &path) { path_ = path; }
-    void setBase(const std::shared_ptr<Rom> &rom) { base_ = rom; }
+    void setBase(Rom *rom) { base_ = rom; }
     
     // Returns the tune data, loading from file if needed. May throw an error.
     std::shared_ptr<TuneData> data();
@@ -91,7 +91,7 @@ public:
 private:
     std::string name_;
     std::string path_;
-    std::shared_ptr<Rom> base_;
+    Rom *base_ = nullptr;
     std::size_t id_;
     
     std::weak_ptr<TuneData> data_;
@@ -100,7 +100,7 @@ private:
 class RomData {
 public:
     // Tries to open the file and read the rom data. May throw an exception.
-    RomData(std::shared_ptr<Rom> rom);
+    RomData(Rom &rom);
     
     const std::vector<uint8_t> &data() const { return data_; }
     
@@ -111,13 +111,13 @@ public:
     table does not exist. */
     std::unique_ptr<Table> loadTable(std::size_t tableId);
     
-    const std::shared_ptr<Rom> &rom() { return rom_; }
+    const Rom &rom() { return rom_; }
     
     // Returns nullptr if an axis with name `name` does not exist
     TableAxis *getAxis(const std::string &name);
     
 private:
-    std::shared_ptr<Rom> rom_;
+    Rom &rom_;
     std::vector<uint8_t> data_;
     std::unordered_map<std::string, std::unique_ptr<TableAxis>> axes_;
 };
@@ -125,7 +125,7 @@ private:
 
 
 /* ROM Metadata */
-class Rom : public std::enable_shared_from_this<Rom> {
+class Rom {
 public:
     Rom();
 
@@ -134,14 +134,21 @@ public:
     const definition::PlatformPtr &platform() const { return platform_; }
     const definition::ModelPtr &model() const { return model_; }
     std::size_t id() const { return id_; }
-    const std::vector<std::shared_ptr<Tune>> &tunes() { return tunes_; }
+    
+    const std::vector<std::unique_ptr<Tune>> &tunes() { return tunes_; }
+    
+    std::size_t tunesCount() { return tunes_.size(); }
+    
+    // Returns tune at index `index` or nullptr if out of range
+    Tune *getTune(std::size_t index);
+    
 
     void setId(std::size_t id) { id_ = id; }
     void setName(const std::string &name) { name_ = name; }
     void setPath(const std::string &path) { path_ = path; }
     void setPlatform(const definition::PlatformPtr &platform) { platform_ = platform; }
     void setModel(const definition::ModelPtr &model) { model_ = model; }
-    void addTune(const std::shared_ptr<Tune> &tune) { tunes_.push_back(std::move(tune)); }
+    void addTune(std::unique_ptr<Tune> &&tune) { tunes_.push_back(std::move(tune)); }
     
     
     // Returns the ROM data, loading from file if needed. May throw an error.
@@ -155,7 +162,7 @@ private:
     definition::ModelPtr model_;
     std::size_t id_;
 
-    std::vector<std::shared_ptr<Tune>> tunes_;
+    std::vector<std::unique_ptr<Tune>> tunes_;
     
     std::weak_ptr<RomData> data_;
 };

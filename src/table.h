@@ -45,7 +45,7 @@
 class TableAxis
  {
 public:
-    virtual QString label(int index) const =0;
+    virtual double label(int index) const =0;
     virtual const std::string &name() const =0;
     virtual ~TableAxis() {}
 };
@@ -59,7 +59,7 @@ class LinearAxis : public TableAxis
 public:
     LinearAxis(std::string name, T start, T increment);
 
-    virtual QString label(int index) const override;
+    virtual double label(int index) const override;
     virtual const std::string &name() const override;
 private:
     T start_, increment_;
@@ -75,8 +75,8 @@ LinearAxis<T>::LinearAxis(std::string name, T start, T increment) : start_(start
 
 
 template<typename T>
-QString LinearAxis<T>::label(int index) const {
-    return QString::number((start_) + index * increment_);
+double LinearAxis<T>::label(int index) const {
+    return (start_) + index * increment_;
 }
 
 
@@ -116,6 +116,8 @@ public:
     
     const std::string name() const { return definition_.name; }
     const std::string description() const { return definition_.description; }
+    const double maximum() const { return definition_.maximum; }
+    const double minimum() const { return definition_.minimum; }
     const definition::Table& definition() const { return definition_; }
     
     bool isTwoDimensional() const { return height() > 1; }

@@ -32,11 +32,9 @@
 class IsoTpInterface;
 class IsoTpTest;
 
-class TuneEditor;
-struct TuneMeta;
-
 class VehicleLink;
 class Tune;
+class TuneData;
 
 class FlashWindow;
 

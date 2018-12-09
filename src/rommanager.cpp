@@ -84,7 +84,7 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
             return;
         }
 
-        std::shared_ptr<Rom> rom = std::make_shared<Rom>();
+        std::unique_ptr<Rom> rom = std::make_unique<Rom>();
         bool foundId = false;
 
         std::string modelId;
@@ -180,7 +180,7 @@ void RomStore::save() {
     xml.writeStartDocument();
     xml.writeDTD("<!DOCTYPE roms>");
     xml.writeStartElement("roms");
-    for (const std::shared_ptr<Rom> &rom : roms_) {
+    for (const auto &rom : roms_) {
         xml.writeStartElement("rom");
         xml.writeTextElement("name", QString::fromStdString(rom->name()));
         xml.writeTextElement("path", QString::fromStdString(rom->path()));
@@ -225,7 +225,7 @@ void RomStore::addRom(const std::string &name,
             "we can add support for this firmware version.");
     }
 
-    std::shared_ptr<Rom> rom = std::make_shared<Rom>();
+    std::unique_ptr<Rom> rom = std::make_unique<Rom>();
     rom->setName(name);
     rom->setPath(path.toStdString());
     rom->setPlatform(definition);
@@ -240,21 +240,27 @@ void RomStore::addRom(const std::string &name,
 
 
 
-std::shared_ptr<Rom> RomStore::fromId(std::size_t id) {
-    for (const std::shared_ptr<Rom> &rom : roms_) {
+Rom *RomStore::fromId(std::size_t id) {
+    for (auto &rom : roms_) {
         if (rom->id() == id) {
-            return rom;
+            return rom.get();
         }
     }
 
-    return std::shared_ptr<Rom>();
+    return nullptr;
 }
 
 
+Rom *RomStore::get(std::size_t index) {
+    if (index <= count()) {
+        return roms_[index].get();
+    }
+    return nullptr;
+}
+    
 
 
-
-std::shared_ptr<Tune> RomStore::createTune(const std::shared_ptr<Rom> &base,
+Tune &RomStore::createTune(Rom &base,
                                   const std::string &name) {
     LibreTuner::get()->checkHome();
 
@@ -281,18 +287,20 @@ std::shared_ptr<Tune> RomStore::createTune(const std::shared_ptr<Rom> &base,
     xml.writeEndDocument();
     file.close();
 
-    std::shared_ptr<Tune> tune = std::make_shared<Tune>();
+    std::unique_ptr<Tune> tune = std::make_unique<Tune>();
     tune->setName(name);
     tune->setPath(path.toStdString());
-    tune->setBase(base);
+    tune->setBase(&base);
     tune->setId(nextId_++);
+    
+    Tune *ptr = tune.get();
 
-    base->addTune(std::move(tune));
+    base.addTune(std::move(tune));
     // emit updateTunes();
 
-    save();
+    saveTunes();
 
-    return tune;
+    return *ptr;
 }
 
 
@@ -306,7 +314,7 @@ void RomStore::readTunes(QXmlStreamReader &xml) {
             return;
         }
 
-        std::shared_ptr<Tune> tune = std::make_shared<Tune>();
+        std::unique_ptr<Tune> tune = std::make_unique<Tune>();
         tune->setId(nextId_++);
 
         // Read ROM data
@@ -326,13 +334,13 @@ void RomStore::readTunes(QXmlStreamReader &xml) {
                     return;
                 }
 
-                std::shared_ptr<Rom> base = fromId(id);
-                if (!base) {
+                Rom *base = fromId(id);
+                if (base == nullptr) {
                     xml.raiseError("Tune does not have a va lid base");
                     return;
                 }
                 tune->setBase(base);
-                base->addTune(tune);
+                base->addTune(std::move(tune));
             }
         }
     }
@@ -357,8 +365,8 @@ void RomStore::saveTunes() {
     xml.writeStartDocument();
     xml.writeDTD("<!DOCTYPE tunes>");
     xml.writeStartElement("tunes");
-    for (const std::shared_ptr<Rom> &rom : roms_) {
-        for (const std::shared_ptr<Tune> &tune : rom->tunes()) {
+    for (const auto &rom : roms_) {
+        for (const auto &tune : rom->tunes()) {
             xml.writeStartElement("tune");
             xml.writeTextElement("name", QString::fromStdString(tune->name()));
             xml.writeTextElement("path", QString::fromStdString(tune->path()));

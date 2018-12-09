@@ -53,7 +53,7 @@ public:
     /* Saves rom list and metadata */
     void save();
 
-    const std::vector<std::shared_ptr<Rom>> &roms() { return roms_; }
+    const std::vector<std::unique_ptr<Rom>> &roms() { return roms_; }
 
     void addRom(const std::string &name, const definition::MainPtr &definition,
                 const uint8_t *data, size_t size);
@@ -61,19 +61,22 @@ public:
     /* Returns the ROM with id or nullptr if the ROM does
      * not exist. Be careful not to store this reference
      * as ROMs can be added or removed. */
-    std::shared_ptr<Rom> fromId(std::size_t id);
+    Rom *fromId(std::size_t id);
 
     /* Creates a new tune with base 'base'. Returns the new tune.
      * If the tune could not be created, throw exception. */
-    std::shared_ptr<Tune> createTune(const std::shared_ptr<Rom> &base, const std::string &name);
+    Tune &createTune(Rom &base, const std::string &name);
 
     void saveTunes();
 
     void loadTunes();
+    
+    std::size_t count() { return roms_.size(); }
+    Rom *get(std::size_t index);
 
 private:
     RomStore() = default;
-    std::vector<std::shared_ptr<Rom>> roms_;
+    std::vector<std::unique_ptr<Rom>> roms_;
     std::size_t nextId_{};
 
     void readTunes(QXmlStreamReader &xml);
