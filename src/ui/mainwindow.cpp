@@ -210,6 +210,9 @@ QDockWidget *MainWindow::createSidebarDock()
     sidebar_ = new SidebarWidget;
     sidebar_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     dock->setWidget(sidebar_);
+    
+    connect(this, &MainWindow::tableChanged, sidebar_, &SidebarWidget::fillTableInfo);
+    
     docks_.emplace_back(dock);
     return dock;
 }
@@ -226,9 +229,7 @@ QDockWidget *MainWindow::createTablesDock()
     connect(tables_, &TablesWidget::activated, [this](int index) {
         Table *table = selectedTune_->tables().get(index, true);
         
-        sidebar_->fillTableInfo(table); 
-        editor_->tableChanged(table);
-        graph_->tableChanged(table);
+        emit tableChanged(table);
     });
     docks_.emplace_back(dock);
     return dock;
@@ -241,15 +242,32 @@ QDockWidget *MainWindow::createEditorDock()
     QDockWidget *dock = new QDockWidget("Editor", this);
     dock->setObjectName("editor");
     editor_ = new EditorWidget(dock);
+    
+    connect(this, &MainWindow::tableChanged, editor_, &EditorWidget::tableChanged);
+    
     dock->setWidget(editor_);
     docks_.emplace_back(dock);
     return dock;
 }
 
-bool MainWindow::changeSelected(const std::shared_ptr<TuneData>& data)
+bool MainWindow::changeSelected(Tune *tune)
 {
+    
     if (checkSaveSelected()) {
-        selectedTune_ = data;
+        try {
+            if (tune) {
+                selectedTune_ = tune->data();
+                flashCurrentAction_->setEnabled(true);
+                tables_->setTables(tune->base()->platform()->tables);
+            } else {
+                tables_->setTables(std::vector<definition::Table>());
+                flashCurrentAction_->setEnabled(false);
+                // editor_->setModel(nullptr);
+                emit tableChanged(nullptr);
+            }
+        } catch (const std::runtime_error &err) {
+            QMessageBox(QMessageBox::Critical, "Error", QString("Failed to load tune\n") + err.what()).exec();
+        }
         return true;
     }
     return false;
@@ -299,40 +317,6 @@ bool MainWindow::checkSaveSelected()
 }
 
 
-/*
-QDockWidget *MainWindow::createRomsDock() {
-    QDockWidget *dock = new QDockWidget("ROMs", this);
-
-    RomsView *roms = new RomsView (dock);
-    RomsModel *model = new RomsModel(roms);
-    model->setRoms(RomStore::get());
-    roms->setModel(model);
-    dock->setWidget(roms);
-    
-    
-    connect(roms, &RomsView::activated, [this](const std::shared_ptr<Tune> &tune) {
-        if (!tune) {
-            if (changeSelected(std::shared_ptr<TuneData>())) 
-                tables_->setTables(std::vector<definition::Table>());
-            return;
-        }
-        
-        if (changeSelected(LibreTuner::openTune(tune)))
-            tables_->setTables(tune->base()->platform()->tables);
-    });
-    
-    connect(roms, &RomsView::downloadClicked, this, &MainWindow::on_buttonDownloadRom_clicked);
-    
-    connect(roms, &RomsWidget::flashClicked, [this]() {
-        if (selectedTune_) {
-            LibreTuner::get()->flashTune(selectedTune_);
-        }
-    });
-    
-    docks_.emplace_back(dock);
-    return dock;
-}*/
-
 
 QDockWidget *MainWindow::createOverviewDock() {
     QDockWidget *dock = new QDockWidget("Overview", this);
@@ -349,8 +333,10 @@ QDockWidget *MainWindow::createGraphDock()
     
     graph_ = new GraphWidget(dock);
     dock->setWidget(graph_);
-    
     dock->setObjectName("graph");
+    
+    connect(this, &MainWindow::tableChanged, graph_, &GraphWidget::tableChanged);
+    
     docks_.emplace_back(dock);
     return dock;
 }
@@ -370,6 +356,16 @@ void MainWindow::setupMenu() {
     QAction *downloadAction = new QAction(tr("&Download ROM"), this);
     fileMenu->addAction(downloadAction);
     
+    flashCurrentAction_ = new QAction(tr("Flash Current Tune"), this);
+    flashCurrentAction_->setEnabled(false);
+    fileMenu->addAction(flashCurrentAction_);
+    
+    connect(flashCurrentAction_, &QAction::triggered, [this]() {
+        if (selectedTune_) {
+            LibreTuner::get()->flashTune(selectedTune_);
+        }
+    });
+    
     connect(downloadAction, &QAction::triggered, this, &MainWindow::on_buttonDownloadRom_clicked);
     
     connect(openTuneAction, &QAction::triggered, [this]() {
@@ -377,18 +373,8 @@ void MainWindow::setupMenu() {
         dlg.exec();
         
         Tune *tune = dlg.selectedTune();
-        if (tune != nullptr) {
-            try {
-                if (changeSelected(tune->data())) {
-                    tables_->setTables(tune->base()->platform()->tables);
-                } else {
-                    tables_->setTables(std::vector<definition::Table>());
-                    editor_->setModel(nullptr);
-                }
-            } catch (const std::runtime_error &err) {
-                QMessageBox(QMessageBox::Critical, "Error", QString("Failed to load tune\n") + err.what()).exec();
-            }
-        }
+        if (tune)
+            changeSelected(tune);
     });
 
     QAction *logAct = viewMenu->addAction(tr("CAN Log"));

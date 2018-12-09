@@ -77,46 +77,5 @@ void EditorWidget::tableChanged(Table *table)
         labelY_->setVisible(false);
         view_->verticalHeader()->setVisible(false);
     }
-    
-    // This is not elegant. Maybe the class structure should be changed
-    /*ui->labelMemory->setText(
-        QStringLiteral("0x") +
-        QString::number(tune_->rom()->definition()->tables[
-                            currentTable_.id],
-                        16));
-    ui->infoName->setText(
-        QString::fromStdString(currentTable_.table->name()));
-    ui->infoDesc->setText(
-        QString::fromStdString(currentTable_.table->description()));*/
-
-    /*const TableAxis *axis = currentTable_.table->definition()->axisX();
-    if (axis != nullptr) {
-        ui->labelAxisX->setText(QString::fromStdString(axis->label()));
-        ui->labelAxisX->setVisible(true);
-        ui->tableEdit->horizontalHeader()->setVisible(true);
-    } else {
-        ui->labelAxisX->setVisible(false);
-        ui->tableEdit->horizontalHeader()->setVisible(false);
-    }
-
-    axis = currentTable_.table->definition()->axisY();
-    if (axis != nullptr) {
-        ui->labelAxisY->setText(QString::fromStdString(axis->label()));
-        ui->labelAxisY->setVisible(true);
-        ui->tableEdit->verticalHeader()->setVisible(true);
-    } else {
-        ui->labelAxisY->setVisible(false);
-        ui->tableEdit->verticalHeader()->setVisible(false);
-    }*/
-
-    //emit tableChanged(currentTable_.table);
-}
-
-
-
-void EditorWidget::tuneChanged(const std::shared_ptr<Tune>& tune)
-{
-    tune_ = tune;
-    tuneData_.reset();
 }
 

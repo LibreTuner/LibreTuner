@@ -44,6 +44,9 @@ private slots:
     void on_buttonDownloadRom_clicked();
     void newLogClicked();
     void closeEvent(QCloseEvent *event) override;
+    
+signals:
+    void tableChanged(Table *table);
 
 private:
     CanViewer canViewer_;
@@ -58,6 +61,8 @@ private:
     TablesWidget *tables_;
     EditorWidget *editor_;
     GraphWidget *graph_;
+    
+    QAction *flashCurrentAction_;
 
     // Docks
     QDockWidget *logDock_;
@@ -69,7 +74,7 @@ private:
     QDockWidget *editorDock_;
     QDockWidget *graphDock_;
     
-    bool changeSelected(const std::shared_ptr<TuneData> &data);
+    bool changeSelected(Tune *tune);
     
     // Returns true if it is safe to discard the tune data
     bool checkSaveSelected();

@@ -58,7 +58,7 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
 
 
 
-void SidebarWidget::fillTableInfo(const Table* table)
+void SidebarWidget::fillTableInfo(Table* table)
 {
     if (!table) {
         tableName_->setText(1, "");

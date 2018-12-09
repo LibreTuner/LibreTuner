@@ -29,8 +29,6 @@ private:
     QTableView *view_;
     QLabel *labelX_;
     VerticalLabel *labelY_;
-    std::shared_ptr<Tune> tune_;
-    std::shared_ptr<TuneData> tuneData_;
 };
 
 #endif // EDITORWIDGET_H

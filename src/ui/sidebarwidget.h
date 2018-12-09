@@ -17,7 +17,8 @@ class SidebarWidget : public QWidget {
 public:
     explicit SidebarWidget(QWidget *parent = nullptr);
     
-    void fillTableInfo(const Table *table);
+public slots:
+    void fillTableInfo(Table *table);
 
 private slots:
     void on_treeToolButton_clicked(bool checked);
