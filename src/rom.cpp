@@ -31,9 +31,7 @@
 
 
 
-Rom::Rom() {
-}
-
+Rom::Rom() = default;
 
 
 RomData::RomData(Rom &rom) : rom_(rom)
@@ -335,7 +333,8 @@ TuneData::TuneData(std::string path, Rom &base, bool open) : path_(std::move(pat
     if (open) {
         QFile file(QString::fromStdString(path_));
         if (!file.open(QFile::ReadOnly)) {
-            throw std::runtime_error(file.errorString().toStdString());
+            return; // Empty tune
+            // throw std::runtime_error(file.errorString().toStdString());
         }
 
         QXmlStreamReader xml(&file);
