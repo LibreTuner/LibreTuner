@@ -37,9 +37,9 @@ struct Rom;
 class CreateTuneDialog : public QDialog {
     Q_OBJECT
 public:
-    CreateTuneDialog(const Rom *base = nullptr);
+    explicit CreateTuneDialog(const Rom *base = nullptr);
 
-    ~CreateTuneDialog();
+    ~CreateTuneDialog() override;
 
 private:
     Ui::CreateTuneDialog *ui_;

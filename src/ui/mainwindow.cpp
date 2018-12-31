@@ -33,6 +33,7 @@
 #include "graphwidget.h"
 #include "setupdialog.h"
 #include "rom.h"
+#include "createtunedialog.h"
 
 #include <QAction>
 #include <QDockWidget>
@@ -358,7 +359,10 @@ void MainWindow::setupMenu() {
     
     auto *openTuneAction = new QAction(tr("&Open Tune"), this);
     fileMenu->addAction(openTuneAction);
-    
+
+    auto *createTuneAction = new QAction(tr("&New Tune"), this);
+    fileMenu->addAction(createTuneAction);
+
     auto *downloadAction = new QAction(tr("&Download ROM"), this);
     fileMenu->addAction(downloadAction);
     
@@ -374,6 +378,11 @@ void MainWindow::setupMenu() {
         if (selectedTune_) {
             LibreTuner::get()->flashTune(selectedTune_);
         }
+    });
+
+    connect(createTuneAction, &QAction::triggered, [this]() {
+        CreateTuneDialog dlg;
+        dlg.exec();
     });
     
     connect(saveCurrentAction_, &QAction::triggered, [this]() {
@@ -416,21 +425,6 @@ void MainWindow::on_buttonDownloadRom_clicked() {
         downloadWindow_ = nullptr;
     }
 
-    /*if (const auto &link = LibreTuner::get()->getVehicleLink()) {
-        try {
-            auto di = link->downloader();
-            downloadWindow_ =
-                new DownloadWindow(std::move(di), link->vehicle(), this);
-            downloadWindow_->show();
-        } catch (const std::runtime_error &err) {
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("Download error");
-            msgBox.setText(QStringLiteral("Error downloading ROM\n") + err.what());
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-        }
-    }*/
-    
     DownloadWindow downloadWindow;
     downloadWindow.exec();
 }
@@ -438,36 +432,6 @@ void MainWindow::on_buttonDownloadRom_clicked() {
 
 
 void MainWindow::newLogClicked() {
-    /*std::unique_ptr<VehicleLink> link = LibreTuner::get()->getVehicleLink();
-    if (!link) {
-        return;
-    }
-
-    std::unique_ptr<DataLogger> logger;
-
-    try {
-        logger = link->logger();
-        if (!logger) {
-            QMessageBox(QMessageBox::Critical, "Logger error",
-                        "Failed to create a usable datalogger. The datalink "
-                        "may not support the needed protocol or there is no "
-                        "log mode set in the definition file.")
-                .exec();
-            return;
-        }
-    } catch (const std::exception &e) {
-        QMessageBox(QMessageBox::Critical, "Logger error",
-                    QStringLiteral(
-                        "An error occurred while creating the datalogger: ") +
-                        e.what())
-            .exec();
-        return;
-    }*/
-    /*DataLogPtr log = std::make_shared<DataLog>();
-    loggerWindow_ = std::make_unique<DataLoggerWindow>(
-        log, std::move(logger), link->definition());
-    loggerWindow_->show();*/
-
     auto *window = new DataLoggerWindow;
     window->setWindowModality(Qt::WindowModal);
     window->show();
