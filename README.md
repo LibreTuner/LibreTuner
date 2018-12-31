@@ -7,7 +7,7 @@ Open source tuning software for Mazda platforms
 
 Screenshots
 -----------
-![Main and Download window](https://user-images.githubusercontent.com/3116133/37375434-eff414a6-26f5-11e8-9922-91ad76e49e50.png)
+![Main Window](https://user-images.githubusercontent.com/3116133/50564228-54bf8500-0cf1-11e9-9e96-03c314e166bc.png)
 
 Supported vehicles
 ------------------
@@ -37,8 +37,3 @@ Building
 `make`
 
 `./LibreTuner`
-
-
-Credits
--------
-Temporary ROM icon made by Freepik from www.flaticon.com 
