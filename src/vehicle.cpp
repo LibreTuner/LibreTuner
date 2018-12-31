@@ -18,7 +18,7 @@
 
 #include "vehicle.h"
 
-#include "datalink.h"
+#include "datalink/datalink.h"
 #include "datalogger.h"
 #include "definitions/definition.h"
 #include "definitions/definitionmanager.h"
@@ -41,16 +41,15 @@ Vehicle Vehicle::fromVin(const std::string &vin) {
 
 
 
-std::unique_ptr<DataLogger> VehicleLink::logger() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+std::unique_ptr<DataLogger> VehicleLink::logger(DataLog &log) const {
+    if (!definition_) {
         return nullptr;
     }
 
-    switch (vehicle_.definition->logMode) {
+    switch (definition_->logMode) {
     case LogMode::Uds: {
         if (auto interface = uds()) {
-            return std::make_unique<UdsDataLogger>(std::move(interface));
+            return std::make_unique<UdsDataLogger>(log, std::move(interface));
         }
         return nullptr;
     }
@@ -62,17 +61,16 @@ std::unique_ptr<DataLogger> VehicleLink::logger() const {
 
 
 std::unique_ptr<DownloadInterface> VehicleLink::downloader() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
 
-    switch (vehicle_.definition->downloadMode) {
+    switch (definition_->downloadMode) {
     case DownloadMode::Mazda23:
         if (auto interface = uds()) {
             return std::make_unique<Uds23DownloadInterface>(
-                std::move(interface), vehicle_.definition->key,
-                vehicle_.definition->romsize);
+                std::move(interface), definition_->key,
+                definition_->romsize);
         }
     default:
         return nullptr;
@@ -82,8 +80,7 @@ std::unique_ptr<DownloadInterface> VehicleLink::downloader() const {
 
 
 std::unique_ptr<DiagnosticsInterface> VehicleLink::diagnostics() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
 
@@ -96,27 +93,24 @@ std::unique_ptr<DiagnosticsInterface> VehicleLink::diagnostics() const {
 
 
 std::unique_ptr<Flasher> VehicleLink::flasher() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
-    switch (vehicle_.definition->flashMode) {
+    switch (definition_->flashMode) {
     case FlashMode::T1:
         if (auto interface = uds()) {
-            return std::make_unique<MazdaT1Flasher>(vehicle_.definition->key,
+            return std::make_unique<MazdaT1Flasher>(definition_->key,
                                                     std::move(interface));
         }
     default:
         return nullptr;
     }
-    return nullptr;
 }
 
 
 
 std::unique_ptr<uds::Protocol> VehicleLink::uds() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
 
@@ -129,14 +123,13 @@ std::unique_ptr<uds::Protocol> VehicleLink::uds() const {
 
 
 std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
     if (auto c = can()) {
         return std::make_unique<isotp::Protocol>(
-            std::move(c), isotp::Options{vehicle_.definition->serverId,
-                                         vehicle_.definition->serverId + 8,
+            std::move(c), isotp::Options{definition_->serverId,
+                                         definition_->serverId + 8,
                                          std::chrono::milliseconds{8000}});
     }
     return nullptr;
@@ -145,11 +138,10 @@ std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const {
 
 
 std::unique_ptr<CanInterface> VehicleLink::can() const {
-    assert(datalink_);
-    if (!vehicle_.definition) {
+    if (!definition_) {
         return nullptr;
     }
-    return datalink_->can(vehicle_.definition->baudrate);
+    return datalink_.can(definition_->baudrate);
 }
 
 VehicleLink::~VehicleLink() { Logger::debug("Closing vehicle link"); }

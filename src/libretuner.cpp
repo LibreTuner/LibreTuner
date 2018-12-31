@@ -25,6 +25,7 @@
 #include "ui/flashwindow.h"
 #include "ui/styledwindow.h"
 #include "ui/tuneeditor.h"
+#include "ui/setupdialog.h"
 #include "vehicle.h"
 
 #include "framelesswindow/framelesswindow.h"
@@ -37,6 +38,7 @@
 
 #ifdef WITH_J2534
 #include "j2534/j2534manager.h"
+#include "datalink/passthru.h"
 #endif
 
 #include <QDir>
@@ -65,7 +67,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     SocketHandler::get()->initialize();
 #endif
 #ifdef WITH_J2534
-    try {
+    /*try {
         J2534Manager::get().init();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
@@ -74,7 +76,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setWindowTitle("J2534Manager error");
         msgBox.exec();
-    }
+    }*/
 #endif
     TimerRunLoop::get().startWorker();
 
@@ -115,23 +117,30 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     }
 
     try {
-        InterfaceManager::get().load();
+        // InterfaceManager::get().load();
+        load_datalinks();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
         msgBox.setText("Could not load interface data from interfaces.xml: " +
                        QString(e.what()));
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("InterfaceManager error");
+        msgBox.setWindowTitle("Datalink error");
         msgBox.exec();
     }
+
+    checkHome();
+
+    dtcDescriptions_.load();
+
+
+    setup();
+
 
     mainWindow_ = new MainWindow;
     mainWindow_->setWindowIcon(QIcon(":/icons/LibreTuner.png"));
     mainWindow_->show();
 
-    checkHome();
 
-    dtcDescriptions_.load();
 
     /*QFile file(":/stylesheet.qss");
     if (file.open(QFile::ReadOnly)) {
@@ -164,7 +173,7 @@ std::shared_ptr<TuneData> LibreTuner::openTune(const std::shared_ptr<Tune> &tune
 
 
 void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
-    if (!data) {
+    /*if (!data) {
         return;
     }
 
@@ -192,7 +201,7 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         return;
-    }
+    }*/
 
     
 }
@@ -230,9 +239,9 @@ void LibreTuner::checkHome() {
 }
 
 
-DataLinkPtr LibreTuner::getDataLink() {
+//DataLinkPtr LibreTuner::getDataLink() {
     // Get the default interface
-    InterfaceSettingsPtr def = InterfaceManager::get().defaultInterface();
+    /*InterfaceSettingsPtr def = InterfaceManager::get().defaultInterface();
     if (!def) {
         // Ask the user to create an interface
         AddInterfaceDialog dlg;
@@ -254,13 +263,13 @@ DataLinkPtr LibreTuner::getDataLink() {
         msg.setIcon(QMessageBox::Critical);
         msg.exec();
         return nullptr;
-    }
-}
+    }*/
+//}
 
 
 
 std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink() {
-    QMessageBox msg(QMessageBox::Information, "Querying vehicle",
+    /*QMessageBox msg(QMessageBox::Information, "Querying vehicle",
                     "Searching for a connected vehicle...");
     msg.show();
 
@@ -282,7 +291,7 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink() {
                     QString("Error while querying vehicle: ") +
                         QString(e.what()))
             .exec();
-    }
+    }*/
 
     return nullptr;
 }
@@ -290,7 +299,7 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink() {
 
 
 std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
-    DataLinkPtr dl = getDataLink();
+    /*DataLinkPtr dl = getDataLink();
     if (!dl) {
         return nullptr;
     }
@@ -336,10 +345,110 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
             return nullptr;
         }
     }
-    return std::make_unique<VehicleLink>(std::move(v), dl);
+    return std::make_unique<VehicleLink>(std::move(v), dl);*/
+}
+
+
+
+void LibreTuner::load_datalinks() {
+#ifdef WITH_J2534
+    for (std::unique_ptr<datalink::PassThruLink> &&link : datalink::detect_passthru_links()) {
+        datalinks_.add_link(std::static_pointer_cast<datalink::Link>(std::move(link)));
+    }
+#endif
 }
 
 
 
 LibreTuner::~LibreTuner() { _global = nullptr; }
 
+
+
+void LibreTuner::setup() {
+    SetupDialog setup;
+    setup.setDefinitionModel(DefinitionManager::get());
+    setup.exec();
+    currentDefinition_ = setup.platform();
+    currentDatalink_ = setup.datalink();
+}
+
+std::unique_ptr<VehicleLink> LibreTuner::platform_link() {
+    if (!currentDefinition_ || !currentDatalink_) {
+        return nullptr;
+    }
+
+    return std::make_unique<VehicleLink>(currentDefinition_, *currentDatalink_);
+}
+
+
+int Links::rowCount(const QModelIndex &parent) const {
+    return static_cast<int>(links_.size());
+}
+
+
+Q_DECLARE_METATYPE(datalink::Link*)
+
+QVariant Links::data(const QModelIndex &index, int role) const {
+    if (index.column() < 0 || index.column() > 1 || index.row() < 0 || index.row() >= links_.size()) {
+        return QVariant();
+    }
+
+    const std::unique_ptr<datalink::Link> &link = links_[index.row()];
+
+    switch (role) {
+        case Qt::DisplayRole:
+            switch (index.column()) {
+                case 0:
+                    return QString::fromStdString(link->name());
+                case 1:
+                    return "UNIMPL";
+                default:
+                    return QVariant();
+            }
+        case Qt::UserRole:
+            return QVariant::fromValue<datalink::Link*>(link.get());
+        default:
+            return QVariant();
+    }
+}
+
+
+
+QVariant Links::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
+        return QVariant();
+    }
+
+    switch (section) {
+        case 0:
+            return "Name";
+        case 1:
+            return "Type";
+        default:
+            return QVariant();
+    }
+}
+
+
+
+int Links::columnCount(const QModelIndex &parent) const {
+    return 2;
+}
+
+
+
+QModelIndex Links::index(int row, int column, const QModelIndex &parent) const {
+    // No parents
+    if (parent.isValid()) {
+        return QModelIndex();
+    }
+
+    return createIndex(row, column);
+}
+
+
+
+QModelIndex Links::parent(const QModelIndex &child) const {
+    // No parents
+    return QModelIndex();
+}

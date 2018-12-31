@@ -30,6 +30,8 @@ enum class InterfaceType {
     Invalid,
 };
 
+
+
 class InterfaceSettings;
 using InterfaceSettingsPtr = std::shared_ptr<InterfaceSettings>;
 
@@ -44,13 +46,13 @@ public:
 
     InterfaceSettings(InterfaceType type) : type_(type){};
 
-    /* Creates an interface for the specified type. Returns
-     * nullptr if the type is not supported */
+    // Creates an interface for the specified type. Returns
+    // nullptr if the type is not supported
     static InterfaceSettingsPtr create(InterfaceType type);
 
-    InterfaceType type() { return type_; }
+    InterfaceType type() const { return type_; }
 
-    std::string name() { return name_; }
+    std::string name() const { return name_; }
 
     void setName(const std::string &name) { name_ = name; }
 
@@ -58,7 +60,7 @@ public:
 
 protected:
     virtual void saveCustom(QXmlStreamWriter &xml) = 0;
-    /* Loads a custom element. */
+    // Loads a custom element.
     virtual void loadCustom(QXmlStreamReader &xml) = 0;
 
 private:
@@ -69,7 +71,7 @@ private:
 class SocketCanSettings : public InterfaceSettings {
 public:
     void setInterface(const std::string &interface);
-    std::string interface() { return scInterface_; }
+    std::string interface() const { return scInterface_; }
     SocketCanSettings() : InterfaceSettings(InterfaceType::SocketCan) {}
 
 protected:

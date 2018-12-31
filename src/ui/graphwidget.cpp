@@ -99,12 +99,18 @@ void GraphWidget::tableChanged(Table *table) {
 
         chartView_->setVisible(false);
         container_->setVisible(true);
-    } else if (table->isOneDimensional() && table->axisX()) {
+    } else if (table->height() == 1 && table->width() > 1) {
         auto *series = new QLineSeries;
-        for (int x = 0; x < table->width(); ++x) {
-            series->append(table->axisX()->label(x),
-                           table->data(table->index(0, x))
-                               .toFloat()); // Should always be a float
+        if (table->axisX()) {
+            for (int x = 0; x < table->width(); ++x) {
+                series->append(table->axisX()->label(x),
+                            table->data(table->index(0, x))
+                                .toFloat()); // Should always be a float
+            }
+        } else {
+            for (int x = 0; x < table->width(); ++x) {
+                series->append(x, table->data(table->index(0, x)).toFloat()); // Should always be a float
+            }
         }
 
         chart_->removeAllSeries();
@@ -112,8 +118,11 @@ void GraphWidget::tableChanged(Table *table) {
         chart_->createDefaultAxes();
 
         chart_->createDefaultAxes();
-        chart_->axisX()->setTitleText(
-            QString::fromStdString(table->axisX()->name()));
+        
+        if (table->axisX()) {
+            chart_->axisX()->setTitleText(
+                QString::fromStdString(table->axisX()->name()));
+        }
 
         chartView_->setVisible(true);
         container_->setVisible(false);

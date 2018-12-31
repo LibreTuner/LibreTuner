@@ -26,6 +26,9 @@
 #include <fstream>
 
 #include <QFile>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+
 
 
 Rom::Rom() {
@@ -90,6 +93,41 @@ TableAxis * RomData::getAxis(const std::string& name)
                 break;
             case TableType::Int32:
                 axis = std::make_unique<LinearAxis<int32_t>>(it->second.name, it->second.start, it->second.increment);
+                break;
+        }
+        
+        TableAxis *ptr = axis.get();
+        axes_.emplace(name, std::move(axis));
+        return ptr;
+    } else if (it->second.type == definition::AxisType::Memory) {
+        // Get offset
+        std::size_t offset = rom_.model()->getAxisOffset(name);
+        
+        auto begin = data_.begin() + offset;
+        std::size_t size = it->second.size;
+        
+        std::unique_ptr<TableAxis> axis;
+        switch (it->second.dataType) {
+            case TableType::Float:
+                axis = std::make_unique<MemoryAxis<float>>(it->second.name, begin, begin + size * sizeof(float), rom_.platform()->endianness);
+                break;
+            case TableType::Uint8:
+                axis = std::make_unique<MemoryAxis<uint8_t>>(it->second.name, begin, begin + size * sizeof(uint8_t), rom_.platform()->endianness);
+                break;
+            case TableType::Uint16:
+                axis = std::make_unique<MemoryAxis<uint16_t>>(it->second.name, begin, begin + size * sizeof(uint16_t), rom_.platform()->endianness);
+                break;
+            case TableType::Uint32:
+                axis = std::make_unique<MemoryAxis<uint32_t>>(it->second.name, begin, begin + size * sizeof(uint32_t), rom_.platform()->endianness);
+                break;
+            case TableType::Int8:
+                axis = std::make_unique<MemoryAxis<int8_t>>(it->second.name, begin, begin + size * sizeof(int8_t), rom_.platform()->endianness);
+                break;
+            case TableType::Int16:
+                axis = std::make_unique<MemoryAxis<int16_t>>(it->second.name, begin, begin + size * sizeof(int16_t), rom_.platform()->endianness);
+                break;
+            case TableType::Int32:
+                axis = std::make_unique<MemoryAxis<int32_t>>(it->second.name, begin, begin + size * sizeof(int32_t), rom_.platform()->endianness);
                 break;
         }
         
@@ -277,6 +315,8 @@ void TuneData::save() {
     if (xml.hasError()) {
         throw std::runtime_error("unknown XML error while writing tune");
     }
+    
+    tables_.clearDirty();
 }
 
 

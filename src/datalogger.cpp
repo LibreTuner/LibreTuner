@@ -23,10 +23,6 @@
 
 
 
-void DataLogger::setLog(const DataLogPtr &log) { log_ = log; }
-
-
-
 void DataLogger::addPid(uint32_t id, uint16_t code,
                         const std::string &formula) {
     addPid(Pid(id, code, formula));
@@ -34,8 +30,7 @@ void DataLogger::addPid(uint32_t id, uint16_t code,
 
 
 
-UdsDataLogger::UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds)
-    : uds_(std::move(uds)) {}
+UdsDataLogger::UdsDataLogger(DataLog &log, std::unique_ptr<uds::Protocol> &&uds) : DataLogger(log), uds_(std::move(uds)) {}
 
 
 
@@ -99,18 +94,9 @@ void UdsDataLogger::processNext() {
         break;
     }
 
-    if (log_) {
-        double result = pid->evaluate();
-        log_->add(pid->id(), result);
-    }
+    double result = pid->evaluate();
+    log_.add(pid->id(), result);
 }
-
-
-
-void UdsDataLogger::setErrorCallback(UdsDataLogger::ErrorCall &&error) {
-    errorCall_ = std::move(error);
-}
-
 
 
 void UdsDataLogger::run() {
@@ -133,57 +119,13 @@ void UdsDataLogger::run() {
 
 
 
-void UdsDataLogger::throwError(const std::string &error) {
-    Logger::critical("UdsDataLogger: " + error);
-    if (errorCall_) {
-        errorCall_(error);
-    }
-}
-
-
-
-void UdsDataLogger::enable() {
-    if (running_) {
-        return;
-    }
-    if (uds_) {
-        running_ = true;
-        
-        if (thread_.joinable()) {
-            // Wait for thread to exit..
-            thread_.join();
-        }
-        
-        thread_ = std::thread([this] { run(); });
-    } else {
-        throw std::runtime_error("a UDS device is not attached to the logger");
-    }
-}
-
-
-
 void UdsDataLogger::disable() { running_ = false; }
-
-
-
-UdsDataLogger::~UdsDataLogger()
-{
-    if (thread_.joinable()) {
-        disable();
-        thread_.join();
-    }
-}
 
 
 
 Pid::Pid(uint32_t id, uint16_t code, const std::string &formula)
     : id_(id), code_(code), expression_(formula.c_str()) {}
 
-
-
-Pid::Pid(Pid &&pid)
-    : id_(pid.id_), code_(pid.code_), vars_(std::move(pid.vars_)),
-      expression_(std::move(pid.expression_)) {}
 
 
 

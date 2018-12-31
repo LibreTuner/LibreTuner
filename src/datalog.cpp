@@ -19,35 +19,43 @@
 #include "datalog.h"
 #include "logger.h"
 
-DataLog::DataLog() : updateSignal_(Signal<UpdateCall>::create())
-{
-}
-
 
 bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
-    auto it = data_.find(id);
-    if (it == data_.end()) {
+    Data *data = addPid(id);
+    if (data == nullptr) {
         return false;
     }
 
-    it->second.values.emplace_back(value);
-    updateSignal_->call(it->second, value.second);
+    data->values.emplace_back(value);
+    updateSignal_->call(*data, value.second);
     return true;
 }
+
+
 
 bool DataLog::add(uint32_t id, double value) {
-    auto it = data_.find(id);
-    if (it == data_.end()) {
-        return false;
-    }
-
-    it->second.values.emplace_back(std::chrono::steady_clock::now(), value);
-    updateSignal_->call(it->second, value);
-    return true;
+    return add(id, std::make_pair(std::chrono::steady_clock::now(), value));
 }
 
-void DataLog::addData(const DataLog::DataHead &data) {
-    Data d;
-    d.head = data;
-    data_.emplace(data.id, std::move(d));
+
+
+DataLog::DataLog(definition::MainPtr platform) : platform_(std::move(platform)), updateSignal_(Signal<UpdateCall>::create()) {
+
+}
+
+
+
+DataLog::Data *DataLog::addPid(uint32_t id) {
+    auto it = data_.find(id);
+    if (it != data_.end()) {
+        return &it->second;
+    }
+    if (!platform_) {
+        return nullptr;
+    }
+    for (definition::Pid &pid : platform_->pids) {
+        auto ret = data_.emplace(id, Data(pid));
+        return &ret.first->second;
+    }
+    return nullptr;
 }

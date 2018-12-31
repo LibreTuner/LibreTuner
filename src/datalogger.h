@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
-#include <thread>
+#include <atomic>
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
@@ -35,7 +35,9 @@ enum class PidType {
 class Pid {
 public:
     Pid(uint32_t id, uint16_t code, const std::string &formula);
-    Pid(Pid &&);
+    Pid(Pid &&) = default;
+    Pid &operator=(Pid&&) = default;
+    Pid &operator=(const Pid&) = delete;
     Pid(const Pid &) = delete;
 
     void setX(uint8_t x) { vars_["a"] = x; }
@@ -59,63 +61,55 @@ class DataLogger;
 
 class DataLogger {
 public:
-    void setLog(const DataLogPtr &log);
+    explicit DataLogger(DataLog &log) : log_(log) {};
 
     virtual ~DataLogger() = default;
 
-    virtual void enable() = 0;
+    /* Sends a request to disable to logger. The logger will likely not be
+     * disabled when this method returns */
     virtual void disable() = 0;
-    /* Returns true if the logger is running */
-    virtual bool running() const = 0;
+
+    /* Starts logging */
+    virtual void run() = 0;
 
     virtual void addPid(Pid &&pid) = 0;
 
     virtual void addPid(uint32_t id, uint16_t code, const std::string &formula);
 
 protected:
-    DataLogPtr log_;
+    DataLog &log_;
 };
 
 
 class UdsDataLogger : public DataLogger {
 public:
-    explicit UdsDataLogger(std::unique_ptr<uds::Protocol> &&uds);
+    UdsDataLogger(DataLog &log, std::unique_ptr<uds::Protocol> &&uds);
     UdsDataLogger(const UdsDataLogger &) = delete;
     UdsDataLogger(UdsDataLogger &&) = delete;
+    UdsDataLogger &operator=(UdsDataLogger&&) = delete;
+    UdsDataLogger &operator=(const UdsDataLogger&) = delete;
     
-    ~UdsDataLogger();
-
-    using ErrorCall = std::function<void(const std::string &error)>;
+    ~UdsDataLogger() override = default;
 
     void addPid(Pid &&pid) override;
 
     Pid *nextPid();
 
-    void enable() override;
-    void disable() override;
-    bool running() const override { return running_; }
-
     void processNext();
 
-    void setErrorCallback(ErrorCall &&error);
+    void disable() override;
+
+    /* Starts logging. */
+    void run() override;
 
 private:
-    /* Thread routine */
-    void run();
-    
-    void throwError(const std::string &error);
-
     std::chrono::steady_clock::time_point freeze_time_;
 
     std::unique_ptr<uds::Protocol> uds_;
     std::vector<Pid> pids_;
 
-    std::mutex mutex_;
-    bool running_ = false;
+    std::atomic<bool> running_ = false;
     size_t current_pid_ = 0;
-    ErrorCall errorCall_;
-    
-    std::thread thread_;
 };
 
 

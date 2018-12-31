@@ -43,6 +43,16 @@ inline std::size_t tableTypeSize(TableType type) {
             return sizeof(float);
         case TableType::Uint8:
             return sizeof(uint8_t);
+        case TableType::Uint16:
+            return sizeof(uint16_t);
+        case TableType::Uint32:
+            return sizeof(uint32_t);
+        case TableType::Int8:
+            return sizeof(int8_t);
+        case TableType::Int16:
+            return sizeof(int16_t);
+        case TableType::Int32:
+            return sizeof(int32_t);
     }
     
     assert(false && "unimplemented");

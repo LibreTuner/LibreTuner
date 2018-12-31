@@ -119,6 +119,8 @@ void InterfaceManager::add(const InterfaceSettingsPtr &iface) {
     }
     save();
     signal_->call();
+    
+    // TODO: Emit change signal
 }
 
 void InterfaceManager::remove(const InterfaceSettingsPtr &iface) {
@@ -130,6 +132,8 @@ void InterfaceManager::remove(const InterfaceSettingsPtr &iface) {
     }
     save();
     signal_->call();
+    
+    // TODO: Emit change signal
 }
 
 void InterfaceManager::addAuto(const InterfaceSettingsPtr &iface) {
@@ -173,3 +177,52 @@ void InterfaceList::removeManual(const InterfaceSettingsPtr &iface) {
         std::remove(manualSettings_.begin(), manualSettings_.end(), iface),
         manualSettings_.end());
 }
+
+Q_DECLARE_METATYPE(InterfaceSettings*)
+
+QVariant InterfaceManager::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::UserRole)) {
+        return QVariant();
+    }
+    
+    if (index.column() != 0) {
+        return QVariant();
+    }
+    
+    int row = index.row();
+    if (row < 0) {
+        return QVariant();
+    }
+    
+    // Settings first
+    if (row < settings_.size()) {
+        switch (role) {
+            case Qt::DisplayRole:
+                return QString::fromStdString(settings_[row]->name());
+            case Qt::UserRole:
+                return QVariant::fromValue<InterfaceSettings*>(settings_[row].get());
+        }
+    }
+    
+    // Auto-detect settings
+    row -= settings_.size();
+    if (row < autosettings_.size()) {
+        switch (role) {
+            case Qt::DisplayRole:
+                return QString::fromStdString(autosettings_[row]->name());
+            case Qt::UserRole:
+                return QVariant::fromValue<InterfaceSettings*>(autosettings_[row].get());
+        }
+    }
+    
+    return QVariant();
+}
+
+
+
+int InterfaceManager::rowCount(const QModelIndex& parent) const
+{
+    return settings_.size() + autosettings_.size();
+}
+

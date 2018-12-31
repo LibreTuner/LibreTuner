@@ -26,6 +26,7 @@
 
 #include "vehicle.h"
 #include "util/signal.h"
+#include "definitions/definition.h"
 
 enum class DataUnit {
     None,
@@ -35,6 +36,8 @@ enum class DataUnit {
 
 class DataLog {
 public:
+    explicit DataLog(definition::MainPtr platform);
+
     using TimePoint = std::chrono::steady_clock::time_point;
     struct DataHead {
         std::string name;
@@ -44,8 +47,10 @@ public:
     };
 
     struct Data {
-        DataHead head;
+        definition::Pid &id;
         std::vector<std::pair<TimePoint, double>> values;
+
+        explicit Data(definition::Pid &mid) : id(mid) {}
     };
 
     std::chrono::system_clock::time_point creationTime() const {
@@ -53,10 +58,6 @@ public:
     }
     
     using UpdateCall = std::function<void(const Data &info, double value)>;
-    
-    DataLog();
-
-    const Vehicle &vehicle() const { return vehicle_; }
 
     /* adds a point to a dataset. Returns false if the dataset
      * with the specified id does not exist. */
@@ -65,13 +66,17 @@ public:
     /* Adds a value at the current time */
     bool add(uint32_t id, double value);
 
-    void addData(const DataHead &data);
+    // void addData(const DataHead &data);
+
+    // Adds the pid with id `id` from the platform. Returns the added
+    // id or nullptr if the pid does not exist.
+    Data *addPid(uint32_t id);
 
     std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
 
 private:
     std::chrono::system_clock::time_point creationTime_;
-    Vehicle vehicle_;
+    definition::MainPtr platform_;
 
     std::unordered_map<uint32_t, Data> data_;
     std::shared_ptr<Signal<UpdateCall>> updateSignal_;

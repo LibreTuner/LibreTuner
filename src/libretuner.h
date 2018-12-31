@@ -19,24 +19,60 @@
 #ifndef LIBRETUNE_H
 #define LIBRETUNE_H
 
-#include "datalink.h"
+#include "datalink/datalink.h"
 #include "definitions/definitionmanager.h"
 #include "dtcdescriptions.h"
 #include "log.h"
 #include "protocols/canlog.h"
 #include "ui/mainwindow.h"
+
+
 #include <QApplication>
+#include <QAbstractItemModel>
 
 #include <memory>
 
-class IsoTpInterface;
-class IsoTpTest;
+
+
+#define LT() LibreTuner::get()
 
 class VehicleLink;
 class Tune;
 class TuneData;
 
 class FlashWindow;
+
+
+
+using LinkVector = std::vector<std::unique_ptr<datalink::Link>>;
+
+class Links : public QAbstractItemModel {
+public:
+    LinkVector::iterator begin() { return links_.begin(); }
+    LinkVector::iterator end() { return links_.end(); }
+
+    void add_link(std::unique_ptr<datalink::Link> &&link) { links_.emplace_back(std::move(link)); }
+    void set_links(LinkVector &&links) { links_ = std::move(links); }
+
+    int rowCount(const QModelIndex &parent) const override;
+
+    int columnCount(const QModelIndex &parent) const override;
+
+    QVariant data(const QModelIndex &index, int role) const override;
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+
+    QModelIndex parent(const QModelIndex &child) const override;
+
+
+
+private:
+    LinkVector links_;
+};
+
+
 
 class LibreTuner : public QApplication {
     Q_OBJECT
@@ -65,7 +101,7 @@ public:
 
     /* Returns the default datalink. Queries the user to create one
      * if none exist. May return nullptr */
-    DataLinkPtr getDataLink();
+    // DataLinkPtr getDataLink();
 
     /* Returns a vehicle link queried with the default datalink. Yeah it's
      * confusing. Use this one \/*/
@@ -78,8 +114,27 @@ public:
 
     const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
 
+    /* Autodetects PassThru interfaces and loads saved datalinks */
+    void load_datalinks();
+
+    const Links &datalinks() const { return datalinks_; }
+    Links &datalinks() { return datalinks_; }
+
     /* Returns the log */
     Log &log() { return log_; }
+
+    /* Runs the setup dialog */
+    void setup();
+
+    /* Returns the current platform or nullptr if one is not selected */
+    const definition::MainPtr &platform() const { return currentDefinition_; }
+
+    /* Returns the selected datalink or nullptr if not is not selected */
+    datalink::Link *datalink() const { return currentDatalink_; }
+
+    /* Creates a platform link from the selected platform & datalink. Returns nullptr if
+     * one could not be created. */
+    std::unique_ptr<VehicleLink> platform_link();
 
 private:
     MainWindow *mainWindow_;
@@ -87,6 +142,11 @@ private:
     CanLog canLog_;
     Log log_;
     DtcDescriptions dtcDescriptions_;
+
+    definition::MainPtr currentDefinition_;
+    datalink::Link *currentDatalink_{nullptr};
+
+    Links datalinks_;
 
     /* Location of home directory. */
     QString home_;

@@ -71,3 +71,35 @@ definition::MainPtr DefinitionManager::fromVin(const std::string &vin) const {
     }
     return nullptr;
 }
+
+Q_DECLARE_METATYPE(definition::MainPtr)
+
+
+QVariant DefinitionManager::data(const QModelIndex& index, int role) const
+{
+    if (index.column() != 0) {
+        return QVariant();
+    }
+    
+    int row = index.row();
+    if (row < 0 || row >= definitions_.size()) {
+        return QVariant();
+    }
+    
+    switch (role) {
+        case Qt::DisplayRole:
+            return QString::fromStdString(definitions_[row]->name);
+        case Qt::UserRole:
+            return QVariant::fromValue(definitions_[row]);
+    }
+    return QVariant();
+}
+
+
+int DefinitionManager::rowCount(const QModelIndex& parent) const
+{
+    if (parent.isValid()) {
+        return 0;
+    }
+    return definitions_.size();
+}

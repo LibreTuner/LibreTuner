@@ -35,12 +35,12 @@ set(libretuner_SRC
     datalog.h
     vehicle.cpp
     vehicle.h
-    datalink.cpp
-    datalink.h
-    interface.cpp
-    interface.h
-    interfacemanager.cpp
-    interfacemanager.h
+    #datalink.cpp
+    #datalink.h
+    #interface.cpp
+    #interface.h
+    #interfacemanager.cpp
+    #interfacemanager.h
     logger.cpp
     logger.h
     timerrunloop.cpp
@@ -90,14 +90,7 @@ set(libretuner_SRC
     ui/graphwidget.h
     ui/flashwindow.cpp
     ui/flashwindow.h
-    ui/interfaceswindow.cpp
-    ui/interfaceswindow.h
-    ui/addinterfacedialog.cpp
-    ui/addinterfacedialog.h
-    ui/socketcansettingsui.cpp
-    ui/socketcansettingsui.h
-    ui/settingswidget.cpp
-    ui/settingswidget.h
+
     ui/titlebar.cpp
     ui/titlebar.h
     ui/styledwindow.cpp
@@ -118,6 +111,8 @@ set(libretuner_SRC
     ui/romsview.h
     ui/tunedialog.cpp
     ui/tunedialog.h
+    ui/platformlinkview.cpp
+    ui/platformlinkview.h
 
     framelesswindow/framelesswindow.cpp
     framelesswindow/windowdragger.cpp
@@ -134,24 +129,31 @@ set(libretuner_SRC
     protocols/isotpserver.cpp
     protocols/isotpserver.h
     protocols/isotpprotocol.cpp
-    protocols/isotpprotocol.h)
+    protocols/isotpprotocol.h
+
+    datalink/datalink.cpp
+    datalink/datalink.h
+        ui/setupdialog.cpp ui/setupdialog.h ui/datalinkswidget.cpp ui/datalinkswidget.h)
 
 if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
         protocols/socketcaninterface.cpp
         protocols/socketcaninterface.h
         os/sockethandler.cpp
-        os/sockethandler.h)
+        os/sockethandler.h
+        datalink/socketcan.cpp
+        datalink/socketcan.h)
 endif ()
 
 if (WIN32)
     set(libretuner_SRC ${libretuner_SRC}
         j2534/j2534.cpp
         j2534/j2534.h
-        j2534/j2534manager.cpp
-        j2534/j2534manager.h
         j2534/j2534caninterface.cpp
-        j2534/j2534caninterface.h)
+        j2534/j2534caninterface.h
+
+        datalink/passthru.cpp
+        datalink/passthru.h)
 endif ()
 
 
@@ -159,11 +161,9 @@ endif ()
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
 qt5_wrap_ui(libretuner_SRC
     ui/canviewer.ui
-    ui/downloadwindow.ui
     ui/createtunedialog.ui
     ui/tuneeditor.ui
     ui/flashwindow.ui
-    ui/interfaceswindow.ui
     ui/addinterfacedialog.ui
 
     framelesswindow/framelesswindow.ui

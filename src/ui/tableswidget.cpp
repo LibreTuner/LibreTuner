@@ -30,6 +30,9 @@ void TablesWidget::setTables(const std::vector<definition::Table> &tables)
     std::vector<std::pair<std::string, QTreeWidgetItem *>> categories_;
 
     for (const definition::Table &def : tables) {
+        if (def.id == -1) {
+            continue;
+        }
         QTreeWidgetItem *par = nullptr;
 
         for (auto &cat : categories_) {

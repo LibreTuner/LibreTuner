@@ -22,6 +22,7 @@
 #include "datalog.h"
 
 #include "diagnosticswidget.h"
+#include "dataloggerwindow.h"
 #include "flowlayout.h"
 #include "logview.h"
 #include "titlebar.h"
@@ -30,6 +31,8 @@
 #include "editorwidget.h"
 #include "tunedialog.h"
 #include "graphwidget.h"
+#include "setupdialog.h"
+#include "rom.h"
 
 #include <QAction>
 #include <QDockWidget>
@@ -44,7 +47,7 @@
 #include <future>
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), datalinksWindow_(LT()->datalinks()) {
     resize(QSize(1100, 630));
 
     setWindowTitle("LibreTuner");
@@ -149,7 +152,7 @@ void MainWindow::saveSettings()
 QDockWidget *MainWindow::createLoggingDock() {
     QDockWidget *dock = new QDockWidget("Logging", this);
     dock->setObjectName("logging");
-    QWidget *widget = new QWidget;
+    auto *widget = new QWidget;
     auto *layout = new QVBoxLayout();
 
     auto *hlayout = new QHBoxLayout();
@@ -258,10 +261,12 @@ bool MainWindow::changeSelected(Tune *tune)
             if (tune) {
                 selectedTune_ = tune->data();
                 flashCurrentAction_->setEnabled(true);
+                saveCurrentAction_->setEnabled(true);
                 tables_->setTables(tune->base()->platform()->tables);
             } else {
                 tables_->setTables(std::vector<definition::Table>());
                 flashCurrentAction_->setEnabled(false);
+                saveCurrentAction_->setEnabled(false);
                 // editor_->setModel(nullptr);
                 emit tableChanged(nullptr);
             }
@@ -349,12 +354,17 @@ void MainWindow::setupMenu() {
     QMenu *editMenu = menuBar->addMenu(tr("&Edit"));
     QMenu *helpMenu = menuBar->addMenu(tr("&Help"));
     QMenu *viewMenu = menuBar->addMenu(tr("&View"));
+    QMenu *toolsMenu = menuBar->addMenu(tr("&Tools"));
     
-    QAction *openTuneAction = new QAction(tr("&Open Tune"), this);
+    auto *openTuneAction = new QAction(tr("&Open Tune"), this);
     fileMenu->addAction(openTuneAction);
     
-    QAction *downloadAction = new QAction(tr("&Download ROM"), this);
+    auto *downloadAction = new QAction(tr("&Download ROM"), this);
     fileMenu->addAction(downloadAction);
+    
+    saveCurrentAction_ = new QAction(tr("&Save Current Tune"), this);
+    saveCurrentAction_->setEnabled(false);
+    fileMenu->addAction(saveCurrentAction_);
     
     flashCurrentAction_ = new QAction(tr("Flash Current Tune"), this);
     flashCurrentAction_->setEnabled(false);
@@ -363,6 +373,12 @@ void MainWindow::setupMenu() {
     connect(flashCurrentAction_, &QAction::triggered, [this]() {
         if (selectedTune_) {
             LibreTuner::get()->flashTune(selectedTune_);
+        }
+    });
+    
+    connect(saveCurrentAction_, &QAction::triggered, [this]() {
+        if (selectedTune_) {
+            selectedTune_->save();
         }
     });
     
@@ -377,12 +393,19 @@ void MainWindow::setupMenu() {
             changeSelected(tune);
     });
 
-    QAction *logAct = viewMenu->addAction(tr("CAN Log"));
+    QAction *logAct = toolsMenu->addAction(tr("&CAN Log"));
     connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
 
-    QAction *interfacesAct = viewMenu->addAction(tr("Interfaces"));
-    connect(interfacesAct, &QAction::triggered,
-            [this] { interfacesWindow_.show(); });
+    QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
+    connect(datalinksAction, &QAction::triggered, [this]() {
+        datalinksWindow_.show();
+    });
+
+    auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
+    connect(setupAction, &QAction::triggered, [this]() {
+       LT()->setup();
+    });
+
     setMenuBar(menuBar);
 }
 
@@ -393,7 +416,7 @@ void MainWindow::on_buttonDownloadRom_clicked() {
         downloadWindow_ = nullptr;
     }
 
-    if (const auto &link = LibreTuner::get()->getVehicleLink()) {
+    /*if (const auto &link = LibreTuner::get()->getVehicleLink()) {
         try {
             auto di = link->downloader();
             downloadWindow_ =
@@ -406,13 +429,16 @@ void MainWindow::on_buttonDownloadRom_clicked() {
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.exec();
         }
-    }
+    }*/
+    
+    DownloadWindow downloadWindow;
+    downloadWindow.exec();
 }
 
 
 
 void MainWindow::newLogClicked() {
-    std::unique_ptr<VehicleLink> link = LibreTuner::get()->getVehicleLink();
+    /*std::unique_ptr<VehicleLink> link = LibreTuner::get()->getVehicleLink();
     if (!link) {
         return;
     }
@@ -436,11 +462,15 @@ void MainWindow::newLogClicked() {
                         e.what())
             .exec();
         return;
-    }
-    DataLogPtr log = std::make_shared<DataLog>();
+    }*/
+    /*DataLogPtr log = std::make_shared<DataLog>();
     loggerWindow_ = std::make_unique<DataLoggerWindow>(
-        log, std::move(logger), link->vehicle().definition);
-    loggerWindow_->show();
+        log, std::move(logger), link->definition());
+    loggerWindow_->show();*/
+
+    auto *window = new DataLoggerWindow;
+    window->setWindowModality(Qt::WindowModal);
+    window->show();
 }
 
 
@@ -451,7 +481,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         return;
     }
     canViewer_.close();
-    interfacesWindow_.close();
+    datalinksWindow_.close();
     
     saveSettings();
 }

@@ -33,7 +33,7 @@ SocketCanSettingsUi::SocketCanSettingsUi(QWidget *parent)
 }
 
 void SocketCanSettingsUi::on_interfaceChanged(const QString &text) {
-    settings_->setInterface(text.toStdString());
+    // settings_->setInterface(text.toStdString());
 }
 
 void SocketCanSettingsUi::setSettings(const InterfaceSettingsPtr &ptr) {

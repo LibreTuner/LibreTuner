@@ -17,19 +17,156 @@
  */
 
 #include "downloadwindow.h"
-#include "ui_downloadwindow.h"
+
 
 #include "definitions/definition.h"
 #include "definitions/definitionmanager.h"
 #include "logger.h"
 #include "protocols/socketcaninterface.h"
 #include "vehicle.h"
+#include "libretuner.h"
+#include "rommanager.h"
+#include "downloadinterface.h"
 
 #include <QMessageBox>
+#include <QVBoxLayout>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QThread>
+#include <QProgressDialog>
+#include <QComboBox>
+
 #include <utility>
+#include <thread>
+#include <atomic>
 
-Q_DECLARE_METATYPE(definition::ModelPtr)
 
+DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
+{
+    setWindowTitle(tr("LibreTuner - Download"));
+    auto *layout = new QVBoxLayout;
+
+    comboPlatform_ = new QComboBox;
+    comboPlatform_->setModel(DefinitionManager::get());
+    
+    auto *groupDetails = new QGroupBox(tr("ROM Details"));
+    auto *form = new QFormLayout;
+    form->setContentsMargins(0, 4, 0, 4);
+    
+    lineName_ = new QLineEdit;
+    lineId_ = new QLineEdit;
+
+    form->addRow(tr("Platform"), comboPlatform_);
+    form->addRow(tr("Name"), lineName_);
+    form->addRow(tr("Id"), lineId_);
+    
+    groupDetails->setLayout(form);
+
+    layout->addWidget(groupDetails);
+    
+    auto *buttonDownload = new QPushButton(tr("Download"));
+    layout->addWidget(buttonDownload);
+    
+    connect(buttonDownload, &QPushButton::clicked, [this]() {
+        download();
+    });
+    
+    setLayout(layout);
+}
+
+
+void DownloadWindow::download()
+{
+    try {
+        std::unique_ptr<VehicleLink> pLink = get_platform_link();
+        if (!pLink) {
+            throw std::runtime_error("Invalid platform or data link");
+        }
+
+        QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0, 100, this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setWindowTitle(tr("LibreTuner - Download"));
+        progress.setValue(0);
+        progress.show();
+
+
+        std::unique_ptr<DownloadInterface> downloader = pLink->downloader();
+        downloader->setProgressCallback([&](float prog) {
+            QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
+        });
+
+        bool success = false;
+        std::atomic<bool> stopped(false);
+
+        std::thread worker([&]() {
+            success = downloader->download();
+            stopped = true;
+        });
+
+        bool canceled = false;
+
+        while (!stopped) {
+            QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+            if (progress.wasCanceled()) {
+                downloader->cancel();
+                canceled = true;
+            }
+        }
+        worker.join();
+
+        if (!success && !canceled) {
+            throw std::runtime_error("Unknown error");
+        } else {
+            auto data = downloader->data();
+            RomStore::get()->addRom(lineName_->text().toStdString(),
+                                    pLink->definition(), data.first, data.second);
+            QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully");
+        }
+
+        
+    } catch (const std::runtime_error &err) {
+        QMessageBox(QMessageBox::Critical, "Download Error", err.what()).exec();
+    }
+}
+
+
+
+void DownloadWindow::closeEvent(QCloseEvent* event)
+{
+}
+
+
+Q_DECLARE_METATYPE(definition::MainPtr)
+
+
+std::unique_ptr<VehicleLink> DownloadWindow::get_platform_link() {
+    datalink::Link *link = LT()->datalink();
+    if (link == nullptr) {
+        return nullptr;
+    }
+
+    QVariant var = comboPlatform_->currentData(Qt::UserRole);
+    if (!var.canConvert<definition::MainPtr>()) {
+        return nullptr;
+    }
+
+    auto platform = var.value<definition::MainPtr>();
+    if (!platform) {
+        return nullptr;
+    }
+
+    return std::make_unique<VehicleLink>(platform, *link);
+}
+
+
+
+DownloadWindow::~DownloadWindow()
+= default;
+
+
+/*
 DownloadWindow::DownloadWindow(std::unique_ptr<DownloadInterface> &&downloader,
                                const Vehicle &vehicle, QWidget *parent)
     : QDialog(parent), ui(new Ui::DownloadWindow),
@@ -169,4 +306,4 @@ void DownloadWindow::on_buttonBack_clicked() {
 DownloadWindow::~DownloadWindow() {
     stop();
     delete ui;
-}
+}*/

@@ -36,18 +36,16 @@ class VehicleLink;
 using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
 
 
-class DataLoggerWindow : public StyledWindow
+class DataLoggerWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DataLoggerWindow(const DataLogPtr &log,
-                              std::unique_ptr<DataLogger> &&logger,
-                              const definition::MainPtr &definition,
-                              QWidget *parent = nullptr);
-    virtual ~DataLoggerWindow();
+    explicit DataLoggerWindow(QWidget *parent = nullptr);
 
-    void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+    ~DataLoggerWindow() override;
+
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 signals:
 
@@ -58,7 +56,7 @@ public slots:
     void logUpdate(const DataLog::Data &info, double value);
 
 private:
-    DataLogPtr log_;
+    DataLog log_;
     std::unique_ptr<DataLogger> logger_;
     definition::MainPtr definition_;
 

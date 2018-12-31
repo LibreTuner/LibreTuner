@@ -61,6 +61,7 @@ private:
 
 enum class AxisType {
     Linear,
+    Memory,
 };
 
 struct Axis {
@@ -68,22 +69,31 @@ struct Axis {
     std::string id;
     AxisType type;
     TableType dataType;
-    double start;
-    double increment;
+    union {
+        struct {
+            double start;
+            double increment;
+        };
+        struct {
+            std::size_t size;
+        };
+    };
 };
 
 
 
 struct Table {
-    int id;
+    int id = -1;
     std::string name;
     std::string description;
     std::string category;
     TableType dataType;
+    TableType storedDataType;
     std::size_t sizeX{1};
     std::size_t sizeY{1};
     double maximum;
     double minimum;
+    double scale = 1.0;
     std::string axisX;
     std::string axisY;
     
@@ -109,7 +119,7 @@ struct Pid {
 /* Model definition. Includes the table locations */
 struct Model {
 public:
-    Model(const Main &main);
+    explicit Model(const Main &main);
     
     const Main &main;
     std::string id;
@@ -129,6 +139,8 @@ public:
     void loadAxis(const YAML::Node &axis);
     void loadIdentifier(const YAML::Node &identifier);
     void loadChecksum(const YAML::Node &checksum);
+    
+    std::size_t getAxisOffset(const std::string &id);
 };
 using ModelPtr = std::shared_ptr<Model>;
 
@@ -182,6 +194,9 @@ struct Main {
     /* Attempts to determine the model of the data. Returns
     * nullptr if no models match. */
     ModelPtr identify(const uint8_t *data, size_t size);
+
+    // Returns the PID with id `id` or nullptr if none exist
+    Pid *getPid(uint32_t id);
 };
 
 

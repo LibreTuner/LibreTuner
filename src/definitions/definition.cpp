@@ -105,6 +105,19 @@ void Model::loadChecksum(const YAML::Node &checksum) {
 
 
 
+std::size_t Model::getAxisOffset(const std::string& id)
+{
+    auto it = axisOffsets.find(id);
+    if (it == axisOffsets.end()) {
+        Logger::warning("No defined offset for axis '" + id + "'");
+        return 0;
+    }
+    
+    return it->second;
+}
+
+
+
 Model::Model(const Main& m) : main(m)
 {
 }
@@ -201,11 +214,12 @@ void Main::load(const YAML::Node& file)
 void Main::loadPid(const YAML::Node& pid)
 {
     Pid definition;
-    definition.id = pid["id"].as<std::size_t>();
+    definition.valid = true;
+    definition.id = static_cast<uint32_t>(pid["id"].as<std::size_t>());
     
     definition.name = pid["name"].as<std::string>();
     definition.description = pid["description"].as<std::string>();
-    definition.code = pid["code"].as<std::size_t>();
+    definition.code = static_cast<uint16_t>(pid["code"].as<std::size_t>());
     definition.formula = pid["formula"].as<std::string>();
     definition.unit = pid["unit"].as<std::string>();
     
@@ -225,7 +239,7 @@ void Main::loadTable(std::size_t id, const YAML::Node& table)
         definition.category = table["category"].as<std::string>();
     }
     
-    definition.dataType = [&](const std::string &type) {
+    const auto get_datatype = [&](const std::string &type) {
         if (type == "float") {
             return TableType::Float;
         }
@@ -249,13 +263,20 @@ void Main::loadTable(std::size_t id, const YAML::Node& table)
         }
         
         throw std::runtime_error("invalid datatype");
-    }(table["datatype"].as<std::string>());
+    };
     
-    if (table["sizex"]) {
-        definition.sizeX = table["sizex"].as<std::size_t>();
+    definition.dataType = get_datatype(table["datatype"].as<std::string>());
+    if (table["storeddatatype"]) {
+        definition.storedDataType = get_datatype(table["storeddatatype"].as<std::string>());
+    } else {
+        definition.storedDataType = definition.dataType;
     }
-    if (table["sizey"]) {
-        definition.sizeY = table["sizey"].as<std::size_t>();
+    
+    if (table["width"]) {
+        definition.sizeX = table["width"].as<std::size_t>();
+    }
+    if (table["height"]) {
+        definition.sizeY = table["height"].as<std::size_t>();
     }
     
     if (table["axisx"]) {
@@ -263,6 +284,9 @@ void Main::loadTable(std::size_t id, const YAML::Node& table)
     }
     if (table["axisy"]) {
         definition.axisY = table["axisy"].as<std::string>();
+    }
+    if (table["scale"]) {
+        definition.scale = table["scale"].as<double>();
     }
     
     const auto opt_double = [&](const YAML::Node &node, double def) {
@@ -275,7 +299,11 @@ void Main::loadTable(std::size_t id, const YAML::Node& table)
     definition.minimum = opt_double(table["minimum"], std::numeric_limits<double>::min());
     definition.maximum = opt_double(table["maximum"], std::numeric_limits<double>::max());
     
-    tables.emplace_back(std::move(definition));
+    if (definition.id >= tables.size()) {
+        tables.resize(id + 1);
+    }
+    
+    tables[id] = std::move(definition);
 }
 
 
@@ -289,6 +317,9 @@ void Main::loadAxis(const YAML::Node& axis)
     definition.type = [&] (const std::string &type) -> AxisType {
         if (type == "linear") {
             return AxisType::Linear;
+        }
+        if (type == "memory") {
+            return AxisType::Memory;
         }
         throw std::runtime_error("invalid axis type");
     }(axis["type"].as<std::string>());
@@ -323,6 +354,10 @@ void Main::loadAxis(const YAML::Node& axis)
     case AxisType::Linear:
         definition.start = axis["minimum"].as<double>();
         definition.increment = axis["increment"].as<double>();
+        break;
+    case AxisType::Memory:
+        definition.size = axis["size"].as<std::size_t>();
+        break;
     }
 
     axes.emplace(definition.id, std::move(definition));
@@ -362,6 +397,14 @@ bool Main::matchVin(const std::string& vin)
 }
 
 
+Pid *Main::getPid(uint32_t id) {
+    auto it = std::find_if(pids.begin(), pids.end(), [id](Pid &pid) { return pid.id == id; });
+    if (it != pids.end()) {
+        return &*it;
+    }
+    return nullptr;
+}
+
 
 bool checkModel(const definition::Model& model, const uint8_t *data, size_t size)
 {
@@ -383,7 +426,7 @@ bool checkModel(const definition::Model& model, const uint8_t *data, size_t size
 
 std::size_t Table::rawSize() const
 {
-    return tableTypeSize(dataType) * sizeX * sizeY;
+    return tableTypeSize(storedDataType) * sizeX * sizeY;
 }
 
 
@@ -396,400 +439,5 @@ std::size_t Model::getOffset(std::size_t index)
     
     return tables[index];
 }
-
-
-
-/*
-uint32_t SubDefinition::getAxisLocation(int axisId, bool *ok) {
-    assert(axisId >= 0);
-    if (axisId >= axesOffsets_.size()) {
-        if (ok != nullptr) {
-            *ok = false;
-        }
-        return 0;
-    }
-
-    if (ok != nullptr) {
-        *ok = true;
-    }
-    return axesOffsets_[axisId];
-}
-
-bool SubDefinition::check(gsl::span<const uint8_t> data) {
-    for (Identifier &identifier : identifiers_) {
-        if (identifier.offset() + identifier.size() > data.size()) {
-            return false;
-        }
-
-        if (std::equal(data.begin() + identifier.offset(), data.end(),
-                       identifier.data(),
-                       identifier.data() + identifier.size()) != 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool SubDefinition::load(const QString &path) {
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly)) {
-        lastError_ = "Failed to open definition file for reading";
-        return false;
-    }
-
-    QXmlStreamReader xml(&file);
-
-    if (xml.readNextStartElement()) {
-        if (xml.name() != "subdefinition") {
-            xml.raiseError("Unexpected element");
-        }
-    }
-
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "id") {
-            id_ = xml.readElementText().trimmed().toStdString();
-        } else if (xml.name() == "name") {
-            name_ = xml.readElementText().trimmed().toStdString();
-        } else if (xml.name() == "tables") {
-            loadTables(xml);
-        } else if (xml.name() == "axes") {
-            loadAxes(xml);
-        } else if (xml.name() == "checksums") {
-            loadChecksums(xml);
-        } else {
-            xml.raiseError("Unexpected element");
-        }
-    }
-
-    if (!xml.hasError() && id_.empty()) {
-        xml.raiseError("No id element is defined");
-    }
-
-    if (xml.hasError()) {
-        lastError_ = QObject::tr("%1\nLine %2, column %3")
-                         .arg(xml.errorString())
-                         .arg(xml.lineNumber())
-                         .arg(xml.columnNumber())
-                         .toStdString();
-        return false;
-    }
-    return true;
-}
-
-int Definition::axisId(const std::string &id) {
-    auto it = axes_.find(id);
-    if (it == std::end(axes_)) {
-        return -1;
-    }
-    return it->second->iId();
-}
-
-SubDefinitionPtr Definition::identifySubtype(gsl::span<const uint8_t> data) {
-    for (SubDefinitionPtr &def : subtypes_) {
-        if (def->check(data)) {
-            return def;
-        }
-    }
-    return nullptr;
-}
-
-void Definition::readTables(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() != "table") {
-            xml.raiseError("Unknown element");
-            break;
-        }
-
-        TableDefinition definition(this);
-        if (definition.load(xml, this)) {
-            tables_.addTable(std::move(definition));
-        }
-    }
-}
-
-void Definition::loadAxes(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() != "axis") {
-            xml.raiseError("Unexpected element");
-            return;
-        }
-
-        TableAxisPtr axis = TableAxis::load(xml, lastAxisId_++);
-        if (!axis) {
-            return;
-        }
-
-        axes_.insert(
-            std::make_pair<std::string, TableAxisPtr &>(axis->id(), axis));
-    }
-}
-
-void Definition::loadVins(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() != "vin") {
-            xml.raiseError("Unexpected element");
-            return;
-        }
-
-        try {
-            vins_.emplace_back(xml.readElementText().trimmed().toStdString());
-        } catch (const std::regex_error &e) {
-            xml.raiseError(QStringLiteral("Could not load vin regex: ") +
-                           e.what());
-        }
-    }
-}
-
-void Definition::loadPids(QXmlStreamReader &xml) {
-    while (xml.readNextStartElement()) {
-        if (xml.name() != "pid") {
-            xml.raiseError("Unexpected element");
-            return;
-        }
-
-        PidDefinition pid;
-        pid.valid = true;
-        QXmlStreamAttributes attributes = xml.attributes();
-        if (!attributes.hasAttribute("id")) {
-            xml.raiseError("Could not load PID: no id attribute");
-            return;
-        }
-        bool ok;
-        pid.id = attributes.value("id").toUInt(&ok);
-        if (!ok) {
-            xml.raiseError(
-                "Could not load PID: id attribute is not an integer");
-            return;
-        }
-
-        while (xml.readNextStartElement()) {
-            if (xml.name() == "name") {
-                pid.name = xml.readElementText().toStdString();
-            } else if (xml.name() == "description") {
-                pid.description = xml.readElementText().toStdString();
-            } else if (xml.name() == "formula") {
-                pid.formula = xml.readElementText().toStdString();
-            } else if (xml.name() == "unit") {
-                pid.unit = xml.readElementText().toStdString();
-            } else if (xml.name() == "code") {
-                pid.code = xml.readElementText().toUInt(&ok, 16);
-                if (!ok) {
-                    xml.raiseError(
-                        "Could not load PID: code is not an integer");
-                    return;
-                }
-            }
-        }
-
-        pids_.add(std::move(pid));
-    }
-}
-
-bool Definition::loadMain(const QString &path) {
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly)) {
-        lastError_ = "Failed to open main definition file for reading";
-        return false;
-    }
-
-    QXmlStreamReader xml(&file);
-
-    bool foundSize = false, foundFlashOffset = false, foundFlashSize = false;
-
-    // Default endianness is big
-    endianness_ = Endianness::Big;
-    downloadMode_ = DM_NONE;
-    flashMode_ = FLASH_NONE;
-
-    if (xml.readNextStartElement()) {
-        if (xml.name() != "maindefinition") {
-            xml.raiseError("Unexpected element");
-        }
-    }
-
-    bool ok;
-    while (xml.readNextStartElement()) {
-        if (xml.name() == "name") {
-            name_ = xml.readElementText().trimmed().toStdString();
-        } else if (xml.name() == "id") {
-            id_ = xml.readElementText().trimmed().toStdString();
-        } else if (xml.name() == "romsize") {
-            size_ = xml.readElementText().toUInt(&ok);
-            if (!ok) {
-                xml.raiseError("Invalid romsize: not a number");
-            }
-            foundSize = true;
-        } else if (xml.name() == "endianness") {
-            QString sEndian = xml.readElementText().trimmed().toLower();
-            if (sEndian == "big") {
-                endianness_ = Endianness::Big;
-            } else if (sEndian == "little") {
-                endianness_ = Endianness::Little;
-            } else {
-                xml.raiseError(
-                    "Invalid endianness. Expected values: 'big' or 'little'");
-            }
-        } else if (xml.name() == "tables") {
-            readTables(xml);
-        } else if (xml.name() == "transfer") {
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "flashmode") {
-                    QString sMode = xml.readElementText().toLower();
-                    if (sMode == "mazdat1") {
-                        flashMode_ = FLASH_T1;
-                    } else {
-                        xml.raiseError("Invalid flash mode");
-                    }
-                } else if (xml.name() == "downloadmode") {
-                    QString sMode = xml.readElementText().toLower();
-                    if (sMode == "mazda23") {
-                        downloadMode_ = DM_MAZDA23;
-                    } else {
-                        xml.raiseError("Invalid download mode");
-                    }
-                } else if (xml.name() == "key") {
-                    key_ = xml.readElementText().toStdString();
-                } else if (xml.name() == "serverid") {
-                    serverId_ = xml.readElementText().toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid server id: not a number");
-                    }
-                } else {
-                    xml.raiseError("Unexpected element");
-                }
-            }
-        } else if (xml.name() == "axes") {
-            loadAxes(xml);
-        } else if (xml.name() == "flashregion") {
-            while (xml.readNextStartElement()) {
-                if (xml.name() == "offset") {
-                    flashOffset_ = xml.readElementText().toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid flash offset: not a number");
-                    }
-                    foundFlashOffset = true;
-                } else if (xml.name() == "size") {
-                    flashSize_ = xml.readElementText().toUInt(&ok, 16);
-                    if (!ok) {
-                        xml.raiseError("Invalid flash size: not a number");
-                    }
-                    foundFlashSize = true;
-                }
-            }
-        } else if (xml.name() == "vins") {
-            loadVins(xml);
-        } else if (xml.name() == "pids") {
-            loadPids(xml);
-        } else if (xml.name() == "baudrate") {
-            baudrate_ = xml.readElementText().toUInt(&ok);
-            if (!ok) {
-                xml.raiseError("Invalid baudrate: not a number");
-            }
-        } else if (xml.name() == "logmode") {
-            QString sMode = xml.readElementText().toLower();
-            if (sMode == "uds") {
-                logMode_ = LogMode::Uds;
-            } else {
-                xml.raiseError("Unknown log mode");
-            }
-        } else {
-            xml.raiseError("Unexpected element");
-        }
-    }
-
-    if (!xml.hasError()) {
-        if (id_.empty()) {
-            xml.raiseError("No id element is defined");
-        } else if (!foundSize) {
-            xml.raiseError("No romsize element is defined");
-        } else if (!foundFlashOffset) {
-            xml.raiseError("No flash offset defined");
-        } else if (!foundFlashSize) {
-            xml.raiseError("No flash size defined");
-        } else {
-            // Ensure that the flash region is in bounds
-            if (flashOffset_ + flashSize_ > size_) {
-                xml.raiseError("Flash region is out of bounds");
-            }
-        }
-    }
-
-    if (xml.hasError()) {
-        lastError_ =
-            (QObject::tr("error loading ") + path + ": %1\nLine %2, column %3")
-                .arg(xml.errorString())
-                .arg(xml.lineNumber())
-                .arg(xml.columnNumber())
-                .toStdString();
-        return false;
-    }
-    return true;
-}
-
-SubDefinitionPtr Definition::findSubtype(const std::string &id) {
-    auto it = std::find_if(
-        subtypes_.begin(), subtypes_.end(),
-        [id](SubDefinitionPtr &def) -> bool { return def->id() == id; });
-    if (it == subtypes_.end()) {
-        return nullptr;
-    }
-
-    return *it;
-}
-
-bool Definition::loadSubtype(const QString &path) {
-    SubDefinitionPtr sub = std::make_shared<SubDefinition>(this);
-    if (!sub->load(path)) {
-        lastError_ = std::string("Could not load definition file ") +
-                     path.toStdString() + ": " + sub->lastError();
-        return false;
-    }
-
-    subtypes_.push_back(sub);
-    return true;
-}
-
-TableAxis *Definition::getAxis(const std::string &id) {
-    auto it = axes_.find(id);
-    if (it == std::end(axes_)) {
-        return nullptr;
-    }
-    return it->second.get();
-}
-
-bool Definition::load(const QString &path) {
-    QDir dir(path);
-
-    Definition definition;
-
-    if (QFile::exists(path + "/main.xml")) {
-        if (!loadMain(path + "/main.xml")) {
-            return false;
-        }
-    } else {
-        lastError_ = std::string("No main.xml file in ") + path.toStdString();
-        return false;
-    }
-
-    for (QFileInfo &info :
-         dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::NoSort)) {
-        if (info.isFile()) {
-            if (info.fileName().toLower() != "main.xml") {
-                // Subtype
-                if (!loadSubtype(info.filePath())) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
-bool Definition::matchVin(const std::string &vin) {
-    return std::any_of(vins_.begin(), vins_.end(), [&vin](const auto &pattern) {
-        return std::regex_match(vin, pattern);
-    });
-}
-*/
 
 }

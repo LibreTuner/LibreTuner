@@ -22,8 +22,9 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
-#include "datalink.h"
+#include "datalink/datalink.h"
 
 /////////////////////////
 // PassThruConnect flags
@@ -76,7 +77,6 @@
 #define FLOW_CONTROL_FILTER 0x00000003
 
 
-
 namespace j2534 {
 
 class Error : public std::runtime_error {
@@ -87,7 +87,7 @@ public:
 struct Info {
     std::string name;
     // Supported protocols
-    DataLinkProtocol protocols;
+    datalink::Protocol protocols;
     // DLL path
     std::string functionLibrary;
 };
@@ -107,7 +107,7 @@ struct PASSTHRU_MSG {
     unsigned char Data[4128]; /* message payload or data */
 };
 
-using PassThruOpen_t = int32_t (*)(void *, uint32_t *);
+using PassThruOpen_t = int32_t (*)(const void *, uint32_t *);
 using PassThruClose_t = int32_t (*)(uint32_t);
 using PassThruConnect_t = int32_t (*)(uint32_t, uint32_t, uint32_t, uint32_t,
                                       uint32_t *);
@@ -255,7 +255,7 @@ public:
     bool initialized() const { return loaded_; }
 
     // Opens a J2534 device. If no device is connected, returns nullptr
-    DevicePtr open(char *port = nullptr);
+    DevicePtr open(const char *port = nullptr);
 
     // Closes a  J2534 device
     void close(uint32_t device);
@@ -281,7 +281,7 @@ public:
     std::string name() const { return info_.name; }
 
     // Returns the protocols supported by the J2534 interface
-    DataLinkProtocol protocols() const { return info_.protocols; }
+    datalink::Protocol protocols() const { return info_.protocols; }
 
     // Creates a J2534 interface. Must be initialized with init() before use.
     static J2534Ptr create(Info &&info);
@@ -317,6 +317,12 @@ private:
     PassThruStopPeriodicMsg_t PassThruStopPeriodicMsg{};
     PassThruSetProgrammingVoltage_t PassThruSetProgrammingVoltage{};
 };
+
+
+
+
+std::vector<Info> detect_interfaces();
+
 
 } // namespace j2534
 

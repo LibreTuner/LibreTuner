@@ -24,6 +24,7 @@
 #include <vector>
 
 #include <QString>
+#include <QAbstractListModel>
 
 namespace definition {
 struct Main;
@@ -33,7 +34,7 @@ using MainPtr = std::shared_ptr<Main>;
 /**
  * @todo write docs
  */
-class DefinitionManager {
+class DefinitionManager : public QAbstractListModel {
 public:
     static DefinitionManager *get();
 
@@ -50,6 +51,9 @@ public:
     definition::MainPtr fromVin(const std::string &vin) const;
 
     const std::vector<definition::MainPtr> &definitions() const { return definitions_; }
+    
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const;
 
 private:
     DefinitionManager();

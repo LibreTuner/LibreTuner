@@ -19,7 +19,7 @@
 #include "addinterfacedialog.h"
 #include "ui_addinterfacedialog.h"
 
-#include "interfacemanager.h"
+// #include "interfacemanager.h"
 #include "socketcansettingsui.h"
 
 #include <QComboBox>
@@ -59,7 +59,7 @@ void AddInterfaceDialog::replaceSettings(
 }
 
 void AddInterfaceDialog::on_comboMode_currentIndexChanged(int index) {
-    auto iface = SettingsWidget::create(
+    /*auto iface = SettingsWidget::create(
         ui->comboMode->itemData(index).value<InterfaceType>());
     replaceSettings(std::move(iface));
     if (!customSettings_) {
@@ -68,7 +68,7 @@ void AddInterfaceDialog::on_comboMode_currentIndexChanged(int index) {
         ui->labelError->setVisible(true);
     } else {
         ui->labelError->setVisible(false);
-    }
+    }*/
 }
 
 void AddInterfaceDialog::on_buttonCreate_clicked() {
@@ -78,7 +78,7 @@ void AddInterfaceDialog::on_buttonCreate_clicked() {
 
     auto settings = customSettings_->settings();
     if (settings) {
-        InterfaceManager::get().add(settings);
+       // InterfaceManager::get().add(settings);
         close();
     }
 }

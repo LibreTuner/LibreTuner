@@ -40,11 +40,13 @@ Table *TableGroup::get(size_t idx, bool create) {
     assert(idx < tables_.size());
 
     std::unique_ptr<Table> &table = tables_[idx];
-    Table *ptr;
+    Table *ptr = nullptr;
     if (!table && create) {
         table = base_->loadTable(idx); //loadTable(*base_, idx);
-        ptr = table.get();
-        set(idx, std::move(table));
+        if (table) {
+            ptr = table.get();
+            set(idx, std::move(table));
+        }
     } else {
         ptr = table.get();
     }

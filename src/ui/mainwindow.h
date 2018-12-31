@@ -20,19 +20,22 @@
 #define MAINWINDOW_H
 
 #include "canviewer.h"
-#include "dataloggerwindow.h"
 #include "downloadwindow.h"
-#include "interfaceswindow.h"
+#include "datalinkswidget.h"
 
 #include <QComboBox>
 #include <QLayout>
 #include <QMainWindow>
+
+class QListView;
 
 class EditorWidget;
 class TablesWidget;
 class TuneData;
 class SidebarWidget;
 class GraphWidget;
+class Table;
+class Tune;
 
 class MainWindow : public QMainWindow { // public QMainWindow {
     Q_OBJECT
@@ -51,8 +54,7 @@ signals:
 private:
     CanViewer canViewer_;
     DownloadWindow *downloadWindow_ = nullptr;
-    InterfacesWindow interfacesWindow_;
-    std::unique_ptr<DataLoggerWindow> loggerWindow_;
+    DatalinksWidget datalinksWindow_;
 
     QComboBox *comboLogVehicles_;
     QListView *listLogs_;
@@ -63,6 +65,7 @@ private:
     GraphWidget *graph_;
     
     QAction *flashCurrentAction_;
+    QAction *saveCurrentAction_;
 
     // Docks
     QDockWidget *logDock_;

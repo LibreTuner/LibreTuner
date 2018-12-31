@@ -3,6 +3,7 @@
 
 #include <QTableView>
 #include <QWidget>
+#include <QButtonGroup>
 
 #include "scanresult.h"
 
@@ -17,6 +18,7 @@ public slots:
 
 private:
     QTableView *listCodes_;
+    QButtonGroup modeGroup_;
 
     ScanResult scanResult_;
 };

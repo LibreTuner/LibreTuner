@@ -17,10 +17,3 @@ add_subdirectory(lib/cparse)
 add_subdirectory(lib/yaml)
 
 add_subdirectory(src)
-
-#if (Test)
-  #add_subdirectory(lib/googletest)
-  #enable_testing()
-  #include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-  #add_subdirectory(test)
-#endif()

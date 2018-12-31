@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 /*
  * LibreTuner
  * Copyright (C) 2018 Altenius
@@ -22,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include "datalink/datalink.h"
+
 namespace definition {
 struct Main;
 using MainPtr = std::shared_ptr<Main>;
@@ -29,9 +35,6 @@ using MainPtr = std::shared_ptr<Main>;
 
 class DataLogger;
 using DataLoggerPtr = std::shared_ptr<DataLogger>;
-
-class DataLink;
-using DataLinkPtr = std::shared_ptr<DataLink>;
 
 class DownloadInterface;
 using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
@@ -52,6 +55,8 @@ class Protocol;
 class CanInterface;
 using CanInterfacePtr = std::shared_ptr<CanInterface>;
 
+class DataLog;
+
 struct Vehicle {
     std::string name;
     std::string vin;
@@ -65,16 +70,14 @@ struct Vehicle {
 // VehicleLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
 class VehicleLink {
 public:
-    VehicleLink(const Vehicle &vehicle, const DataLinkPtr &link)
-        : vehicle_(vehicle), datalink_(link) {}
-    VehicleLink(Vehicle &&vehicle, const DataLinkPtr &link)
-        : vehicle_(std::move(vehicle)), datalink_(link) {}
+    VehicleLink(definition::MainPtr definition, datalink::Link &link)
+        : definition_(std::move(definition)), datalink_(link) {}
 
     ~VehicleLink();
 
     /* Returns a logger suitable for logging from the vehicle using the
        datalink. Returns nullptr if a logger could not be created. */
-    std::unique_ptr<DataLogger> logger() const;
+    std::unique_ptr<DataLogger> logger(DataLog &log) const;
 
     /* Returns a usable download interface for the link, if one exists. May
      * return nullptr. */
@@ -100,11 +103,11 @@ public:
      * does not support CAN */
     std::unique_ptr<CanInterface> can() const;
 
-    const Vehicle &vehicle() const { return vehicle_; }
+    const definition::MainPtr &definition() const { return definition_; }
 
 private:
-    Vehicle vehicle_;
-    DataLinkPtr datalink_;
+    definition::MainPtr definition_;
+    datalink::Link &datalink_;
 };
 
 #endif // LIBRETUNER_VEHICLE_H

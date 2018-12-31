@@ -19,11 +19,13 @@
 #ifndef LIBRETUNER_INTERFACEMANAGER_H
 #define LIBRETUNER_INTERFACEMANAGER_H
 
-#include "datalink.h"
+#include "datalink/datalink.h"
 #include "interface.h"
 #include "util/signal.h"
 
 #include <functional>
+
+#include <QAbstractListModel>
 
 class InterfaceList {
 public:
@@ -37,7 +39,7 @@ private:
     std::vector<InterfaceSettingsPtr> autoDetectSettings_;
 };
 
-class InterfaceManager {
+class InterfaceManager : public QAbstractListModel {
 public:
     using ChangeCall = std::function<void()>;
     using SignalType = Signal<ChangeCall>;
@@ -65,6 +67,10 @@ public:
     void save();
 
     std::string path();
+    
+    
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     std::vector<InterfaceSettingsPtr> settings_;

@@ -51,6 +51,57 @@ public:
 };
 
 
+template<typename DataType>
+class MemoryAxis : public TableAxis
+{
+public:
+    template<typename InputIt>
+    MemoryAxis(std::string name, InputIt begin, InputIt end, Endianness endianness);
+    
+    virtual double label(int index) const override;
+    virtual const std::string &name() const override;
+    
+private:
+    std::vector<DataType> data_;
+    std::string name_;
+};
+
+template<typename DataType>
+template<typename InputIt>
+MemoryAxis<DataType>::MemoryAxis(std::string name, InputIt begin, InputIt end, Endianness endianness) : name_(name)
+{
+    switch (endianness) {
+    case Endianness::Big:
+        for (auto it = begin; it < end; it += sizeof(DataType)) {
+            DataType data = readBE<DataType>(it, end);
+            data_.emplace_back(data);
+        }
+        break;
+    case Endianness::Little:
+        for (auto it = begin; it < end; it += sizeof(DataType)) {
+            DataType data = readLE<DataType>(it, end);
+            data_.emplace_back(data);
+        }
+        break;
+    }
+}
+
+template<typename DataType>
+double MemoryAxis<DataType>::label(int index) const
+{
+    if (index < 0 || index >= data_.size()) {
+        Logger::warning("Axis index '" + std::to_string(index) + "' exceeds axis size (" + std::to_string(data_.size()) + ")");
+        return 0;
+    }
+    
+    return data_[index];
+}
+
+
+template<typename DataType>
+const std::string &MemoryAxis<DataType>::name() const {
+    return name_;
+}
 
 
 template<typename T>
@@ -92,7 +143,7 @@ const std::string &LinearAxis<T>::name() const
 class Table : public QAbstractTableModel {
 Q_OBJECT
 public:
-    Table(const definition::Table& definition) : definition_(definition) {}
+    Table() {}
     
     virtual ~Table() override = default;
     
@@ -114,11 +165,11 @@ public:
     virtual TableAxis *axisY() const =0;
     virtual std::size_t offset() const =0;
     
-    const std::string name() const { return definition_.name; }
-    const std::string description() const { return definition_.description; }
-    const double maximum() const { return definition_.maximum; }
-    const double minimum() const { return definition_.minimum; }
-    const definition::Table& definition() const { return definition_; }
+    virtual const std::string name() const =0;
+    virtual const std::string description() const =0;
+    virtual const double maximum() const =0;
+    virtual const double minimum() const =0;
+    virtual const definition::Table& definition() const =0;
     
     bool isTwoDimensional() const { return height() > 1; }
     bool isOneDimensional() const { return height() == 1; }
@@ -131,9 +182,6 @@ public:
 
 signals:
     void onModified();
-    
-private:
-    const definition::Table& definition_;
 };
 
 
@@ -149,17 +197,128 @@ struct TableInfo {
 
 
 template<typename DataType>
+class TableStore {
+public:
+    virtual DataType get(std::size_t index) const =0;
+    virtual void set(std::size_t index, DataType data) =0;
+    virtual std::size_t size() const =0;
+    
+    virtual void serialize(uint8_t *buffer, size_t len, Endianness endianness) const =0;
+    
+    virtual std::size_t byteSize() const =0;
+};
+
+// This design results in 49 definitions (for each type of datatype * each type of stored datatype)
+// If should be changed in the future. At the moment, I do not want to mess with these gross templates
+template<typename DataType, typename StoredDataType>
+class TableStoreBase : public TableStore<DataType> {
+public:
+    template<typename InputIt>
+    TableStoreBase(InputIt begin, InputIt end, Endianness endianness, double scale);
+    
+    virtual DataType get(std::size_t index) const override;
+    virtual void set(std::size_t index, DataType data) override;
+    virtual std::size_t size() const override;
+    
+    virtual void serialize(uint8_t *buffer, size_t len, Endianness endianness) const override;
+    
+    virtual std::size_t byteSize() const override;
+    
+    
+private:
+    std::vector<StoredDataType> data_;
+    double scale_;
+};
+
+
+
+template<typename DataType, typename StoredDataType>
+DataType TableStoreBase<DataType, StoredDataType>::get(std::size_t index) const
+{
+    return static_cast<DataType>(data_[index] * scale_);
+}
+
+
+
+template<typename DataType, typename StoredDataType>
+void TableStoreBase<DataType, StoredDataType>::serialize(uint8_t* buffer, size_t len, Endianness endianness) const
+{
+    if (len < byteSize()) {
+        throw std::runtime_error("data array is too small to serialize table into");
+    }
+
+    uint8_t *end = buffer + len;
+    
+    if (endianness == Endianness::Big) {
+        for (StoredDataType data : data_) {
+            writeBE<StoredDataType>(data, buffer, end);
+            buffer += sizeof(DataType);
+        }
+    } else {
+        // Little endian
+        for (StoredDataType data : data_) {
+            writeLE<StoredDataType>(data, buffer, end);
+            buffer += sizeof(DataType);
+        }
+    }
+}
+
+
+
+template<typename DataType, typename StoredDataType>
+void TableStoreBase<DataType, StoredDataType>::set(std::size_t index, DataType data)
+{
+    data_[index] = static_cast<StoredDataType>(data / scale_);
+}
+
+
+
+template<typename DataType, typename StoredDataType>
+std::size_t TableStoreBase<DataType, StoredDataType>::size() const
+{
+    return data_.size();
+}
+
+
+
+template<typename DataType, typename StoredDataType>
+std::size_t TableStoreBase<DataType, StoredDataType>::byteSize() const
+{
+    return data_.size() * sizeof(StoredDataType);
+}
+
+
+
+template<typename DataType, typename StoredDataType>
+template<typename InputIt>
+TableStoreBase<DataType, StoredDataType>::TableStoreBase(InputIt begin, InputIt end, Endianness endianness, double scale) : scale_(scale)
+{
+    // Start deserializing
+    switch (endianness) {
+    case Endianness::Big:
+        for (auto it = begin; it < end; it += sizeof(StoredDataType)) {
+            StoredDataType data = readBE<StoredDataType>(it, end);
+            data_.emplace_back(data);
+        }
+        break;
+    case Endianness::Little:
+        for (auto it = begin; it < end; it += sizeof(StoredDataType)) {
+            StoredDataType data = readLE<StoredDataType>(it, end);
+            data_.emplace_back(data);
+        }
+        break;
+    }
+}
+
+
+template<typename DataType>
 class TableBase : public Table {
 public:
-    template<class InputIt>
-    TableBase(const definition::Table& definition, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info);
+    TableBase(const definition::Table& definition, std::unique_ptr<TableStore<DataType>> &&data, const TableInfo<DataType> &info);
     TableBase(std::size_t width, std::size_t height);
     
-    std::size_t height() const override { return data_.size() / width_; }
+    std::size_t height() const override { return data_->size() / width_; }
     std::size_t width() const override { return width_; }
-    
-    DataType minimum() const { return minimum_; }
-    DataType maximum() const { return maximum_; }
     
     void serialize(uint8_t *data, size_t len, Endianness endianness) const override;
     
@@ -173,12 +332,18 @@ public:
     virtual TableAxis *axisY() const override { return axisY_; }
     std::size_t offset() const override { return offset_; }
     
+    const std::string name() const override { return definition_.name; }
+    const std::string description() const override { return definition_.description; }
+    const double maximum() const override { return definition_.maximum; }
+    const double minimum() const override { return definition_.minimum; }
+    const definition::Table& definition() const override { return definition_; }
+    
     QVariant data(const QModelIndex & index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 private:
-    std::vector<DataType> data_;
+    std::unique_ptr<TableStore<DataType>> data_;
     std::vector<bool> modified_;
     bool dirty_ {false};
     std::size_t width_;
@@ -186,6 +351,7 @@ private:
     TableAxis *axisX_;
     TableAxis *axisY_;
     std::size_t offset_;
+    const definition::Table& definition_;
 };
 
 
@@ -247,7 +413,8 @@ inline TableType TableBase<int32_t>::dataType() const {
 template<typename DataType>
 void TableBase<DataType>::serialize(uint8_t *buffer, size_t len, Endianness endianness) const
 {
-    if (len < byteSize()) {
+    data_->serialize(buffer, len, endianness);
+    /*if (len < byteSize()) {
         throw std::runtime_error("data array is too small to serialize table into");
     }
 
@@ -264,7 +431,7 @@ void TableBase<DataType>::serialize(uint8_t *buffer, size_t len, Endianness endi
             writeLE<DataType>(data, buffer, end);
             buffer += sizeof(DataType);
         }
-    }
+    }*/
 }
 
 
@@ -272,7 +439,7 @@ void TableBase<DataType>::serialize(uint8_t *buffer, size_t len, Endianness endi
 template<typename DataType>
 inline std::size_t TableBase<DataType>::byteSize() const
 {
-    return sizeof(DataType) * data_.size();
+    return data_->byteSize();
 }
 
 
@@ -314,7 +481,7 @@ QVariant TableBase<DataType>::headerData(int section, Qt::Orientation orientatio
             return QVariant();
         }
         
-        return axisX_->label(section);
+        return round(axisX_->label(section) * 100.0) / 100.0;
     } else {
         if (!axisY_) {
             return QVariant();
@@ -324,7 +491,7 @@ QVariant TableBase<DataType>::headerData(int section, Qt::Orientation orientatio
             return QVariant();
         }
         
-        return axisY_->label(section);
+        return round(axisX_->label(section) * 100.0) / 100.0;
     }
 }
 
@@ -371,10 +538,11 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
         return QVariant();
     }
     
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(3) << get(index.column(), index.row());
+    //std::stringstream ss;
+    //ss << std::fixed << std::setprecision(3) << get(index.column(), index.row());
 
-    return QString::fromStdString(ss.str());
+    //return QString::fromStdString(ss.str());
+    return QString::number(get(index.column(), index.row()));
 }
 
 
@@ -384,9 +552,35 @@ public:
     TableDeserializer(const definition::Table& definition, Endianness endianness, InputIt begin, InputIt end, TableAxis *axisX, TableAxis *axisY, std::size_t offset) :
         definition_(definition), endianness_(endianness), begin_(begin), end_(end), axisX_(axisX), axisY_(axisY), offset_(offset) {}
 
-    template<typename T>
+    template<typename DataType>
     std::unique_ptr<Table> deserialize() {
-        return std::make_unique<TableBase<T>>(definition_, std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, TableInfo<T>{definition_.sizeX, definition_.minimum, definition_.maximum, axisX_, axisY_, offset_});
+        std::unique_ptr<TableStore<DataType>> data;
+        switch (definition_.storedDataType) {
+            case TableType::Float:
+                data = std::make_unique<TableStoreBase<DataType, float>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Uint8:
+                data = std::make_unique<TableStoreBase<DataType, uint8_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Uint16:
+                data = std::make_unique<TableStoreBase<DataType, uint16_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Uint32:
+                data = std::make_unique<TableStoreBase<DataType, uint32_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Int8:
+                data = std::make_unique<TableStoreBase<DataType, int8_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Int16:
+                data = std::make_unique<TableStoreBase<DataType, int16_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            case TableType::Int32:
+                data = std::make_unique<TableStoreBase<DataType, int32_t>>(std::forward<InputIt>(begin_), std::forward<InputIt>(end_), endianness_, definition_.scale);
+                break;
+            default:
+                assert(false && "Unimplemented");
+        }
+        return std::make_unique<TableBase<DataType>>(definition_, std::move(data), TableInfo<DataType>{definition_.sizeX, definition_.minimum, definition_.maximum, axisX_, axisY_, offset_});
     }
 
 private:
@@ -397,6 +591,7 @@ private:
     TableAxis *axisX_, *axisY_;
     std::size_t offset_;
 };
+
 
 
 template<class InputIt>
@@ -425,37 +620,16 @@ std::unique_ptr<Table> deserializeTable(const definition::Table& definition, End
 
 
 template <typename DataType>
-template <typename InputIt>
-TableBase<DataType>::TableBase(const definition::Table& definition, InputIt begin, InputIt end, Endianness endianness, const TableInfo<DataType> &info) : Table(definition), modified_(std::distance(begin, end) / sizeof(DataType)), width_(info.width), minimum_(info.minimum), maximum_(info.maximum), axisX_(info.axisX), axisY_(info.axisY), offset_(info.offset)
+TableBase<DataType>::TableBase(const definition::Table& definition, std::unique_ptr<TableStore<DataType>> &&data, const TableInfo<DataType> &info) : width_(info.width), minimum_(info.minimum), maximum_(info.maximum), axisX_(info.axisX), axisY_(info.axisY), offset_(info.offset), definition_(definition)
 {
-    if ((std::distance(begin, end) / sizeof(DataType)) % info.width != 0) {
+    data_ = std::move(data);
+    modified_.resize(data_->size());
+    /*f ((std::distance(begin, end) / sizeof(StoredDataType)) % info.width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
-    }
+    }*/
     
-    // Start deserializing
-    switch (endianness) {
-    case Endianness::Big:
-        for (auto it = begin; it < end; it += sizeof(DataType)) {
-            DataType data = readBE<DataType>(it, end);
-            data_.emplace_back(data);
-        }
-        break;
-    case Endianness::Little:
-        for (auto it = begin; it < end; it += sizeof(DataType)) {
-            DataType data = readLE<DataType>(it, end);
-            data_.emplace_back(data);
-        }
-        break;
-    }
+    // data_ = std::make_unique<TableStoreBase<DataType, StoredDataType>>(std::move(begin), std::move(end), endianness);
 }
-
-
-
-template<typename DataType>
-TableBase<DataType>::TableBase(std::size_t width, std::size_t height) : data_(width * height), modified_(width * height), width_(width)
-{
-}
-
 
 
 template<typename DataType>
@@ -464,7 +638,7 @@ inline DataType TableBase<DataType>::get(std::size_t x, std::size_t y) const
     if (x >= width() || y >= height()) {
         throw std::runtime_error("out of bounds");
     }
-    return data_[y * width() + x];
+    return data_->get(y * width() + x);
 }
 
 
@@ -476,7 +650,7 @@ inline void TableBase<DataType>::set(std::size_t x, std::size_t y, DataType data
         throw std::runtime_error("out of bounds");
     }
     modified_[y * width() + x] = true;
-    data_[y * width() + x] = data;
+    data_->set(y * width() + x, data);
     dirty_ = true;
     emit onModified();
 }

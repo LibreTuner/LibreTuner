@@ -61,8 +61,7 @@ Vehicle query_can(std::unique_ptr<CanInterface> &&can) {
 #ifdef WITH_SOCKETCAN
 class SocketCanDataLink : public DataLink {
 public:
-    explicit SocketCanDataLink(
-        const std::shared_ptr<SocketCanSettings> &settings);
+    explicit SocketCanDataLink(const SocketCanSettings &settings);
 
     Vehicle queryVehicle() override;
 
@@ -74,8 +73,8 @@ private:
 };
 
 SocketCanDataLink::SocketCanDataLink(
-    const std::shared_ptr<SocketCanSettings> &settings) {
-    interface_ = settings->interface();
+    const SocketCanSettings &settings) {
+    interface_ = settings.interface();
     protocols_ = DataLinkProtocol::Can;
     defaultProtocol_ = DataLinkProtocol::Can;
 }
@@ -92,7 +91,7 @@ std::unique_ptr<CanInterface> SocketCanDataLink::can(uint32_t baudrate) {
 #ifdef WITH_J2534
 class J2534DataLink : public DataLink {
 public:
-    explicit J2534DataLink(const std::shared_ptr<J2534Settings> &settings);
+    explicit J2534DataLink(const J2534Settings &settings);
     virtual ~J2534DataLink() override = default;
 
     Vehicle queryVehicle() override;
@@ -109,9 +108,9 @@ private:
 
 
 
-J2534DataLink::J2534DataLink(const std::shared_ptr<J2534Settings> &settings) {
-    assert(settings->interface());
-    j2534_ = settings->interface();
+J2534DataLink::J2534DataLink(const J2534Settings &settings) {
+    assert(settings.interface());
+    j2534_ = settings.interface();
     if (!j2534_->initialized()) {
         j2534_->init();
     }
@@ -158,20 +157,19 @@ bool J2534DataLink::checkDevice() {
 
 DataLink::~DataLink() {}
 
-DataLinkPtr DataLink::create(const InterfaceSettingsPtr &iface) {
-    assert(iface);
-    switch (iface->type()) {
+DataLinkPtr DataLink::create(const InterfaceSettings &iface) {
+    switch (iface.type()) {
 #ifdef WITH_SOCKETCAN
     case InterfaceType::SocketCan:
         return std::static_pointer_cast<DataLink>(
             std::make_shared<SocketCanDataLink>(
-                std::static_pointer_cast<SocketCanSettings>(iface)));
+                *reinterpret_cast<const SocketCanSettings*>(&iface)));
 #endif
 #ifdef WITH_J2534
     case InterfaceType::J2534:
         return std::static_pointer_cast<DataLink>(
             std::make_shared<J2534DataLink>(
-                std::static_pointer_cast<J2534Settings>(iface)));
+                *reinterpret_cast<J2534Settings*>(&iface)));
 #endif
     default:
         throw std::runtime_error("unsupported protocol");

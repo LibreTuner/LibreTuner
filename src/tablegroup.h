@@ -55,6 +55,9 @@ public:
     void apply(uint8_t *data, size_t size, Endianness endianness);
     
     bool dirty() const { return dirty_; }
+    
+    /* Clears the dirty flag */
+    void clearDirty() { dirty_ = false; }
 
 private:
     std::shared_ptr<RomData> base_;
