@@ -491,7 +491,7 @@ QVariant TableBase<DataType>::headerData(int section, Qt::Orientation orientatio
             return QVariant();
         }
         
-        return round(axisX_->label(section) * 100.0) / 100.0;
+        return round(axisY_->label(section) * 100.0) / 100.0;
     }
 }
 
