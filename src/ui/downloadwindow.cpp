@@ -37,6 +37,7 @@
 #include <QThread>
 #include <QProgressDialog>
 #include <QComboBox>
+#include <QFileDialog>
 
 #include <utility>
 #include <thread>
@@ -120,9 +121,37 @@ void DownloadWindow::download()
             throw std::runtime_error("Unknown error");
         } else {
             auto data = downloader->data();
-            RomStore::get()->addRom(lineName_->text().toStdString(),
-                                    pLink->definition(), data.first, data.second);
-            QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully");
+            try {
+                RomStore::get()->addRom(lineName_->text().toStdString(),
+                                        pLink->definition(), data.first, data.second);
+                QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully").exec();
+            } catch (const std::runtime_error &err) {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Download Error");
+                msgBox.setText("The ROM was downloaded, but an error occurred while saving. Would you like to save the binary data?");
+                msgBox.setInformativeText(err.what());
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::Yes);
+
+                int ret = msgBox.exec();
+                if (ret == QMessageBox::Yes) {
+                    QString fileName = QFileDialog::getSaveFileName(this,
+                                                                    tr("Save ROM"), "",
+                                                                    tr("Binary (*.bin);;All Files (*)"));
+                    if (fileName.isEmpty()) {
+                        return;
+                    }
+
+                    QFile file(fileName);
+                    if (!file.open(QIODevice::WriteOnly)) {
+                        QMessageBox::information(this, tr("Unable to open file"),
+                                                 file.errorString());
+                        return;
+                    }
+                    file.write(reinterpret_cast<const char*>(data.first), static_cast<qint64>(data.second));
+                    file.close();
+                }
+            }
         }
 
         
