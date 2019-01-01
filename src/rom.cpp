@@ -279,7 +279,8 @@ void TuneData::readTables(QXmlStreamReader &xml) {
 
 
 void TuneData::save() {
-    QFile file(QString::fromStdString(path_));
+    QFile file(QString::fromStdString(LibreTuner::get()->home().toStdString() + "/tunes/" + path_));
+
     if (!file.open(QFile::WriteOnly)) {
         throw std::runtime_error(file.errorString().toStdString());
     }

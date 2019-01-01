@@ -387,7 +387,11 @@ void MainWindow::setupMenu() {
     
     connect(saveCurrentAction_, &QAction::triggered, [this]() {
         if (selectedTune_) {
-            selectedTune_->save();
+            try {
+                selectedTune_->save();
+            } catch (const std::runtime_error &err) {
+                QMessageBox::critical(this, "Error Saving", err.what());
+            }
         }
     });
     

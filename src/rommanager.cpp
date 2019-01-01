@@ -323,7 +323,7 @@ void RomStore::readTunes(QXmlStreamReader &xml) {
                 tune->setName(xml.readElementText().toStdString());
             }
             if (xml.name() == "path") {
-                tune->setPath(LibreTuner::get()->home().toStdString() + "/tunes/" + xml.readElementText().toStdString());
+                tune->setPath(xml.readElementText().toStdString());
             }
             if (xml.name() == "base") {
                 // Locate the base rom from the ID
