@@ -108,7 +108,7 @@ private:
     std::unique_ptr<uds::Protocol> uds_;
     std::vector<Pid> pids_;
 
-    std::atomic<bool> running_ = false;
+    std::atomic<bool> running_{false};
     size_t current_pid_ = 0;
 };
 
