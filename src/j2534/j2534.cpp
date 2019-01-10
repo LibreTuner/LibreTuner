@@ -276,7 +276,7 @@ std::vector<Info> detect_interfaces() {
         if (res == ERROR_FILE_NOT_FOUND) {
             // If this entry does not exist, then no PassThru interfaces are
             // installed
-            return;
+            return interfaces;
         }
         throw std::runtime_error(
                 "Could not open "
@@ -343,7 +343,7 @@ std::vector<Info> detect_interfaces() {
                             reinterpret_cast<uint8_t *>(&can),
                             &keySize) == ERROR_SUCCESS) {
             if (can) {
-                info.protocols = info.protocols | DataLinkProtocol::Can;
+                info.protocols = info.protocols | datalink::Protocol::Can;
             }
         }
 

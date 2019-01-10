@@ -37,7 +37,7 @@
 #endif
 
 #ifdef WITH_J2534
-#include "j2534/j2534manager.h"
+#include "j2534/j2534.h"
 #include "datalink/passthru.h"
 #endif
 
@@ -352,8 +352,8 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
 
 void LibreTuner::load_datalinks() {
 #ifdef WITH_J2534
-    for (std::unique_ptr<datalink::PassThruLink> &&link : datalink::detect_passthru_links()) {
-        datalinks_.add_link(std::static_pointer_cast<datalink::Link>(std::move(link)));
+    for (std::unique_ptr<datalink::PassThruLink> &link : datalink::detect_passthru_links()) {
+        datalinks_.add_link(std::unique_ptr<datalink::Link>(static_cast<datalink::Link*>(link.release())));
     }
 #endif
 }

@@ -12,7 +12,7 @@ namespace datalink {
 
     void PassThruLink::check_interface() {
         if (!interface_) {
-            interface_ = j2534::J2534::create(Info(info_));
+            interface_ = j2534::J2534::create(j2534::Info(info_));
             interface_->init();
         }
     }
@@ -44,8 +44,8 @@ namespace datalink {
 
         std::vector<std::unique_ptr<PassThruLink>> links;
 
-        for (j2534::Info &&i : info) {
-            links.push_back(j2534::J2534::create(std::move(i)));
+        for (j2534::Info &i : info) {
+            links.emplace_back(std::make_unique<datalink::PassThruLink>(std::move(i)));
         }
 
         return links;

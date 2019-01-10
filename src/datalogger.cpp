@@ -81,7 +81,7 @@ void UdsDataLogger::processNext() {
         response.data.erase(response.data.begin());
     }
 
-    switch (data.size()) {
+    /*switch (data.size()) {
     case 0:
         break;
     default:
@@ -92,10 +92,10 @@ void UdsDataLogger::processNext() {
     case 1:
         pid->setX(data[0]);
         break;
-    }
+    }*/
 
-    double result = pid->evaluate();
-    log_.add(pid->id(), result);
+    //double result = pid->evaluate();
+    //log_.add(pid->id(), result);
 }
 
 
@@ -124,9 +124,9 @@ void UdsDataLogger::disable() { running_ = false; }
 
 
 Pid::Pid(uint32_t id, uint16_t code, const std::string &formula)
-    : id_(id), code_(code), expression_(formula.c_str()) {}
+    : id_(id), code_(code) /*, expression_(formula.c_str()) */ {}
 
 
 
 
-double Pid::evaluate() const { return expression_.eval(vars_).asDouble(); }
+//double Pid::evaluate() const { return expression_.eval(vars_).asDouble(); }
