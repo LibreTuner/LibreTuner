@@ -5,6 +5,7 @@
 #include "passthru.h"
 #include "j2534/j2534caninterface.h"
 
+
 namespace datalink {
     PassThruLink::PassThruLink(j2534::Info &&info) : Link(info.name), info_(std::move(info)) {
 

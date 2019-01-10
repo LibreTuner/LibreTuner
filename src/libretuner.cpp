@@ -359,6 +359,7 @@ LibreTuner::~LibreTuner() { _global = nullptr; }
 void LibreTuner::setup() {
     SetupDialog setup;
     setup.setDefinitionModel(DefinitionManager::get());
+    setup.setDatalinksModel(&datalinks_);
     setup.exec();
     currentDefinition_ = setup.platform();
     currentDatalink_ = setup.datalink();
