@@ -114,10 +114,6 @@ set(libretuner_SRC
     ui/platformlinkview.cpp
     ui/platformlinkview.h
 
-    framelesswindow/framelesswindow.cpp
-    framelesswindow/windowdragger.cpp
-    DarkStyle.cpp
-
     protocols/caninterface.cpp
     protocols/caninterface.h
     protocols/canlog.cpp

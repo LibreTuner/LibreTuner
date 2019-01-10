@@ -28,9 +28,6 @@
 #include "ui/setupdialog.h"
 #include "vehicle.h"
 
-#include "framelesswindow/framelesswindow.h"
-#include "DarkStyle.h"
-
 #ifdef WITH_SOCKETCAN
 #include "os/sockethandler.h"
 #include "protocols/socketcaninterface.h"
@@ -58,7 +55,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     Q_INIT_RESOURCE(definitions);
     Q_INIT_RESOURCE(stylesheet);
     Q_INIT_RESOURCE(codes);
-    Q_INIT_RESOURCE(darkstyle);
     Q_INIT_RESOURCE(framelesswindow);
 
     home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -147,10 +143,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         setStyleSheet(file.readAll());
         file.close();
     }*/
-
-#ifndef __unix__
-    setStyle(new DarkStyle);
-#endif
 }
 
 
