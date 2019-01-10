@@ -413,9 +413,8 @@ bool checkModel(const definition::Model& model, const uint8_t *data, size_t size
             return false;
         }
 
-        if (std::equal(data + identifier.offset(), data + size,
-                       identifier.data(),
-                       identifier.data() + identifier.size()) != 0) {
+        if (!std::equal(data + identifier.offset(), data + identifier.offset() + identifier.size(),
+                       identifier.data())) {
             return false;
         }
     }
