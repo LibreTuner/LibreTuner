@@ -126,7 +126,7 @@ void MainWindow::restoreDocks()
 
 void MainWindow::loadSettings()
 {
-    QSettings settings;
+    QSettings settings("LibreTuner", "LibreTuner");
     QByteArray geo = settings.value("geometry", QByteArray()).toByteArray();
     restoreGeometry(geo);
     QByteArray state = settings.value("state", QByteArray()).toByteArray();
@@ -141,7 +141,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings;
+    QSettings settings("LibreTuner", "LibreTuner");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("size", size());
     settings.setValue("pos", pos());

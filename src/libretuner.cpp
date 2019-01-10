@@ -42,6 +42,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QStyledItemDelegate>
+#include <QTextStream>
 
 #include <future>
 #include <memory>
@@ -53,9 +54,17 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
     Q_INIT_RESOURCE(icons);
     Q_INIT_RESOURCE(definitions);
-    Q_INIT_RESOURCE(stylesheet);
+    Q_INIT_RESOURCE(style);
     Q_INIT_RESOURCE(codes);
-    Q_INIT_RESOURCE(framelesswindow);
+
+    {
+        QFile f(":qdarkstyle/style.qss");
+        if (f.exists()) {
+            f.open(QFile::ReadOnly | QFile::Text);
+            QTextStream ts(&f);
+            setStyleSheet(ts.readAll());
+        }
+    }
 
     home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 

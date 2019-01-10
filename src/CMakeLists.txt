@@ -168,10 +168,8 @@ qt5_wrap_ui(libretuner_SRC
 qt5_add_resources(libretuner_SRC
     resources/icons.qrc
     resources/definitions.qrc
-    resources/stylesheet.qrc
     resources/codes.qrc
-    resources/darkstyle.qrc
-    resources/framelesswindow.qrc
+    resources/qdarkstyle/style.qrc
 )
 
 # Separate the program into a library for testing
