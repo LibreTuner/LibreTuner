@@ -503,6 +503,10 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
         return QVariant();
     }
 
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
+        return QString::number(get(index.column(), index.row()));
+    }
+
     if (role == Qt::FontRole) {
         QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
         if (modified(index.column(), index.row())) {
@@ -534,15 +538,7 @@ QVariant TableBase<DataType>::data(const QModelIndex& index, int role) const
         return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
     }
 
-    if (role != Qt::DisplayRole && role != Qt::EditRole) {
-        return QVariant();
-    }
-    
-    //std::stringstream ss;
-    //ss << std::fixed << std::setprecision(3) << get(index.column(), index.row());
-
-    //return QString::fromStdString(ss.str());
-    return QString::number(get(index.column(), index.row()));
+    return QVariant();
 }
 
 
