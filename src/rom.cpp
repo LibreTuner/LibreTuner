@@ -36,7 +36,7 @@ Rom::Rom() = default;
 
 RomData::RomData(Rom &rom) : rom_(rom)
 {
-    std::ifstream file(rom_.path(), std::ios::binary);
+    std::ifstream file(LT()->home().toStdString() + "/roms/" + rom_.path(), std::ios::binary);
     if (!file.is_open()) {
         // File does not exist, abort.
         throw std::runtime_error("ROM '" + rom_.path() + "' does not exist");
@@ -332,7 +332,7 @@ void TuneData::apply(uint8_t *data, size_t size) {
 TuneData::TuneData(std::string path, Rom &base, bool open) : path_(std::move(path)), base_(base), baseData_(base_.data()), tables_(baseData_)
 {
     if (open) {
-        QFile file(QString::fromStdString(path_));
+        QFile file(QString::fromStdString(LT()->home().toStdString() + "/tunes/" + path_));
         if (!file.open(QFile::ReadOnly)) {
             return; // Empty tune
             // throw std::runtime_error(file.errorString().toStdString());

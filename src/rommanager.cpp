@@ -94,7 +94,7 @@ void RomStore::readRoms(QXmlStreamReader &xml) {
             if (xml.name() == "name") {
                 rom->setName(xml.readElementText().trimmed().toStdString());
             } else if (xml.name() == "path") {
-                rom->setPath(LibreTuner::get()->home().toStdString() + "/roms/" + xml.readElementText().trimmed().toStdString());
+                rom->setPath(xml.readElementText().trimmed().toStdString());
             } else if (xml.name() == "type") {
                 QString type = xml.readElementText().toLower();
                 definition::MainPtr def =

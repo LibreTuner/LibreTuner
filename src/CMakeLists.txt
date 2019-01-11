@@ -191,3 +191,9 @@ endif (WIN32)
 
 add_executable(LibreTuner main.cpp)
 target_link_libraries(LibreTuner LibreTuner_lib)
+
+
+if (MINGW)
+    message("Detected MINGW")
+    target_link_options(LibreTuner PRIVATE -mwindows)
+endif(MINGW)
