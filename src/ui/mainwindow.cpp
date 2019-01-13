@@ -413,10 +413,10 @@ void MainWindow::setupMenu() {
         datalinksWindow_.show();
     });
 
-    auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
+    /*auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
     connect(setupAction, &QAction::triggered, [this]() {
        LT()->setup();
-    });
+    });*/
 
     setMenuBar(menuBar);
 }
