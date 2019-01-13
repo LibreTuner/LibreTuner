@@ -47,7 +47,7 @@ class TableAxis
 public:
     virtual double label(int index) const =0;
     virtual const std::string &name() const =0;
-    virtual ~TableAxis() {}
+    virtual ~TableAxis();
 };
 
 
@@ -202,9 +202,9 @@ public:
     virtual DataType get(std::size_t index) const =0;
     virtual void set(std::size_t index, DataType data) =0;
     virtual std::size_t size() const =0;
-    
+
     virtual void serialize(uint8_t *buffer, size_t len, Endianness endianness) const =0;
-    
+
     virtual std::size_t byteSize() const =0;
 };
 
@@ -215,16 +215,16 @@ class TableStoreBase : public TableStore<DataType> {
 public:
     template<typename InputIt>
     TableStoreBase(InputIt begin, InputIt end, Endianness endianness, double scale);
-    
+
     virtual DataType get(std::size_t index) const override;
     virtual void set(std::size_t index, DataType data) override;
     virtual std::size_t size() const override;
-    
+
     virtual void serialize(uint8_t *buffer, size_t len, Endianness endianness) const override;
-    
+
     virtual std::size_t byteSize() const override;
-    
-    
+
+
 private:
     std::vector<StoredDataType> data_;
     double scale_;
@@ -248,7 +248,7 @@ void TableStoreBase<DataType, StoredDataType>::serialize(uint8_t* buffer, size_t
     }
 
     uint8_t *end = buffer + len;
-    
+
     if (endianness == Endianness::Big) {
         for (StoredDataType data : data_) {
             writeBE<StoredDataType>(data, buffer, end);
@@ -316,12 +316,12 @@ class TableBase : public Table {
 public:
     TableBase(const definition::Table& definition, std::unique_ptr<TableStore<DataType>> &&data, const TableInfo<DataType> &info);
     TableBase(std::size_t width, std::size_t height);
-    
+
     std::size_t height() const override { return data_->size() / width_; }
     std::size_t width() const override { return width_; }
-    
+
     void serialize(uint8_t *data, size_t len, Endianness endianness) const override;
-    
+
     DataType get(std::size_t x, std::size_t y) const;
     void set(std::size_t x, std::size_t y, DataType data);
     bool modified(std::size_t x, std::size_t y) const override;
@@ -331,13 +331,13 @@ public:
     virtual TableAxis *axisX() const override { return axisX_; }
     virtual TableAxis *axisY() const override { return axisY_; }
     std::size_t offset() const override { return offset_; }
-    
+
     const std::string name() const override { return definition_.name; }
     const std::string description() const override { return definition_.description; }
     const double maximum() const override { return definition_.maximum; }
     const double minimum() const override { return definition_.minimum; }
     const definition::Table& definition() const override { return definition_; }
-    
+
     QVariant data(const QModelIndex & index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
@@ -419,7 +419,7 @@ void TableBase<DataType>::serialize(uint8_t *buffer, size_t len, Endianness endi
     }
 
     uint8_t *end = buffer + len;
-    
+
     if (endianness == Endianness::Big) {
         for (DataType data : data_) {
             writeBE<DataType>(data, buffer, end);
@@ -450,13 +450,13 @@ bool TableBase<DataType>::setData(const QModelIndex& index, const QVariant& valu
     if (role != Qt::EditRole) {
         return false;
     }
-    
+
     bool success;
-    
+
     if (!value.canConvert<DataType>()) {
         return false;
     }
-    
+
     DataType res = value.value<DataType>();
 
     set(index.column(), index.row(), res);
@@ -471,26 +471,26 @@ QVariant TableBase<DataType>::headerData(int section, Qt::Orientation orientatio
     if (role != Qt::DisplayRole || section < 0) {
         return QVariant();
     }
-    
+
     if (orientation == Qt::Horizontal) {
         if (!axisX_) {
             return QVariant();
         }
-        
+
         if (section >= width()) {
             return QVariant();
         }
-        
+
         return round(axisX_->label(section) * 100.0) / 100.0;
     } else {
         if (!axisY_) {
             return QVariant();
         }
-        
+
         if (section >= height()) {
             return QVariant();
         }
-        
+
         return round(axisY_->label(section) * 100.0) / 100.0;
     }
 }
@@ -623,7 +623,7 @@ TableBase<DataType>::TableBase(const definition::Table& definition, std::unique_
     /*f ((std::distance(begin, end) / sizeof(StoredDataType)) % info.width != 0) {
         throw std::runtime_error("table does not fit in given width (size % width != 0)");
     }*/
-    
+
     // data_ = std::make_unique<TableStoreBase<DataType, StoredDataType>>(std::move(begin), std::move(end), endianness);
 }
 

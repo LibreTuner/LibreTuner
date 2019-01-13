@@ -36,8 +36,8 @@ using MainPtr = std::shared_ptr<Main>;
 class DataLogger;
 using DataLoggerPtr = std::shared_ptr<DataLogger>;
 
-class DownloadInterface;
-using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
+class Downloader;
+using DownloadInterfacePtr = std::shared_ptr<Downloader>;
 
 class DiagnosticsInterface;
 
@@ -81,7 +81,7 @@ public:
 
     /* Returns a usable download interface for the link, if one exists. May
      * return nullptr. */
-    std::unique_ptr<DownloadInterface> downloader() const;
+    std::unique_ptr<Downloader> downloader() const;
 
     /* Returns a diagnostic interface for the link. If none exist, returns
      * nullptr. */

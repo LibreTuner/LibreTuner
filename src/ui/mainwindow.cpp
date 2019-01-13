@@ -310,8 +310,6 @@ bool MainWindow::checkSaveSelected()
                 msg.exec();
                 return false;
             }
-            
-            return false;
         case QMessageBox::Discard:
             return true;
         case QMessageBox::Cancel:
@@ -380,7 +378,7 @@ void MainWindow::setupMenu() {
         }
     });
 
-    connect(createTuneAction, &QAction::triggered, [this]() {
+    connect(createTuneAction, &QAction::triggered, []() {
         CreateTuneDialog dlg;
         dlg.exec();
     });

@@ -31,20 +31,20 @@
 #include "protocols/socketcaninterface.h"
 #endif
 
-Uds23DownloadInterface::Uds23DownloadInterface(
-    std::unique_ptr<uds::Protocol> &&uds, std::string key, uint32_t size)
-    : key_(std::move(key)), totalSize_(size), uds_(std::move(uds)) {}
+Uds23Downloader::Uds23Downloader(
+    std::unique_ptr<uds::Protocol> &&uds, std::string key, std::size_t size)
+    : uds_(std::move(uds)), key_(std::move(key)), totalSize_(size) {}
 
 
 
-bool Uds23DownloadInterface::update_progress() {
-    notifyProgress((1.0f - ((float)downloadSize_ / totalSize_)));
+bool Uds23Downloader::update_progress() {
+    notifyProgress((1.0f - (static_cast<float>(downloadSize_) / totalSize_)));
     return downloadSize_ > 0;
 }
 
 
 
-bool Uds23DownloadInterface::download() {
+bool Uds23Downloader::download() {
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
@@ -52,7 +52,7 @@ bool Uds23DownloadInterface::download() {
 
     do {
         std::vector<uint8_t> data = uds_->requestReadMemoryAddress(
-            downloadOffset_, std::min<uint32_t>(downloadSize_, 0xFFE));
+            static_cast<uint32_t>(downloadOffset_), std::min<std::uint16_t>(static_cast<uint16_t>(downloadSize_), 0xFFE));
 
         if (data.empty()) {
             throw std::runtime_error("received 0 bytes in download packet");
@@ -67,10 +67,10 @@ bool Uds23DownloadInterface::download() {
 
 
 
-void Uds23DownloadInterface::cancel() { canceled_ = true; }
+void Uds23Downloader::cancel() { canceled_ = true; }
 
 
 
-std::pair<const uint8_t*, size_t> Uds23DownloadInterface::data() {
+std::pair<const uint8_t*, size_t> Uds23Downloader::data() {
     return std::make_pair(downloadData_.data(), downloadData_.size());
 }

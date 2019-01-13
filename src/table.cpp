@@ -17,3 +17,5 @@
  */
 
 #include "table.h"
+
+TableAxis::~TableAxis() {}

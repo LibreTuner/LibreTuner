@@ -248,31 +248,12 @@ std::vector<Info> detect_interfaces() {
     std::vector<Info> interfaces;
     // Search HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04 for connected
     // interfaces
-    HKEY hKeySoftware;
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software", 0, KEY_READ,
-                     &hKeySoftware) != ERROR_SUCCESS) {
-        throw std::runtime_error(
-                "Could not open HKEY_LOCAL_MACHINE\\Software for reading");
-    }
-
     LSTATUS res;
-    /*HKEY hKeyWow;
-    if ((res = RegOpenKeyEx(hKeySoftware, "WOW6432Node", 0, KEY_READ, &hKeyWow))
-    != ERROR_SUCCESS) { RegCloseKey(hKeySoftware); if (res ==
-    ERROR_FILE_NOT_FOUND) {
-            // If this entry does not exist, then no PassThru interfaces are
-    installed return;
-        }
-
-        throw std::runtime_error("Could not open
-    HKEY_LOCAL_MACHINE\\Software\\WOW6432Node for reading");
-    }
-    RegCloseKey(hKeySoftware);*/
 
     HKEY hKeyPassthrough;
-    if ((res = RegOpenKeyEx(hKeySoftware, "PassThruSupport.04.04", 0, KEY_READ,
+    if ((res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\PassThruSupport.04.04", 0, KEY_ENUMERATE_SUB_KEYS,
                             &hKeyPassthrough)) != ERROR_SUCCESS) {
-        RegCloseKey(hKeySoftware);
+        //RegCloseKey(hKeySoftware);
         if (res == ERROR_FILE_NOT_FOUND) {
             // If this entry does not exist, then no PassThru interfaces are
             // installed
@@ -282,9 +263,6 @@ std::vector<Info> detect_interfaces() {
                 "Could not open "
                 "HKEY_LOCAL_MACHINE\\Software\\PassThruSupport.04.04 for reading");
     }
-
-    // We don't need to use this key anymore
-    RegCloseKey(hKeySoftware);
 
     char keyValue[255];
     DWORD keySize;

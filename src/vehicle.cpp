@@ -60,7 +60,7 @@ std::unique_ptr<DataLogger> VehicleLink::logger(DataLog &log) const {
 
 
 
-std::unique_ptr<DownloadInterface> VehicleLink::downloader() const {
+std::unique_ptr<Downloader> VehicleLink::downloader() const {
     if (!definition_) {
         return nullptr;
     }
@@ -68,7 +68,7 @@ std::unique_ptr<DownloadInterface> VehicleLink::downloader() const {
     switch (definition_->downloadMode) {
     case DownloadMode::Mazda23:
         if (auto interface = uds()) {
-            return std::make_unique<Uds23DownloadInterface>(
+            return std::make_unique<Uds23Downloader>(
                 std::move(interface), definition_->key,
                 definition_->romsize);
         }

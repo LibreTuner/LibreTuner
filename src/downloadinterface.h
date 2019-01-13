@@ -31,14 +31,14 @@
 
 class CanInterface;
 
-class DownloadInterface : public AsyncRoutine {
+class Downloader : public AsyncRoutine {
 public:
     enum Type {
         TYPE_CAN,
         TYPE_J2534,
     };
 
-    virtual ~DownloadInterface() = default;
+    virtual ~Downloader() = default;
 
     /* Starts downloading. Calls updateProgress if possible.
      * Returns false if canceled. */
@@ -50,14 +50,14 @@ public:
     /* Returns the downloaded data */
     virtual std::pair<const uint8_t*, size_t> data() = 0;
 };
-using DownloadInterfacePtr = std::shared_ptr<DownloadInterface>;
+using DownloadInterfacePtr = std::shared_ptr<Downloader>;
 
 
-
-class Uds23DownloadInterface : public DownloadInterface {
+// Downloads using ReadMemoryByAddress (UDS SID 23)
+class Uds23Downloader : public Downloader {
 public:
-    Uds23DownloadInterface(std::unique_ptr<uds::Protocol> &&uds,
-                           std::string key, uint32_t size);
+    Uds23Downloader(std::unique_ptr<uds::Protocol> &&uds,
+                           std::string key, std::size_t size);
 
     bool download() override;
     void cancel() override;
