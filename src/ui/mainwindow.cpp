@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), datalinksWindow_(
     //layout_->addWidget(main_);
 
     setupMenu();
+    setupStatusBar();
 
     // Blank central widget
     //QLabel *central = new QLabel("TEST");
@@ -418,6 +419,43 @@ void MainWindow::setupMenu() {
     });
 
     setMenuBar(menuBar);
+}
+
+
+Q_DECLARE_METATYPE(definition::MainPtr);
+Q_DECLARE_METATYPE(datalink::Link*);
+
+void MainWindow::setupStatusBar() {
+    auto *comboPlatform = new QComboBox;
+    comboPlatform->setModel(DefinitionManager::get());
+    connect(comboPlatform, QOverload<int>::of(&QComboBox::currentIndexChanged), [comboPlatform](int index) {
+        QVariant var = comboPlatform->currentData(Qt::UserRole);
+        if (!var.canConvert<definition::MainPtr>()) {
+            return;
+        }
+        LT()->setPlatform(var.value<definition::MainPtr>());
+    });
+
+    auto *comboDatalink = new QComboBox;
+    comboDatalink->setModel(&LT()->datalinks());
+    connect(comboDatalink, QOverload<int>::of(&QComboBox::currentIndexChanged), [comboDatalink](int index) {
+        QVariant var = comboDatalink->currentData(Qt::UserRole);
+        if (!var.canConvert<datalink::Link*>()) {
+            return;
+        }
+
+        LT()->setDatalink(var.value<datalink::Link*>());
+    });
+
+    if (LT()->platform()) {
+        comboPlatform->setCurrentText(QString::fromStdString(LT()->platform()->name));
+    }
+    if (LT()->datalink()) {
+        comboDatalink->setCurrentText(QString::fromStdString(LT()->datalink()->name()));
+    }
+
+    statusBar()->addPermanentWidget(comboPlatform);
+    statusBar()->addPermanentWidget(comboDatalink);
 }
 
 

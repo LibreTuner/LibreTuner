@@ -54,7 +54,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     
     auto *groupDetails = new QGroupBox(tr("ROM Details"));
     auto *form = new QFormLayout;
-    form->setContentsMargins(0, 4, 0, 4);
+    //form->setContentsMargins(0, 4, 0, 4);
     
     lineName_ = new QLineEdit;
     lineId_ = new QLineEdit;

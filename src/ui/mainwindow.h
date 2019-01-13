@@ -83,6 +83,7 @@ private:
     bool checkSaveSelected();
 
     void setupMenu();
+    void setupStatusBar();
     
     void hideAllDocks();
     void restoreDocks();

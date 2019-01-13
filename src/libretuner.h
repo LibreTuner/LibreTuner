@@ -128,9 +128,11 @@ public:
 
     /* Returns the current platform or nullptr if one is not selected */
     const definition::MainPtr &platform() const { return currentDefinition_; }
+    void setPlatform(const definition::MainPtr &platform) {currentDefinition_ = platform; }
 
     /* Returns the selected datalink or nullptr if not is not selected */
     datalink::Link *datalink() const { return currentDatalink_; }
+    void setDatalink(datalink::Link *link) { currentDatalink_ = link; }
 
     /* Creates a platform link from the selected platform & datalink. Returns nullptr if
      * one could not be created. */
