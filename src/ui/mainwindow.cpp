@@ -127,13 +127,13 @@ void MainWindow::restoreDocks()
 
 void MainWindow::loadSettings()
 {
-    QSettings settings("LibreTuner", "LibreTuner");
-    QByteArray geo = settings.value("geometry", QByteArray()).toByteArray();
+    QSettings settings;
+    QByteArray geo = settings.value("mainwindow/geometry", QByteArray()).toByteArray();
     restoreGeometry(geo);
-    QByteArray state = settings.value("state", QByteArray()).toByteArray();
+    QByteArray state = settings.value("mainwindow/state", QByteArray()).toByteArray();
     restoreState(state);
-    QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
-    QSize size = settings.value("size", QSize(400, 400)).toSize();
+    QPoint pos = settings.value("mainwindow/pos", QPoint(200, 200)).toPoint();
+    QSize size = settings.value("mainwindow/size", QSize(900, 600)).toSize();
     resize(size);
     move(pos);
 }
@@ -142,11 +142,11 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings("LibreTuner", "LibreTuner");
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("size", size());
-    settings.setValue("pos", pos());
-    settings.setValue("state", saveState());
+    QSettings settings;
+    settings.setValue("mainwindow/geometry", saveGeometry());
+    settings.setValue("mainwindow/size", size());
+    settings.setValue("mainwindow/pos", pos());
+    settings.setValue("mainwindow/state", saveState());
 }
 
 

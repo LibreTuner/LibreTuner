@@ -57,6 +57,9 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     Q_INIT_RESOURCE(style);
     Q_INIT_RESOURCE(codes);
 
+    setOrganizationDomain("libretuner.org");
+    setApplicationName("LibreTuner");
+
     {
         QFile f(":qdarkstyle/style.qss");
         if (f.exists()) {
@@ -70,18 +73,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
 
 #ifdef WITH_SOCKETCAN
     SocketHandler::get()->initialize();
-#endif
-#ifdef WITH_J2534
-    /*try {
-        J2534Manager::get().init();
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText("Could not initialize J2534Manager: " +
-                       QString(e.what()));
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setWindowTitle("J2534Manager error");
-        msgBox.exec();
-    }*/
 #endif
     TimerRunLoop::get().startWorker();
 
@@ -122,7 +113,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     }
 
     try {
-        // InterfaceManager::get().load();
         load_datalinks();
     } catch (const std::exception &e) {
         QMessageBox msgBox;
@@ -380,6 +370,29 @@ std::unique_ptr<VehicleLink> LibreTuner::platform_link() {
     }
 
     return std::make_unique<VehicleLink>(currentDefinition_, *currentDatalink_);
+}
+
+
+
+void LibreTuner::setPlatform(const definition::MainPtr &platform) {
+    currentDefinition_ = platform;
+
+    if (platform) {
+        Logger::debug("Set platform to " + platform->name);
+    } else {
+        Logger::debug("Unset platform");
+    }
+}
+
+
+void LibreTuner::setDatalink(datalink::Link *link) {
+    currentDatalink_ = link;
+
+    if (link != nullptr) {
+        Logger::debug("Set datalink to " + link->name());
+    } else {
+        Logger::debug("Unset datalink");
+    }
 }
 
 
