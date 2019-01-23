@@ -24,7 +24,6 @@
 #include "ui/addinterfacedialog.h"
 #include "ui/flashwindow.h"
 #include "ui/styledwindow.h"
-#include "ui/tuneeditor.h"
 #include "ui/setupdialog.h"
 #include "vehicle.h"
 

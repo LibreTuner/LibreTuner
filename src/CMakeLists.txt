@@ -164,7 +164,6 @@ endif ()
 qt5_wrap_ui(libretuner_SRC
     ui/canviewer.ui
     ui/createtunedialog.ui
-    ui/tuneeditor.ui
     ui/flashwindow.ui
     ui/addinterfacedialog.ui
 

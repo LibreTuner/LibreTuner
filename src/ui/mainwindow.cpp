@@ -29,7 +29,6 @@
 #include "docks/tableswidget.h"
 
 #include "dataloggerwindow.h"
-#include "flowlayout.h"
 #include "titlebar.h"
 
 #include "tunedialog.h"
