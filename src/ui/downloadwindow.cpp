@@ -26,7 +26,7 @@
 #include "vehicle.h"
 #include "libretuner.h"
 #include "rommanager.h"
-#include "downloadinterface.h"
+#include "downloader.h"
 
 #include <QMessageBox>
 #include <QVBoxLayout>

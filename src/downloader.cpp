@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "downloadinterface.h"
+#include "downloader.h"
 #include "definitions/definition.h"
 #include "logger.h"
 #include "protocols/udsprotocol.h"

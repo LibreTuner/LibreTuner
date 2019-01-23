@@ -12,8 +12,8 @@ set(CMAKE_AUTOMOC ON)
 set(libretuner_SRC
     libretuner.cpp
     libretuner.h
-    downloadinterface.cpp
-    downloadinterface.h
+    downloader.cpp
+    downloader.h
     rommanager.cpp
     rommanager.h
     rom.cpp

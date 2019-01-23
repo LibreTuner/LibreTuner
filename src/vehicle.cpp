@@ -27,7 +27,7 @@
 #include "logger.h"
 #include "protocols/isotpprotocol.h"
 #include "protocols/udsprotocol.h"
-#include "downloadinterface.h"
+#include "downloader.h"
 #include <utility>
 
 
