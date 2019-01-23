@@ -12,7 +12,6 @@ option(Test "Build all tests." OFF)
 
 set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Build yaml-cpp tests")
 
-# add_subdirectory(lib/GSL)
 add_subdirectory(lib/cparse)
 add_subdirectory(lib/yaml)
 
