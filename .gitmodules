@@ -4,3 +4,6 @@
 [submodule "lib/yaml"]
 	path = lib/yaml
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "lib/QHexView"]
+	path = lib/QHexView
+	url = https://github.com/Dax89/QHexView.git

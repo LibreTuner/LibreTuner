@@ -113,6 +113,12 @@ set(libretuner_SRC
     ui/tunedialog.h
     ui/platformlinkview.cpp
     ui/platformlinkview.h
+    ui/romexplorer.cpp
+    ui/romexplorer.h
+    ui/setupdialog.cpp
+    ui/setupdialog.h
+    ui/datalinkswidget.cpp
+    ui/datalinkswidget.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
@@ -129,7 +135,7 @@ set(libretuner_SRC
 
     datalink/datalink.cpp
     datalink/datalink.h
-        ui/setupdialog.cpp ui/setupdialog.h ui/datalinkswidget.cpp ui/datalinkswidget.h)
+    )
 
 if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
@@ -175,7 +181,7 @@ qt5_add_resources(libretuner_SRC
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp)
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView)
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${Boost_INCLUDE_DIRS})
 
