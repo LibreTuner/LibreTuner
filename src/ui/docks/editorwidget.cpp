@@ -3,7 +3,7 @@
 #include "rom.h"
 #include "libretuner.h"
 
-#include "verticallabel.h"
+#include "../verticallabel.h"
 
 #include <QTableView>
 #include <QAbstractItemView>

@@ -21,16 +21,18 @@
 
 #include "datalog.h"
 
-#include "diagnosticswidget.h"
+#include "docks/diagnosticswidget.h"
+#include "docks/sidebarwidget.h"
+#include "docks/editorwidget.h"
+#include "docks/graphwidget.h"
+#include "docks/logview.h"
+#include "docks/tableswidget.h"
+
 #include "dataloggerwindow.h"
 #include "flowlayout.h"
-#include "logview.h"
 #include "titlebar.h"
-#include "sidebarwidget.h"
-#include "tableswidget.h"
-#include "editorwidget.h"
+
 #include "tunedialog.h"
-#include "graphwidget.h"
 #include "setupdialog.h"
 #include "rom.h"
 #include "createtunedialog.h"
@@ -55,18 +57,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), datalinksWindow_(
     
     setDocumentMode(false);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    
-
-    //main_ = new QMainWindow;
-    //layout_->addWidget(main_);
 
     setupMenu();
     setupStatusBar();
-
-    // Blank central widget
-    //QLabel *central = new QLabel("TEST");
-    //setCentralWidget(central);
-    //central->hide();
 
     setDockOptions(dockOptions() | QMainWindow::AllowNestedDocks);
     setDocumentMode(true);
@@ -80,15 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), datalinksWindow_(
     tablesDock_ = createTablesDock();
     editorDock_ = createEditorDock();
     graphDock_ = createGraphDock();
-
-    // Setup corners
-    /*setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
-    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);*/
     
-    
-    //hideAllDocks();
     restoreDocks();
     
     loadSettings();

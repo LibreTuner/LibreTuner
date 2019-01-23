@@ -86,27 +86,14 @@ set(libretuner_SRC
     ui/createtunedialog.h
     ui/verticallabel.cpp
     ui/verticallabel.h
-    ui/graphwidget.cpp
-    ui/graphwidget.h
     ui/flashwindow.cpp
     ui/flashwindow.h
-
     ui/titlebar.cpp
     ui/titlebar.h
     ui/styledwindow.cpp
     ui/styledwindow.h
     ui/dataloggerwindow.cpp
     ui/dataloggerwindow.h
-    ui/logview.cpp
-    ui/logview.h
-    ui/diagnosticswidget.cpp
-    ui/diagnosticswidget.h
-    ui/sidebarwidget.cpp
-    ui/sidebarwidget.h
-    ui/tableswidget.cpp
-    ui/tableswidget.h
-    ui/editorwidget.cpp
-    ui/editorwidget.h
     ui/romsview.cpp
     ui/romsview.h
     ui/tunedialog.cpp
@@ -119,6 +106,19 @@ set(libretuner_SRC
     ui/setupdialog.h
     ui/datalinkswidget.cpp
     ui/datalinkswidget.h
+    
+    ui/docks/logview.cpp
+    ui/docks/logview.h
+    ui/docks/diagnosticswidget.cpp
+    ui/docks/diagnosticswidget.h
+    ui/docks/sidebarwidget.cpp
+    ui/docks/sidebarwidget.h
+    ui/docks/tableswidget.cpp
+    ui/docks/tableswidget.h
+    ui/docks/editorwidget.cpp
+    ui/docks/editorwidget.h
+    ui/docks/graphwidget.cpp
+    ui/docks/graphwidget.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
