@@ -171,7 +171,7 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
     try {
         Flashable flash = data->flashable();
         
-        if (std::unique_ptr<VehicleLink> link = getVehicleLink()) {
+        if (std::unique_ptr<PlatformLink> link = getVehicleLink()) {
             std::unique_ptr<Flasher> flasher = link->flasher();
             if (!flasher) {
                 QMessageBox(QMessageBox::Critical, "Flash failure",
@@ -258,13 +258,13 @@ void LibreTuner::checkHome() {
 
 
 
-std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink() {
+std::unique_ptr<PlatformLink> LibreTuner::getVehicleLink() {
     /*QMessageBox msg(QMessageBox::Information, "Querying vehicle",
                     "Searching for a connected vehicle...");
     msg.show();
 
     try {
-        std::unique_ptr<VehicleLink> link = queryVehicleLink();
+        std::unique_ptr<PlatformLink> link = queryVehicleLink();
         msg.hide();
 
         if (!link) {
@@ -288,7 +288,7 @@ std::unique_ptr<VehicleLink> LibreTuner::getVehicleLink() {
 
 
 
-std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
+std::unique_ptr<PlatformLink> LibreTuner::queryVehicleLink() {
     /*DataLinkPtr dl = getDataLink();
     if (!dl) {
         return nullptr;
@@ -335,7 +335,7 @@ std::unique_ptr<VehicleLink> LibreTuner::queryVehicleLink() {
             return nullptr;
         }
     }
-    return std::make_unique<VehicleLink>(std::move(v), dl);*/
+    return std::make_unique<PlatformLink>(std::move(v), dl);*/
 }
 
 
@@ -363,12 +363,12 @@ void LibreTuner::setup() {
     currentDatalink_ = setup.datalink();
 }
 
-std::unique_ptr<VehicleLink> LibreTuner::platform_link() {
+std::unique_ptr<PlatformLink> LibreTuner::platform_link() {
     if (!currentDefinition_ || !currentDatalink_) {
         return nullptr;
     }
 
-    return std::make_unique<VehicleLink>(currentDefinition_, *currentDatalink_);
+    return std::make_unique<PlatformLink>(currentDefinition_, *currentDatalink_);
 }
 
 

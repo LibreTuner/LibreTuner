@@ -27,7 +27,7 @@
 class QLineEdit;
 class QComboBox;
 class LibreTuner;
-class VehicleLink;
+class PlatformLink;
 
 /**
  * Window for downloading firmware from the ECU
@@ -50,7 +50,7 @@ private:
     QLineEdit *lineName_;
     QLineEdit *lineId_;
 
-    std::unique_ptr<VehicleLink> get_platform_link();
+    std::unique_ptr<PlatformLink> get_platform_link();
 };
 
 #endif // DOWNLOADWINDOW_H

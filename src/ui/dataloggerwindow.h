@@ -32,8 +32,8 @@
 
 class QListWidget;
 
-class VehicleLink;
-using VehicleLinkPtr = std::shared_ptr<VehicleLink>;
+class PlatformLink;
+using PlatformLinkPtr = std::shared_ptr<PlatformLink>;
 
 
 class DataLoggerWindow : public QWidget

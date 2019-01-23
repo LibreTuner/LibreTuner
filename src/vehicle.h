@@ -67,13 +67,13 @@ struct Vehicle {
     static Vehicle fromVin(const std::string &vin);
 };
 
-// VehicleLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
-class VehicleLink {
+// PlatformLink is DataLink + vehicle-specific optons (like the CAN bus baudrate)
+class PlatformLink {
 public:
-    VehicleLink(definition::MainPtr definition, datalink::Link &link)
+    PlatformLink(definition::MainPtr definition, datalink::Link &link)
         : definition_(std::move(definition)), datalink_(link) {}
 
-    ~VehicleLink();
+    ~PlatformLink();
 
     /* Returns a logger suitable for logging from the vehicle using the
        datalink. Returns nullptr if a logger could not be created. */

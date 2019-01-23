@@ -81,7 +81,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
 void DownloadWindow::download()
 {
     try {
-        std::unique_ptr<VehicleLink> pLink = get_platform_link();
+        std::unique_ptr<PlatformLink> pLink = get_platform_link();
         if (!pLink) {
             throw std::runtime_error("Invalid platform or data link");
         }
@@ -170,7 +170,7 @@ void DownloadWindow::closeEvent(QCloseEvent* event)
 Q_DECLARE_METATYPE(definition::MainPtr)
 
 
-std::unique_ptr<VehicleLink> DownloadWindow::get_platform_link() {
+std::unique_ptr<PlatformLink> DownloadWindow::get_platform_link() {
     datalink::Link *link = LT()->datalink();
     if (link == nullptr) {
         return nullptr;
@@ -186,7 +186,7 @@ std::unique_ptr<VehicleLink> DownloadWindow::get_platform_link() {
         return nullptr;
     }
 
-    return std::make_unique<VehicleLink>(platform, *link);
+    return std::make_unique<PlatformLink>(platform, *link);
 }
 
 

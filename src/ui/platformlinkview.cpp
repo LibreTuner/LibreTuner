@@ -25,7 +25,7 @@ PlatformLinkView::PlatformLinkView(QWidget* parent) : QWidget(parent)
 Q_DECLARE_METATYPE(definition::MainPtr)
 Q_DECLARE_METATYPE(datalink::Link*)
 
-std::unique_ptr<VehicleLink> PlatformLinkView::getLink()
+std::unique_ptr<PlatformLink> PlatformLinkView::getLink()
 {
     QVariant datalinkVar = comboDatalink_->currentData(Qt::UserRole);
     if (!datalinkVar.canConvert<datalink::Link*>()) {
@@ -48,7 +48,7 @@ std::unique_ptr<VehicleLink> PlatformLinkView::getLink()
     
     auto def = platformVar.value<definition::MainPtr>();
     
-    //return std::make_unique<VehicleLink>(std::move(def), std::move(datalink));
+    //return std::make_unique<PlatformLink>(std::move(def), std::move(datalink));
     return nullptr;
 }
 

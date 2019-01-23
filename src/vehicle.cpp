@@ -41,7 +41,7 @@ Vehicle Vehicle::fromVin(const std::string &vin) {
 
 
 
-std::unique_ptr<DataLogger> VehicleLink::logger(DataLog &log) const {
+std::unique_ptr<DataLogger> PlatformLink::logger(DataLog &log) const {
     if (!definition_) {
         return nullptr;
     }
@@ -60,7 +60,7 @@ std::unique_ptr<DataLogger> VehicleLink::logger(DataLog &log) const {
 
 
 
-std::unique_ptr<Downloader> VehicleLink::downloader() const {
+std::unique_ptr<Downloader> PlatformLink::downloader() const {
     if (!definition_) {
         return nullptr;
     }
@@ -79,7 +79,7 @@ std::unique_ptr<Downloader> VehicleLink::downloader() const {
 
 
 
-std::unique_ptr<DiagnosticsInterface> VehicleLink::diagnostics() const {
+std::unique_ptr<DiagnosticsInterface> PlatformLink::diagnostics() const {
     if (!definition_) {
         return nullptr;
     }
@@ -92,7 +92,7 @@ std::unique_ptr<DiagnosticsInterface> VehicleLink::diagnostics() const {
 
 
 
-std::unique_ptr<Flasher> VehicleLink::flasher() const {
+std::unique_ptr<Flasher> PlatformLink::flasher() const {
     if (!definition_) {
         return nullptr;
     }
@@ -109,7 +109,7 @@ std::unique_ptr<Flasher> VehicleLink::flasher() const {
 
 
 
-std::unique_ptr<uds::Protocol> VehicleLink::uds() const {
+std::unique_ptr<uds::Protocol> PlatformLink::uds() const {
     if (!definition_) {
         return nullptr;
     }
@@ -122,7 +122,7 @@ std::unique_ptr<uds::Protocol> VehicleLink::uds() const {
 
 
 
-std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const {
+std::unique_ptr<isotp::Protocol> PlatformLink::isotp() const {
     if (!definition_) {
         return nullptr;
     }
@@ -137,11 +137,11 @@ std::unique_ptr<isotp::Protocol> VehicleLink::isotp() const {
 
 
 
-std::unique_ptr<CanInterface> VehicleLink::can() const {
+std::unique_ptr<CanInterface> PlatformLink::can() const {
     if (!definition_) {
         return nullptr;
     }
     return datalink_.can(definition_->baudrate);
 }
 
-VehicleLink::~VehicleLink() { Logger::debug("Closing vehicle link"); }
+PlatformLink::~PlatformLink() { Logger::debug("Closing vehicle link"); }

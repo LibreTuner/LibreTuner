@@ -14,7 +14,7 @@ class PlatformLinkView : public QWidget
 public:
     explicit PlatformLinkView(QWidget *parent = nullptr);
     
-    std::unique_ptr<VehicleLink> getLink();
+    std::unique_ptr<PlatformLink> getLink();
 
     void setDatalinkModel(QAbstractItemModel *model);
     void setPlatformModel(QAbstractItemModel *model);

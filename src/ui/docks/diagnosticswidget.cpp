@@ -43,7 +43,7 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
 
 
     connect(buttonScan, &QPushButton::clicked, [this] {
-        std::unique_ptr<VehicleLink> link = LT()->platform_link();
+        std::unique_ptr<PlatformLink> link = LT()->platform_link();
         if (!link) {
             QMessageBox(QMessageBox::Critical, "Diagnostics Error", "Invalid platform or data link. Please run setup again").exec();
             return;

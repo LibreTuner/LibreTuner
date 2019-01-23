@@ -36,7 +36,7 @@
 
 #define LT() LibreTuner::get()
 
-class VehicleLink;
+class PlatformLink;
 class Tune;
 class TuneData;
 
@@ -105,12 +105,12 @@ public:
 
     /* Returns a vehicle link queried with the default datalink. Yeah it's
      * confusing. Use this one \/*/
-    std::unique_ptr<VehicleLink> getVehicleLink();
+    std::unique_ptr<PlatformLink> getVehicleLink();
 
     /* Queries for an attached vehicle and returns a vehicle link.
      * The returned link may be nullptr if no datalink is attached. If you're
      * confused, use that one /\ */
-    std::unique_ptr<VehicleLink> queryVehicleLink();
+    std::unique_ptr<PlatformLink> queryVehicleLink();
 
     const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
 
@@ -136,7 +136,7 @@ public:
 
     /* Creates a platform link from the selected platform & datalink. Returns nullptr if
      * one could not be created. */
-    std::unique_ptr<VehicleLink> platform_link();
+    std::unique_ptr<PlatformLink> platform_link();
 
 private:
     MainWindow *mainWindow_;
