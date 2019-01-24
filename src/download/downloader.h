@@ -31,6 +31,8 @@
 
 class CanInterface;
 
+namespace download {
+
 class Downloader : public AsyncRoutine {
 public:
     enum Type {
@@ -54,9 +56,9 @@ using DownloadInterfacePtr = std::shared_ptr<Downloader>;
 
 
 // Downloads using ReadMemoryByAddress (UDS SID 23)
-class Uds23Downloader : public Downloader {
+class RMADownloader : public Downloader {
 public:
-    Uds23Downloader(std::unique_ptr<uds::Protocol> &&uds,
+    RMADownloader(std::unique_ptr<uds::Protocol> &&uds,
                            std::string key, std::size_t size);
 
     bool download() override;
@@ -83,5 +85,7 @@ private:
 
     bool update_progress();
 };
+
+}
 
 #endif // DOWNLOADINTERFACE_H

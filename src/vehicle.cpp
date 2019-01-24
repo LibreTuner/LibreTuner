@@ -60,7 +60,7 @@ std::unique_ptr<DataLogger> PlatformLink::logger(DataLog &log) const {
 
 
 
-std::unique_ptr<Downloader> PlatformLink::downloader() const {
+std::unique_ptr<download::Downloader> PlatformLink::downloader() const {
     if (!definition_) {
         return nullptr;
     }
@@ -68,7 +68,7 @@ std::unique_ptr<Downloader> PlatformLink::downloader() const {
     switch (definition_->downloadMode) {
     case DownloadMode::Mazda23:
         if (auto interface = uds()) {
-            return std::make_unique<Uds23Downloader>(
+            return std::make_unique<download::RMADownloader>(
                 std::move(interface), definition_->key,
                 definition_->romsize);
         }

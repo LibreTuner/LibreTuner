@@ -93,7 +93,7 @@ void DownloadWindow::download()
         progress.show();
 
 
-        std::unique_ptr<Downloader> downloader = pLink->downloader();
+        std::unique_ptr<download::Downloader> downloader = pLink->downloader();
         downloader->setProgressCallback([&](float prog) {
             QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
         });

@@ -31,20 +31,22 @@
 #include "protocols/socketcaninterface.h"
 #endif
 
-Uds23Downloader::Uds23Downloader(
+namespace download {
+
+RMADownloader::RMADownloader(
     std::unique_ptr<uds::Protocol> &&uds, std::string key, std::size_t size)
     : uds_(std::move(uds)), key_(std::move(key)), totalSize_(size) {}
 
 
 
-bool Uds23Downloader::update_progress() {
+bool RMADownloader::update_progress() {
     notifyProgress((1.0f - (static_cast<float>(downloadSize_) / totalSize_)));
     return downloadSize_ > 0;
 }
 
 
 
-bool Uds23Downloader::download() {
+bool RMADownloader::download() {
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
@@ -67,10 +69,12 @@ bool Uds23Downloader::download() {
 
 
 
-void Uds23Downloader::cancel() { canceled_ = true; }
+void RMADownloader::cancel() { canceled_ = true; }
 
 
 
-std::pair<const uint8_t*, size_t> Uds23Downloader::data() {
+std::pair<const uint8_t*, size_t> RMADownloader::data() {
     return std::make_pair(downloadData_.data(), downloadData_.size());
+}
+
 }
