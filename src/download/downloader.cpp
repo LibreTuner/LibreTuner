@@ -21,6 +21,7 @@
 #include "logger.h"
 #include "protocols/udsprotocol.h"
 #include "udsauthenticator.h"
+#include "vehicle.h"
 
 #include <algorithm>
 #include <cassert>
@@ -33,9 +34,12 @@
 
 namespace download {
 
-RMADownloader::RMADownloader(
-    std::unique_ptr<uds::Protocol> &&uds, std::string key, std::size_t size)
-    : uds_(std::move(uds)), key_(std::move(key)), totalSize_(size) {}
+RMADownloader::RMADownloader(const PlatformLink &link, const Options &options)
+    : uds_(link.uds()), key_(options.key), totalSize_(options.size) {
+        if (!uds_) {
+            throw std::runtime_error("UDS is unsupported with the selected datalink");
+        }
+    }
 
 
 
@@ -76,5 +80,15 @@ void RMADownloader::cancel() { canceled_ = true; }
 std::pair<const uint8_t*, size_t> RMADownloader::data() {
     return std::make_pair(downloadData_.data(), downloadData_.size());
 }
+
+
+
+std::unique_ptr<Downloader> get_downloader(const std::string& id, const PlatformLink& link, const Options& options)
+{
+    if (id == "rma") {
+        return std::make_unique<RMADownloader>(link, options);
+    }
+}
+
 
 }
