@@ -11,7 +11,8 @@ class RomExplorer : public QWidget
     Q_OBJECT
 public:
     explicit RomExplorer(QWidget *parent = nullptr);
-        
+    
+    
 };
 
 #endif // ROMEXPLORER_H

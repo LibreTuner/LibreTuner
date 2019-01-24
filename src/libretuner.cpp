@@ -21,7 +21,6 @@
 #include "logger.h"
 #include "rommanager.h"
 #include "timerrunloop.h"
-#include "ui/addinterfacedialog.h"
 #include "ui/flashwindow.h"
 #include "ui/styledwindow.h"
 #include "ui/setupdialog.h"
