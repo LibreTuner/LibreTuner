@@ -31,6 +31,8 @@
 
 class CanInterface;
 
+class PlatformLink;
+
 namespace download {
 
 class Downloader : public AsyncRoutine {
@@ -53,7 +55,6 @@ public:
     virtual std::pair<const uint8_t*, size_t> data() = 0;
 };
 using DownloadInterfacePtr = std::shared_ptr<Downloader>;
-
 
 // Downloads using ReadMemoryByAddress (UDS SID 23)
 class RMADownloader : public Downloader {
@@ -85,6 +86,9 @@ private:
 
     bool update_progress();
 };
+
+/* Creates a downloader from an id and platform link */
+std::unique_ptr<Downloader> get_downloader(const std::string &id, PlatformLink &link);
 
 }
 
