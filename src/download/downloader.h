@@ -34,14 +34,14 @@ class CanInterface;
 class PlatformLink;
 
 namespace download {
+    
+struct Options {
+    std::string key;
+    std::size_t size;
+};
 
 class Downloader : public AsyncRoutine {
 public:
-    enum Type {
-        TYPE_CAN,
-        TYPE_J2534,
-    };
-
     virtual ~Downloader() = default;
 
     /* Starts downloading. Calls updateProgress if possible.
@@ -59,8 +59,7 @@ using DownloadInterfacePtr = std::shared_ptr<Downloader>;
 // Downloads using ReadMemoryByAddress (UDS SID 23)
 class RMADownloader : public Downloader {
 public:
-    RMADownloader(std::unique_ptr<uds::Protocol> &&uds,
-                           std::string key, std::size_t size);
+    RMADownloader(const PlatformLink &link, const Options &options);
 
     bool download() override;
     void cancel() override;
@@ -87,8 +86,9 @@ private:
     bool update_progress();
 };
 
-/* Creates a downloader from an id and platform link */
-std::unique_ptr<Downloader> get_downloader(const std::string &id, PlatformLink &link);
+/* Creates a downloader from an id and platform link.
+ * Returns nullptr if id does not exist. */
+std::unique_ptr<Downloader> get_downloader(const std::string &id, const PlatformLink &link, const Options &options);
 
 }
 
