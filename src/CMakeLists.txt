@@ -35,12 +35,6 @@ set(libretuner_SRC
     datalog.h
     vehicle.cpp
     vehicle.h
-    #datalink.cpp
-    #datalink.h
-    #interface.cpp
-    #interface.h
-    #interfacemanager.cpp
-    #interfacemanager.h
     logger.cpp
     logger.h
     timerrunloop.cpp
@@ -98,8 +92,6 @@ set(libretuner_SRC
     ui/romsview.h
     ui/tunedialog.cpp
     ui/tunedialog.h
-    ui/platformlinkview.cpp
-    ui/platformlinkview.h
     ui/romexplorer.cpp
     ui/romexplorer.h
     ui/setupdialog.cpp
