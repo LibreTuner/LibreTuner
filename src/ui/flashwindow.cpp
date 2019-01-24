@@ -20,8 +20,8 @@
 #include "ui_flashwindow.h"
 
 #include "definitions/definition.h"
-#include "flashable.h"
-#include "flasher.h"
+#include "flash/flashable.h"
+#include "flash/flasher.h"
 #include "logger.h"
 
 #include <cassert>

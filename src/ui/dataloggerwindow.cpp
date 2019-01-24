@@ -26,8 +26,8 @@
 #include <QVBoxLayout>
 
 #include "datalink/datalink.h"
-#include "datalog.h"
-#include "datalogger.h"
+#include "datalog/datalog.h"
+#include "datalog/datalogger.h"
 #include "definitions/definition.h"
 #include "libretuner.h"
 

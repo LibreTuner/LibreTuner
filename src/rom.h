@@ -25,7 +25,7 @@
 #include <unordered_map>
 
 #include "tablegroup.h"
-#include "flashable.h"
+#include "flash/flashable.h"
 
 class QXmlStreamReader;
 

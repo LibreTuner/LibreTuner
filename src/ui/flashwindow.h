@@ -24,7 +24,7 @@
 #include <memory>
 #include <thread>
 
-#include "flasher.h"
+#include "flash/flasher.h"
 #include "styledwindow.h"
 
 namespace Ui {

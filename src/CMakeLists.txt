@@ -12,8 +12,6 @@ set(CMAKE_AUTOMOC ON)
 set(libretuner_SRC
     libretuner.cpp
     libretuner.h
-    downloader.cpp
-    downloader.h
     rommanager.cpp
     rommanager.h
     rom.cpp
@@ -22,25 +20,17 @@ set(libretuner_SRC
     tablegroup.h
     table.cpp
     table.h
-    flasher.cpp
-    flasher.h
-    flashable.cpp
-    flashable.h
     endian.h
     udsauthenticator.cpp
     udsauthenticator.h
     timer.cpp
     timer.h
-    datalog.cpp
-    datalog.h
     vehicle.cpp
     vehicle.h
     logger.cpp
     logger.h
     timerrunloop.cpp
     timerrunloop.h
-    datalogger.cpp
-    datalogger.h
     asyncroutine.cpp
     asyncroutine.h
     log.cpp
@@ -51,6 +41,19 @@ set(libretuner_SRC
     diagnosticsinterface.h
     dtcdescriptions.cpp
     dtcdescriptions.h
+    
+    download/downloader.cpp
+    download/downloader.h
+    
+    flash/flasher.cpp
+    flash/flasher.h
+    flash/flashable.cpp
+    flash/flashable.h
+    
+    datalog/datalogger.cpp
+    datalog/datalogger.h
+    datalog/datalog.cpp
+    datalog/datalog.h
 
     util/signal.cpp
     util/signal.h

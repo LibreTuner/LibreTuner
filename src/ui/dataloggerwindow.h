@@ -26,9 +26,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "datalogger.h"
+#include "datalog/datalogger.h"
 #include "styledwindow.h"
-#include "datalog.h"
+#include "datalog/datalog.h"
 
 class QListWidget;
 

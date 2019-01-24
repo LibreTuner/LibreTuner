@@ -19,7 +19,7 @@
 #include "mainwindow.h"
 #include "libretuner.h"
 
-#include "datalog.h"
+#include "datalog/datalog.h"
 
 #include "docks/diagnosticswidget.h"
 #include "docks/sidebarwidget.h"

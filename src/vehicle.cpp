@@ -19,15 +19,15 @@
 #include "vehicle.h"
 
 #include "datalink/datalink.h"
-#include "datalogger.h"
+#include "datalog/datalogger.h"
 #include "definitions/definition.h"
 #include "definitions/definitionmanager.h"
 #include "diagnosticsinterface.h"
-#include "flasher.h"
+#include "flash/flasher.h"
 #include "logger.h"
 #include "protocols/isotpprotocol.h"
 #include "protocols/udsprotocol.h"
-#include "downloader.h"
+#include "download/downloader.h"
 #include <utility>
 
 
