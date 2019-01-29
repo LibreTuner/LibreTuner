@@ -43,8 +43,10 @@ using DownloaderPtr = std::shared_ptr<Downloader>;
 
 class DiagnosticsInterface;
 
+namespace flash {
 class Flasher;
 using FlasherPtr = std::shared_ptr<Flasher>;
+}
 
 namespace isotp {
 class Protocol;
@@ -91,7 +93,7 @@ public:
 
     /* Returns a flash interface for flashing, if one exists. May return
      * nullptr. */
-    std::unique_ptr<Flasher> flasher() const;
+    std::unique_ptr<flash::Flasher> flasher() const;
 
     /* Returns a UDS interface. May return nullptr if the vehicle/datalink
      * does not support it */

@@ -11,6 +11,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(libretuner_SRC
     libretuner.cpp
+
     libretuner.h
     rommanager.cpp
     rommanager.h
@@ -81,8 +82,8 @@ set(libretuner_SRC
     ui/createtunedialog.h
     ui/verticallabel.cpp
     ui/verticallabel.h
-    ui/flashwindow.cpp
-    ui/flashwindow.h
+    ui/flasherwindow.cpp
+    ui/flasherwindow.h
     ui/titlebar.cpp
     ui/titlebar.h
     ui/styledwindow.cpp
@@ -157,7 +158,6 @@ endif ()
 qt5_wrap_ui(libretuner_SRC
     ui/canviewer.ui
     ui/createtunedialog.ui
-    ui/flashwindow.ui
 
     framelesswindow/framelesswindow.ui
 )

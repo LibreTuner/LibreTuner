@@ -54,7 +54,7 @@ public:
 
     void save();
     
-    Flashable flashable();
+    flash::Flashable flashable();
     
     bool dirty() const { return tables_.dirty(); }
     

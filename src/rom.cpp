@@ -204,7 +204,7 @@ std::shared_ptr<TuneData> Tune::data()
 
 
 
-Flashable TuneData::flashable()
+flash::Flashable TuneData::flashable()
 {
     std::vector<uint8_t> data = baseData_->data();
 
@@ -217,7 +217,7 @@ Flashable TuneData::flashable()
     data.assign(data.data() + offset,
                 data.data() + offset + base_.platform()->flashSize);
     
-    return Flashable(std::move(data), base_.model());
+    return flash::Flashable(std::move(data), base_.model());
 }
 
 

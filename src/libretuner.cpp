@@ -21,7 +21,7 @@
 #include "logger.h"
 #include "rommanager.h"
 #include "timerrunloop.h"
-#include "ui/flashwindow.h"
+#include "ui/flasherwindow.h"
 #include "ui/styledwindow.h"
 #include "ui/setupdialog.h"
 #include "vehicle.h"
@@ -180,7 +180,7 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
                     .exec();
                 return;
             }
-            flashWindow_ = std::make_unique<FlashWindow>(std::move(flasher), std::move(flash));
+            flashWindow_ = std::make_unique<FlasherWindow>(std::move(flasher), std::move(flash));
             flashWindow_->show();
         }
     } catch (const std::exception &e) {
@@ -225,116 +225,6 @@ void LibreTuner::checkHome() {
             }
         }
     }
-}
-
-
-//DataLinkPtr LibreTuner::getDataLink() {
-    // Get the default interface
-    /*InterfaceSettingsPtr def = InterfaceManager::get().defaultInterface();
-    if (!def) {
-        // Ask the user to create an interface
-        AddInterfaceDialog dlg;
-        dlg.exec();
-        def = InterfaceManager::get().defaultInterface();
-        if (!def) {
-            // The user did not create one.
-            return nullptr;
-        }
-    }
-
-    try {
-        return DataLink::create(def);
-    } catch (const std::exception &e) {
-        QMessageBox msg;
-        msg.setText("Failed to create datalink from default interface\n" +
-                    QString(e.what()));
-        msg.setWindowTitle("DataLink Error");
-        msg.setIcon(QMessageBox::Critical);
-        msg.exec();
-        return nullptr;
-    }*/
-//}
-
-
-
-std::unique_ptr<PlatformLink> LibreTuner::getVehicleLink() {
-    /*QMessageBox msg(QMessageBox::Information, "Querying vehicle",
-                    "Searching for a connected vehicle...");
-    msg.show();
-
-    try {
-        std::unique_ptr<PlatformLink> link = queryVehicleLink();
-        msg.hide();
-
-        if (!link) {
-            QMessageBox(QMessageBox::Critical, "Query error",
-                        "A vehicle could not be queried. Is the device "
-                        "connected and ECU active?")
-                .exec();
-            return nullptr;
-        }
-
-        return link;
-    } catch (const std::exception &e) {
-        QMessageBox(QMessageBox::Critical, "Query error",
-                    QString("Error while querying vehicle: ") +
-                        QString(e.what()))
-            .exec();
-    }*/
-
-    return nullptr;
-}
-
-
-
-std::unique_ptr<PlatformLink> LibreTuner::queryVehicleLink() {
-    /*DataLinkPtr dl = getDataLink();
-    if (!dl) {
-        return nullptr;
-    }
-
-    Logger::debug("Starting vehicle query");
-    Vehicle v;
-    try {
-        v = dl->queryVehicle();
-    } catch (const std::exception &e) {
-        Logger::warning("Failed to query vehicle: " + std::string(e.what()));
-    }
-    if (!v.valid()) {
-        // Ask to manually select a vehicle
-        StyledDialog window;
-        window.setWindowTitle("Query platform");
-        QLabel *label =
-            new QLabel("A vehicle could not automatically be queried.\nPlease "
-                       "manually select from the list or cancel.");
-        label->setAlignment(Qt::AlignCenter);
-        window.mainLayout()->addWidget(label);
-
-        QComboBox *combo = new QComboBox;
-        int id = 0;
-        for (const definition::MainPtr &def : DefinitionManager::get()->definitions()) {
-            combo->addItem(QString::fromStdString(def->name), QVariant(id++));
-        }
-        combo->setItemDelegate(new QStyledItemDelegate());
-        window.mainLayout()->addWidget(combo);
-
-        QPushButton *button = new QPushButton("Select");
-        window.mainLayout()->addWidget(button);
-        connect(button, &QPushButton::clicked, [&v, combo, &window] {
-            QVariant data = combo->currentData();
-            if (!data.isNull()) {
-                const definition::MainPtr &def =
-                    DefinitionManager::get()->definitions()[data.toInt()];
-                v = Vehicle{def->name, "unknown", def};
-            }
-            window.close();
-        });
-        window.exec();
-        if (!v.valid()) {
-            return nullptr;
-        }
-    }
-    return std::make_unique<PlatformLink>(std::move(v), dl);*/
 }
 
 

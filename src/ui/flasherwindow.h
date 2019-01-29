@@ -20,55 +20,28 @@
 #define FLASHWINDOW_H
 
 #include <QWidget>
+#include <QDialog>
 
 #include <memory>
 #include <thread>
 
-#include "flash/flasher.h"
-#include "styledwindow.h"
-
-namespace Ui {
-class FlashWindow;
-}
-
+namespace flash {
 class Flashable;
-typedef std::shared_ptr<Flashable> FlashablePtr;
+using FlashablePtr = std::shared_ptr<Flashable>;
 
 class Flasher;
 using FlasherPtr = std::shared_ptr<Flasher>;
+}
 
 /**
  * @todo write docs
  */
-class FlashWindow : public QDialog {
+class FlasherWindow : public QDialog {
     Q_OBJECT
 public:
-    FlashWindow(std::unique_ptr<Flasher> &&flasher_,
-                Flashable &&flashable);
+    explicit FlasherWindow(QWidget *parent = nullptr);
 
-    virtual ~FlashWindow() override;
-
-    void onCompletion();
-    void onError(const std::string &error);
-    void onProgress(float percent);
-
-private slots:
-    void on_buttonCancel_clicked();
-    void on_buttonFlash_clicked();
-    void mainError(const QString &error);
-    void mainCompletion();
-
-private:
-    Ui::FlashWindow *ui;
-    Flashable flashable_;
-    std::unique_ptr<Flasher> flasher_;
-    std::thread worker_;
-
-    void stop();
-
-    // QWidget interface
-protected:
-    void closeEvent(QCloseEvent *event);
+    virtual ~FlasherWindow() override;
 };
 
 #endif // FLASHWINDOW_H
