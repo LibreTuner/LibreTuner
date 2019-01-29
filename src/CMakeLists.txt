@@ -113,6 +113,9 @@ set(libretuner_SRC
     ui/docks/editorwidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
+    
+    ui/tunemodel.cpp
+    ui/tunemodel.h
 
     protocols/caninterface.cpp
     protocols/caninterface.h
