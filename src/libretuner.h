@@ -40,8 +40,6 @@ class PlatformLink;
 class Tune;
 class TuneData;
 
-class FlashWindow;
-
 
 
 using LinkVector = std::vector<std::unique_ptr<datalink::Link>>;
@@ -99,19 +97,6 @@ public:
     /* Open tune flasher */
     void flashTune(const std::shared_ptr<TuneData> &tune);
 
-    /* Returns the default datalink. Queries the user to create one
-     * if none exist. May return nullptr */
-    // DataLinkPtr getDataLink();
-
-    /* Returns a vehicle link queried with the default datalink. Yeah it's
-     * confusing. Use this one \/*/
-    std::unique_ptr<PlatformLink> getVehicleLink();
-
-    /* Queries for an attached vehicle and returns a vehicle link.
-     * The returned link may be nullptr if no datalink is attached. If you're
-     * confused, use that one /\ */
-    std::unique_ptr<PlatformLink> queryVehicleLink();
-
     const DtcDescriptions &dtcDescriptions() const { return dtcDescriptions_; }
 
     /* Autodetects PassThru interfaces and loads saved datalinks */
@@ -140,7 +125,6 @@ public:
 
 private:
     MainWindow *mainWindow_;
-    std::unique_ptr<FlashWindow> flashWindow_;
     CanLog canLog_;
     Log log_;
     DtcDescriptions dtcDescriptions_;

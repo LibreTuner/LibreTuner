@@ -28,15 +28,21 @@
 #include "protocols/udsprotocol.h"
 #include "udsauthenticator.h"
 
+class PlatformLink;
+
+
+namespace flash {
+
 class Flasher;
 typedef std::shared_ptr<Flasher> FlasherPtr;
-
-class CanInterface;
-typedef std::shared_ptr<CanInterface> CanInterfacePtr;
 
 class Flashable;
 typedef std::shared_ptr<Flashable> FlashablePtr;
 
+
+struct Options {
+    std::string key;
+};
 
 
 /**
@@ -57,7 +63,7 @@ public:
 
 class MazdaT1Flasher : public Flasher {
 public:
-    MazdaT1Flasher(std::string key, std::unique_ptr<uds::Protocol> &&uds);
+    MazdaT1Flasher(const PlatformLink &platform, const Options &options);
 
     bool flash(Flashable &flashable) override;
     void cancel() override;
@@ -75,5 +81,9 @@ private:
     bool do_erase();
     bool do_request_download();
 };
+
+std::unique_ptr<Flasher> get_flasher(const std::string &id, const PlatformLink &link, const Options &options);
+
+}
 
 #endif // FLASHER_H

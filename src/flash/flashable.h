@@ -31,6 +31,8 @@ using ModelPtr = std::shared_ptr<Model>;
 
 class TuneData;
 
+namespace flash {
+
 /**
  * A representation of data able to be flashed.
  */
@@ -50,5 +52,7 @@ private:
     std::size_t offset_;
     definition::ModelPtr model_;
 };
+
+}
 
 #endif // FLASHABLE_H

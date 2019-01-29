@@ -88,6 +88,7 @@ std::unique_ptr<Downloader> get_downloader(const std::string& id, const Platform
     if (id == "rma") {
         return std::make_unique<RMADownloader>(link, options);
     }
+    return nullptr;
 }
 
 

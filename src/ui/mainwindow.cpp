@@ -30,6 +30,7 @@
 
 #include "dataloggerwindow.h"
 #include "titlebar.h"
+#include "flasherwindow.h"
 
 #include "tunedialog.h"
 #include "setupdialog.h"
@@ -356,6 +357,13 @@ void MainWindow::setupMenu() {
     flashCurrentAction_ = new QAction(tr("Flash Current Tune"), this);
     flashCurrentAction_->setEnabled(false);
     fileMenu->addAction(flashCurrentAction_);
+    
+    auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
+    
+    connect(flashAction, &QAction::triggered, []() {
+        FlasherWindow flasher;
+        flasher.exec();
+    });
     
     connect(flashCurrentAction_, &QAction::triggered, [this]() {
         if (selectedTune_) {

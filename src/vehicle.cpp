@@ -88,16 +88,13 @@ std::unique_ptr<DiagnosticsInterface> PlatformLink::diagnostics() const {
 
 
 
-std::unique_ptr<Flasher> PlatformLink::flasher() const {
+std::unique_ptr<flash::Flasher> PlatformLink::flasher() const {
     if (!definition_) {
         return nullptr;
     }
     switch (definition_->flashMode) {
     case FlashMode::T1:
-        if (auto interface = uds()) {
-            return std::make_unique<MazdaT1Flasher>(definition_->key,
-                                                    std::move(interface));
-        }
+        return flash::get_flasher("mazdat1", *this, flash::Options{definition_->key});
     default:
         return nullptr;
     }

@@ -23,7 +23,11 @@
 
 #include <cassert>
 
+namespace flash {
+
 Flashable::Flashable(std::vector<uint8_t> data, definition::ModelPtr model) : data_(std::move(data)), model_(std::move(model)) {
     assert(model_);
     offset_ = model_->main.flashOffset;
+}
+
 }

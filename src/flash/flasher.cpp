@@ -23,6 +23,7 @@
 #include "protocols/isotpprotocol.h"
 #include "udsauthenticator.h"
 #include "util.hpp"
+#include "vehicle.h"
 
 #include <cassert>
 #include <sstream>
@@ -30,11 +31,14 @@
 
 #include <iostream>
 
+namespace flash {
 
-
-MazdaT1Flasher::MazdaT1Flasher(std::string key,
-                               std::unique_ptr<uds::Protocol> &&uds)
-    : key_(std::move(key)), uds_(std::move(uds)) {}
+MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, const Options &options)
+    : key_(options.key), uds_(platform.uds()) {
+    if (!uds_) {
+        throw std::runtime_error("UDS is unsupported with the selected datalink");
+    }
+}
 
 bool MazdaT1Flasher::flash(Flashable &flashable) {
     canceled_ = false;
@@ -108,4 +112,15 @@ bool MazdaT1Flasher::sendLoad() {
         }
     }
     return true;
+}
+
+std::unique_ptr<Flasher> get_flasher(const std::string& id, const PlatformLink& link, const flash::Options& options)
+{
+    if (id == "mazdat1") {
+        return std::make_unique<MazdaT1Flasher>(link, options);
+    }
+    return nullptr;
+}
+
+
 }
