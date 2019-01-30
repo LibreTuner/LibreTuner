@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>definitions/mazdaspeed6/main.yaml</file>
-        <file>definitions/mazdaspeed6/l38k.yaml</file>
-        <file>definitions/mazdaspeed6_versa/l38k.yaml</file>
-        <file>definitions/mazdaspeed6_versa/main.yaml</file>
+        
     </qresource>
 </RCC>
