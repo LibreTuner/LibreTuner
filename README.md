@@ -7,7 +7,7 @@ Open source tuning software for Mazda platforms
 
 Screenshots
 -----------
-![Main Window](https://user-images.githubusercontent.com/3116133/50564228-54bf8500-0cf1-11e9-9e96-03c314e166bc.png)
+![Main Window](https://user-images.githubusercontent.com/3116133/52010479-9b94cc00-24a3-11e9-904a-0d64776f6b6c.png)
 
 Supported vehicles
 ------------------
