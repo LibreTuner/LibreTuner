@@ -1,0 +1,377 @@
+name: "Mazdaspeed 6/Mazda 6 MPS/Mazdaspeed Atenza"
+id: "mazdaspeed6"
+
+romsize: 1048576
+
+baudrate: 500000
+
+logmode: "uds"
+
+vins:
+  - "JM1GG12L........."
+
+transfer:
+  flashmode: "MazdaT1"
+  downloadmode: "Mazda23"
+  key: "MazdA"
+  serverid: 0x7E0
+
+
+# Tables
+tables:
+  0:
+    name: Overload Protection Fuel Cut
+    description: Overload Protection Fuel Cut
+    category: Limits
+    datatype: float
+    width: 14
+    height: 8
+    minimum: 0
+    maximum: 4
+
+  1:
+    name: Intake Cam Advance (VVT)
+    description: Intake Cam Advance (VVT)
+    category: Valve Timing
+    datatype: float
+    width: 14
+    height: 32
+    axisx: rpm_500_linear
+    axisy: load_0625
+    minimum: 0
+    maximum: 60
+
+  2:
+    name: Closed Loop AFR Target
+    description: Closed Loop AFR Target
+    category: Fuel Injection
+    datatype: float
+    width: 10
+    height: 31
+    axisx: rpm_500_linear
+    axisy: load_125
+    minimum: 0.5
+    maximum: 1.5
+
+  4:
+    name: Idle RPM (In Gear, No A/C)
+    description: Idle RPM (In Gear, No A/C)
+    category: Idle
+    datatype: float
+    width: 8
+    axisx: temp_coolant
+    minimum: 500
+    maximum: 2500
+
+  6:
+    name: Fan On Voltage Adjustment
+    description: Fan On Voltage Adjustment
+    category: Fan Control
+    datatype: float
+    width: 7
+    axisx: voltage_batt
+    minimum: 0
+    maximum: 2
+
+  8:
+    name: Idle RPM (Not in gear, A/C on)
+    description: Idle RPM (Not in gear, A/C on)
+    category: Idle
+    datatype: float
+    width: 8
+    axisx: pressure_kpa
+    minimum: 500
+    maximum: 2500
+
+  9:
+    name: Open Loop Timing (Normal)
+    description: Open Loop Timing (Normal)
+    category: Ignition
+    datatype: float
+    width: 14
+    height: 28
+    axisx: rpm_500_linear
+    axisy: load_3125
+    minimum: -25
+    maximum: 75
+
+  10:
+    name: Speed Limit Threshold (Throttle Close)
+    description: Speed Limit Threshold (Throttle Close)
+    category: Limits
+    datatype: float
+    minimum: 3
+    maximum: 10
+
+  11:
+    name: Closed Loop Timing (Overload)
+    description: Closed Loop Timing (Overload)
+    category: Ignition
+    datatype: float
+    width: 14
+    height: 28
+    axisx: rpm_500_linear
+    axisy: load_3125
+    minimum: -15
+    maximum: 70
+
+  12:
+    name: Speed Limit (Throttle Close)
+    description: Speed Limit (Throttle Close)
+    category: Limits
+    datatype: float
+    minimum: 0
+    maximum: 350
+
+  13:
+    name: Overboost Fuel Cut
+    description: Overboost Fuel Cut
+    category: Limits
+    datatype: float
+    width: 14
+    height: 8
+    axisx: rpm_500
+    axisy: pressure_kpa
+    minimum: 0
+    maximum: 450
+
+  14:
+    name: Speed Limit (Fuel cut)
+    description: Speed Limit (Fuel cut)
+    datatype: float
+    category: Limits
+    width: 1
+
+  15:
+    name: MAF Calibration 2
+    description: MAF Calibration 2
+    category: MAF
+    datatype: float
+    width: 129
+    axisx: maf_5
+    minimum: 0
+    maximum: 850
+
+  16:
+    name: RPM Limit
+    description: RPM Limit
+    category: Limits
+    datatype: float
+    minimum: 0
+    maximum: 8500
+
+  17:
+    name: Closed Loop Timing (Normal)
+    description: Closed Loop Timing (Normal)
+    category: Ignition
+    datatype: float
+    width: 14
+    height: 28
+    axisx: rpm_500_linear
+    axisy: load_3125
+    minimum: -15
+    maximum: 70
+
+  18:
+    name: Open Loop Timing (Overload)
+    description: Open Loop Timing (Overload)
+    category: Ignition
+    datatype: float
+    width: 14
+    height: 28
+    axisx: rpm_500_linear
+    axisy: load_3125
+    minimum: -15
+    maximum: 70
+
+  19:
+    name: Speed Limit Threshold (Fuel Cut)
+    description: Speed Limit Threshold (Fuel Cut)
+    category: Limits
+    datatype: float
+    minimum: 3
+    maximum: 15
+
+  20:
+    name: Idle RPM (In Gear, A/C)
+    description: Idle RPM (In Gear, A/C)
+    category: Idle
+    datatype: float
+    width: 8
+    axisx: pressure_kpa
+    minimum: 500
+    maximum: 2500
+
+  21:
+    name: Overboost Throttle Cut
+    description: Overboost Throttle Cut
+    category: Limits
+    datatype: float
+    width: 14
+    axisx: rpm_500
+    minimum: 0
+    maximum: 450
+
+  22:
+    name: Fan On Engine Coolant Temperature
+    description: Fan On Engine Coolant Temperature
+    category: Fan Control
+    datatype: float
+    width: 8
+    axisx: pressure_kpa
+    minimum: 0
+    maximum: 180
+
+  23:
+    name: MAF Calibration 1
+    description: MAF Calibration 1
+    category: MAF
+    datatype: float
+    width: 129
+    axisx: maf_5
+    minimum: 0
+    maximum: 850
+
+  24:
+    name: Idle RPM - Neutral
+    description: Idle RPM - Neutral
+    category: Idle
+    datatype: float
+    width: 8
+    axisx: temp_coolant
+    minimum: 500
+    maximum: 2500
+
+  25:
+    name: Maximum Load Limit
+    description: Maximum Load Limit
+    category: Limits
+    datatype: float
+    width: 14
+    axisx: rpm_500_linear
+    minimum: 0
+    maximum: 4
+
+
+
+# Axes
+axes:
+  #- id: "rpm_500"
+  #  type: "linear"
+  #  datatype: "uint32"
+  #  name: "RPM"
+  #  minimum: 500
+  #  increment: 500
+
+  - id: "rpm_500"
+    size: 14
+    type: "memory"
+    datatype: "float"
+    name: "RPM"
+    
+  - id: "rpm_500_15"
+    size: 15
+    type: "memory"
+    datatype: "float"
+    name: "RPM"
+    
+  - id: "rpm_500_linear"
+    type: "linear"
+    datatype: "float"
+    name: "RPM"
+    minimum: 500
+    increment: 500
+    
+  - id: "load_125"
+    type: "linear"
+    datatype: "float"
+    name: "Load"
+    minimum: 0.125
+    increment: 0.0625
+    
+  - id: "load_025"
+    type: "linear"
+    datatype: "float"
+    name: "Load"
+    minimum: 0.25
+    increment: 0.0625
+    
+  - id: "load_0625"
+    type: "linear"
+    datatype: "float"
+    name: "Load"
+    minimum: 0.0625
+    increment: 0.0625
+    
+  - id: "load_3125"
+    type: "linear"
+    datatype: "float"
+    name: "Load"
+    minimum: 0.3125
+    increment: 0.0625
+    
+  - id: "pressure_kpa"
+    size: 8
+    type: "memory"
+    datatype: "float"
+    name: "Barometric Pressure"
+    
+  - id: "pressure_kpa_diff"
+    size: 11
+    type: "memory"
+    datatype: "float"
+    name: "Boost Target Difference"
+    
+  - id: "bsc_dc_volts"
+    type: "linear"
+    datatype: "float"
+    name: "Battery Voltage"
+    minimum: 6.5
+    increment: 1.25
+    
+  - id: "temp_iat"
+    type: "linear"
+    datatype: "float"
+    name: "Intake Air Temperature (Celsius)"
+    minimum: -40
+    increment: 20
+
+  - id: "temp_coolant"
+    type: "linear"
+    datatype: "float"
+    name: "Coolant Temperature (Celsius)"
+    minimum: -40
+    increment: 20
+    
+  - id: "tps_0"
+    type: "linear"
+    datatype: "float"
+    minimum: 0
+    increment: 6.25
+    name: "Requested Throttle Position"
+    
+  - id: "maf_5"
+    type: "linear"
+    datatype: "float"
+    minimum: 0
+    increment: 0.039000001
+    name: "Voltage"
+    
+  - id: "voltage_batt"
+    type: "memory"
+    datatype: "float"
+    name: "Battery Voltage"
+    size: 7
+
+flashregion:
+  offset: 0x8000
+  size: 0xF8000
+
+# PIDs
+pids:
+  - id: 0
+    name: "Coolant Temperature"
+    description: "Coolant Temperature"
+    code: 5
+    unit: "temp_celsius"
+    formula: "a - 40"

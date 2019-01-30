@@ -1,0 +1,63 @@
+name: "L38K"
+id: "l38k"
+
+# Tables
+tables:
+  0: 0x181a0
+  1: 0x24260
+  2: 0x27838
+  4: 0x9eb0
+  6: 0xbd3c
+  8: 0xa090
+  9: 0x1d584
+  10: 0x9ae8
+  11: 0x1eee4
+  12: 0x9ae4
+  13: 0x17fe0
+  14: 0x836c
+  15: 0xc5e0
+  16: 0x88e0
+  17: 0x1e8c4
+  18: 0x1dba4
+  19: 0x8370
+  20: 0xa0b0
+  21: 0x30aec
+  22: 0xbcd0
+  23: 0xc3dc
+  24: 0x9ed0
+  25: 0x9bd0
+
+
+
+
+# Axes
+axes:
+  - id: "rpm_500"
+    offset: 0x37848
+    
+  - id: "rpm_500_15"
+    offset: 0x378C0
+    
+  - id: "pressure_kpa"
+    offset: 0x377D4
+    
+  - id: "pressure_kpa_diff"
+    offset: 0x3096C
+    
+  - id: "voltage_batt"
+    offset: 0xBD20
+
+# Checksums
+checksums:
+  - mode: "basic"
+    offset: 0x48000
+    size: 0xB8000
+    target: 0x5AA55AA5
+    modify:
+      - offset: 0
+        size: 4
+
+# Identifiers
+identifiers:
+  - offset: 0x2A7C8
+    data: "L38K"
