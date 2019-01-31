@@ -41,10 +41,11 @@ struct Table;
 class Table;
 class Rom;
 class RomData;
+class Tune;
 
 class TuneData {
 public:
-    TuneData(std::string path, Rom &base, bool open = true);
+    TuneData(Tune &tune, std::string path, Rom &base, bool open = true);
     
     /* Applies table modifications to data and computes checksums.
      * Returns false on error and sets lastError. */
@@ -58,12 +59,15 @@ public:
     
     bool dirty() const { return tables_.dirty(); }
     
+    Tune &tune() const { return tune_; }
+    
 private:
     void readTables(QXmlStreamReader &xml);
     
     std::string path_;
     Rom &base_;
     std::shared_ptr<RomData> baseData_;
+    Tune &tune_;
     
     TableGroup tables_;
 };

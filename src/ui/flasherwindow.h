@@ -33,6 +33,9 @@ class Flasher;
 using FlasherPtr = std::shared_ptr<Flasher>;
 }
 
+class Tune;
+class QComboBox;
+
 /**
  * @todo write docs
  */
@@ -42,6 +45,20 @@ public:
     explicit FlasherWindow(QWidget *parent = nullptr);
 
     virtual ~FlasherWindow() override;
+    
+    void setTune(Tune *tune);
+    
+private:
+    void buttonTuneClicked();
+    void buttonFlashClicked();
+    // Verifies form entries and enables or disables buttonFlash
+    void verify();
+    
+    Tune *selectedTune_;
+    
+    QPushButton *buttonTune_;
+    QPushButton *buttonFlash_;
+    QComboBox *comboLink_;
 };
 
 #endif // FLASHWINDOW_H

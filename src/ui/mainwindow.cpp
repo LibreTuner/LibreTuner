@@ -367,7 +367,10 @@ void MainWindow::setupMenu() {
     
     connect(flashCurrentAction_, &QAction::triggered, [this]() {
         if (selectedTune_) {
-            LibreTuner::get()->flashTune(selectedTune_);
+            // LibreTuner::get()->flashTune(selectedTune_);
+            FlasherWindow flasher;
+            flasher.setTune(&selectedTune_->tune());
+            flasher.exec();
         }
     });
 

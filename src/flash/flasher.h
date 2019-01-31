@@ -53,7 +53,7 @@ public:
     virtual ~Flasher() = default;
 
     /* Flash that shit. Returns false if canceled. */
-    virtual bool flash(Flashable &flashable) = 0;
+    virtual bool flash(const Flashable &flashable) = 0;
 
     /* Cancels the active flash */
     virtual void cancel() = 0;
@@ -65,13 +65,13 @@ class MazdaT1Flasher : public Flasher {
 public:
     MazdaT1Flasher(const PlatformLink &platform, const Options &options);
 
-    bool flash(Flashable &flashable) override;
+    bool flash(const Flashable &flashable) override;
     void cancel() override;
 
 private:
     std::string key_;
     std::unique_ptr<uds::Protocol> uds_;
-    Flashable *flash_;
+    const Flashable *flash_;
     uds::Authenticator auth_;
     std::atomic<bool> canceled_;
 

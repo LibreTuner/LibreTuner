@@ -40,7 +40,7 @@ MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, const Options &opti
     }
 }
 
-bool MazdaT1Flasher::flash(Flashable &flashable) {
+bool MazdaT1Flasher::flash(const Flashable &flashable) {
     canceled_ = false;
     flash_ = &flashable;
     auth_.auth(key_, *uds_, 0x85);

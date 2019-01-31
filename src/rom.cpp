@@ -197,7 +197,7 @@ std::shared_ptr<TuneData> Tune::data()
         return d;
     }
     
-    std::shared_ptr<TuneData> data = std::make_shared<TuneData>(path_, *base_);
+    std::shared_ptr<TuneData> data = std::make_shared<TuneData>(*this, path_, *base_);
     data_ = data;
     return data;
 }
@@ -329,7 +329,7 @@ void TuneData::apply(uint8_t *data, size_t size) {
 
 
 
-TuneData::TuneData(std::string path, Rom &base, bool open) : path_(std::move(path)), base_(base), baseData_(base_.data()), tables_(baseData_)
+TuneData::TuneData(Tune &tune, std::string path, Rom &base, bool open) : tune_(tune), path_(std::move(path)), base_(base), baseData_(base_.data()), tables_(baseData_)
 {
     if (open) {
         QFile file(QString::fromStdString(LT()->home().toStdString() + "/tunes/" + path_));

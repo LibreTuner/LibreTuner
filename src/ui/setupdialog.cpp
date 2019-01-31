@@ -10,6 +10,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QStyledItemDelegate>
 
 SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("LibreTuner - Initial Setup"));
@@ -17,9 +18,13 @@ SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
 
     auto *formLayout = new QFormLayout;
     comboPlatforms_ = new QComboBox;
+    comboPlatforms_->setItemDelegate(new QStyledItemDelegate());
+    comboPlatforms_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     formLayout->addRow(tr("Definition"), comboPlatforms_);
 
     comboDatalinks_ = new QComboBox;
+    comboDatalinks_->setItemDelegate(new QStyledItemDelegate());
+    comboDatalinks_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     formLayout->addRow(tr("Datalink"), comboDatalinks_);
 
     layout->addLayout(formLayout);
