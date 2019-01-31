@@ -285,6 +285,10 @@ void LibreTuner::setDatalink(datalink::Link *link) {
 
 
 int Links::rowCount(const QModelIndex &parent) const {
+    if (links_.empty()) {
+        // When empty, we set the only value to "No links"
+        return 1;
+    }
     return static_cast<int>(links_.size());
 }
 
@@ -292,7 +296,17 @@ int Links::rowCount(const QModelIndex &parent) const {
 Q_DECLARE_METATYPE(datalink::Link*)
 
 QVariant Links::data(const QModelIndex &index, int role) const {
-    if (index.column() < 0 || index.column() > 1 || index.row() < 0 || index.row() >= links_.size()) {
+    if (index.column() < 0 || index.column() > 1) {
+        return QVariant();
+    }
+    
+    if (index.row() < 0 || index.row() >= links_.size()) {
+        if (index.row() == 0 && links_.empty()) {
+            if (role == Qt::DisplayRole) {
+                return tr("No links available");
+            }
+        }
+        
         return QVariant();
     }
 
