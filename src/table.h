@@ -576,7 +576,7 @@ public:
             default:
                 assert(false && "Unimplemented");
         }
-        return std::make_unique<TableBase<DataType>>(definition_, std::move(data), TableInfo<DataType>{definition_.sizeX, definition_.minimum, definition_.maximum, axisX_, axisY_, offset_});
+        return std::make_unique<TableBase<DataType>>(definition_, std::move(data), TableInfo<DataType>{definition_.sizeX, static_cast<DataType>(definition_.minimum), static_cast<DataType>(definition_.maximum), axisX_, axisY_, offset_});
     }
 
 private:

@@ -25,6 +25,7 @@
 // Std
 #include <chrono>
 #include <cstdint>
+#include <array>
 
 namespace isotp {
 struct Options {
