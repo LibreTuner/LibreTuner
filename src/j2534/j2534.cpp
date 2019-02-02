@@ -332,6 +332,7 @@ std::vector<Info> detect_interfaces() {
         RegCloseKey(hKeyDevice);
     } while (res == ERROR_SUCCESS);
     RegCloseKey(hKeyPassthrough);
+    return interfaces;
 }
 
 } // namespace j2534
