@@ -61,6 +61,7 @@ void Authenticator::do_send_key(uint32_t key) {
     kData[2] = (key & 0xFF0000) >> 16;
 
     uds_->requestSecurityKey(kData, 3);
+    Logger::debug("[AUTH] Got key response");
 }
 
 

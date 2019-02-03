@@ -67,6 +67,7 @@ std::unique_ptr<download::Downloader> PlatformLink::downloader() const {
 
     switch (definition_->downloadMode) {
     case DownloadMode::Mazda23:
+        Logger::debug("Creating RMA downloader with key " + definition_->key + " and size " + std::to_string(definition_->romsize));
         return download::get_downloader("rma", *this, download::Options{definition_->key, definition_->romsize});
     default:
         return nullptr;
