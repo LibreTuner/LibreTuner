@@ -54,13 +54,17 @@ bool RMADownloader::download() {
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
+    Logger::debug("[Download] Downloading " + std::to_string(downloadSize_) + " bytes");
     auth_.auth(key_, *uds_);
+    Logger::debug("[DOWNLOAD] Authenticated");
 
     do {
+        size_t to_download = std::min<std::size_t>(static_cast<size_t>(downloadSize_), 0xFFE);
         std::vector<uint8_t> data = uds_->requestReadMemoryAddress(
-            static_cast<uint32_t>(downloadOffset_), std::min<std::uint16_t>(static_cast<uint16_t>(downloadSize_), 0xFFE));
+            static_cast<uint32_t>(downloadOffset_), static_cast<uint16_t>(to_download));
 
         if (data.empty()) {
+            Logger::debug("[DOWNLOAD] Received null packet");
             throw std::runtime_error("received 0 bytes in download packet");
         }
 

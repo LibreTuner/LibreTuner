@@ -101,8 +101,16 @@ void DownloadWindow::download()
         bool success = false;
         std::atomic<bool> stopped(false);
 
+        std::promise<void> p;
+        std::future<void> future = p.get_future();
+
         std::thread worker([&]() {
-            success = downloader->download();
+            try {
+                success = downloader->download();
+            } catch (...) {
+                success = false;
+                p.set_exception(std::current_exception());
+            }
             stopped = true;
         });
 
@@ -118,6 +126,7 @@ void DownloadWindow::download()
         worker.join();
 
         if (!success && !canceled) {
+            future.get();
             throw std::runtime_error("Unknown error");
         } else {
             auto data = downloader->data();
