@@ -107,27 +107,30 @@ struct PASSTHRU_MSG {
     unsigned char Data[4128]; /* message payload or data */
 };
 
-using PassThruOpen_t = int32_t (*)(const void *, uint32_t *);
-using PassThruClose_t = int32_t (*)(uint32_t);
-using PassThruConnect_t = int32_t (*)(uint32_t, uint32_t, uint32_t, uint32_t,
+
+#define PTAPI	__stdcall //WINAPI
+
+using PassThruOpen_t = long PTAPI (*)(void *, uint32_t *);
+using PassThruClose_t = long PTAPI (*)(uint32_t);
+using PassThruConnect_t = long PTAPI (*)(uint32_t, uint32_t, uint32_t, uint32_t,
                                       uint32_t *);
-using PassThruDisconnect_t = int32_t (*)(uint32_t);
-using PassThruReadMsgs_t = int32_t (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+using PassThruDisconnect_t = long PTAPI (*)(uint32_t);
+using PassThruReadMsgs_t = long PTAPI (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
                                        uint32_t);
-using PassThruWriteMsgs_t = int32_t (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+using PassThruWriteMsgs_t = long PTAPI (*)(uint32_t, PASSTHRU_MSG *, uint32_t *,
                                         uint32_t);
-using PassThruStartPeriodicMsg_t = int32_t (*)(uint32_t, const PASSTHRU_MSG *,
+using PassThruStartPeriodicMsg_t = long PTAPI (*)(uint32_t, const PASSTHRU_MSG *,
                                                uint32_t *, uint32_t);
-using PassThruStopPeriodicMsg_t = int32_t (*)(uint32_t, uint32_t);
-using PassThruStartMsgFilter_t = int32_t (*)(uint32_t, uint32_t,
+using PassThruStopPeriodicMsg_t = long PTAPI (*)(uint32_t, uint32_t);
+using PassThruStartMsgFilter_t = long PTAPI (*)(uint32_t, uint32_t,
                                              const PASSTHRU_MSG *,
                                              const PASSTHRU_MSG *,
                                              const PASSTHRU_MSG *, uint32_t *);
-using PassThruStopMsgFilter_t = int32_t (*)(uint32_t, uint32_t);
-using PassThruSetProgrammingVoltage_t = int32_t (*)(uint32_t, uint32_t);
-using PassThruReadVersion_t = int32_t (*)(char *, char *, char *);
-using PassThruGetLastError_t = int32_t (*)(char *);
-using PassThruIoctl_t = int32_t (*)(uint32_t, uint32_t, void *, void *);
+using PassThruStopMsgFilter_t = long PTAPI (*)(uint32_t, uint32_t);
+using PassThruSetProgrammingVoltage_t = long PTAPI (*)(uint32_t, uint32_t);
+using PassThruReadVersion_t = long PTAPI (*)(char *, char *, char *);
+using PassThruGetLastError_t = long PTAPI (*)(char *);
+using PassThruIoctl_t = long PTAPI (*)(uint32_t, uint32_t, void *, void *);
 
 
 class J2534;
