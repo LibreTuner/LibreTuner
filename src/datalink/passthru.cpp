@@ -4,6 +4,7 @@
 
 #include "passthru.h"
 #include "j2534/j2534caninterface.h"
+#include "logger.h"
 
 
 namespace datalink {
@@ -13,8 +14,10 @@ namespace datalink {
 
     void PassThruLink::check_interface() {
         if (!interface_) {
+            Logger::debug("Creating j2534 interface");
             interface_ = j2534::J2534::create(j2534::Info(info_));
             interface_->init();
+            Logger::debug("Created interface");
         }
     }
 

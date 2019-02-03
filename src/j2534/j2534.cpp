@@ -32,9 +32,9 @@ DevicePtr J2534::open(const char *port) {
 
     Logger::debug("Opening J2534 device");
 
-    uint32_t deviceId;
+    uint32_t deviceId = 0;
     long res;
-    if ((res = PassThruOpen(port, &deviceId)) != 0) {
+    if ((res = PassThruOpen(const_cast<void*>(reinterpret_cast<const void*>(port)), &deviceId)) != 0) {
         if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
             // Return nullptr. Don't throw an exception,
             // because the absence of a device is not an exceptional error
@@ -133,13 +133,15 @@ J2534::~J2534() {
 }
 
 void J2534::load() {
+    Logger::debug("Loading " + info_.functionLibrary);
     if ((hDll_ = LoadLibrary(info_.functionLibrary.c_str())) == nullptr) {
         std::stringstream ss;
         ss << std::hex << GetLastError();
         throw Error("Failed to load library " + info_.functionLibrary + ": 0x" +
                     ss.str());
     }
-
+    Logger::debug("Loaded library");
+    Logger::debug("Loading library functions");
     PassThruOpen = reinterpret_cast<PassThruOpen_t>(getProc("PassThruOpen"));
     PassThruClose = reinterpret_cast<PassThruClose_t>(getProc("PassThruClose"));
     PassThruConnect =
@@ -166,6 +168,8 @@ void J2534::load() {
     PassThruSetProgrammingVoltage =
         reinterpret_cast<PassThruSetProgrammingVoltage_t>(
             getProc("PassThruSetProgrammingVoltage"));
+
+    Logger::debug("Loaded library functions");
 
     // If all exports were found (no exceptions were thrown), we can set loaded_
     // to true
@@ -199,6 +203,7 @@ void Device::close() {
 
 Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate) {
     assert(valid());
+    Logger::debug("[j2534::Device] Connecting to J2534 channel");
 
     return Channel(j2534_, shared_from_this(),
                    j2534_->connect(device_, protocol, flags, baudrate));
