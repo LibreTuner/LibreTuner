@@ -28,6 +28,8 @@
 #include "rommanager.h"
 #include "download/downloader.h"
 
+#include "authoptionsview.h"
+
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -65,7 +67,10 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     
     groupDetails->setLayout(form);
 
+    auto *authOptions = new AuthOptionsView;
+
     layout->addWidget(groupDetails);
+    layout->addWidget(authOptions);
     
     auto *buttonDownload = new QPushButton(tr("Download"));
     layout->addWidget(buttonDownload);

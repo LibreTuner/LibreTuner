@@ -100,6 +100,8 @@ set(libretuner_SRC
     ui/setupdialog.h
     ui/datalinkswidget.cpp
     ui/datalinkswidget.h
+    ui/authoptionsview.cpp
+    ui/authoptionsview.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h
