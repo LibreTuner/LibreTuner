@@ -72,7 +72,7 @@ private:
     std::string key_;
     std::unique_ptr<uds::Protocol> uds_;
     const Flashable *flash_;
-    uds::Authenticator auth_;
+    auth::UdsAuthenticator auth_;
     std::atomic<bool> canceled_;
 
     size_t left_{}, sent_{};

@@ -54,9 +54,9 @@ bool RMADownloader::download() {
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
-    Logger::debug("[Download] Downloading " + std::to_string(downloadSize_) + " bytes");
-    auth_.auth(key_, *uds_);
+    auth_.auth(*uds_, auth::Options{key_});
     Logger::debug("[DOWNLOAD] Authenticated");
+    Logger::debug("[Download] Downloading " + std::to_string(downloadSize_) + " bytes");
 
     do {
         size_t to_download = std::min<std::size_t>(static_cast<size_t>(downloadSize_), 0xFFE);

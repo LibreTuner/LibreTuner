@@ -43,7 +43,7 @@ MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, const Options &opti
 bool MazdaT1Flasher::flash(const Flashable &flashable) {
     canceled_ = false;
     flash_ = &flashable;
-    auth_.auth(key_, *uds_, 0x85);
+    auth_.auth(*uds_, auth::Options{key_, 0x85});
     if (canceled_)
         return false;
     return do_erase();

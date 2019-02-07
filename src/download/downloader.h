@@ -66,7 +66,7 @@ public:
     virtual std::pair<const uint8_t*, size_t> data() override;
 
 private:
-    uds::Authenticator auth_;
+    auth::UdsAuthenticator auth_;
 
     std::unique_ptr<uds::Protocol> uds_;
 
