@@ -22,19 +22,18 @@
 #include <cassert>
 #include <sstream>
 
-namespace uds {
+namespace auth {
 
-void Authenticator::auth(const std::string &key, uds::Protocol &uds,
-                         uint8_t sessionType) {
-    key_ = key;
+void UdsAuthenticator::auth(uds::Protocol &uds, Options options) {
+    key_ = std::move(options.key);
     uds_ = &uds;
 
-    do_session(sessionType);
+    do_session(options.session);
 }
 
 
 
-void Authenticator::do_session(uint8_t sessionType) {
+void UdsAuthenticator::do_session(uint8_t sessionType) {
     Logger::debug("[AUTH] sending session request");
     uds_->requestSession(sessionType);
     do_request_seed();
@@ -42,7 +41,7 @@ void Authenticator::do_session(uint8_t sessionType) {
 
 
 
-void Authenticator::do_request_seed() {
+void UdsAuthenticator::do_request_seed() {
     Logger::debug("[AUTH] Sending seed request");
     std::vector<uint8_t> seed = uds_->requestSecuritySeed();
 
@@ -53,7 +52,7 @@ void Authenticator::do_request_seed() {
 
 
 
-void Authenticator::do_send_key(uint32_t key) {
+void UdsAuthenticator::do_send_key(uint32_t key) {
     Logger::debug("[AUTH] Sending key request");
     uint8_t kData[3];
     kData[0] = key & 0xFF;
@@ -66,7 +65,7 @@ void Authenticator::do_send_key(uint32_t key) {
 
 
 
-uint32_t Authenticator::generateKey(uint32_t parameter,
+uint32_t UdsAuthenticator::generateKey(uint32_t parameter,
                                     const uint8_t *seed, size_t size) {
     std::vector<uint8_t> nseed(seed, seed + size);
     nseed.insert(nseed.end(), key_.begin(), key_.end());

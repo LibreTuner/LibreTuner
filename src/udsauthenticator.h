@@ -26,12 +26,16 @@
 /**
  * Handles UDS authentication for flashing & downloading
  */
-namespace uds {
-class Authenticator {
+namespace auth {
+struct Options {
+    std::string key;
+    uint8_t session = 0x87;
+};
+
+class UdsAuthenticator {
 public:
     /* Start authentication */
-    void auth(const std::string &key, uds::Protocol &uds,
-              uint8_t sessionType = 0x87);
+    void auth(uds::Protocol &uds, Options options);
 
     uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t size);
 
