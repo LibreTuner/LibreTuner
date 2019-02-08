@@ -27,6 +27,7 @@
 #include "rom.h"
 #include "vehicle.h"
 #include "flash/flashable.h"
+#include "authoptionsview.h"
 
 #include <cassert>
 
@@ -64,12 +65,15 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
     QFormLayout *form = new QFormLayout;
     form->addRow(tr("Tune"), buttonTune_);
     form->addRow(tr("Link"), comboLink_);
+
+    auto *authOptions = new AuthOptionsView;
     
     // Main layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSizeConstraint(QLayout::SetFixedSize);
     
     layout->addLayout(form);
+    layout->addWidget(authOptions);
     layout->addWidget(buttonFlash_);
     
     setLayout(layout);
