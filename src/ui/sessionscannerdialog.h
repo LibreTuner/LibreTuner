@@ -6,6 +6,7 @@
 
 class QListWidget;
 class QPushButton;
+class QSpinBox;
 
 // Scans sessions
 class SessionScannerDialog : public QDialog
@@ -21,6 +22,8 @@ public slots:
 private:
     QListWidget *sessionIds_;
     QPushButton *buttonStart_;
+    QSpinBox *spinMinimum_;
+    QSpinBox *spinMaximum_;
 
     void scan();
 };
