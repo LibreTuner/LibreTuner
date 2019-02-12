@@ -107,8 +107,11 @@ struct PASSTHRU_MSG {
     unsigned char Data[4128]; /* message payload or data */
 };
 
-
-#define PTAPI	__stdcall //WINAPI
+#ifdef WIN32
+#define PTAPI   __stdcall //WINAPI
+#else
+#define PTAPI
+#endif
 
 using PassThruOpen_t = long PTAPI (*)(void *, uint32_t *);
 using PassThruClose_t = long PTAPI (*)(uint32_t);
