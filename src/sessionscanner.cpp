@@ -7,9 +7,9 @@ SessionScanner::SessionScanner()
 }
 
 
-void SessionScanner::scan(uds::ProtocolPtr &&protocol)
+void SessionScanner::scan(uds::ProtocolPtr &&protocol, uint8_t minimum, uint8_t maximum)
 {
-    for (int session = 0; session <= 0xFF; ++session) {
+    for (int session = minimum; session <= maximum; ++session) {
         try {
             protocol->requestSession(static_cast<uint8_t>(session));
             callSuccess(static_cast<uint8_t>(session));

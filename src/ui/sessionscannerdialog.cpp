@@ -1,9 +1,12 @@
 #include "sessionscannerdialog.h"
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QListWidget>
 #include <QMessageBox>
+#include <QSpinBox>
+#include <QLabel>
 
 #include <thread>
 #include <atomic>
@@ -18,17 +21,35 @@
 SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle(tr("LibreTuner - Session Scanner"));
-    auto *layout = new QVBoxLayout;
 
     sessionIds_ = new QListWidget;
-
     buttonStart_ = new QPushButton(tr("Scan"));
+    
+    spinMinimum_ = new QSpinBox;
+    spinMinimum_->setRange(0, 0xFF);
+    spinMinimum_->setDisplayIntegerBase(16);
+    spinMinimum_->setPrefix("0x");
+    
+    spinMaximum_ = new QSpinBox;
+    spinMaximum_->setRange(0, 0xFF);
+    spinMaximum_->setDisplayIntegerBase(16);
+    spinMaximum_->setPrefix("0x");
+    spinMaximum_->setValue(0xFF);
 
     connect(buttonStart_, &QPushButton::clicked, [this]() {
         scan();
     });
+    
+    auto *layout = new QVBoxLayout;
+    
+    auto *spinLayout = new QHBoxLayout;
+    spinLayout->addWidget(new QLabel(tr("Minimum:")));
+    spinLayout->addWidget(spinMinimum_);
+    spinLayout->addWidget(new QLabel(tr("Maximum:")));
+    spinLayout->addWidget(spinMaximum_);
 
     layout->addWidget(sessionIds_);
+    layout->addLayout(spinLayout);
     layout->addWidget(buttonStart_);
 
     setLayout(layout);
@@ -68,8 +89,8 @@ void SessionScannerDialog::scan()
     
     
     // Task
-    std::packaged_task<void()> task([&uds, &stopped, &scanner]() {
-        scanner.scan(std::move(uds));
+    std::packaged_task<void()> task([&]() {
+        scanner.scan(std::move(uds), spinMinimum_->value(), spinMaximum_->value());
         stopped = true;
     });
     

@@ -18,7 +18,7 @@ public:
 
     SessionScanner();
 
-    void scan(uds::ProtocolPtr &&protocol);
+    void scan(uds::ProtocolPtr &&protocol, uint8_t minimum = 0, uint8_t maximum = 0xFF);
 
     void onSuccess(SuccessCallback &&cb);
 
