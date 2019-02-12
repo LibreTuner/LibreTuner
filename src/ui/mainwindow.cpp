@@ -31,6 +31,7 @@
 #include "dataloggerwindow.h"
 #include "titlebar.h"
 #include "flasherwindow.h"
+#include "sessionscannerdialog.h"
 
 #include "tunedialog.h"
 #include "setupdialog.h"
@@ -406,6 +407,12 @@ void MainWindow::setupMenu() {
     QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
     connect(datalinksAction, &QAction::triggered, [this]() {
         datalinksWindow_.show();
+    });
+
+    auto *sessionScanAct = toolsMenu->addAction("Session Scanner");
+    connect(sessionScanAct, &QAction::triggered, [this]() {
+        SessionScannerDialog scanner;
+        scanner.exec();
     });
 
     /*auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
