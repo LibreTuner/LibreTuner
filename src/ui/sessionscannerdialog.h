@@ -4,6 +4,9 @@
 #include <QDialog>
 #include <QStringListModel>
 
+class QListWidget;
+class QPushButton;
+
 // Scans sessions
 class SessionScannerDialog : public QDialog
 {
@@ -16,7 +19,8 @@ signals:
 public slots:
 
 private:
-    QStringListModel sessions_;
+    QListWidget *sessionIds_;
+    QPushButton *buttonStart_;
 
     void scan();
 };
