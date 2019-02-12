@@ -42,6 +42,8 @@ set(libretuner_SRC
     diagnosticsinterface.h
     dtcdescriptions.cpp
     dtcdescriptions.h
+    sessionscanner.cpp
+    sessionscanner.h
     
     download/downloader.cpp
     download/downloader.h
@@ -102,6 +104,8 @@ set(libretuner_SRC
     ui/datalinkswidget.h
     ui/authoptionsview.cpp
     ui/authoptionsview.h
+    ui/sessionscannerdialog.cpp
+    ui/sessionscannerdialog.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h
