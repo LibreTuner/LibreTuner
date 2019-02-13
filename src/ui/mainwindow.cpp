@@ -360,6 +360,14 @@ void MainWindow::setupMenu() {
     fileMenu->addAction(flashCurrentAction_);
     
     auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
+
+    QMenu *themeMenu = viewMenu->addMenu(tr("Theme"));
+
+    auto *nativeThemeAction = themeMenu->addAction(tr("Native"));
+
+    connect(nativeThemeAction, &QAction::triggered, []() {
+        LT()->setStyleSheet("");
+    });
     
     connect(flashAction, &QAction::triggered, []() {
         FlasherWindow flasher;
