@@ -3,14 +3,12 @@
 
 
 #include <QWidget>
-#include <QToolButton>
-#include <QTreeWidget>
 
 
 class Table;
-
 class QPlainTextEdit;
-
+class QLineEdit;
+class QToolButton;
 
 class SidebarWidget : public QWidget {
     Q_OBJECT
@@ -25,15 +23,15 @@ private slots:
 
 private:
     QToolButton *tableInfoButton_;
-    QTreeWidget *tableTreeWidget_;
+    QWidget *tableInfo_;
     
     QPlainTextEdit *tableDescription_;
     
-    QTreeWidgetItem *tableName_;
-    QTreeWidgetItem *tableOffset_;
-    QTreeWidgetItem *tableWidth_;
-    QTreeWidgetItem *tableHeight_;
-    QTreeWidgetItem *tableRange_;
+    QLineEdit *tableName_;
+    QLineEdit *tableOffset_;
+    QLineEdit *tableWidth_;
+    QLineEdit *tableHeight_;
+    QLineEdit *tableRange_;
 };
 
 #endif // SIDEBARWIDGET_H

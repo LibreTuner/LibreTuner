@@ -4,9 +4,12 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QTreeWidget>
+#include <QLineEdit>
 #include <QScrollArea>
 #include <QPlainTextEdit>
+#include <QToolButton>
+#include <QFormLayout>
+
 
 SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -34,25 +37,37 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfoTitleLayout->addWidget(new QLabel(tr("Table Info:")));
 
     // Table info tree widget
-    tableTreeWidget_ = new QTreeWidget;
-    tableTreeWidget_->setColumnCount(2);
-    tableTreeWidget_->setFrameShape(QFrame::NoFrame);
-    tableTreeWidget_->setHeaderHidden(true);
-    tableTreeWidget_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    tableInfo_ = new QWidget;
+    tableInfo_->setContentsMargins(0, 0, 0, 0);
+    auto *tableForm = new QFormLayout;
     
     // Build tree widget
-    tableName_ = new QTreeWidgetItem(tableTreeWidget_, QStringList{"Name"});
-    tableOffset_ = new QTreeWidgetItem(tableTreeWidget_, QStringList("Offset"));
-    tableWidth_ = new QTreeWidgetItem(tableTreeWidget_, QStringList("Width"));
-    tableHeight_ = new QTreeWidgetItem(tableTreeWidget_, QStringList("Height"));
-    tableRange_ = new QTreeWidgetItem(tableTreeWidget_, QStringList("Range"));
+    tableName_ = new QLineEdit;
+    tableName_->setReadOnly(true);
+    tableOffset_ = new QLineEdit;
+    tableOffset_->setReadOnly(true);
+    tableWidth_ = new QLineEdit;
+    tableWidth_->setReadOnly(true);
+    tableHeight_ = new QLineEdit;
+    tableHeight_->setReadOnly(true);
+    tableRange_ = new QLineEdit;
+    tableRange_->setReadOnly(true);
+    
+    tableForm->addRow(tr("Name"), tableName_);
+    tableForm->addRow(tr("Offset"), tableOffset_);
+    tableForm->addRow(tr("Width"), tableWidth_);
+    tableForm->addRow(tr("Height"), tableHeight_);
+    tableForm->addRow(tr("Range"), tableRange_);
+    
+    
+    tableInfo_->setLayout(tableForm);
     
     scrollLayout->addWidget(tableDescription_);
     scrollLayout->addLayout(tableInfoTitleLayout);
-    scrollLayout->addWidget(tableTreeWidget_);
+    scrollLayout->addWidget(tableInfo_);
     scrollLayout->addStretch();
     layout->addWidget(scrollArea);
-    layout->addStretch();
+    layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
 }
 
@@ -61,20 +76,20 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
 void SidebarWidget::fillTableInfo(Table* table)
 {
     if (!table) {
-        tableName_->setText(1, "");
-        tableOffset_->setText(1, "");
-        tableWidth_->setText(1, "");
-        tableHeight_->setText(1, "");
-        tableRange_->setText(1, "");
-        tableDescription_->setPlainText("");
+        tableName_->setText("N/A");
+        tableOffset_->setText("N/A");
+        tableWidth_->setText("N/A");
+        tableHeight_->setText("N/A");
+        tableRange_->setText("N/A");
+        tableDescription_->setPlainText("No table selected");
         return;
     }
     
-    tableName_->setText(1, QString::fromStdString(table->name()));
-    tableOffset_->setText(1, QString("0x") + QString::number(table->offset(), 16));
-    tableWidth_->setText(1, QString::number(table->width()));
-    tableHeight_->setText(1, QString::number(table->height()));
-    tableRange_->setText(1, QString("Minimum: %1; Maximum: %2").arg(table->minimum()).arg(table->maximum()));
+    tableName_->setText(QString::fromStdString(table->name()));
+    tableOffset_->setText(QString("0x") + QString::number(table->offset(), 16));
+    tableWidth_->setText(QString::number(table->width()));
+    tableHeight_->setText(QString::number(table->height()));
+    tableRange_->setText(QString("%1 - %2").arg(table->minimum()).arg(table->maximum()));
     tableDescription_->setPlainText(QString::fromStdString(table->description()));
 }
 
@@ -83,9 +98,9 @@ void SidebarWidget::fillTableInfo(Table* table)
 void SidebarWidget::on_treeToolButton_clicked(bool checked) {
     if (checked) {
         tableInfoButton_->setArrowType(Qt::RightArrow);
-        tableTreeWidget_->hide();
+        tableInfo_->hide();
     } else {
         tableInfoButton_->setArrowType(Qt::DownArrow);
-        tableTreeWidget_->show();
+        tableInfo_->show();
     }
 }
