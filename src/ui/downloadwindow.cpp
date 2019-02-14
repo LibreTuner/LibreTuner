@@ -168,6 +168,7 @@ void DownloadWindow::download()
             if (progress.wasCanceled()) {
                 downloader->cancel();
                 canceled = true;
+                Logger::info("Aborted download");
             }
         }
         worker.join();
@@ -175,7 +176,7 @@ void DownloadWindow::download()
         if (!success && !canceled) {
             future.get();
             throw std::runtime_error("Unknown error");
-        } else {
+        } else if (success) {
             auto data = downloader->data();
             try {
                 RomStore::get()->addRom(lineName_->text().toStdString(),
