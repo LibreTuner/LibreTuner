@@ -42,5 +42,6 @@
   </qresource>
   <qresource prefix="qdarkstyle">
       <file>style.qss</file>
+      <file>style_light.qss</file>
   </qresource>
 </RCC>
