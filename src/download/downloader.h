@@ -36,7 +36,7 @@ class PlatformLink;
 namespace download {
     
 struct Options {
-    std::string key;
+    auth::Options auth;
     std::size_t size;
 };
 
@@ -59,18 +59,16 @@ using DownloadInterfacePtr = std::shared_ptr<Downloader>;
 // Downloads using ReadMemoryByAddress (UDS SID 23)
 class RMADownloader : public Downloader {
 public:
-    RMADownloader(const PlatformLink &link, const Options &options);
+    RMADownloader(const PlatformLink &link, Options &&options);
 
     bool download() override;
     void cancel() override;
     virtual std::pair<const uint8_t*, size_t> data() override;
 
 private:
-    auth::UdsAuthenticator auth_;
-
     std::unique_ptr<uds::Protocol> uds_;
 
-    std::string key_;
+    auth::Options authOptions_;
 
     /* Next memory location to be read from */
     size_t downloadOffset_{};
@@ -88,7 +86,7 @@ private:
 
 /* Creates a downloader from an id and platform link.
  * Returns nullptr if id does not exist. */
-std::unique_ptr<Downloader> get_downloader(const std::string &id, const PlatformLink &link, const Options &options);
+std::unique_ptr<Downloader> get_downloader(const std::string &id, const PlatformLink &link, Options options);
 
 }
 

@@ -183,8 +183,31 @@ void Main::load(const YAML::Node& file)
             return DownloadMode::None;
         }(transfer["downloadmode"].as<std::string>());
         
-        key = transfer["key"].as<std::string>();
         serverId = transfer["serverid"].as<std::size_t>();
+    }
+    
+    Logger::debug("Loading auth options");
+    // Load auth options
+    if (file["auth"]) {
+        const auto &auth = file["auth"];
+        
+        // Key should be the same for both
+        if (auth["key"]) {
+            downloadAuthOptions.key = auth["key"].as<std::string>();
+            flashAuthOptions.key = downloadAuthOptions.key;
+        }
+        
+        // Session IDs
+        if (auth["sessionid"]) {
+            downloadAuthOptions.session = auth["sessionid"].as<std::size_t>();
+            flashAuthOptions.session = downloadAuthOptions.session;
+        }
+        if (auth["download_sessionid"]) {
+            downloadAuthOptions.session = auth["download_sessionid"].as<std::size_t>();
+        }
+        if (auth["flash_sessionid"]) {
+            flashAuthOptions.session = auth["flash_sessionid"].as<std::size_t>();
+        }
     }
     
     // Load VIN patterns

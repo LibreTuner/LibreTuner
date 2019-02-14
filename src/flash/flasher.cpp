@@ -33,8 +33,8 @@
 
 namespace flash {
 
-MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, const Options &options)
-    : key_(options.key), uds_(platform.uds()) {
+MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, Options &&options)
+    : uds_(platform.uds()), authOptions_(std::move(options.auth)) {
     if (!uds_) {
         throw std::runtime_error("UDS is unsupported with the selected datalink");
     }
@@ -43,7 +43,11 @@ MazdaT1Flasher::MazdaT1Flasher(const PlatformLink &platform, const Options &opti
 bool MazdaT1Flasher::flash(const Flashable &flashable) {
     canceled_ = false;
     flash_ = &flashable;
-    auth_.auth(*uds_, auth::Options{key_, 0x85});
+    
+    auth::UdsAuthenticator auth(*uds_, authOptions_);
+    // auth_.auth(*uds_, auth::Options{key_, 0x85});
+    auth.auth();
+    
     if (canceled_)
         return false;
     return do_erase();
@@ -114,10 +118,10 @@ bool MazdaT1Flasher::sendLoad() {
     return true;
 }
 
-std::unique_ptr<Flasher> get_flasher(const std::string& id, const PlatformLink& link, const flash::Options& options)
+std::unique_ptr<Flasher> get_flasher(const std::string& id, const PlatformLink& link, flash::Options options)
 {
     if (id == "mazdat1") {
-        return std::make_unique<MazdaT1Flasher>(link, options);
+        return std::make_unique<MazdaT1Flasher>(link, std::move(options));
     }
     return nullptr;
 }

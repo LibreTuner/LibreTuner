@@ -28,6 +28,7 @@
 #include "checksummanager.h"
 #include "endian.h"
 #include "enums.hpp"
+#include "udsauthenticator.h"
 
 
 namespace definition {
@@ -157,8 +158,10 @@ struct Main {
     FlashMode flashMode;
     uint32_t baudrate {500000};
     LogMode logMode = LogMode::None;
-    /* Security key */
-    std::string key;
+    
+    auth::Options downloadAuthOptions;
+    auth::Options flashAuthOptions;
+    
     /* Server ID for ISO-TP reqeusts */
     unsigned serverId {0x7e0};
 

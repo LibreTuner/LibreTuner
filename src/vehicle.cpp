@@ -67,8 +67,8 @@ std::unique_ptr<download::Downloader> PlatformLink::downloader() const {
 
     switch (definition_->downloadMode) {
     case DownloadMode::Mazda23:
-        Logger::debug("Creating RMA downloader with key " + definition_->key + " and size " + std::to_string(definition_->romsize));
-        return download::get_downloader("rma", *this, download::Options{definition_->key, definition_->romsize});
+        Logger::debug("Creating RMA downloader for platform " + definition_->name);
+        return download::get_downloader("rma", *this, download::Options{definition_->downloadAuthOptions, definition_->romsize});
     default:
         return nullptr;
     }
@@ -95,7 +95,7 @@ std::unique_ptr<flash::Flasher> PlatformLink::flasher() const {
     }
     switch (definition_->flashMode) {
     case FlashMode::T1:
-        return flash::get_flasher("mazdat1", *this, flash::Options{definition_->key});
+        return flash::get_flasher("mazdat1", *this, flash::Options{definition_->flashAuthOptions});
     default:
         return nullptr;
     }

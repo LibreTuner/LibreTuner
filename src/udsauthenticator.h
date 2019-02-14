@@ -34,16 +34,17 @@ struct Options {
 
 class UdsAuthenticator {
 public:
+    UdsAuthenticator(uds::Protocol &uds, Options options);
     /* Start authentication */
-    void auth(uds::Protocol &uds, Options options);
+    void auth();
 
     uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t size);
 
 private:
-    uds::Protocol *uds_;
-    std::string key_;
+    uds::Protocol &uds_;
+    Options options_;
 
-    void do_session(uint8_t sessionType);
+    void do_session();
     void do_request_seed();
     void do_send_key(uint32_t key);
 };

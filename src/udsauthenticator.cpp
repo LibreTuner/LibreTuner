@@ -23,19 +23,21 @@
 #include <sstream>
 
 namespace auth {
+    
+UdsAuthenticator::UdsAuthenticator(uds::Protocol& uds, auth::Options options) : uds_(uds), options_(std::move(options))
+{
+}
 
-void UdsAuthenticator::auth(uds::Protocol &uds, Options options) {
-    key_ = std::move(options.key);
-    uds_ = &uds;
 
-    do_session(options.session);
+void UdsAuthenticator::auth() {
+    do_session();
 }
 
 
 
-void UdsAuthenticator::do_session(uint8_t sessionType) {
+void UdsAuthenticator::do_session() {
     Logger::debug("[AUTH] sending session request");
-    uds_->requestSession(sessionType);
+    uds_.requestSession(options_.session);
     do_request_seed();
 }
 
@@ -43,7 +45,7 @@ void UdsAuthenticator::do_session(uint8_t sessionType) {
 
 void UdsAuthenticator::do_request_seed() {
     Logger::debug("[AUTH] Sending seed request");
-    std::vector<uint8_t> seed = uds_->requestSecuritySeed();
+    std::vector<uint8_t> seed = uds_.requestSecuritySeed();
 
     // Generate key from seed
     uint32_t key = generateKey(0xC541A9, seed.data(), seed.size());
@@ -59,7 +61,7 @@ void UdsAuthenticator::do_send_key(uint32_t key) {
     kData[1] = (key & 0xFF00) >> 8;
     kData[2] = (key & 0xFF0000) >> 16;
 
-    uds_->requestSecurityKey(kData, 3);
+    uds_.requestSecurityKey(kData, 3);
     Logger::debug("[AUTH] Got key response");
 }
 
@@ -68,7 +70,7 @@ void UdsAuthenticator::do_send_key(uint32_t key) {
 uint32_t UdsAuthenticator::generateKey(uint32_t parameter,
                                     const uint8_t *seed, size_t size) {
     std::vector<uint8_t> nseed(seed, seed + size);
-    nseed.insert(nseed.end(), key_.begin(), key_.end());
+    nseed.insert(nseed.end(), options_.key.begin(), options_.key.end());
 
     // This is Mazda's key generation algorithm reverse engineered from a
     // Mazda 6 MPS ROM. Internally, the ECU uses a timer/counter for the seed

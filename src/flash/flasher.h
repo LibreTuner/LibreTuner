@@ -41,7 +41,7 @@ typedef std::shared_ptr<Flashable> FlashablePtr;
 
 
 struct Options {
-    std::string key;
+    auth::Options auth;
 };
 
 
@@ -63,26 +63,27 @@ public:
 
 class MazdaT1Flasher : public Flasher {
 public:
-    MazdaT1Flasher(const PlatformLink &platform, const Options &options);
+    MazdaT1Flasher(const PlatformLink &platform, Options &&options);
 
     bool flash(const Flashable &flashable) override;
     void cancel() override;
 
 private:
-    std::string key_;
     std::unique_ptr<uds::Protocol> uds_;
+    
     const Flashable *flash_;
-    auth::UdsAuthenticator auth_;
     std::atomic<bool> canceled_;
 
     size_t left_{}, sent_{};
+    
+    auth::Options authOptions_;
 
     bool sendLoad();
     bool do_erase();
     bool do_request_download();
 };
 
-std::unique_ptr<Flasher> get_flasher(const std::string &id, const PlatformLink &link, const Options &options);
+std::unique_ptr<Flasher> get_flasher(const std::string &id, const PlatformLink &link, Options options);
 
 }
 

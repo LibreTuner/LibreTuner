@@ -69,6 +69,8 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(scrollArea);
     layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
+    
+    fillTableInfo(nullptr);
 }
 
 
