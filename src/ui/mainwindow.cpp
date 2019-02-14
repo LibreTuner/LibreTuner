@@ -92,6 +92,9 @@ void MainWindow::hideAllDocks()
 
 void MainWindow::restoreDocks()
 {
+    for (auto dock : docks_) {
+        dock->show();
+    }
     // Place docks
 
     // Roms | Central | Sidebar
@@ -362,6 +365,11 @@ void MainWindow::setupMenu() {
     auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
 
     QMenu *themeMenu = viewMenu->addMenu(tr("Theme"));
+    auto *resetLayoutAction = viewMenu->addAction(tr("Reset Layout"));
+    connect(resetLayoutAction, &QAction::triggered, [this]() {
+        hideAllDocks();
+        restoreDocks();
+    });
 
     auto *nativeThemeAction = themeMenu->addAction(tr("Native"));
 
