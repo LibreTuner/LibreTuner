@@ -12,15 +12,6 @@
 
 
 SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-    
-    QScrollArea *scrollArea = new QScrollArea;
-    QVBoxLayout *scrollLayout = new QVBoxLayout;
-    scrollLayout->setContentsMargins(0, 5, 0, 5);
-    scrollArea->setLayout(scrollLayout);
-    scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    
     tableDescription_ = new QPlainTextEdit;
     tableDescription_->setReadOnly(true);
     tableDescription_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -40,6 +31,7 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfo_ = new QWidget;
     tableInfo_->setContentsMargins(0, 0, 0, 0);
     auto *tableForm = new QFormLayout;
+    tableForm->setSizeConstraint(QFormLayout::SetMaximumSize);
     
     // Build tree widget
     tableName_ = new QLineEdit;
@@ -62,12 +54,27 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     
     tableInfo_->setLayout(tableForm);
     
+    // Scroll area
+    QVBoxLayout *scrollLayout = new QVBoxLayout;
+    scrollLayout->setContentsMargins(0, 5, 0, 5);
+    scrollLayout->setAlignment(Qt::AlignTop);
     scrollLayout->addWidget(tableDescription_);
     scrollLayout->addLayout(tableInfoTitleLayout);
     scrollLayout->addWidget(tableInfo_);
-    scrollLayout->addStretch();
+    
+    QWidget *scrollWidget = new QWidget;
+    scrollWidget->setContentsMargins(0, 0, 0, 0);
+    scrollWidget->setLayout(scrollLayout);
+    
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setWidget(scrollWidget);
+    scrollArea->setWidgetResizable(true);
+    
+    // Main layout
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
     layout->addWidget(scrollArea);
-    layout->setAlignment(Qt::AlignTop);
+    // layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
     
     fillTableInfo(nullptr);
