@@ -28,6 +28,7 @@ class QLineEdit;
 class QComboBox;
 class LibreTuner;
 class PlatformLink;
+class AuthOptionsView;
 
 /**
  * Window for downloading firmware from the ECU
@@ -40,6 +41,7 @@ public:
     
 public slots:
     void download();
+    void platformChanged(int index);
 
     // QWidget interface
 protected:
@@ -49,6 +51,7 @@ private:
     QComboBox *comboPlatform_;
     QLineEdit *lineName_;
     QLineEdit *lineId_;
+    AuthOptionsView *authOptions_;
 
     std::unique_ptr<PlatformLink> get_platform_link();
 };

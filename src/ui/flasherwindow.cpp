@@ -46,6 +46,8 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
     // Form entries
     buttonTune_ = new QPushButton(tr("None selected"));
     buttonTune_->setMinimumWidth(300);
+    buttonTune_->setDefault(true);
+    buttonTune_->setAutoDefault(true);
     connect(buttonTune_, &QPushButton::clicked, [this]() {
         buttonTuneClicked();
     });
@@ -58,6 +60,11 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
         verify();
     });
     
+    // Buttons
+    auto *buttonClose = new QPushButton(tr("Close"));
+    auto *buttonAdvanced = new QPushButton(tr("Advanced"));
+    buttonAdvanced->setCheckable(true);
+    
     buttonFlash_ = new QPushButton(tr("Flash"));
     buttonFlash_->setEnabled(false);
 
@@ -66,15 +73,30 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
     form->addRow(tr("Tune"), buttonTune_);
     form->addRow(tr("Link"), comboLink_);
 
-    auto *authOptions = new AuthOptionsView;
+    authOptions_ = new AuthOptionsView;
+    authOptions_->hide();
+    
+    // Buttons layout
+    auto *buttonLayout = new QVBoxLayout;
+    buttonLayout->setAlignment(Qt::AlignTop);
+    buttonLayout->addWidget(buttonFlash_);
+    buttonLayout->addWidget(buttonClose);
+    buttonLayout->addWidget(buttonAdvanced);
+    
+    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
+    connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
+    
+    // Top layout
+    auto *topLayout = new QHBoxLayout;
+    topLayout->addLayout(form);
+    topLayout->addLayout(buttonLayout);
     
     // Main layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSizeConstraint(QLayout::SetFixedSize);
     
-    layout->addLayout(form);
-    layout->addWidget(authOptions);
-    layout->addWidget(buttonFlash_);
+    layout->addLayout(topLayout);
+    layout->addWidget(authOptions_);
     
     setLayout(layout);
 }
@@ -174,6 +196,8 @@ void FlasherWindow::verify()
         buttonTune_->setText(tr("None selected"));
     } else {
         buttonTune_->setText(QString::fromStdString(selectedTune_->name()));
+        authOptions_->setDefaultOptions(selectedTune_->base()->platform()->flashAuthOptions);
+
     }
     buttonFlash_->setEnabled(selectedTune_ && comboLink_->currentData(Qt::UserRole).isValid());
 }

@@ -34,8 +34,8 @@
 
 namespace download {
 
-RMADownloader::RMADownloader(const PlatformLink &link, const Options &options)
-    : uds_(link.uds()), key_(options.key), totalSize_(options.size) {
+RMADownloader::RMADownloader(const PlatformLink &link, Options &&options)
+    : uds_(link.uds()), authOptions_(std::move(options.auth)), totalSize_(options.size) {
         if (!uds_) {
             throw std::runtime_error("UDS is unsupported with the selected datalink");
         }
@@ -54,7 +54,11 @@ bool RMADownloader::download() {
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
-    auth_.auth(*uds_, auth::Options{key_});
+    
+    // Authenticate
+    auth::UdsAuthenticator auth(*uds_, authOptions_);
+    auth.auth();
+    
     Logger::debug("[DOWNLOAD] Authenticated");
     Logger::debug("[Download] Downloading " + std::to_string(downloadSize_) + " bytes");
 
@@ -87,10 +91,10 @@ std::pair<const uint8_t*, size_t> RMADownloader::data() {
 
 
 
-std::unique_ptr<Downloader> get_downloader(const std::string& id, const PlatformLink& link, const Options& options)
+std::unique_ptr<Downloader> get_downloader(const std::string& id, const PlatformLink& link, Options options)
 {
     if (id == "rma") {
-        return std::make_unique<RMADownloader>(link, options);
+        return std::make_unique<RMADownloader>(link, std::move(options));
     }
     return nullptr;
 }

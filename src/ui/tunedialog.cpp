@@ -9,27 +9,35 @@
 
 TuneDialog::TuneDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Select Tune"));
-    QVBoxLayout *layout = new QVBoxLayout;
+    resize(600, 400);
     
     roms_ = new RomsView;
     roms_->setModel(new RomsModel(this));
+    
+    QPushButton *select = new QPushButton(tr("Select"));
+    select->setEnabled(false);
+    select->setDefault(true);
+    select->setAutoDefault(true);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(roms_);
+    layout->addWidget(select);
+    
+    setLayout(layout);
+    
+    // Signals
+    
     connect(roms_, &RomsView::activated, [this](const QModelIndex &index) {
         if (roms_->selectedTune() != nullptr) {
             close();
         }
     });
     
-    QPushButton *select = new QPushButton(tr("Select"));
-    select->setEnabled(false);
-    
     connect(roms_, &RomsView::tuneChanged, [this, select]() {
         select->setEnabled(roms_->selectedTune() != nullptr);
     });
     
-    layout->addWidget(roms_);
-    layout->addWidget(select);
-    
-    setLayout(layout);
+    connect(select, &QPushButton::clicked, this, &QWidget::close);
 }
 
 

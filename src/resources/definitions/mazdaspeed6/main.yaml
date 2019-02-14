@@ -13,8 +13,12 @@ vins:
 transfer:
   flashmode: "MazdaT1"
   downloadmode: "Mazda23"
-  key: "MazdA"
   serverid: 0x7E0
+  
+auth:
+  key: "MazdA"
+  download_sessionid: 0x87
+  flash_sessionid: 0x85
 
 
 # Tables

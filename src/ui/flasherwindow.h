@@ -35,6 +35,7 @@ using FlasherPtr = std::shared_ptr<Flasher>;
 
 class Tune;
 class QComboBox;
+class AuthOptionsView;
 
 /**
  * @todo write docs
@@ -59,6 +60,7 @@ private:
     QPushButton *buttonTune_;
     QPushButton *buttonFlash_;
     QComboBox *comboLink_;
+    AuthOptionsView *authOptions_;
 };
 
 #endif // FLASHWINDOW_H
