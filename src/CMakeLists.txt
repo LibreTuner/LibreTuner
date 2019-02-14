@@ -119,6 +119,8 @@ set(libretuner_SRC
     ui/docks/editorwidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
+    ui/docks/overviewwidget.cpp
+    ui/docks/overviewwidget.h
     
     ui/tunesmodel.cpp
     ui/tunesmodel.h

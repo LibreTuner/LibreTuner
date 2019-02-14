@@ -27,6 +27,7 @@
 #include "docks/graphwidget.h"
 #include "docks/logview.h"
 #include "docks/tableswidget.h"
+#include "docks/overviewwidget.h"
 
 #include "dataloggerwindow.h"
 #include "titlebar.h"
@@ -315,6 +316,9 @@ bool MainWindow::checkSaveSelected()
 QDockWidget *MainWindow::createOverviewDock() {
     QDockWidget *dock = new QDockWidget("Overview", this);
     dock->setObjectName("overview");
+    
+    dock->setWidget(new OverviewWidget);
+    
     docks_.emplace_back(dock);
     return dock;
 }
