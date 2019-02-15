@@ -1491,7 +1491,7 @@ QDockWidget {
 }
 
 QDockWidget::title {
-    padding: 0.3em;   /* better size for title bar */
+    padding: 0.2em;   /* better size for title bar */
     border: none;
     background-color: #2b2b2b;
 }
