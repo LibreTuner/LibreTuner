@@ -53,9 +53,10 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     hlayout->addLayout(logLayout);
     logOutput_ = new QTreeWidget;
     logOutput_->setHeaderHidden(true);
+    logOutput_->setColumnCount(2);
     logLayout->addWidget(logOutput_);
 
-    buttonLog_ = new QPushButton("Start logging");
+    buttonLog_ = new QPushButton(tr("Start logging"));
     logLayout->addWidget(buttonLog_);
     connect(buttonLog_, &QPushButton::clicked, this,
             &DataLoggerWindow::buttonClicked);
@@ -76,45 +77,58 @@ void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
 }
 
 void DataLoggerWindow::buttonClicked() {
-    std::unique_ptr<PlatformLink> link = LT()->platform_link();
-    if (!link) {
-        QMessageBox::critical(this, "Datalog error", "A platform link could not be created");
+    if (logger_) {
+        logger_->disable();
         return;
     }
-    
-    logger_ = link->logger(log_);
-    
-    if (!logger_) {
-        QMessageBox::critical(this, "Datalog error", "A datalogger could not be created for the platform link");
-        return;
-    }
-    
-    connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value) {
-        onLogEntry(data, value);
-    });
-    
-    // Add PIDs
-    for (QListWidgetItem *item : pidItems_) {
-        if (item->checkState() == Qt::Checked) {
-            definition::Pid *pid = definition_->getPid(item->data(Qt::UserRole).toInt());
-            if (!pid) {
-                // Should never happen...
-                Logger::warning("Invalid pid " + std::to_string(item->data(Qt::UserRole).toInt()) + " while adding to logger");
-                continue;
-            }
-            logger_->addPid(pid->id, pid->code, pid->formula);
-        }
-    }
-    
-    BackgroundTask<void()> task([&]() {
-        logger_->run();
-    });
-    
-    task();
-    
-    // Catch and exceptions
     try {
+        std::unique_ptr<PlatformLink> link = LT()->platform_link();
+        if (!link) {
+            QMessageBox::critical(this, "Datalog error", "A platform link could not be created");
+            return;
+        }
+
+        logger_ = link->logger(log_);
+
+        if (!logger_) {
+            QMessageBox::critical(this, "Datalog error", "A datalogger could not be created for the platform link");
+            return;
+        }
+
+        connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value) {
+            onLogEntry(data, value);
+        });
+
+        // Add PIDs
+        for (QListWidgetItem *item : pidItems_) {
+            if (item->checkState() == Qt::Checked) {
+                definition::Pid *pid = definition_->getPid(item->data(Qt::UserRole).toInt());
+                if (!pid) {
+                    // Should never happen...
+                    Logger::warning("Invalid pid " + std::to_string(item->data(Qt::UserRole).toInt()) + " while adding to logger");
+                    continue;
+                }
+
+                logger_->addPid(pid->id, pid->code, pid->formula);
+            }
+        }
+
+        BackgroundTask<void()> task([&]() {
+            logger_->run();
+        });
+
+        connect(this, &QWidget::close, [&]() {
+            logger_->disable();
+        });
+
+        buttonLog_->setText(tr("Stop logging"));
+        task();
+
+        // Catch any exceptions
         task.future().get();
+
+        logger_.reset();
+        buttonLog_->setText(tr("Start logging"));
     } catch (const std::runtime_error &error) {
         QMessageBox::critical(this, "Datalog error", error.what());
     }
@@ -129,11 +143,13 @@ void DataLoggerWindow::onLogEntry(const DataLog::Data& data, double value)
         item = it->second;
     } else {
         item = new QTreeWidgetItem;
-        item->setData(0, Qt::DisplayRole, QString::fromStdString(data.id.name));
+        item->setText(0, QString::fromStdString(data.id.name));
+        item->setText(1, "...");
+        logOutput_->addTopLevelItem(item);
         outputItems_.insert({data.id.id, item});
     }
     
-    item->setData(0, Qt::DisplayRole, QString::number(value));
+    item->setData(1, Qt::DisplayRole, value);
 }
 
 
@@ -149,13 +165,6 @@ void DataLoggerWindow::reset()
 
     for (const definition::Pid &pid : definition_->pids) {
         if (!pid.valid) {
-            continue;
-        }
-        try {
-            //log_->addData({pid.name, pid.description, pid.id, DataUnit::None});
-            //logger_->addPid(pid.id, pid.code, pid.formula);
-        } catch (const std::exception &e) {
-            Logger::warning(std::string("Error while adding PID ") + std::to_string(pid.id) + ": " + e.what());
             continue;
         }
         auto *item = new QListWidgetItem;
