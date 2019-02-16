@@ -1068,8 +1068,16 @@ QComboBox QAbstractItemView {
     background-color: #1b1b1b;
     border-radius: 0px;
     border: 1px solid #2b2b2b;
-    selection-color: #148CD2;
-    selection-background-color: #2b2b2b;
+    outline: 0px;
+}
+
+QComboBox QAbstractItemView::item {
+    border: none;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background: #2b2b2b;
+    color: #148CD2;
 }
 
 QComboBox::drop-down {
