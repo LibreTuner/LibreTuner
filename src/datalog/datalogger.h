@@ -26,7 +26,7 @@
 
 #include "datalog.h"
 #include "protocols/udsprotocol.h"
-// #include <shunting-yard.h>
+#include <shunting-yard.h>
 
 enum class PidType {
     Queried,
@@ -40,9 +40,9 @@ public:
     Pid &operator=(const Pid&) = delete;
     Pid(const Pid &) = delete;
 
-    //void setX(uint8_t x) { vars_["a"] = x; }
-    //void setY(uint8_t y) { vars_["b"] = y; }
-    //void setZ(uint8_t z) { vars_["c"] = z; }
+    void setX(uint8_t x) { vars_["a"] = x; }
+    void setY(uint8_t y) { vars_["b"] = y; }
+    void setZ(uint8_t z) { vars_["c"] = z; }
 
     double evaluate() const;
     uint32_t id() const { return id_; }
@@ -53,8 +53,8 @@ private:
     uint32_t id_;
     uint16_t code_;
 
-    // TokenMap vars_;
-    // calculator expression_;
+    TokenMap vars_;
+    calculator expression_;
 };
 
 class DataLogger;

@@ -45,6 +45,7 @@ void TablesWidget::setTables(const std::vector<definition::Table> &tables)
         if (par == nullptr) {
             par = new QTreeWidgetItem(view_);
             par->setText(0, QString::fromStdString(def.category));
+            par->setData(0, Qt::UserRole, QVariant(-1));
 
             categories_.emplace_back(def.category, par);
         }

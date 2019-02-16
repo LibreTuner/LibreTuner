@@ -32,6 +32,8 @@ public:
     using SignalType = Signal<Func>;
     Connection(const std::shared_ptr<SignalType> &signal, Func f)
         : signal_(signal), func_(f) {}
+    
+    Connection() {}
 
     ~Connection() { disconnect(); }
 

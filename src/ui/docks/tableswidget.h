@@ -19,8 +19,6 @@ class TablesWidget : public QWidget
 public:
     explicit TablesWidget(QWidget *parent = nullptr);
 
-    //void setModel(QAbstractItemModel *model);
-
 signals:
     void activated(int index);
 

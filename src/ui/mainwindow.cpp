@@ -222,6 +222,10 @@ QDockWidget *MainWindow::createTablesDock()
     dock->setWidget(tables_);
     
     connect(tables_, &TablesWidget::activated, [this](int index) {
+        if (index < 0) {
+            // Don't change
+            return;
+        }
         Table *table = selectedTune_->tables().get(index, true);
         
         emit tableChanged(table);
@@ -247,8 +251,9 @@ QDockWidget *MainWindow::createEditorDock()
 
 bool MainWindow::changeSelected(Tune *tune)
 {
-    
+    // Ask to save any open tune before continuing
     if (checkSaveSelected()) {
+        // The user gave permission to open a new tune
         try {
             if (tune) {
                 selectedTune_ = tune->data();
@@ -256,10 +261,10 @@ bool MainWindow::changeSelected(Tune *tune)
                 saveCurrentAction_->setEnabled(true);
                 tables_->setTables(tune->base()->platform()->tables);
             } else {
+                // Change to null tune (a tune was likely closed)
                 tables_->setTables(std::vector<definition::Table>());
                 flashCurrentAction_->setEnabled(false);
                 saveCurrentAction_->setEnabled(false);
-                // editor_->setModel(nullptr);
                 emit tableChanged(nullptr);
             }
         } catch (const std::runtime_error &err) {
@@ -278,6 +283,7 @@ bool MainWindow::checkSaveSelected()
         return true;
     }
     
+    // Check if the current tune has been modified
     if (selectedTune_->dirty()) {
         QMessageBox mb;
         mb.setText(tr("This tune has been modified"));
