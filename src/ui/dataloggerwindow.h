@@ -56,6 +56,8 @@ public slots:
     /* Callback for the start/stop button */
     void buttonClicked();
 
+
+
 private:
     DataLog log_;
     std::unique_ptr<DataLogger> logger_;
