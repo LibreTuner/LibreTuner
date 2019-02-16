@@ -26,9 +26,10 @@
 #include <memory>
 #include <unordered_map>
 
-#include "datalog/datalogger.h"
 #include "styledwindow.h"
 #include "datalog/datalog.h"
+
+class DataLogger;
 
 class QListWidget;
 class QTreeWidgetItem;

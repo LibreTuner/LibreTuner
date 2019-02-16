@@ -68,31 +68,24 @@ void UdsDataLogger::processNext() {
 
     // Request the data
     std::vector<uint8_t> data;
-    data.emplace_back(0x01);
-    if (pid->code() > 0xFF) {
-        data.emplace_back(pid->code() >> 8);
-    }
+    data.emplace_back(0x22); // readDataByIdentifier
+    data.emplace_back(pid->code() >> 8);
     data.emplace_back(pid->code() & 0xFF);
     uds::Packet response;
-    uds_->request(data.data(), data.size(), 0x41, response);
+    uds_->request(data.data(), data.size(), 0x62, response);
     
-    
-    if (pid->code() > 0xFF) {
-        response.data.erase(response.data.begin(), response.data.begin() + 2);
-    } else {
-        response.data.erase(response.data.begin());
-    }
+    response.data.erase(response.data.begin(), response.data.begin() + 2);
 
-    switch (data.size()) {
+    switch (response.data.size()) {
     case 0:
         break;
     default:
     case 3:
-        pid->setZ(data[2]);
+        pid->setZ(response.data[2]);
     case 2:
-        pid->setY(data[1]);
+        pid->setY(response.data[1]);
     case 1:
-        pid->setX(data[0]);
+        pid->setX(response.data[0]);
         break;
     }
 
@@ -110,6 +103,7 @@ void UdsDataLogger::run() {
       current_pid_ = 0;
       processNext();
     });*/
+    running_ = true;
     try {
         while (running_)
             processNext();

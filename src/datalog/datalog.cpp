@@ -53,8 +53,10 @@ DataLog::Data *DataLog::addPid(uint32_t id) {
     if (!platform_) {
         return nullptr;
     }
-    for (definition::Pid &pid : platform_->pids) {
-        auto ret = data_.emplace(id, Data(pid));
+
+    definition::Pid *pid = platform_->getPid(id);
+    if (pid != nullptr) {
+        auto ret = data_.emplace(id, Data(*pid));
         return &ret.first->second;
     }
     return nullptr;

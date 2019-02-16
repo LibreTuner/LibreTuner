@@ -163,6 +163,15 @@ void Main::load(const YAML::Node& file)
     id = file["id"].as<std::string>();
     romsize = file["romsize"].as<std::size_t>();
     baudrate = file["baudrate"].as<std::size_t>();
+    if (file["logmode"]) {
+        logMode = [](std::string mode) {
+            std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
+            if (mode == "uds") {
+                return LogMode::Uds;
+            }
+            return LogMode::None;
+        }(file["logmode"].as<std::string>());
+    }
     
     // Load transfer
     {
