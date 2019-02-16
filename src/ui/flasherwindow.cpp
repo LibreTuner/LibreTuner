@@ -28,6 +28,7 @@
 #include "vehicle.h"
 #include "flash/flashable.h"
 #include "authoptionsview.h"
+#include "backgroundtask.h"
 
 #include <cassert>
 
@@ -85,6 +86,7 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
     
     connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
     connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
+    connect(buttonFlash_, &QPushButton::clicked, this, &FlasherWindow::buttonFlashClicked);
     
     // Top layout
     auto *topLayout = new QHBoxLayout;
@@ -129,40 +131,46 @@ void FlasherWindow::buttonFlashClicked()
             return;
         }
 
+        // Create progress dialog
         QProgressDialog progress(tr("Flashing tune..."), tr("Abort"), 0, 100, this);
         progress.setWindowModality(Qt::WindowModal);
         progress.setWindowTitle(tr("LibreTuner - Flash"));
         progress.setValue(0);
         progress.show();
 
-
         flasher->setProgressCallback([&](float prog) {
             QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
         });
-
-        bool success = false;
-        std::atomic<bool> stopped(false);
-
-        std::thread worker([&]() {
-            success = flasher->flash(tuneData->flashable());
-            stopped = true;
+        
+        // Create task
+        BackgroundTask<bool()> task([&]() {
+            return flasher->flash(tuneData->flashable());
         });
-
+        
         bool canceled = false;
-
-        while (!stopped) {
-            QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-            if (progress.wasCanceled()) {
+        
+        connect(&progress, &QProgressDialog::canceled, [&]() {
+            // Alert the user of possible bricking
+            QMessageBox msgBox;
+            msgBox.setText("Are you sure you want to cancel reprogramming");
+            msgBox.setInformativeText("Canceling the reprogramming task WILL leave the ECU in an inoperable state.");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::No);
+            
+            if (msgBox.exec() == QMessageBox::Yes) {
                 flasher->cancel();
                 canceled = true;
             }
-        }
-        worker.join();
+        });
+        
+        task();
 
-        if (!success && !canceled) {
-            throw std::runtime_error("Unknown error");
-        } else {
-            QMessageBox(QMessageBox::Information, "Flash Finished", "Successfully reprogrammed ECU").exec();
+        if (!canceled) {
+            if (!task.future().get()) {
+                throw std::runtime_error("Unknown error");
+            } else {
+                QMessageBox(QMessageBox::Information, "Flash Finished", "Successfully reprogrammed ECU").exec();
+            }
         }
     } catch (const std::runtime_error &err) {
         QMessageBox(QMessageBox::Critical, "Flash Error", err.what()).exec();

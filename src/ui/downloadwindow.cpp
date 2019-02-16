@@ -27,6 +27,7 @@
 #include "libretuner.h"
 #include "rommanager.h"
 #include "download/downloader.h"
+#include "backgroundtask.h"
 
 #include "authoptionsview.h"
 
@@ -133,6 +134,7 @@ void DownloadWindow::download()
             throw std::runtime_error("Invalid platform or data link");
         }
 
+        // Create progress dialog
         QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0, 100, this);
         progress.setWindowModality(Qt::WindowModal);
         progress.setWindowTitle(tr("LibreTuner - Download"));
@@ -144,39 +146,25 @@ void DownloadWindow::download()
         downloader->setProgressCallback([&](float prog) {
             QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
         });
-
-        bool success = false;
-        std::atomic<bool> stopped(false);
-
-        std::promise<void> p;
-        std::future<void> future = p.get_future();
-
-        std::thread worker([&]() {
-            try {
-                success = downloader->download();
-            } catch (...) {
-                success = false;
-                p.set_exception(std::current_exception());
-            }
-            stopped = true;
+        
+        BackgroundTask<bool()> task([&]() -> bool {
+            return downloader->download();
+        });
+        
+        bool canceled = false;
+        
+        connect(&progress, &QProgressDialog::canceled, [&downloader, &canceled]() {
+            downloader->cancel();
+            canceled = true;
         });
 
-        bool canceled = false;
-
-        while (!stopped) {
-            QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-            if (progress.wasCanceled()) {
-                downloader->cancel();
-                canceled = true;
-                Logger::info("Aborted download");
+        task();
+        
+        if (!canceled) {
+            bool success = task.future().get();
+            if (!success) {
+                throw std::runtime_error("Unknown error");
             }
-        }
-        worker.join();
-
-        if (!success && !canceled) {
-            future.get();
-            throw std::runtime_error("Unknown error");
-        } else if (success) {
             auto data = downloader->data();
             try {
                 RomStore::get()->addRom(lineName_->text().toStdString(),
@@ -210,8 +198,6 @@ void DownloadWindow::download()
                 }
             }
         }
-
-        
     } catch (const std::runtime_error &err) {
         QMessageBox(QMessageBox::Critical, "Download Error", err.what()).exec();
     }

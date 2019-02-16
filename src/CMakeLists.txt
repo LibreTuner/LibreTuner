@@ -106,6 +106,8 @@ set(libretuner_SRC
     ui/authoptionsview.h
     ui/sessionscannerdialog.cpp
     ui/sessionscannerdialog.h
+    ui/backgroundtask.cpp
+    ui/backgroundtask.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h
