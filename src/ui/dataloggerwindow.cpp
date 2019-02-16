@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QShowEvent>
 #include <QVBoxLayout>
+#include <QHeaderView>
 
 #include "datalink/datalink.h"
 #include "datalog/datalog.h"
@@ -54,6 +55,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     logOutput_ = new QTreeWidget;
     logOutput_->setHeaderHidden(true);
     logOutput_->setColumnCount(2);
+    logOutput_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     logLayout->addWidget(logOutput_);
 
     buttonLog_ = new QPushButton(tr("Start logging"));
@@ -73,7 +75,9 @@ void DataLoggerWindow::showEvent(QShowEvent *event) {
 void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
     // TODO: ask to save log
     pidList_->clear();
-    logger_.reset();
+    if (logger_) {
+        logger_->disable();
+    }
 }
 
 void DataLoggerWindow::buttonClicked() {
@@ -115,10 +119,6 @@ void DataLoggerWindow::buttonClicked() {
 
         BackgroundTask<void()> task([&]() {
             logger_->run();
-        });
-
-        connect(this, &QWidget::close, [&]() {
-            logger_->disable();
         });
 
         buttonLog_->setText(tr("Stop logging"));
