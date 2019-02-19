@@ -32,11 +32,23 @@ UdsDiagnosticInterface::UdsDiagnosticInterface(
 
 
 void UdsDiagnosticInterface::scan(ScanResult &result) {
-    static uint8_t request[1] = {7};
+    scanPid(result, 0x2);
+}
+
+
+void UdsDiagnosticInterface::scanPending(ScanResult &result)
+{
+    scanPid(result, 0x7);
+}
+
+
+void UdsDiagnosticInterface::scanPid(ScanResult &result, uint8_t pid)
+{
+    static uint8_t request[1] = {pid};
     uds::Packet response;
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
-    uds_->request(request, 1, 0x47, response);
+    uds_->request(request, 1, 0x40 + pid, response);
 
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
@@ -49,7 +61,7 @@ void UdsDiagnosticInterface::scan(ScanResult &result) {
         // Temporary description resolution. In the future,
         // manufacturer-specific codes will be added
         auto descRes =
-            LibreTuner::get()->dtcDescriptions().get(code.codeString());
+            LT()->dtcDescriptions().get(code.codeString());
         code.description = descRes.first ? descRes.second : "unknown";
 
         result.add(std::move(code));

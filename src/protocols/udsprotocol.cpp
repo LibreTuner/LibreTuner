@@ -52,8 +52,8 @@ void IsoTpInterface::request(const uint8_t *data, size_t size, uint8_t expectedI
                     continue;
                 }
                 std::stringstream ss;
-                ss << "negative UDS response: 0x" << std::hex << (int)code
-                   << " (" << std::dec << (int)code << ")";
+                ss << "negative UDS response: 0x" << std::hex << static_cast<int>(code)
+                   << " (" << std::dec << static_cast<int>(code) << ")";
                 throw std::runtime_error(ss.str());
             }
             throw std::runtime_error("negative UDS response");

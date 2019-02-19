@@ -32,6 +32,7 @@ public:
 
     /* Scans the interface for codes and fills result */
     virtual void scan(ScanResult &result) = 0;
+    virtual void scanPending(ScanResult &result) = 0;
 };
 
 
@@ -42,9 +43,12 @@ public:
 
 
     virtual void scan(ScanResult &result) override;
+    virtual void scanPending(ScanResult &result) override;
 
 private:
     std::unique_ptr<uds::Protocol> uds_;
+
+    void scanPid(ScanResult &result, uint8_t pid = 0x2);
 };
 
 #endif // DIAGNOSTICSINTERFACE_H
