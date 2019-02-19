@@ -3,9 +3,10 @@
 
 #include <QTableView>
 #include <QWidget>
-#include <QButtonGroup>
 
 #include "scanresult.h"
+
+class QCheckBox;
 
 class DiagnosticsWidget : public QWidget {
     Q_OBJECT
@@ -15,12 +16,14 @@ public:
 signals:
 
 public slots:
+    void scan();
 
 private:
     QTableView *listCodes_;
-    QButtonGroup modeGroup_;
+    QCheckBox *checkPending_;
 
     ScanResult scanResult_;
+    ScanResult pendingScanResult_;
 };
 
 #endif // DIAGNOSTICSWIDGET_H
