@@ -78,6 +78,7 @@ uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
 
 void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
                      uint32_t timeout) {
+    assert(initialized());
     int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
     if (res != 0) {
         Logger::warning("PassThruReadMsgs failed");
@@ -87,6 +88,7 @@ void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
 
 void J2534::writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
                       uint32_t timeout) {
+    assert(initialized());
     int32_t res = PassThruWriteMsgs(channel, pMsg, &pNumMsgs, timeout);
     if (res != 0) {
         Logger::warning("PassThruWriteMsgs failed");
@@ -99,6 +101,7 @@ void J2534::startMsgFilter(uint32_t channel, uint32_t type,
                            const PASSTHRU_MSG *pPatternMsg,
                            const PASSTHRU_MSG *pFlowControlMsg,
                            uint32_t &pMsgID) {
+    assert(initialized());
     int32_t res = PassThruStartMsgFilter(channel, type, pMaskMsg, pPatternMsg,
                                          pFlowControlMsg, &pMsgID);
     if (res != 0) {

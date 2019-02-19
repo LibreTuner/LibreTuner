@@ -32,17 +32,19 @@ UdsDiagnosticInterface::UdsDiagnosticInterface(
 
 
 void UdsDiagnosticInterface::scan(ScanResult &result) {
-    static uint8_t request[1] = {3};
+    static uint8_t request[1] = {7};
     uds::Packet response;
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
-    uds_->request(request, 1, 0x43, response);
+    uds_->request(request, 1, 0x47, response);
 
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
+    Logger::debug("Response size: " + std::to_string(response.data.size()));
     for (size_t i = 1; i < response.data.size(); i += 2) {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
+        Logger::debug("Got code");
 
         // Temporary description resolution. In the future,
         // manufacturer-specific codes will be added
