@@ -17,7 +17,7 @@ class BackgroundTask<R(Args...)>
 {
 public:
     template<class F>
-    explicit BackgroundTask(F &&f) : task_(std::move(f)) {};
+    explicit BackgroundTask(F &&f) : task_(std::move(f)) {}
     
     // Executes the function
     void operator()(Args && ...args) {
@@ -34,7 +34,7 @@ public:
     }
     
     // Returns the future. Can only be called once.
-    std::future<R> future() { return task_.get_future(); };
+    std::future<R> future() { return task_.get_future(); }
     
 private:
     std::packaged_task<R(Args...)> task_;

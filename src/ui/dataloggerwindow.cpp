@@ -37,6 +37,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
 {
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
+    resize(600, 400);
 
     auto *hlayout = new QHBoxLayout;
     setLayout(hlayout);
@@ -48,6 +49,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     pidLayout->addWidget(pidLabel);
 
     pidList_ = new QListWidget;
+    pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     pidLayout->addWidget(pidList_);
 
     auto *logLayout = new QVBoxLayout;
@@ -69,7 +71,6 @@ DataLoggerWindow::~DataLoggerWindow() = default;
 
 void DataLoggerWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event)
-
 }
 
 void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
@@ -100,7 +101,9 @@ void DataLoggerWindow::buttonClicked() {
         }
 
         connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value) {
-            onLogEntry(data, value);
+            QMetaObject::invokeMethod(this, [this, data, value]() {
+                onLogEntry(data, value);
+            });
         });
 
         // Add PIDs
@@ -175,4 +178,7 @@ void DataLoggerWindow::reset()
         pidList_->addItem(item);
         pidItems_.emplace_back(item);
     }
+
+    // Adjust minimum width to fit all elements
+    pidList_->setMinimumWidth(pidList_->sizeHintForColumn(0) + 8 * pidList_->frameWidth());
 }

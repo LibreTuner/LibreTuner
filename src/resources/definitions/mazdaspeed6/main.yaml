@@ -513,7 +513,7 @@ pids:
     unit: "percentage"
     formula: "a / 1.28 - 100"
 
-  - id: 19
+  - id: 20
     name: "Short term fuel trim (secondary)"
     description: "The short term fuel trim calculated from the secondary oxygen sensor"
     code: 0x163e
