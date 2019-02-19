@@ -44,6 +44,7 @@ namespace datalink {
     class Link {
     public:
         explicit Link(const std::string &name);
+        virtual ~Link() = default;
 
         virtual Type type() const = 0;
 

@@ -21,11 +21,13 @@
 
 #include <QColor>
 
-Log::Log() {}
+Log::Log() {
+    connect(&Logger::get(), &Logger::appended, this, &Log::append);
+}
 
 
 
-void Log::append(LogEntry &&entry) {
+void Log::appendEntry(LogEntry &&entry) {
     beginInsertRows(QModelIndex(), entries_.size(), entries_.size());
 
     entries_.emplace_back(std::move(entry));
@@ -36,7 +38,7 @@ void Log::append(LogEntry &&entry) {
 
 
 void Log::append(Logger::Mode mode, const std::string &text) {
-    append({mode, text});
+    appendEntry({mode, text});
 }
 
 

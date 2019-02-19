@@ -20,9 +20,11 @@
 #define LOGGER_H
 
 #include <string>
+#include <QObject>
 
 /* Static logger */
-class Logger {
+class Logger : public QObject {
+    Q_OBJECT
 public:
     enum class Mode {
         Debug,
@@ -31,24 +33,37 @@ public:
         Critical,
     };
 
-    Logger();
+    // Returns the logger singleton
+    static Logger &get();
 
-    static void log(Mode mode, const std::string &message);
+    void log(Mode mode, const std::string &message);
 
-    static void debug(const std::string &message) { log(Mode::Debug, message); }
+    static void debug(const std::string &message) { Logger::get().log(Mode::Debug, message); }
 
-    static void info(const std::string &message) { log(Mode::Info, message); }
+    static void info(const std::string &message) { Logger::get().log(Mode::Info, message); }
 
     static void warning(const std::string &message) {
-        log(Mode::Warning, message);
+        Logger::get().log(Mode::Warning, message);
     }
 
     static void critical(const std::string &message) {
-        log(Mode::Critical, message);
+        Logger::get().log(Mode::Critical, message);
     }
+
+    virtual ~Logger() = default;
+
+    Logger(Logger&&) = delete;
+    Logger(const Logger&) = delete;
+    Logger &operator=(Logger&&) = delete;
+    Logger &operator=(const Logger&) = delete;
+
+signals:
+    void appended(Mode mode, const std::string &message);
 
 private:
     static std::string modeString(Mode mode);
+
+    Logger();
 };
 
 #endif // LOGGER_H
