@@ -22,10 +22,16 @@
 
 Logger::Logger() = default;
 
+
+
+Logger &Logger::get()
+{
+    static Logger logger;
+    return logger;
+}
+
 void Logger::log(Logger::Mode mode, const std::string &message) {
-    if (LibreTuner *lt = LibreTuner::get()) {
-        lt->log().append(mode, message);
-    }
+    emit appended(mode, message);
     std::cout << "[" << modeString(mode) << "] " << message << std::endl;
 }
 

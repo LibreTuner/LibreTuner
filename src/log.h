@@ -30,6 +30,7 @@ struct LogEntry {
 };
 
 class Log : public QAbstractListModel {
+    Q_OBJECT
 public:
     Log();
     Log(const Log &) = delete;
@@ -38,8 +39,9 @@ public:
 
 
     /* Adds to the end of log */
-    void append(LogEntry &&entry);
+    void appendEntry(LogEntry &&entry);
 
+public slots:
     void append(Logger::Mode mode, const std::string &text);
 
     // QAbstractItemModel interface
