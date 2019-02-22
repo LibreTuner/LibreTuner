@@ -16,16 +16,25 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     auto *layout = new QVBoxLayout;
     auto *menuLayout = new QHBoxLayout;
 
-    QPushButton *buttonScan = new QPushButton(tr("Scan for diagnostic codes"));
+    // Top menu
+    // Buttons
+    auto *buttonScan = new QPushButton(tr("Scan for diagnostic codes"));
     buttonScan->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    menuLayout->addWidget(buttonScan);
 
+    auto *buttonClear = new QPushButton(tr("Clear diagnostic trouble codes"));
+    buttonClear->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    menuLayout->addWidget(buttonScan);
+    menuLayout->addWidget(buttonClear);
+
+    // Options
     checkPending_ = new QCheckBox(tr("Scan Pending Codes"));
     checkPending_->setChecked(true);
     menuLayout->addWidget(checkPending_);
 
     layout->addLayout(menuLayout);
 
+    // Lists
     listCodes_ = new QTableView;
     listCodes_->setModel(&scanResult_);
     listCodes_->horizontalHeader()->setStretchLastSection(true);
@@ -46,6 +55,7 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 
     connect(buttonScan, &QPushButton::clicked, this, &DiagnosticsWidget::scan);
+    connect(buttonClear, &QPushButton::clicked, this, &DiagnosticsWidget::clear);
 }
 
 void DiagnosticsWidget::scan()
@@ -79,9 +89,14 @@ void DiagnosticsWidget::scan()
     try {
         diag->scan(scanResult_);
         if (checkPending_->isChecked()) {
-            diag->scan(pendingScanResult_);
+            diag->scanPending(pendingScanResult_);
         }
     } catch (const std::exception &e) {
         Logger::critical("Scan error: " + std::string(e.what()));
     }
+}
+
+void DiagnosticsWidget::clear()
+{
+
 }

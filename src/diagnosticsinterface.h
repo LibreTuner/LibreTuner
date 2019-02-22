@@ -48,7 +48,7 @@ public:
 private:
     std::unique_ptr<uds::Protocol> uds_;
 
-    void scanPid(ScanResult &result, uint8_t pid = 0x2);
+    void scanPid(ScanResult &result, uint8_t pid = 0x3);
 };
 
 #endif // DIAGNOSTICSINTERFACE_H
