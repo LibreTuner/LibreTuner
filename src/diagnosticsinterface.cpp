@@ -32,7 +32,7 @@ UdsDiagnosticInterface::UdsDiagnosticInterface(
 
 
 void UdsDiagnosticInterface::scan(ScanResult &result) {
-    scanPid(result, 0x2);
+    scanPid(result, 0x3);
 }
 
 
@@ -44,7 +44,7 @@ void UdsDiagnosticInterface::scanPending(ScanResult &result)
 
 void UdsDiagnosticInterface::scanPid(ScanResult &result, uint8_t pid)
 {
-    static uint8_t request[1] = {pid};
+    uint8_t request[1] = {pid};
     uds::Packet response;
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03

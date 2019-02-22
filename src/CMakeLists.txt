@@ -44,6 +44,8 @@ set(libretuner_SRC
     dtcdescriptions.h
     sessionscanner.cpp
     sessionscanner.h
+    diagnostics.cpp
+    diagnostics.h
     
     download/downloader.cpp
     download/downloader.h

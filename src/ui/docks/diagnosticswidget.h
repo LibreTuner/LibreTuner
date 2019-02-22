@@ -17,6 +17,7 @@ signals:
 
 public slots:
     void scan();
+    void clear();
 
 private:
     QTableView *listCodes_;
