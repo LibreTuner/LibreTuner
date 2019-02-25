@@ -61,7 +61,7 @@ class DataLogger;
 
 class DataLogger {
 public:
-    explicit DataLogger(DataLog &log) : log_(log) {};
+    explicit DataLogger(DataLog &log) : log_(log) {}
 
     virtual ~DataLogger() = default;
 
