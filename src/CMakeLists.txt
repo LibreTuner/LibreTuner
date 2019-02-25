@@ -47,6 +47,11 @@ set(libretuner_SRC
     diagnostics.cpp
     diagnostics.h
     
+    plugin/plugin.cpp
+    plugin/plugin.h
+    plugin/pluginstate.cpp
+    plugin/pluginstate.h
+    
     download/downloader.cpp
     download/downloader.h
     
@@ -137,7 +142,8 @@ set(libretuner_SRC
     protocols/udsprotocol.h
     protocols/mockcaninterface.cpp
     protocols/mockcaninterface.h
-    protocols/isotpserver.cpp
+    protocols/isotpserver.cpp    
+    
     protocols/isotpserver.h
     protocols/isotpprotocol.cpp
     protocols/isotpprotocol.h
@@ -187,7 +193,7 @@ qt5_add_resources(libretuner_SRC
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView)
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2)
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${Boost_INCLUDE_DIRS})
 

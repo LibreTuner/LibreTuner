@@ -15,6 +15,7 @@ set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Build yaml-cpp tests")
 add_subdirectory(lib/cparse)
 add_subdirectory(lib/yaml)
 add_subdirectory(lib/QHexView)
+add_subdirectory(lib/sol2)
 
 add_library(QHexView ${QHEXVIEW_SOURCES})
 target_include_directories(QHexView PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/QHexView)
