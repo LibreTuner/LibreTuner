@@ -38,6 +38,7 @@ DevicePtr J2534::open(const char *port) {
         if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
             // Return nullptr. Don't throw an exception,
             // because the absence of a device is not an exceptional error
+            Logger::info("PassThru device not connected");
             return nullptr;
         }
         Logger::warning("PassThruOpen failed");

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LT_LOGGER_H
+#define LT_LOGGER_H
 
 #include <string>
 #include <QObject>
@@ -66,4 +66,4 @@ private:
     Logger();
 };
 
-#endif // LOGGER_H
+#endif // LT_LOGGER_H
