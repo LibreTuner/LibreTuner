@@ -49,6 +49,9 @@ public:
 
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
+    
+    // Simulate PIDs
+    void simulate();
 
 signals:
 

@@ -116,8 +116,6 @@ void GraphWidget::tableChanged(Table *table) {
         chart_->removeAllSeries();
         chart_->addSeries(series);
         chart_->createDefaultAxes();
-
-        chart_->createDefaultAxes();
         
         if (table->axisX()) {
             chart_->axisX()->setTitleText(
