@@ -53,6 +53,7 @@ public:
         explicit Data(definition::Pid &mid) : id(mid) {}
     };
 
+    // Returns the time of the first data point
     TimePoint beginTime() const {
         return beginTime_;
     }
@@ -74,9 +75,13 @@ public:
 
     std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
 
+    // Returns true if the log is empty
+    bool empty() const { return empty_; }
+
 private:
     TimePoint beginTime_;
     definition::MainPtr platform_;
+    bool empty_{true};
 
     std::unordered_map<uint32_t, Data> data_;
     std::shared_ptr<Signal<UpdateCall>> updateSignal_;
