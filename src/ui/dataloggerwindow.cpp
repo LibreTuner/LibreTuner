@@ -40,35 +40,47 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     setWindowTitle("LibreTuner - Data Logger");
     resize(600, 400);
 
-    auto *hlayout = new QHBoxLayout;
-    setLayout(hlayout);
-
-    auto *pidLayout = new QVBoxLayout;
-    hlayout->addLayout(pidLayout);
-
     QLabel *pidLabel = new QLabel("Available PIDs");
-    pidLayout->addWidget(pidLabel);
-
+    
     pidList_ = new QListWidget;
     pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    pidLayout->addWidget(pidList_);
     
     auto *datalogView = new DataLogView;
     datalogView->setDatalog(&log_);
 
-    auto *logLayout = new QVBoxLayout;
-    hlayout->addLayout(logLayout);
-    logOutput_ = new QTreeWidget;
+    /*logOutput_ = new QTreeWidget;
     logOutput_->setHeaderHidden(true);
     logOutput_->setColumnCount(2);
     logOutput_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    //logLayout->addWidget(logOutput_);
-    logLayout->addWidget(datalogView);
+    logLayout->addWidget(logOutput_);*/
 
     buttonLog_ = new QPushButton(tr("Start logging"));
+    auto *buttonSave = new QPushButton(tr("Save log"));
+    
+    auto *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(buttonLog_);
+    
+    auto *logLayout = new QVBoxLayout;
+    logLayout->addWidget(datalogView);
     logLayout->addWidget(buttonLog_);
+    
+    // PIDs layout
+    auto *pidLayout = new QVBoxLayout;
+    pidLayout->addWidget(pidLabel);
+    pidLayout->addWidget(pidList_);
+    
+    // Main layout
+    auto *hlayout = new QHBoxLayout;
+    hlayout->addLayout(pidLayout);
+    hlayout->addLayout(logLayout);
+    
+    setLayout(hlayout);
+    
+    // Signals
     connect(buttonLog_, &QPushButton::clicked, this,
-            &DataLoggerWindow::buttonClicked);
+            &DataLoggerWindow::toggleLogger);
+    connect(buttonSave, &QPushButton::clicked, this,
+            &DataLoggerWindow::saveLog);
     reset();
 }
 
@@ -87,6 +99,11 @@ void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
 }
 
 
+void DataLoggerWindow::saveLog()
+{
+}
+
+
 void DataLoggerWindow::simulate()
 {
     auto start = log_.beginTime();
@@ -98,7 +115,7 @@ void DataLoggerWindow::simulate()
 }
 
 
-void DataLoggerWindow::buttonClicked() {
+void DataLoggerWindow::toggleLogger() {
     if (logger_) {
         logger_->disable();
         return;

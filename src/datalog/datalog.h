@@ -73,10 +73,14 @@ public:
     Data *addPid(uint32_t id);
 
     std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
+    
+    std::string name() const { return name_; }
+    void setName(const std::string &name) { name_ = name; }
 
 private:
     TimePoint beginTime_;
     definition::MainPtr platform_;
+    std::string name_;
 
     std::unordered_map<uint32_t, Data> data_;
     std::shared_ptr<Signal<UpdateCall>> updateSignal_;

@@ -46,6 +46,8 @@ set(libretuner_SRC
     sessionscanner.h
     diagnostics.cpp
     diagnostics.h
+    bytebuffer.cpp
+    bytebuffer.h
     
     plugin/plugin.cpp
     plugin/plugin.h
@@ -64,6 +66,8 @@ set(libretuner_SRC
     datalog/datalogger.h
     datalog/datalog.cpp
     datalog/datalog.h
+    datalog/datalogdatabase.cpp
+    datalog/datalogdatabase.h
 
     util/signal.cpp
     util/signal.h
