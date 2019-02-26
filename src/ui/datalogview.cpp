@@ -1,5 +1,6 @@
 #include "datalogview.h"
 #include "logger.h"
+#include "qcustomplot.h"
 
 #include <QVBoxLayout>
 
@@ -25,7 +26,9 @@ void DataLogView::setDatalog(DataLog *log)
     plot_->clearGraphs();
     if (log != nullptr) {
         connection_ = log->connectUpdate([this] (const DataLog::Data &data, double value, DataLog::TimePoint time) {
-            append(data, value, time);
+            QMetaObject::invokeMethod(this, [=]() {
+               append(data, value, time);
+            });
         });
     }
 
@@ -75,4 +78,5 @@ void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimeP
 
     plot_->graph(graphId)->addData(diff, value);
     plot_->graph(graphId)->rescaleAxes(true);
+    plot_->replot();
 }

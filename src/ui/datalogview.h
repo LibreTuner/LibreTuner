@@ -3,11 +3,11 @@
 
 #include <QWidget>
 
-#include "qcustomplot.h"
 #include "datalog/datalog.h"
 
 #include <unordered_map>
 
+class QCustomPlot;
 
 // An interactive graph for analyzing datalogs
 class DataLogView : public QWidget

@@ -26,6 +26,11 @@ bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
         return false;
     }
 
+    if (empty_) {
+        empty_ = false;
+        beginTime_ = std::chrono::steady_clock::now();
+    }
+
     data->values.emplace_back(value);
     updateSignal_->call(*data, value.second, value.first);
     return true;
