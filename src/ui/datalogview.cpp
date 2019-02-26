@@ -8,7 +8,9 @@ DataLogView::DataLogView(QWidget *parent) : QWidget(parent)
 {
     plot_ = new QCustomPlot;
     plot_->legend->setVisible(true);
-    plot_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    plot_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    
+    plot_->xAxis->setLabel("Elapsed time (seconds)");
 
     auto *layout = new QVBoxLayout;
     layout->addWidget(plot_);
@@ -19,6 +21,8 @@ DataLogView::DataLogView(QWidget *parent) : QWidget(parent)
 
 void DataLogView::setDatalog(DataLog *log)
 {
+    connection_.reset();
+    plot_->clearGraphs();
     if (log != nullptr) {
         connection_ = log->connectUpdate([this] (const DataLog::Data &data, double value, DataLog::TimePoint time) {
             append(data, value, time);
@@ -30,6 +34,24 @@ void DataLogView::setDatalog(DataLog *log)
 
 void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimePoint time)
 {
+    static QColor plotColors[] = {
+        Qt::red,
+        Qt::green,
+        Qt::blue,
+        Qt::magenta,
+        Qt::yellow,
+        Qt::gray,
+        Qt::cyan,
+        Qt::darkRed,
+        Qt::darkGreen,
+        Qt::darkBlue,
+        Qt::darkMagenta,
+        Qt::darkYellow,
+        Qt::darkGray,
+        Qt::darkCyan,
+        Qt::lightGray,
+    };
+    
     std::size_t graphId;
     auto it = graphs_.find(data.id.id);
     if (it != graphs_.end()) {
@@ -38,6 +60,10 @@ void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimeP
         graphId = plot_->graphCount();
         plot_->addGraph();
         plot_->graph(graphId)->setName(QString::fromStdString(data.id.name));
+        
+        // Set next color
+        plot_->graph(graphId)->setPen(QPen(plotColors[graphId % sizeof(plotColors)]));
+        
         graphs_.emplace(data.id.id, graphId);
     }
     // Get time since start

@@ -89,7 +89,10 @@ public:
      * creates it. */
     void checkHome();
 
-    QString home() { return home_; }
+    QString home() const { return home_; }
+    
+    /* Returns a path to the data directory */
+    std::string dataDirectory() const { return home_.toStdString(); }
 
     /* Attempts to open a tune. Shows an error dialog on failure and returns nullptr. */
     static std::shared_ptr<TuneData> openTune(const std::shared_ptr<Tune> &tune);

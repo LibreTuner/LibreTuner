@@ -57,7 +57,8 @@ signals:
 
 public slots:
     /* Callback for the start/stop button */
-    void buttonClicked();
+    void toggleLogger();
+    void saveLog();
 
 
 
