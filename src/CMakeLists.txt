@@ -115,6 +115,8 @@ set(libretuner_SRC
     ui/sessionscannerdialog.h
     ui/backgroundtask.cpp
     ui/backgroundtask.h
+    ui/datalogview.cpp
+    ui/datalogview.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h
