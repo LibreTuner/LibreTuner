@@ -53,11 +53,11 @@ public:
         explicit Data(definition::Pid &mid) : id(mid) {}
     };
 
-    std::chrono::system_clock::time_point creationTime() const {
-        return creationTime_;
+    TimePoint beginTime() const {
+        return beginTime_;
     }
     
-    using UpdateCall = std::function<void(const Data &info, double value)>;
+    using UpdateCall = std::function<void(const Data &info, double value, TimePoint time)>;
 
     /* adds a point to a dataset. Returns false if the dataset
      * with the specified id does not exist. */
@@ -75,7 +75,7 @@ public:
     std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
 
 private:
-    std::chrono::system_clock::time_point creationTime_;
+    TimePoint beginTime_;
     definition::MainPtr platform_;
 
     std::unordered_map<uint32_t, Data> data_;

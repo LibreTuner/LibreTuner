@@ -117,6 +117,8 @@ set(libretuner_SRC
     ui/backgroundtask.h
     ui/datalogview.cpp
     ui/datalogview.h
+    ui/qcustomplot.cpp
+    ui/qcustomplot.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h
@@ -195,7 +197,7 @@ qt5_add_resources(libretuner_SRC
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua)
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua)
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${Boost_INCLUDE_DIRS})
 

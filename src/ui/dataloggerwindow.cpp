@@ -32,6 +32,7 @@
 #include "definitions/definition.h"
 #include "libretuner.h"
 #include "backgroundtask.h"
+#include "datalogview.h"
 
 DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definition_(LT()->platform()), log_(LT()->platform())
 {
@@ -51,6 +52,9 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     pidList_ = new QListWidget;
     pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     pidLayout->addWidget(pidList_);
+    
+    auto *datalogView = new DataLogView;
+    datalogView->setDatalog(&log_);
 
     auto *logLayout = new QVBoxLayout;
     hlayout->addLayout(logLayout);
@@ -58,7 +62,8 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     logOutput_->setHeaderHidden(true);
     logOutput_->setColumnCount(2);
     logOutput_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    logLayout->addWidget(logOutput_);
+    //logLayout->addWidget(logOutput_);
+    logLayout->addWidget(datalogView);
 
     buttonLog_ = new QPushButton(tr("Start logging"));
     logLayout->addWidget(buttonLog_);
@@ -81,6 +86,18 @@ void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
     }
 }
 
+
+void DataLoggerWindow::simulate()
+{
+    auto start = log_.beginTime();
+    
+    // Simulate coolant temp
+    for (int i = 0; i < 10; ++i) {
+        log_.add(0, std::make_pair(start + std::chrono::milliseconds(i * 50), (i / 7000.0) * 30 + 30));
+    }
+}
+
+
 void DataLoggerWindow::buttonClicked() {
     if (logger_) {
         logger_->disable();
@@ -100,7 +117,7 @@ void DataLoggerWindow::buttonClicked() {
             return;
         }
 
-        connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value) {
+        connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value, DataLog::TimePoint time) {
             QMetaObject::invokeMethod(this, [this, data, value]() {
                 onLogEntry(data, value);
             });

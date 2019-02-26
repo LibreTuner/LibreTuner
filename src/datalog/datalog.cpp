@@ -27,7 +27,7 @@ bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
     }
 
     data->values.emplace_back(value);
-    updateSignal_->call(*data, value.second);
+    updateSignal_->call(*data, value.second, value.first);
     return true;
 }
 
@@ -40,7 +40,7 @@ bool DataLog::add(uint32_t id, double value) {
 
 
 DataLog::DataLog(definition::MainPtr platform) : platform_(std::move(platform)), updateSignal_(Signal<UpdateCall>::create()) {
-
+    beginTime_ = std::chrono::steady_clock::now();
 }
 
 

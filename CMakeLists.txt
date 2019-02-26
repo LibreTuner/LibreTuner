@@ -6,6 +6,7 @@ project(LibreTuner)
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5DataVisualization CONFIG REQUIRED)
 find_package(Qt5Charts CONFIG REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
 find_package(Threads REQUIRED)
 
 option(Test "Build all tests." OFF)
