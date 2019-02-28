@@ -193,7 +193,7 @@ void DataLoggerWindow::onLogEntry(const DataLog::Data& data, double value)
 void DataLoggerWindow::reset()
 {
     pidList_->clear();
-    logOutput_->clear();
+    //logOutput_->clear();
 
     if (!definition_) {
         Logger::info("No definition");

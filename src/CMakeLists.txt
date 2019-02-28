@@ -48,6 +48,8 @@ set(libretuner_SRC
     diagnostics.h
     bytebuffer.cpp
     bytebuffer.h
+    serializeddata.cpp
+    serializeddata.h
     
     plugin/plugin.cpp
     plugin/plugin.h
