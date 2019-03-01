@@ -18,6 +18,7 @@ add_subdirectory(lib/yaml)
 add_subdirectory(lib/QHexView)
 add_subdirectory(lib/lua)
 add_subdirectory(lib/sol2)
+add_subdirectory(lib/catch)
 
 add_library(QHexView ${QHEXVIEW_SOURCES})
 
@@ -25,3 +26,4 @@ target_include_directories(QHexView PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/QHexV
 target_link_libraries(QHexView Qt5::Widgets)
 
 add_subdirectory(src)
+add_subdirectory(test)
