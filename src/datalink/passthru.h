@@ -28,8 +28,9 @@ namespace datalink {
 
     private:
         std::string port_;
-        j2534::J2534Ptr interface_;
+        // device_ must be destructed before interface_
         j2534::DevicePtr device_;
+        j2534::J2534Ptr interface_;
         j2534::Info info_;
 
 
