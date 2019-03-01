@@ -85,12 +85,45 @@ TEST_CASE("Serialization") {
         }
     }
     
+    SECTION("Vectors") {
+        // Serialize
+        {
+            serialize::Serializer<OutputAdapter> serializer(buffer);
+            std::vector<int> vec;
+            vec.reserve(128);
+            for (int i = 0; i < 128; ++i) {
+                vec.emplace_back(i);
+            }
+            serializer.save(vec);
+        }
+        // Deserialize
+        {
+            serialize::Deserializer<InputAdapter> deserializer(buffer);
+            
+            std::vector<int> vec;
+            deserializer.load(vec);
+            REQUIRE(vec.size() == 128);
+            for (int i = 0; i < 128; ++i) {
+                CHECK(vec[i] == i);
+            }
+        }
+           
+    }
+    
     SECTION("Structs") {
         // Serialize
         {
             Serializable ser{"string", 123, 0.123f};
             serialize::Serializer<OutputAdapter> serializer(buffer);
             serializer.save(ser);
+            
+            // Vector of structs
+            std::vector<Serializable> ser_vec;
+            ser_vec.reserve(16);
+            for (int i = 0; i < 16; ++i) {
+                ser_vec.emplace_back(Serializable{"string" + std::to_string(i), i, 0.123f});
+            }
+            serializer.save(ser_vec);
         }
         // Deserialize
         {
