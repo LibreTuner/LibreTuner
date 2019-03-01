@@ -13,3 +13,6 @@
 [submodule "lib/lua"]
 	path = lib/lua
 	url = https://github.com/Altenius/Lua.git
+[submodule "lib/catch"]
+	path = lib/catch
+	url = https://github.com/catchorg/Catch2.git
