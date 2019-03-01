@@ -160,6 +160,9 @@ set(libretuner_SRC
 
     datalink/datalink.cpp
     datalink/datalink.h
+    datalink/linkdatabase.cpp
+    datalink/linkdatabase.h
+    
     )
 
 if (UNIX AND NOT APPLE)

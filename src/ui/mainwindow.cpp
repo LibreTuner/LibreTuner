@@ -52,7 +52,7 @@
 #include <future>
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), datalinksWindow_(LT()->datalinks()) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     resize(QSize(1100, 630));
 
     setWindowTitle("LibreTuner");
