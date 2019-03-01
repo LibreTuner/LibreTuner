@@ -158,12 +158,18 @@ void deserialize(D &d, T (&t)[SIZE]) {
 }
 
 // Default serializers
-template<typename S>
-void serialize(S &s, const std::string &string) {
+template<typename S, class T, class Traits, class Allocator>
+void serialize(S &s, const std::basic_string<T, Traits, Allocator> &string) {
     s.serialize(string.size());
     s.serialize(string.c_str(), string.size());
 }
 
+// Vector
+template<typename D, typename T, class Allocator>
+void serialize(D &d, const std::vector<T, Allocator> &vector) {
+    d.serialize(vector.size());
+    d.serialize(vector.data(), vector.size());
+}
 
 template<typename S, typename T>
 void serialize(S &s, const T *data, std::size_t size) {
@@ -312,6 +318,15 @@ private:
     template<typename T, typename std::enable_if<!std::is_arithmetic<T>::value>::type * = nullptr>
     void write(const T &t) {
         SerializeFunction<Serializer, T>::invoke(*this, t);
+    }
+    
+    // Other arrays
+    template<typename T, typename std::enable_if<!std::is_arithmetic<T>::value>::type * = nullptr>
+    void write(T *t, std::size_t size) {
+        // Serialize each
+        for (T *ptr = t; ptr != t + size; ++ptr) {
+            SerializeFunction<Serializer, T>::invoke(*this, *t);
+        }
     }
 };
 
