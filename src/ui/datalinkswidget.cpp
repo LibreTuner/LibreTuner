@@ -48,23 +48,20 @@ int DataLinksTreeModel::columnCount(const QModelIndex& parent) const
     return 2;
 }
 
-
+Q_DECLARE_METATYPE(datalink::Link *)
 
 QVariant DataLinksTreeModel::data(const QModelIndex& index, int role) const {
     if (!links_) {
         return QVariant();
     }
     
-    if (role != Qt::DisplayRole) {
-        return QVariant();
-    }
     
     if (!index.isValid()) {
         return QVariant();
     }
     
     if (index.internalId() == 0) {
-        if (index.column() != 0) {
+        if (index.column() != 0 || role != Qt::DisplayRole) {
             return QVariant();
         }
         if (index.row() == 0) {
@@ -87,8 +84,12 @@ QVariant DataLinksTreeModel::data(const QModelIndex& index, int role) const {
         return QVariant();
     }
     
-    if (index.column() == 0) {
-        return QString::fromStdString(link->name());
+    if (role == Qt::DisplayRole) {
+        if (index.column() == 0) {
+            return QString::fromStdString(link->name());
+        }
+    } else if (role == Qt::UserRole) {
+        return QVariant::fromValue(link);
     }
     
     return QVariant();
