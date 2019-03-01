@@ -20,6 +20,7 @@
 #define LIBRETUNE_H
 
 #include "datalink/datalink.h"
+#include "datalink/linkdatabase.h"
 #include "definitions/definitionmanager.h"
 #include "dtcdescriptions.h"
 #include "log.h"
@@ -107,6 +108,9 @@ public:
 
     const Links &datalinks() const { return datalinks_; }
     Links &datalinks() { return datalinks_; }
+    
+    const datalink::LinkDatabase &links() const { return links_; }
+    datalink::LinkDatabase &links() { return links_; }
 
     /* Returns the log */
     Log &log() { return log_; }
@@ -136,6 +140,7 @@ private:
     datalink::Link *currentDatalink_{nullptr};
 
     Links datalinks_;
+    datalink::LinkDatabase links_;
 
     /* Location of home directory. */
     QString home_;
