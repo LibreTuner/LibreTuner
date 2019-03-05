@@ -30,7 +30,7 @@ enum class TableType {
 
 
 
-enum class LogMode {
+enum class DataLogMode {
     None,
     Uds,
 };

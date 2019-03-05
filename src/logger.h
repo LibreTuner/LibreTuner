@@ -22,6 +22,7 @@
 #include <string>
 #include <QObject>
 
+
 /* Static logger */
 class Logger : public QObject {
     Q_OBJECT
@@ -58,12 +59,15 @@ public:
     Logger &operator=(const Logger&) = delete;
 
 signals:
-    void appended(Mode mode, const std::string &message);
+    void appended(Mode mode, const QString &message);
 
 private:
     static std::string modeString(Mode mode);
 
     Logger();
 };
+
+Q_DECLARE_METATYPE(Logger::Mode)
+
 
 #endif // LT_LOGGER_H

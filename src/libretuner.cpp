@@ -231,6 +231,12 @@ void LibreTuner::checkHome() {
 
 void LibreTuner::load_datalinks() {
     links_.detect();
+
+#ifdef WITH_J2534
+    for (std::unique_ptr<datalink::PassThruLink> &link : datalink::detect_passthru_links()) {
+        datalinks_.add_link(std::unique_ptr<datalink::Link>(static_cast<datalink::Link*>(link.release())));
+    }
+#endif
 }
 
 

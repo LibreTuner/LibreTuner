@@ -37,8 +37,8 @@ void Log::appendEntry(LogEntry &&entry) {
 
 
 
-void Log::append(Logger::Mode mode, const std::string &text) {
-    appendEntry({mode, text});
+void Log::append(Logger::Mode mode, const QString &text) {
+    appendEntry({mode, text.toStdString()});
 }
 
 

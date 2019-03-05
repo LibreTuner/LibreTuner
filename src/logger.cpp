@@ -19,8 +19,11 @@
 #include "logger.h"
 #include "libretuner.h"
 #include <iostream>
+#include <QMetaObject>
 
-Logger::Logger() = default;
+Logger::Logger() {
+    qRegisterMetaType<Logger::Mode>("Mode");
+}
 
 
 
@@ -31,19 +34,19 @@ Logger &Logger::get()
 }
 
 void Logger::log(Logger::Mode mode, const std::string &message) {
-    emit appended(mode, message);
+    emit appended(mode, QString::fromStdString(message));
     std::cout << "[" << modeString(mode) << "] " << message << std::endl;
 }
 
 std::string Logger::modeString(Logger::Mode mode) {
     switch (mode) {
-    case Logger::Mode::Debug:
+    case Mode::Debug:
         return "DEBUG";
-    case Logger::Mode::Info:
+    case Mode::Info:
         return "INFO";
-    case Logger::Mode::Warning:
+    case Mode::Warning:
         return "WARNING";
-    case Logger::Mode::Critical:
+    case Mode::Critical:
         return "CRITICAL";
     default:
         return "";

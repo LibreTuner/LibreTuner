@@ -54,11 +54,14 @@ void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimeP
         Qt::darkCyan,
         Qt::lightGray,
     };
-    
-    std::size_t graphId;
-    auto it = graphs_.find(data.id.id);
-    if (it != graphs_.end()) {
-        graphId = it->second;
+
+    int graphId;
+    if (graphs_.size() <= data.id.id) {
+        graphs_.resize(data.id.id + 1, -1);
+    }
+    auto it = graphs_[data.id.id];
+    if (it != -1) {
+        graphId = it;
     } else {
         graphId = plot_->graphCount();
         plot_->addGraph();
@@ -67,7 +70,7 @@ void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimeP
         // Set next color
         plot_->graph(graphId)->setPen(QPen(plotColors[graphId % sizeof(plotColors)]));
         
-        graphs_.emplace(data.id.id, graphId);
+        graphs_[data.id.id] = graphId;
     }
     // Get time since start
     auto duration = time - log_->beginTime();
@@ -77,6 +80,6 @@ void DataLogView::append(const DataLog::Data &data, double value, DataLog::TimeP
     auto diff = std::chrono::duration_cast<milliseconds>(duration).count() / 1000.0;
 
     plot_->graph(graphId)->addData(diff, value);
-    plot_->graph(graphId)->rescaleAxes(true);
+    plot_->xAxis->setRange(diff, 8, Qt::AlignRight);
     plot_->replot();
 }

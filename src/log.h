@@ -42,7 +42,7 @@ public:
     void appendEntry(LogEntry &&entry);
 
 public slots:
-    void append(Logger::Mode mode, const std::string &text);
+    void append(Logger::Mode mode, const QString &text);
 
     // QAbstractItemModel interface
 public:
