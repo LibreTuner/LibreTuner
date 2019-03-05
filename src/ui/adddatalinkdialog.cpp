@@ -66,6 +66,7 @@ void AddDatalinkDialog::addClicked()
         // SocketCAN
 #ifdef WITH_SOCKETCAN
         LT()->links().add(std::make_unique<datalink::SocketCanLink>(name.toStdString(), linePort_->text().trimmed().toStdString()));
+        LT()->saveLinks();
         close();
 #endif
     } else {

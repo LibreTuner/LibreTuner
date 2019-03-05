@@ -244,12 +244,8 @@ void LibreTuner::load_datalinks() {
 
 
 
+
 LibreTuner::~LibreTuner() {
-    try {
-        links_.save();
-    } catch (const std::runtime_error &err) {
-        QMessageBox::critical(nullptr, tr("Datalink save error"), tr("Failed to save datalink database: ") + err.what());
-    }
     _global = nullptr;
 }
 
@@ -266,12 +262,25 @@ void LibreTuner::setup() {
     currentDatalink_ = setup.datalink();
 }
 
+
+
 std::unique_ptr<PlatformLink> LibreTuner::platform_link() {
     if (!currentDefinition_ || !currentDatalink_) {
         return nullptr;
     }
 
     return std::make_unique<PlatformLink>(currentDefinition_, *currentDatalink_);
+}
+
+
+
+void LibreTuner::saveLinks()
+{
+    try {
+        links_.save();
+    } catch (const std::runtime_error &err) {
+        QMessageBox::critical(nullptr, tr("Datalink save error"), tr("Failed to save datalink database: ") + err.what());
+    }
 }
 
 
