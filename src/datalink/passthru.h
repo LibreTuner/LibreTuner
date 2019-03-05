@@ -20,7 +20,7 @@ namespace datalink {
 
         void set_port(const std::string &port) { port_ = port; }
 
-        const std::string &port() const { return port_; }
+        std::string port() const override { return port_; }
 
         Protocol supported_protocols() const override;
 

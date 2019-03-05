@@ -18,6 +18,8 @@ namespace datalink {
         std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
 
         Protocol supported_protocols() const override { return Protocol::Can; }
+        
+        std::string port() const override { return device_; }
 
     private:
         // std::shared_ptr<SocketCanInterface> interface_;

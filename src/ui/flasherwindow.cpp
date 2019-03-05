@@ -53,10 +53,12 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
         buttonTuneClicked();
     });
     
+    linksModel_.setDatabase(&LT()->links());
+    
     comboLink_ = new QComboBox;
     comboLink_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     comboLink_->setItemDelegate(new QStyledItemDelegate());
-    comboLink_->setModel(&LT()->datalinks());
+    comboLink_->setModel(&linksModel_);
     connect(comboLink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
         verify();
     });

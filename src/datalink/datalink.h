@@ -61,6 +61,9 @@ namespace datalink {
 
         // Currently a stub. Returns nullptr.
         virtual std::unique_ptr<isotp::Protocol> isotp();
+        
+        // Returns the port or an empty string if no port is used by the datalink type
+        virtual std::string port() const =0;
 
     protected:
         std::string name_;

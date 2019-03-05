@@ -465,7 +465,10 @@ void MainWindow::setupStatusBar() {
     });
 
     auto *comboDatalink = new QComboBox;
-    comboDatalink->setModel(&LT()->datalinks());
+    
+    linksModel_.setDatabase(&LT()->links());
+    
+    comboDatalink->setModel(&linksModel_);
     connect(comboDatalink, QOverload<int>::of(&QComboBox::currentIndexChanged), [comboDatalink](int index) {
         QVariant var = comboDatalink->currentData(Qt::UserRole);
         if (!var.canConvert<datalink::Link*>()) {
