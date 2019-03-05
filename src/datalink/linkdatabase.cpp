@@ -1,11 +1,104 @@
 #include "linkdatabase.h"
 
 #include "datalink.h"
+#include "serializeddata.h"
+#include "logger.h"
+
+#include <fstream>
 
 #ifdef WITH_J2534
 #include "passthru.h"
 #endif
 
+#ifdef WITH_SOCKETCAN
+#include "socketcan.h"
+#endif
+
+
+
+struct LinkData {
+    std::string type;
+    std::string name;
+    std::string port;
+};
+
+namespace serialize {
+    template<typename D>
+    void deserialize(D &d, LinkData &link) {
+        d.deserialize(link.type);
+        d.deserialize(link.name);
+        d.deserialize(link.port);
+    }
+    
+    template<typename S>
+    void serialize(S &s, const LinkData &link) {
+        s.serialize(link.type);
+        s.serialize(link.name);
+        s.serialize(link.port);
+    }
+}
+
+
+void datalink::LinkDatabase::load()
+{
+    if (path_.empty()) {
+        throw std::runtime_error("database path has not been set");
+    }
+    
+    std::ifstream file(path_, std::ios::binary | std::ios::in);
+    if (!file.is_open()) {
+        // Does not exist
+        return;
+    }
+    
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+    std::vector<LinkData> links;
+    
+    serialize::Deserializer<serialize::InputBufferAdapter<std::vector<char>>> des(buffer);
+    des.load(links);
+    
+    for (const LinkData &link : links) {
+        if (link.type == "socketcan") {
+#ifdef WITH_SOCKETCAN
+            manualLinks_.emplace_back(std::make_unique<datalink::SocketCanLink>(link.name, link.port));
+#else
+            Logger::warning("SocketCAN is unuspported on this platform, ignoring link.");
+#endif
+        } else {
+            throw std::runtime_error("Unknown datalink type: " + link.type);
+        }
+    }
+}
+
+
+void datalink::LinkDatabase::save() const
+{
+    if (path_.empty()) {
+        throw std::runtime_error("database path has not been set");
+    }
+    
+    // Save manual links
+    std::vector<LinkData> links;
+    for (const datalink::LinkPtr &link : manualLinks_) {
+        std::string type;
+        if (link->type() == datalink::Type::SocketCan) {
+            type = "socketcan";
+        }
+        LinkData data;
+        data.type = type;
+        data.name = link->name();
+        data.port = link->port();
+        links.emplace_back(std::move(data));
+    }
+    
+    std::vector<char> buffer;
+    serialize::Serializer<serialize::OutputBufferAdapter<std::vector<char>>> ser(buffer);
+    ser.save(links);
+    
+    std::ofstream file(path_, std::ios::binary | std::ios::out);
+    file.write(buffer.data(), buffer.size());
+    file.close();
+}
 
 
 void datalink::LinkDatabase::detect()
