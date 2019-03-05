@@ -22,6 +22,7 @@
 #include "canviewer.h"
 #include "downloadwindow.h"
 #include "datalinkswidget.h"
+#include "datalinkslistmodel.h"
 
 #include <QComboBox>
 #include <QLayout>
@@ -55,6 +56,7 @@ private:
     CanViewer canViewer_;
     DownloadWindow *downloadWindow_ = nullptr;
     DatalinksWidget datalinksWindow_;
+    DataLinksListModel linksModel_;
 
     QComboBox *comboLogVehicles_;
     QListView *listLogs_;

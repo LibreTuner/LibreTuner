@@ -53,9 +53,14 @@ public:
     // Get detected link at index.
     // Returns nullptr if the index is out of bounds
     Link *getDetected(std::size_t index) const;
+    
+    void setPath(const std::string &path) { path_ = path; }
+    const std::string &path() const { return path_; }
 private:
     std::vector<LinkPtr> manualLinks_;
     std::vector<LinkPtr> detectedLinks_;
+    
+    std::string path_;
 };
 
 } // namespace datalink

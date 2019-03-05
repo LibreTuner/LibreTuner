@@ -242,17 +242,17 @@ public:
     
     template<typename T>
     void load(T &t) {
-        return deserialize(t);
+        deserialize(t);
     }
     
     template<typename T>
     void deserialize(T &t) {
-        return read(t);
+        read(t);
     }
     
     template<typename T>
     void deserialize(T *t, std::size_t size) {
-        return read(t, size);
+        read(t, size);
     }
     
 private:
@@ -274,6 +274,14 @@ private:
     template<typename T, typename std::enable_if<!std::is_arithmetic<T>::value>::type * = nullptr>
     void read(T &t) {
         DeserializeFunction<Deserializer, T>::invoke(*this, t);
+    }
+    
+    // Other arrays
+    template<typename T, typename std::enable_if<!std::is_arithmetic<T>::value>::type * = nullptr>
+    void read(T *t, std::size_t size) {
+        for (std::size_t i = 0; i < size; ++i) {
+            DeserializeFunction<Deserializer, T>::invoke(*this, t[i]);
+        }
     }
 };
 

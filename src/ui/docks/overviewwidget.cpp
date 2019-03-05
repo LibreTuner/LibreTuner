@@ -26,7 +26,7 @@ OverviewWidget::OverviewWidget(QWidget* parent) : QWidget(parent)
     
     lineRomCount_->setText(QString::number(RomStore::get()->count()));
     lineDefinitionCount_->setText(QString::number(DefinitionManager::get()->rowCount(QModelIndex())));
-    lineDatalinkCount_->setText(QString::number(LT()->datalinks().rowCount(QModelIndex())));
+    lineDatalinkCount_->setText(QString::number(LT()->links().count()));
     
     auto *layout = new QVBoxLayout;
     layout->addLayout(form);
