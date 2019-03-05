@@ -47,7 +47,7 @@ std::unique_ptr<DataLogger> PlatformLink::logger(DataLog &log) const {
     }
 
     switch (definition_->logMode) {
-    case LogMode::Uds: {
+    case DataLogMode::Uds: {
         if (auto interface = uds()) {
             return std::make_unique<UdsDataLogger>(log, std::move(interface));
         }

@@ -12,7 +12,7 @@ void datalink::LinkDatabase::detect()
 {
 #ifdef WITH_J2534
     for (std::unique_ptr<datalink::PassThruLink> &link : datalink::detect_passthru_links()) {
-        detectedLinks_.push_back(std::unique_ptr<datalink::Link>(static_cast<datalink::Link*>(link.release())));
+        detectedLinks_.emplace_back(std::unique_ptr<datalink::Link>(static_cast<datalink::Link*>(link.release())));
     }
 #endif
 }

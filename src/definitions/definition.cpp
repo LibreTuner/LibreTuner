@@ -167,9 +167,9 @@ void Main::load(const YAML::Node& file)
         logMode = [](std::string mode) {
             std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
             if (mode == "uds") {
-                return LogMode::Uds;
+                return DataLogMode::Uds;
             }
-            return LogMode::None;
+            return DataLogMode::None;
         }(file["logmode"].as<std::string>());
     }
     

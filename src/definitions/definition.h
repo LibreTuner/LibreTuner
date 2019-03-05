@@ -157,7 +157,7 @@ struct Main {
     DownloadMode downloadMode;
     FlashMode flashMode;
     uint32_t baudrate {500000};
-    LogMode logMode = LogMode::None;
+    DataLogMode logMode = DataLogMode::None;
     
     auth::Options downloadAuthOptions;
     auth::Options flashAuthOptions;

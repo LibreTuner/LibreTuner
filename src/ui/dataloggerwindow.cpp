@@ -25,6 +25,7 @@
 #include <QShowEvent>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QTimer>
 
 #include "datalink/datalink.h"
 #include "datalog/datalog.h"
@@ -108,10 +109,19 @@ void DataLoggerWindow::simulate()
 {
     auto start = log_.beginTime();
     
+    static QTimer timer;
+    timer.setInterval(1);
+    connect(&timer, &QTimer::timeout, [this, start]() {
+        static std::size_t offset = 0;
+        log_.add(0, std::make_pair(start + std::chrono::milliseconds(offset * 2), 6));
+        offset++;
+    });
+    timer.start();
+
     // Simulate coolant temp
-    for (int i = 0; i < 10; ++i) {
+    /*for (int i = 0; i < 10; ++i) {
         log_.add(0, std::make_pair(start + std::chrono::milliseconds(i * 50), (i / 7000.0) * 30 + 30));
-    }
+    }*/
 }
 
 
@@ -136,7 +146,7 @@ void DataLoggerWindow::toggleLogger() {
 
         connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value, DataLog::TimePoint time) {
             QMetaObject::invokeMethod(this, [this, data, value]() {
-                onLogEntry(data, value);
+               // onLogEntry(data, value);
             });
         });
 
