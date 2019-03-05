@@ -125,6 +125,10 @@ set(libretuner_SRC
     ui/datalogview.h
     ui/qcustomplot.cpp
     ui/qcustomplot.h
+    ui/datalinkslistmodel.cpp
+    ui/datalinkslistmodel.h
+    ui/adddatalinkdialog.cpp
+    ui/adddatalinkdialog.h
     
     ui/docks/logview.cpp
     ui/docks/logview.h

@@ -24,6 +24,7 @@
 #include "ui/flasherwindow.h"
 #include "ui/styledwindow.h"
 #include "ui/setupdialog.h"
+#include "ui/datalinkslistmodel.h"
 #include "vehicle.h"
 
 #ifdef WITH_SOCKETCAN
@@ -109,6 +110,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.setWindowTitle("TuneManager error");
         msgBox.exec();
     }
+    
+    links_.setPath((home_ + "/links.dat").toStdString());
 
     try {
         load_datalinks();
@@ -231,18 +234,33 @@ void LibreTuner::checkHome() {
 
 void LibreTuner::load_datalinks() {
     links_.detect();
+    
+    try {
+        links_.load();
+    } catch (const std::runtime_error &err) {
+        QMessageBox::warning(nullptr, tr("Datalink database error"), tr("Failed to load datalink save data: ") + err.what());
+    }
 }
 
 
 
-LibreTuner::~LibreTuner() { _global = nullptr; }
+LibreTuner::~LibreTuner() {
+    try {
+        links_.save();
+    } catch (const std::runtime_error &err) {
+        QMessageBox::critical(nullptr, tr("Datalink save error"), tr("Failed to save datalink database: ") + err.what());
+    }
+    _global = nullptr;
+}
 
 
 
 void LibreTuner::setup() {
     SetupDialog setup;
     setup.setDefinitionModel(DefinitionManager::get());
-    setup.setDatalinksModel(&datalinks_);
+    DataLinksListModel model;
+    model.setDatabase(&links_);
+    setup.setDatalinksModel(&model);
     setup.exec();
     currentDefinition_ = setup.platform();
     currentDatalink_ = setup.datalink();
@@ -277,91 +295,4 @@ void LibreTuner::setDatalink(datalink::Link *link) {
     } else {
         Logger::debug("Unset datalink");
     }
-}
-
-
-int Links::rowCount(const QModelIndex &parent) const {
-    if (links_.empty()) {
-        // When empty, we set the only value to "No links"
-        return 1;
-    }
-    return static_cast<int>(links_.size());
-}
-
-
-Q_DECLARE_METATYPE(datalink::Link*)
-
-QVariant Links::data(const QModelIndex &index, int role) const {
-    if (index.column() < 0 || index.column() > 1) {
-        return QVariant();
-    }
-    
-    if (index.row() < 0 || index.row() >= links_.size()) {
-        if (index.row() == 0 && links_.empty()) {
-            if (role == Qt::DisplayRole) {
-                return tr("No links available");
-            }
-        }
-        
-        return QVariant();
-    }
-
-    const std::unique_ptr<datalink::Link> &link = links_[index.row()];
-
-    switch (role) {
-        case Qt::DisplayRole:
-            switch (index.column()) {
-                case 0:
-                    return QString::fromStdString(link->name());
-                case 1:
-                    return "UNIMPL";
-                default:
-                    return QVariant();
-            }
-        case Qt::UserRole:
-            return QVariant::fromValue<datalink::Link*>(link.get());
-        default:
-            return QVariant();
-    }
-}
-
-
-
-QVariant Links::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
-        return QVariant();
-    }
-
-    switch (section) {
-        case 0:
-            return "Name";
-        case 1:
-            return "Type";
-        default:
-            return QVariant();
-    }
-}
-
-
-
-int Links::columnCount(const QModelIndex &parent) const {
-    return 2;
-}
-
-
-
-QModelIndex Links::index(int row, int column, const QModelIndex &parent) const {
-    // No parents
-    if (parent.isValid()) {
-        return QModelIndex();
-    }
-
-    return createIndex(row, column);
-}
-
-
-
-QModelIndex Links::parent(const QModelIndex &child) const {
-    // No parents
-    return QModelIndex();
 }
