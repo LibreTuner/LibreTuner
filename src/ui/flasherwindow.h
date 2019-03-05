@@ -25,6 +25,8 @@
 #include <memory>
 #include <thread>
 
+#include "datalinkslistmodel.h"
+
 namespace flash {
 class Flashable;
 using FlashablePtr = std::shared_ptr<Flashable>;
@@ -61,6 +63,8 @@ private:
     QPushButton *buttonFlash_;
     QComboBox *comboLink_;
     AuthOptionsView *authOptions_;
+    
+    DataLinksListModel linksModel_;
 };
 
 #endif // FLASHWINDOW_H

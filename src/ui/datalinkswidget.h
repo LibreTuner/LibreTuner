@@ -36,7 +36,6 @@ private:
 };
 
 
-
 class DatalinksWidget : public QWidget {
 public:
     explicit DatalinksWidget(QWidget *parent = nullptr);

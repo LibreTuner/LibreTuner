@@ -14,6 +14,7 @@
 
 #include "datalink/linkdatabase.h"
 #include "libretuner.h"
+#include "adddatalinkdialog.h"
 
 
 
@@ -178,8 +179,8 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     // Layouts
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
-    buttonLayout->addWidget( buttonAdd );
-    buttonLayout->addWidget( buttonRemove );
+    buttonLayout->addWidget(buttonAdd);
+    buttonLayout->addWidget(buttonRemove);
 
     auto *formLayout = new QFormLayout;
     formLayout->addRow(tr("Name"), lineName);
@@ -193,4 +194,11 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     layout->addLayout(linksLayout);
     layout->addLayout(buttonLayout);
     setLayout(layout);
+    
+    
+    
+    connect(buttonAdd, &QPushButton::clicked, []() {
+        AddDatalinkDialog dlg;
+        dlg.exec();
+    });
 }

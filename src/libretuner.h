@@ -42,37 +42,6 @@ class Tune;
 class TuneData;
 
 
-
-using LinkVector = std::vector<std::unique_ptr<datalink::Link>>;
-
-class Links : public QAbstractItemModel {
-public:
-    LinkVector::iterator begin() { return links_.begin(); }
-    LinkVector::iterator end() { return links_.end(); }
-
-    void add_link(std::unique_ptr<datalink::Link> &&link) { links_.emplace_back(std::move(link)); }
-    void set_links(LinkVector &&links) { links_ = std::move(links); }
-
-    int rowCount(const QModelIndex &parent) const override;
-
-    int columnCount(const QModelIndex &parent) const override;
-
-    QVariant data(const QModelIndex &index, int role) const override;
-
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
-
-    QModelIndex parent(const QModelIndex &child) const override;
-
-
-
-private:
-    LinkVector links_;
-};
-
-
-
 class LibreTuner : public QApplication {
     Q_OBJECT
 public:
@@ -105,9 +74,6 @@ public:
 
     /* Autodetects PassThru interfaces and loads saved datalinks */
     void load_datalinks();
-
-    const Links &datalinks() const { return datalinks_; }
-    Links &datalinks() { return datalinks_; }
     
     const datalink::LinkDatabase &links() const { return links_; }
     datalink::LinkDatabase &links() { return links_; }
@@ -139,7 +105,6 @@ private:
     definition::MainPtr currentDefinition_;
     datalink::Link *currentDatalink_{nullptr};
 
-    Links datalinks_;
     datalink::LinkDatabase links_;
 
     /* Location of home directory. */
