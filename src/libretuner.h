@@ -96,6 +96,8 @@ public:
      * one could not be created. */
     std::unique_ptr<PlatformLink> platform_link();
 
+    void saveLinks();
+
 private:
     MainWindow *mainWindow_;
     CanLog canLog_;
