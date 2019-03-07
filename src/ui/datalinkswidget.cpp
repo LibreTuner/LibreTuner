@@ -110,6 +110,18 @@ QVariant DataLinksTreeModel::headerData(int section, Qt::Orientation orientation
     }
 }
 
+void DataLinksTreeModel::setLinks(datalink::LinkDatabase* links)
+{
+    links_ = links;
+    if (links_ != nullptr) {
+        updateConnection_ = links->connectUpdate([this]() {
+            beginResetModel();
+            endResetModel();
+        });
+    } else {
+        updateConnection_.reset();
+    }
+}
 
 
 QModelIndex DataLinksTreeModel::parent(const QModelIndex& child) const {
@@ -200,5 +212,16 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     connect(buttonAdd, &QPushButton::clicked, []() {
         AddDatalinkDialog dlg;
         dlg.exec();
+    });
+    
+    connect(buttonRemove, &QPushButton::clicked, [linksView, this]() {
+        QVariant data = linksModel_.data(linksView->currentIndex(), Qt::UserRole);
+        if (!data.canConvert<datalink::Link*>()) {
+            return;
+        }
+        
+        auto *link = data.value<datalink::Link*>();
+        LT()->links().remove(link);
+        LT()->saveLinks();
     });
 }

@@ -123,6 +123,12 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         msgBox.setWindowTitle("Datalink error");
         msgBox.exec();
     }
+    linkRemovedConn_ = links_.connectRemove([this](datalink::Link *link) {
+        if (link == currentDatalink_) {
+            currentDatalink_ = links_.getFirst();
+            mainWindow_->datalinkChanged(currentDatalink_);
+        }
+    });
 
     checkHome();
 

@@ -39,6 +39,12 @@ namespace serialize {
 }
 
 
+datalink::LinkDatabase::LinkDatabase() : updateSignal_(UpdateSignal::create()), removeSignal_(RemoveSignal::create())
+{
+    
+}
+
+
 void datalink::LinkDatabase::load()
 {
     if (path_.empty()) {
@@ -68,6 +74,8 @@ void datalink::LinkDatabase::load()
             throw std::runtime_error("Unknown datalink type: " + link.type);
         }
     }
+    
+    updateSignal_->call();
 }
 
 
@@ -103,17 +111,20 @@ void datalink::LinkDatabase::save() const
 
 void datalink::LinkDatabase::detect()
 {
+    detectedLinks_.clear();
 #ifdef WITH_J2534
     for (std::unique_ptr<datalink::PassThruLink> &link : datalink::detect_passthru_links()) {
         detectedLinks_.emplace_back(std::unique_ptr<datalink::Link>(static_cast<datalink::Link*>(link.release())));
     }
 #endif
+    updateSignal_->call();
 }
 
 
 void datalink::LinkDatabase::add(datalink::LinkPtr && link)
 {
     manualLinks_.emplace_back(std::move(link));
+    updateSignal_->call();
 }
 
 
@@ -150,6 +161,20 @@ datalink::Link * datalink::LinkDatabase::getManual(std::size_t index) const
     }
     
     return manualLinks_[index].get();
+}
+
+
+datalink::Link * datalink::LinkDatabase::getFirst() const
+{
+    return get(0);
+}
+
+
+void datalink::LinkDatabase::remove(datalink::Link* link)
+{
+    manualLinks_.erase(std::remove_if(manualLinks_.begin(), manualLinks_.end(), [link](const LinkPtr &l) { return l.get() == link; }));
+    removeSignal_->call(link);
+    updateSignal_->call();
 }
 
 

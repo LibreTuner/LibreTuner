@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <memory>
+#include <functional>
+
+#include "util/signal.h"
 
 
 namespace datalink {
@@ -16,7 +19,13 @@ using LinkPtr = std::unique_ptr<Link>;
 class LinkDatabase
 {
 public:
-    LinkDatabase() = default;
+    using UpdateSignal = Signal<std::function<void()>>;
+    using UpdateConn = UpdateSignal::ConnectionPtr;
+    
+    using RemoveSignal = Signal<std::function<void(datalink::Link*)>>;
+    using RemoveConn = RemoveSignal::ConnectionPtr;
+    
+    LinkDatabase();
     LinkDatabase(const LinkDatabase&) = delete;
     LinkDatabase &operator=(const LinkDatabase&) = delete;
     LinkDatabase(LinkDatabase &&database);
@@ -54,13 +63,34 @@ public:
     // Returns nullptr if the index is out of bounds
     Link *getDetected(std::size_t index) const;
     
+    // Returns the first datalink
+    Link *getFirst() const;
+    
+    // Returns true if the database is empty
+    bool empty() const { return count() == 0; }
+    
     void setPath(const std::string &path) { path_ = path; }
     const std::string &path() const { return path_; }
+    
+    // Removes datalink from database
+    void remove(datalink::Link *link);
+    
+    // Connects function to update signal
+    UpdateConn connectUpdate(std::function<void()> &&f) {
+        return updateSignal_->connect(std::move(f));
+    }
+    
+    RemoveConn connectRemove(std::function<void(datalink::Link*)> &&f) {
+        return removeSignal_->connect(std::move(f));
+    }
 private:
     std::vector<LinkPtr> manualLinks_;
     std::vector<LinkPtr> detectedLinks_;
     
     std::string path_;
+    
+    std::shared_ptr<UpdateSignal> updateSignal_;
+    std::shared_ptr<RemoveSignal> removeSignal_;
 };
 
 } // namespace datalink

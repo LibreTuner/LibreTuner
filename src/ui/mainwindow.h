@@ -38,11 +38,18 @@ class GraphWidget;
 class Table;
 class Tune;
 
+namespace datalink {
+    class Link;
+}
+
 class MainWindow : public QMainWindow { // public QMainWindow {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    
+public slots:
+    void datalinkChanged(datalink::Link *link);
 
 private slots:
     void on_buttonDownloadRom_clicked();
@@ -59,6 +66,7 @@ private:
     DataLinksListModel linksModel_;
 
     QComboBox *comboLogVehicles_;
+    QComboBox *comboDatalink_;
     QListView *listLogs_;
     SidebarWidget *sidebar_;
 

@@ -6,12 +6,8 @@
 #define LIBRETUNER_INTERFACESDIALOG_H
 
 #include <QWidget>
-
 #include <QAbstractItemModel>
-
-namespace datalink {
-    class LinkDatabase;
-}
+#include "datalink/linkdatabase.h"
 
 class DataLinksTreeModel : public QAbstractItemModel {
 public:
@@ -29,10 +25,11 @@ public:
     
     Qt::ItemFlags flags(const QModelIndex & index) const override;
     
-    void setLinks(datalink::LinkDatabase *links) { links_ = links; }
+    void setLinks(datalink::LinkDatabase *links);
     
 private:
     datalink::LinkDatabase *links_{nullptr};
+    datalink::LinkDatabase::UpdateConn updateConnection_;
 };
 
 
