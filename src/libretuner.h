@@ -108,6 +108,7 @@ private:
     datalink::Link *currentDatalink_{nullptr};
 
     datalink::LinkDatabase links_;
+    datalink::LinkDatabase::RemoveConn linkRemovedConn_;
 
     /* Location of home directory. */
     QString home_;

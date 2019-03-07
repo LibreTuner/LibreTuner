@@ -109,6 +109,12 @@ bool SocketCanInterface::bind(const std::string &ifname) {
         throw std::runtime_error("Failed to bind socketcan interface: " +
                                  std::string(strerror(errno)));
     }
+    
+    // Set timeout to 1s
+    timeval tv;
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
     return true;
 }

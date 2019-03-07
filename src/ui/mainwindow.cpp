@@ -464,13 +464,13 @@ void MainWindow::setupStatusBar() {
         LT()->setPlatform(var.value<definition::MainPtr>());
     });
 
-    auto *comboDatalink = new QComboBox;
+    comboDatalink_ = new QComboBox;
     
     linksModel_.setDatabase(&LT()->links());
     
-    comboDatalink->setModel(&linksModel_);
-    connect(comboDatalink, QOverload<int>::of(&QComboBox::currentIndexChanged), [comboDatalink](int index) {
-        QVariant var = comboDatalink->currentData(Qt::UserRole);
+    comboDatalink_->setModel(&linksModel_);
+    connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+        QVariant var = comboDatalink_->currentData(Qt::UserRole);
         if (!var.canConvert<datalink::Link*>()) {
             return;
         }
@@ -482,12 +482,20 @@ void MainWindow::setupStatusBar() {
         comboPlatform->setCurrentText(QString::fromStdString(LT()->platform()->name));
     }
     if (LT()->datalink()) {
-        comboDatalink->setCurrentText(QString::fromStdString(LT()->datalink()->name()));
+        comboDatalink_->setCurrentText(QString::fromStdString(LT()->datalink()->name()));
     }
 
     statusBar()->addPermanentWidget(comboPlatform);
-    statusBar()->addPermanentWidget(comboDatalink);
+    statusBar()->addPermanentWidget(comboDatalink_);
 }
+
+void MainWindow::datalinkChanged(datalink::Link* link)
+{
+    if (link) {
+        comboDatalink_->setCurrentText(QString::fromStdString(link->name()));
+    }
+}
+
 
 
 void MainWindow::on_buttonDownloadRom_clicked() {

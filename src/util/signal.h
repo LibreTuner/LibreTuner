@@ -61,13 +61,14 @@ private:
 template <typename Func> class Signal {
 public:
     using ConnectionType = Connection<Func>;
+    using ConnectionPtr = std::shared_ptr<ConnectionType>;
 
     std::vector<std::weak_ptr<ConnectionType>> connections;
 
     /* Connects a new listener and returns the connection */
     std::shared_ptr<ConnectionType> connect(Func f) {
         auto self = self_.lock();
-        assert(self && "This should never happen. self_ could not be locked.");
+        assert(self && "Failed to lock self. Is this signal a share_ptr?");
         auto conn = std::make_shared<ConnectionType>(self, f);
         connections.push_back(conn);
         return conn;
