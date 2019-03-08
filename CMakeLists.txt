@@ -20,6 +20,9 @@ add_subdirectory(lib/lua)
 add_subdirectory(lib/sol2)
 add_subdirectory(lib/catch)
 
+
+add_subdirectory(lib/LibLibreTuner)
+
 add_library(QHexView ${QHEXVIEW_SOURCES})
 
 target_include_directories(QHexView PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/QHexView)
