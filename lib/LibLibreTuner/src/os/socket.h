@@ -1,6 +1,8 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
+#ifdef WITH_SOCKET
+
 #include <sys/socket.h>
 #include <string.h>
 #include <errno.h>
@@ -71,5 +73,7 @@ private:
 
 } // namespace os
 } // namespace lt
+
+#endif
 
 #endif // SOCKET_H

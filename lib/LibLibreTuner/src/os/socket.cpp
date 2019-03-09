@@ -1,5 +1,7 @@
 #include "socket.h"
 
+#ifdef WITH_SOCKET
+
 #include <stdexcept>
 #include <cassert>
 
@@ -104,3 +106,6 @@ void Socket::setsockopt(int level, int option_name, const void* option_value, So
 
 } // namespace os
 } // namespace lt
+
+
+#endif

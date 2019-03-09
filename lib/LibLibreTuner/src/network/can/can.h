@@ -1,11 +1,10 @@
 #ifndef CAN_H
 #define CAN_H
 
-
-#include <cstdint>
 #include <array>
-#include <chrono>
 #include <cassert>
+#include <chrono>
+#include <cstdint>
 #include <memory>
 
 namespace lt {
@@ -18,47 +17,55 @@ enum class CanError {
     Write,
 };
 
-
-
 // Constants
 constexpr std::size_t max_can_id = (1 << 30) - 1;
 
-
-
 class CanMessage {
-public:
+  public:
     CanMessage() = default;
     CanMessage(uint32_t id, const uint8_t *message, std::size_t length);
-    
+
     inline uint32_t id() const { return id_; }
-    
+
     inline void setId(uint32_t id) {
         assert(id <= max_can_id);
         id_ = id;
     }
-    
+
     inline const uint8_t *message() const { return message_.data(); }
     inline uint8_t *message() { return message_.data(); }
-    
+
+    inline uint8_t &operator[](std::size_t index) { return message_[index]; }
+    inline const uint8_t &operator[](std::size_t index) const {
+        return message_[index];
+    }
+
+    inline void setLength(uint8_t length) {
+		assert(length <= 8);
+		length_ = length;
+	}
     inline uint8_t length() const { return length_; }
-    
-    inline void setMessage(std::array<uint8_t, 8> &&message, uint8_t length) { message_ = std::move(message); length_ = length; }
+
+    inline void setMessage(std::array<uint8_t, 8> &&message, uint8_t length) {
+        message_ = std::move(message);
+        length_ = length;
+    }
     void setMessage(const uint8_t *message, std::size_t length);
-    
-    inline void setMessage(uint32_t id, const uint8_t *message, std::size_t length) {
+
+    inline void setMessage(uint32_t id, const uint8_t *message,
+                           std::size_t length) {
         setId(id);
         setMessage(message, length);
     }
-private:
+
+  private:
     std::array<uint8_t, 8> message_;
     uint8_t length_;
     uint32_t id_ = 0;
 };
 
-
-
 class Can {
-public:
+  public:
     Can();
     virtual ~Can() = default;
 

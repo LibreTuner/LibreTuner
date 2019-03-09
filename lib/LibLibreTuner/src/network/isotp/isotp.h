@@ -23,60 +23,72 @@ public:
     IsoTpPacket();
     IsoTpPacket(const uint8_t *data, size_t size);
 
-    /* Sets the packet data and resets the pointer
-     * to the beginning */
+    /* Resets packet data to `data` */
     void setData(const uint8_t *data, size_t size);
 
-    /* Returns the next data in the packet up to length max.
-     * Increments the pointer */
-    std::vector<uint8_t> next(size_t max);
-
-    /* Returns the next byte and increments the pointer */
-    uint8_t next();
-
     /* moves the data into the vector */
-    void moveAll(std::vector<uint8_t> &data);
+    void moveInto(std::vector<uint8_t> &data);
 
-    /* Appends data to the packet. Does not use the pointer */
+    /* Appends data to the end of the packet */
     void append(const uint8_t *data, size_t size);
 
     std::vector<uint8_t>::size_type size() const { return data_.size(); }
-
-    uint16_t remaining() const { return data_.end() - pointer_; }
 
     uint8_t &operator[](int index) { return data_[index]; }
 
     uint8_t operator[](int index) const { return data_[index]; }
 
-    bool eof() const { return pointer_ == data_.end(); }
-
     void clear() {
         data_.clear();
-        pointer_ = data_.begin();
     }
+
+	std::vector<uint8_t>::iterator begin() { return data_.begin(); }
+    std::vector<uint8_t>::const_iterator cbegin() const {
+        return data_.cbegin(); }
+
+    std::vector<uint8_t>::iterator end() { return data_.end(); }
+    std::vector<uint8_t>::const_iterator cend() const { return data_.cend(); }
+
+	uint8_t *data() { return data_.data(); }
+    const uint8_t *data() const { return data_.data(); }
 
 private:
     std::vector<uint8_t> data_;
-    std::vector<uint8_t>::iterator pointer_ = data_.begin();
 };
 
+class IsoTpPacketReader {
+public:
+	IsoTpPacketReader(const IsoTpPacket &packet) : packet_(packet) {};
 
+	std::size_t remaining() const { return packet_.size()  - pointer_; }
+
+	// Returns the next bytes in the packet, stopping at `max` bytes
+	std::vector<uint8_t> next(std::size_t max);
+	// Returns the amount of bytes read
+	std::size_t next(uint8_t *dest, std::size_t max);
+
+	std::vector<uint8_t> readRemaining();
+
+private:
+	const IsoTpPacket &packet_;
+	std::size_t pointer_{ 0 };
+};
 
 // ISO 15765-2 transport layer (ISO-TP) for sending large packets over CAN
 class IsoTp {
 public:
     // Takes ownership of a CAN interface
-    IsoTp(CanPtr &&can = CanPtr(), IsoTpOptions = IsoTpOptions());
+    IsoTp(CanPtr &&can = CanPtr(), IsoTpOptions options = IsoTpOptions());
     ~IsoTp();
 
     void recv(IsoTpPacket &result);
 
     // Sends a request and waits for a response
-    void request(IsoTpPacket &&req, IsoTpPacket &result);
+    void request(const IsoTpPacket &req, IsoTpPacket &result);
 
-    void send(IsoTpPacket &&packet);
+    void send(const IsoTpPacket &packet);
 
-    void setCan(CanPtr &&can);
+    void setCan(CanPtr &&can) { can_ = std::move(can); }
 
     // May return nullptr
     Can *can() { return can_.get(); }
@@ -85,34 +97,15 @@ public:
 
     const IsoTpOptions &options() const { return options_; }
 
-    /* Sends a frame to the CAN interface */
-    void send(const Frame &frame);
-
-    void send_single_frame(const uint8_t *data, size_t size);
-
-    void send_first_frame(uint16_t size, const uint8_t *data, size_t data_size);
-                                                                                                                                                                                                                                           
-    void send_consecutive_frame(uint8_t index,
-                                const uint8_t *data, size_t size);
-
-    // Sends a flow control frame
-    void send_flow_frame(const FlowControlFrame &frame);
+	// Receives next CAN message with proper id
+	CanMessage recvNextFrame();
+	CanMessage recvNextFrame(uint8_t expectedType);
 
 private:
     CanPtr can_;
-    Options options_;
-    uint8_t consecIndex_;
-    Packet packet_;
+    IsoTpOptions options_;
 
-    // Sending
-    void sendConsecutiveFrames();
-    void recvFlowControlFrame(FlowControlFrame &frame);
-    uint8_t incrementConsec();
-
-    // Receiving
-    void recvConsecutiveFrames(Packet &result, int remaining);
-
-    bool recvFrame(Frame &frame);
+	void sendSingleFrame(const uint8_t *data, std::size_t size);
 };
 
 } // namespace network
