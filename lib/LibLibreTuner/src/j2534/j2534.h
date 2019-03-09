@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "datalink/datalink.h"
-
 /////////////////////////
 // PassThruConnect flags
 /////////////////////////
@@ -79,20 +77,44 @@
 
 namespace j2534 {
 
+enum class Protocol {
+    None = 0,
+    J1850VPW = 1,
+    J1850PWM = 2,
+    ISO9141 = 3,
+    ISO14230 = 4,
+    CAN = 5,
+    ISO15765 = 6,
+    SCI_A_Engine = 7,
+    SCI_A_Trans = 8,
+    SCI_B_Engine = 9,
+    SCI_B_Trans = 10,
+};
+
+inline Protocol operator|(Protocol lhs, Protocol rhs) {
+    using DType = std::underlying_type<Protocol>::type;
+    return static_cast<Protocol>(static_cast<DType>(lhs) |
+                                 static_cast<DType>(rhs));
+}
+
+inline Protocol operator&(Protocol lhs, Protocol rhs) {
+    using DType = std::underlying_type<Protocol>::type;
+    return static_cast<Protocol>(static_cast<DType>(lhs) &
+                                 static_cast<DType>(rhs));
+}
+
 class Error : public std::runtime_error {
-public:
+  public:
     Error(const std::string &message) : std::runtime_error(message) {}
 };
 
 struct Info {
     std::string name;
     // Supported protocols
-    datalink::Protocol protocols;
+    Protocol protocols;
     // DLL path
     std::string functionLibrary;
 };
-
-
 
 // J2534 API
 
@@ -108,50 +130,36 @@ struct PASSTHRU_MSG {
 };
 
 #ifdef WIN32
-#define PTAPI   __stdcall
+#define PTAPI __stdcall
 #else
 #define PTAPI
 #endif
 
-using PassThruOpen_t = long (PTAPI *)(void *, uint32_t *);
-using PassThruClose_t = long (PTAPI *)(uint32_t);
-using PassThruConnect_t = long (PTAPI *)(uint32_t, uint32_t, uint32_t, uint32_t,
-                                      uint32_t *);
-using PassThruDisconnect_t = long (PTAPI *)(uint32_t);
-using PassThruReadMsgs_t = long (PTAPI *)(uint32_t, PASSTHRU_MSG *, uint32_t *,
-                                       uint32_t);
-using PassThruWriteMsgs_t = long (PTAPI *)(uint32_t, PASSTHRU_MSG *, uint32_t *,
-                                        uint32_t);
-using PassThruStartPeriodicMsg_t = long (PTAPI *)(uint32_t, const PASSTHRU_MSG *,
-                                               uint32_t *, uint32_t);
-using PassThruStopPeriodicMsg_t = long (PTAPI *)(uint32_t, uint32_t);
-using PassThruStartMsgFilter_t = long (PTAPI *)(uint32_t, uint32_t,
-                                             const PASSTHRU_MSG *,
-                                             const PASSTHRU_MSG *,
-                                             const PASSTHRU_MSG *, uint32_t *);
-using PassThruStopMsgFilter_t = long (PTAPI *)(uint32_t, uint32_t);
-using PassThruSetProgrammingVoltage_t = long (PTAPI *)(uint32_t, uint32_t);
-using PassThruReadVersion_t = long (PTAPI *)(char *, char *, char *);
-using PassThruGetLastError_t = long (PTAPI *)(char *);
-using PassThruIoctl_t = long (PTAPI *)(uint32_t, uint32_t, void *, void *);
-
+using PassThruOpen_t = long(PTAPI *)(void *, uint32_t *);
+using PassThruClose_t = long(PTAPI *)(uint32_t);
+using PassThruConnect_t = long(PTAPI *)(uint32_t, uint32_t, uint32_t, uint32_t,
+                                        uint32_t *);
+using PassThruDisconnect_t = long(PTAPI *)(uint32_t);
+using PassThruReadMsgs_t = long(PTAPI *)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+                                         uint32_t);
+using PassThruWriteMsgs_t = long(PTAPI *)(uint32_t, PASSTHRU_MSG *, uint32_t *,
+                                          uint32_t);
+using PassThruStartPeriodicMsg_t = long(PTAPI *)(uint32_t, const PASSTHRU_MSG *,
+                                                 uint32_t *, uint32_t);
+using PassThruStopPeriodicMsg_t = long(PTAPI *)(uint32_t, uint32_t);
+using PassThruStartMsgFilter_t = long(PTAPI *)(uint32_t, uint32_t,
+                                               const PASSTHRU_MSG *,
+                                               const PASSTHRU_MSG *,
+                                               const PASSTHRU_MSG *,
+                                               uint32_t *);
+using PassThruStopMsgFilter_t = long(PTAPI *)(uint32_t, uint32_t);
+using PassThruSetProgrammingVoltage_t = long(PTAPI *)(uint32_t, uint32_t);
+using PassThruReadVersion_t = long(PTAPI *)(char *, char *, char *);
+using PassThruGetLastError_t = long(PTAPI *)(char *);
+using PassThruIoctl_t = long(PTAPI *)(uint32_t, uint32_t, void *, void *);
 
 class J2534;
 using J2534Ptr = std::shared_ptr<J2534>;
-
-enum class Protocol {
-    None = 0,
-    J1850VPW = 1,
-    J1850PWM = 2,
-    ISO9141 = 3,
-    ISO14230 = 4,
-    CAN = 5,
-    ISO15765 = 6,
-    SCI_A_Engine = 7,
-    SCI_A_Trans = 8,
-    SCI_B_Engine = 9,
-    SCI_B_Trans = 10,
-};
 
 enum class Ioctl {
     GetConfig = 0x01,
@@ -178,7 +186,7 @@ class Device;
 using DevicePtr = std::shared_ptr<Device>;
 
 class Channel {
-public:
+  public:
     // Creates an invalid device
     Channel() = default;
 
@@ -214,14 +222,14 @@ public:
     Channel(const J2534Ptr &j2534, const DevicePtr &device, uint32_t channel)
         : j2534_(j2534), device_(device), channel_(channel) {}
 
-private:
+  private:
     J2534Ptr j2534_;
     DevicePtr device_;
     uint32_t channel_;
 };
 
 class Device : public std::enable_shared_from_this<Device> {
-public:
+  public:
     // This object should never be contructed by the client. Use
     // J2534::open instaed
     Device(const J2534Ptr &j2534, uint32_t device);
@@ -246,14 +254,14 @@ public:
 
     uint32_t handle() const { return device_; }
 
-private:
+  private:
     J2534Ptr j2534_;
     uint32_t device_;
 };
 
 // TODO: Synchronize this all into one thread! (IMPORTANT!!!)
 class J2534 : public std::enable_shared_from_this<J2534> {
-public:
+  public:
     // Initializes the interface by loading the DLL. May throw an exception
     void init();
 
@@ -287,7 +295,7 @@ public:
     std::string name() const { return info_.name; }
 
     // Returns the protocols supported by the J2534 interface
-    datalink::Protocol protocols() const { return info_.protocols; }
+    Protocol protocols() const { return info_.protocols; }
 
     // Creates a J2534 interface. Must be initialized with init() before use.
     static J2534Ptr create(Info &&info);
@@ -296,7 +304,7 @@ public:
 
     ~J2534();
 
-private:
+  private:
     Info info_;
 
     void *hDll_ = nullptr;
@@ -324,11 +332,7 @@ private:
     PassThruSetProgrammingVoltage_t PassThruSetProgrammingVoltage{};
 };
 
-
-
-
 std::vector<Info> detect_interfaces();
-
 
 } // namespace j2534
 

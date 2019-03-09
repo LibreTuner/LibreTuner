@@ -6,6 +6,8 @@
 
 #include <string>
 
+#ifdef WITH_SOCKETCAN
+
 namespace lt {
 namespace network {
 
@@ -33,5 +35,7 @@ private:
 
 } // namespace network
 } // namespace lt
+
+#endif
 
 #endif // SOCKETCAN_H

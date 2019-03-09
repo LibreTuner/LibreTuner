@@ -1,5 +1,7 @@
 #include "socketcan.h"
 
+#ifdef WITH_SOCKETCAN
+
 #include <fcntl.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -65,3 +67,5 @@ bool SocketCan::recv(CanMessage &message,
     
 } // namespace network
 } // namespace lt
+
+#endif

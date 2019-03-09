@@ -137,9 +137,9 @@ template<typename D, class T, class Traits, class Allocator>
 void deserialize(D &d, std::basic_string<T, Traits, Allocator> &string) {
     typename std::basic_string<T, Traits, Allocator>::size_type size;
     d.deserialize(size);
-    T data[size];
-    d.deserialize(data, size);
-    string.assign(data, size);
+    std::vector<T> data(size);
+    d.deserialize(data.data(), size);
+    string.assign(data.data(), size);
 }
 
 // Vector
@@ -188,7 +188,7 @@ void serialize(D &d, const T (&t)[SIZE]) {
 template<typename S>
 void serialize(S &s, const char *string) {
     std::size_t len = std::strlen(string);
-    s.template serialize(len);
+    s.serialize(len);
     s.serialize(string, len);
 }
 

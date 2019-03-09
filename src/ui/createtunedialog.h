@@ -29,7 +29,7 @@ namespace Ui {
 class CreateTuneDialog;
 }
 
-struct Rom;
+class Rom;
 
 /**
  * @todo write docs
