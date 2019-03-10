@@ -88,8 +88,8 @@ public:
     IsoTpOptions options_;
 	IsoTp &protocol_;
 
-    std::chrono::microseconds separationTime_;
-    uint8_t blockSize_;
+	std::chrono::microseconds separationTime_{0};
+	uint8_t blockSize_{0};
     uint8_t consecIndex_{1};
 };
 
@@ -125,7 +125,7 @@ void IsoTp::recv(IsoTpPacket& result)
 		return;
 	}
 	if (type == typeFirst) {
-		std::size_t length = ((message[1] & 0x0F) << 8) | message[2];
+		uint16_t length = ((message[1] & 0x0F) << 8) | message[2];
 		MultiFrameReceiver receiver(length, result, *can_, options_, *this);
 		receiver.recv();
 		return;
@@ -313,7 +313,7 @@ void MultiFrameReceiver::recvConsecutiveFrames()
 			throw std::runtime_error("received invalid consecutive frame index");
 		}
 
-		std::size_t received = std::min<std::size_t>(frame.length() - 1, size_);
+		uint16_t received = std::min<uint16_t>(frame.length() - 1, size_);
 
 		packet_.append(frame.message() + 1, received);
 		size_ -= received;

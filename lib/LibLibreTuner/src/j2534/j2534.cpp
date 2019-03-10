@@ -31,7 +31,9 @@ DevicePtr J2534::open(const char *port) {
 
     uint32_t deviceId = 0;
     long res;
-    if ((res = PassThruOpen(const_cast<void*>(reinterpret_cast<const void*>(port)), &deviceId)) != 0) {
+    if ((res = PassThruOpen(
+             const_cast<void *>(reinterpret_cast<const void *>(port)),
+             &deviceId)) != 0) {
         if (res == 0x8) { // ERR_DEVICE_NOT_CONNECTED
             // Return nullptr. Don't throw an exception,
             // because the absence of a device is not an exceptional error
@@ -105,17 +107,17 @@ void J2534::disconnect(uint32_t channel) {
     }
 }
 
-std::string J2534::lastError() {
+std::string J2534::lastError() noexcept {
     char msg[80];
     PassThruGetLastError(msg);
     return std::string(msg);
 }
 
-J2534Ptr J2534::create(Info &&info) {
+J2534Ptr J2534::create(Info &&info) noexcept {
     return std::make_shared<J2534>(std::move(info));
 }
 
-J2534::~J2534() {
+J2534::~J2534() noexcept {
     if (hDll_) {
         CloseHandle(hDll_);
     }
@@ -170,12 +172,10 @@ void *J2534::getProc(const char *proc) {
     return func;
 }
 
-Device::Device(const J2534Ptr &j2534, uint32_t device)
+Device::Device(const J2534Ptr &j2534, uint32_t device) noexcept
     : j2534_(j2534), device_(device) {}
 
-Device::~Device() {
-    close();
-}
+Device::~Device() { close(); }
 
 void Device::close() {
     if (valid()) {
@@ -191,7 +191,7 @@ Channel Device::connect(Protocol protocol, uint32_t flags, uint32_t baudrate) {
                    j2534_->connect(device_, protocol, flags, baudrate));
 }
 
-Device::Device(Device &&dev) {
+Device::Device(Device &&dev) noexcept {
     device_ = dev.device_;
     j2534_ = std::move(dev.j2534_);
 }
@@ -202,7 +202,7 @@ Channel::~Channel() {
     }
 }
 
-Channel::Channel(Channel &&chann)
+Channel::Channel(Channel &&chann) noexcept
     : j2534_(std::move(chann.j2534_)), channel_(chann.channel_) {}
 
 void Channel::readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
@@ -226,11 +226,6 @@ void Channel::startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg,
                            pFlowControlMsg, pMsgID);
 }
 
-
-
-
-
-
 std::vector<Info> detect_interfaces() {
     std::vector<Info> interfaces;
     // Search HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04 for connected
@@ -238,17 +233,18 @@ std::vector<Info> detect_interfaces() {
     LSTATUS res;
 
     HKEY hKeyPassthrough;
-    if ((res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\PassThruSupport.04.04", 0, KEY_ENUMERATE_SUB_KEYS,
-                            &hKeyPassthrough)) != ERROR_SUCCESS) {
-        //RegCloseKey(hKeySoftware);
+    if ((res = RegOpenKeyEx(
+             HKEY_LOCAL_MACHINE, "SOFTWARE\\PassThruSupport.04.04", 0,
+             KEY_ENUMERATE_SUB_KEYS, &hKeyPassthrough)) != ERROR_SUCCESS) {
+        // RegCloseKey(hKeySoftware);
         if (res == ERROR_FILE_NOT_FOUND) {
             // If this entry does not exist, then no PassThru interfaces are
             // installed
             return interfaces;
         }
         throw std::runtime_error(
-                "Could not open "
-                "HKEY_LOCAL_MACHINE\\Software\\PassThruSupport.04.04 for reading");
+            "Could not open "
+            "HKEY_LOCAL_MACHINE\\Software\\PassThruSupport.04.04 for reading");
     }
 
     char keyValue[255];
@@ -264,7 +260,7 @@ std::vector<Info> detect_interfaces() {
         if (res != ERROR_SUCCESS) {
             RegCloseKey(hKeyPassthrough);
             throw std::runtime_error(
-                    "Error while enumerating passthrough devices");
+                "Error while enumerating passthrough devices");
         }
 
         HKEY hKeyDevice;
@@ -272,7 +268,7 @@ std::vector<Info> detect_interfaces() {
             ERROR_SUCCESS) {
             RegCloseKey(hKeyPassthrough);
             throw std::runtime_error(
-                    "Error while opening passthrough device entry");
+                "Error while opening passthrough device entry");
         }
 
         j2534::Info info;
@@ -296,7 +292,7 @@ std::vector<Info> detect_interfaces() {
             RegCloseKey(hKeyDevice);
             RegCloseKey(hKeyPassthrough);
             throw std::runtime_error(
-                    "Error querying passthrough device function library");
+                "Error querying passthrough device function library");
         }
 
         info.functionLibrary = keyValue;

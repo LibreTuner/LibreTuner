@@ -46,11 +46,11 @@ public:
     void bind(const Address_t *address, SocketLen_t address_len);
     
     std::size_t recv(void *buffer, std::size_t length, int flags);
-    ssize_t recvNoExcept(void *buffer, std::size_t length, int flags);
+    ssize_t recvNoExcept(void *buffer, std::size_t length, int flags) noexcept;
     
     // Throws an exception on failure or if less than `length` bytes are sent
     void send(void *buffer, std::size_t length, int flags);
-    ssize_t sendNoExcept(void *buffer, std::size_t length, int flags);
+    ssize_t sendNoExcept(void *buffer, std::size_t length, int flags) noexcept;
     
     void setsockopt(int level, int option_name, const void *option_value, SocketLen_t option_len);
     
