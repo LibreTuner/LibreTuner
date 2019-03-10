@@ -32,25 +32,27 @@ public:
     /* Appends data to the end of the packet */
     void append(const uint8_t *data, size_t size);
 
-    std::vector<uint8_t>::size_type size() const { return data_.size(); }
+    inline std::vector<uint8_t>::size_type size() const { return data_.size(); }
 
-    uint8_t &operator[](int index) { return data_[index]; }
+    inline uint8_t &operator[](int index) { return data_[index]; }
 
-    uint8_t operator[](int index) const { return data_[index]; }
+    inline uint8_t operator[](int index) const { return data_[index]; }
 
-    void clear() {
+    inline void clear() {
         data_.clear();
     }
 
-	std::vector<uint8_t>::iterator begin() { return data_.begin(); }
-    std::vector<uint8_t>::const_iterator cbegin() const {
+	inline std::vector<uint8_t>::iterator begin() { return data_.begin(); }
+    inline std::vector<uint8_t>::const_iterator cbegin() const {
         return data_.cbegin(); }
 
-    std::vector<uint8_t>::iterator end() { return data_.end(); }
-    std::vector<uint8_t>::const_iterator cend() const { return data_.cend(); }
+    inline std::vector<uint8_t>::iterator end() { return data_.end(); }
+    inline std::vector<uint8_t>::const_iterator cend() const { return data_.cend(); }
 
-	uint8_t *data() { return data_.data(); }
-    const uint8_t *data() const { return data_.data(); }
+	inline uint8_t *data() { return data_.data(); }
+    inline const uint8_t *data() const { return data_.data(); }
+
+	inline bool empty() const { return data_.empty(); }
 
 private:
     std::vector<uint8_t> data_;
@@ -60,7 +62,7 @@ class IsoTpPacketReader {
 public:
 	IsoTpPacketReader(const IsoTpPacket &packet) : packet_(packet) {};
 
-	std::size_t remaining() const { return packet_.size()  - pointer_; }
+	inline std::size_t remaining() const { return packet_.size()  - pointer_; }
 
 	// Returns the next bytes in the packet, stopping at `max` bytes
 	std::vector<uint8_t> next(std::size_t max);
@@ -88,14 +90,14 @@ public:
 
     void send(const IsoTpPacket &packet);
 
-    void setCan(CanPtr &&can) { can_ = std::move(can); }
+    inline void setCan(CanPtr &&can) { can_ = std::move(can); }
 
     // May return nullptr
-    Can *can() { return can_.get(); }
+    inline Can *can() { return can_.get(); }
 
-    void setOptions(const IsoTpOptions &options) { options_ = options; }
+    inline void setOptions(const IsoTpOptions &options) { options_ = options; }
 
-    const IsoTpOptions &options() const { return options_; }
+    inline const IsoTpOptions &options() const { return options_; }
 
 	// Receives next CAN message with proper id
 	CanMessage recvNextFrame();
@@ -107,6 +109,8 @@ private:
 
 	void sendSingleFrame(const uint8_t *data, std::size_t size);
 };
+
+using IsoTpPtr = std::unique_ptr<IsoTp>;
 
 } // namespace network
 } // namespace lt

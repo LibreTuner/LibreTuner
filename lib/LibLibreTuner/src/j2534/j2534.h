@@ -35,7 +35,6 @@
 #define SNIFF_MODE                                                             \
     0x10000000 // OP2.0: listens to a bus (e.g. CAN) without acknowledging
 
-
 //////////////////
 // RxStatus flags
 //////////////////
@@ -48,7 +47,8 @@
 #define ISO15765_PADDING_ERROR 0x00000010
 #define ISO15765_EXT_ADDR 0x00000080
 #define ISO15765_ADDR_TYPE 0x00000080
-//#define CAN_29BIT_ID						0x00000100 // (already defined
+//#define CAN_29BIT_ID						0x00000100 // (already
+//defined
 // above)
 
 //////////////////
@@ -56,15 +56,16 @@
 //////////////////
 
 #define ISO15765_FRAME_PAD 0x00000040
-//#define ISO15765_ADDR_TYPE				0x00000080 // (already defined
+//#define ISO15765_ADDR_TYPE				0x00000080 // (already
+//defined
 // above)
-//#define CAN_29BIT_ID						0x00000100 // (already defined
+//#define CAN_29BIT_ID						0x00000100 // (already
+//defined
 // above)
 #define WAIT_P3_MIN_ONLY 0x00000200
 #define SW_CAN_HV_TX 0x00000400   // OP2.0: Not supported
 #define SCI_MODE 0x00400000       // OP2.0: Not supported
 #define SCI_TX_VOLTAGE 0x00800000 // OP2.0: Not supported
-
 
 ////////////////
 // Filter types
@@ -73,7 +74,6 @@
 #define PASS_FILTER 0x00000001
 #define BLOCK_FILTER 0x00000002
 #define FLOW_CONTROL_FILTER 0x00000003
-
 
 namespace j2534 {
 
@@ -111,7 +111,7 @@ class Error : public std::runtime_error {
 struct Info {
     std::string name;
     // Supported protocols
-    Protocol protocols;
+    Protocol protocols{Protocol::None};
     // DLL path
     std::string functionLibrary;
 };
@@ -193,7 +193,7 @@ class Channel {
     ~Channel();
 
     Channel(const Channel &) = delete;
-    Channel(Channel &&chann);
+    Channel(Channel &&chann) noexcept;
 
     /* Reads `pNumMsgs` messages or until the timeout expires. If timeout is 0,
      * reads the buffer and returns immediately. Sets pNumMsgs to the amount of
@@ -215,11 +215,12 @@ class Channel {
      * is in an invalid state after calling this method */
     void disconnect();
 
-    bool valid() const { return !!j2534_; }
+    bool valid() const noexcept { return !!j2534_; }
 
     // This should only be constructed internally.
     // Use J2534Device::connect
-    Channel(const J2534Ptr &j2534, const DevicePtr &device, uint32_t channel)
+    Channel(const J2534Ptr &j2534, const DevicePtr &device,
+            uint32_t channel) noexcept
         : j2534_(j2534), device_(device), channel_(channel) {}
 
   private:
@@ -232,9 +233,9 @@ class Device : public std::enable_shared_from_this<Device> {
   public:
     // This object should never be contructed by the client. Use
     // J2534::open instaed
-    Device(const J2534Ptr &j2534, uint32_t device);
+    Device(const J2534Ptr &j2534, uint32_t device) noexcept;
     // Creates an invalid device
-    Device() = default;
+    Device() noexcept = default;
 
     ~Device();
 
@@ -248,11 +249,11 @@ class Device : public std::enable_shared_from_this<Device> {
                     uint32_t baudrate = 500000);
 
     Device(const Device &) = delete;
-    Device(Device &&dev);
+    Device(Device &&dev) noexcept;
 
-    bool valid() const { return !!j2534_; }
+    bool valid() const noexcept { return !!j2534_; }
 
-    uint32_t handle() const { return device_; }
+    uint32_t handle() const noexcept { return device_; }
 
   private:
     J2534Ptr j2534_;
@@ -266,7 +267,7 @@ class J2534 : public std::enable_shared_from_this<J2534> {
     void init();
 
     // Returns true if the interface's library has been loaded
-    bool initialized() const { return loaded_; }
+    bool initialized() const noexcept { return loaded_; }
 
     // Opens a J2534 device. If no device is connected, returns nullptr
     DevicePtr open(const char *port = nullptr);
@@ -290,19 +291,19 @@ class J2534 : public std::enable_shared_from_this<J2534> {
     // Disconnects a logical communication channel
     void disconnect(uint32_t channel);
 
-    std::string lastError();
+    std::string lastError() noexcept;
 
-    std::string name() const { return info_.name; }
+    std::string name() const noexcept { return info_.name; }
 
     // Returns the protocols supported by the J2534 interface
-    Protocol protocols() const { return info_.protocols; }
+    Protocol protocols() const noexcept { return info_.protocols; }
 
     // Creates a J2534 interface. Must be initialized with init() before use.
-    static J2534Ptr create(Info &&info);
+    static J2534Ptr create(Info &&info) noexcept;
 
-    J2534(Info &&info) : info_(std::move(info)) {}
+    J2534(Info &&info) noexcept : info_(std::move(info)) {}
 
-    ~J2534();
+    ~J2534() noexcept;
 
   private:
     Info info_;

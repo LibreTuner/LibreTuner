@@ -23,43 +23,44 @@ constexpr std::size_t max_can_id = (1 << 30) - 1;
 class CanMessage {
   public:
     CanMessage() = default;
-    CanMessage(uint32_t id, const uint8_t *message, std::size_t length);
+    CanMessage(uint32_t id, const uint8_t *message, uint8_t length);
 
-    inline uint32_t id() const { return id_; }
+    inline uint32_t id() const noexcept { return id_; }
 
-    inline void setId(uint32_t id) {
+    inline void setId(uint32_t id) noexcept {
         assert(id <= max_can_id);
         id_ = id;
     }
 
-    inline const uint8_t *message() const { return message_.data(); }
-    inline uint8_t *message() { return message_.data(); }
+    inline const uint8_t *message() const noexcept { return message_.data(); }
+    inline uint8_t *message() noexcept { return message_.data(); }
 
     inline uint8_t &operator[](std::size_t index) { return message_[index]; }
     inline const uint8_t &operator[](std::size_t index) const {
         return message_[index];
     }
 
-    inline void setLength(uint8_t length) {
-		assert(length <= 8);
-		length_ = length;
-	}
-    inline uint8_t length() const { return length_; }
+    inline void setLength(uint8_t length) noexcept {
+        assert(length <= 8);
+        length_ = length;
+    }
+    inline uint8_t length() const noexcept { return length_; }
 
-    inline void setMessage(std::array<uint8_t, 8> &&message, uint8_t length) {
+    inline void setMessage(std::array<uint8_t, 8> &&message,
+                           uint8_t length) noexcept {
         message_ = std::move(message);
         length_ = length;
     }
-    void setMessage(const uint8_t *message, std::size_t length);
+    void setMessage(const uint8_t *message, uint8_t length);
 
     inline void setMessage(uint32_t id, const uint8_t *message,
-                           std::size_t length) {
+                           uint16_t length) {
         setId(id);
         setMessage(message, length);
     }
 
   private:
-    std::array<uint8_t, 8> message_;
+    std::array<uint8_t, 8> message_{0};
     uint8_t length_;
     uint32_t id_ = 0;
 };

@@ -2,25 +2,20 @@
 
 #ifdef WITH_SOCKET
 
-#include <stdexcept>
 #include <cassert>
+#include <stdexcept>
 
 #include <unistd.h>
 
 namespace lt {
 namespace os {
 
-static inline void throwErrno() {
-    throw std::runtime_error(strerror(errno));
-}    
+static inline void throwErrno() { throw std::runtime_error(strerror(errno)); }
 
-
-
-void Socket::create(int domain, int type, int protocol)
-{
+void Socket::create(int domain, int type, int protocol) {
     // Close previously opened socket
     close();
-    
+
     socket_ = ::socket(domain, type, protocol);
     if (socket_ == -1) {
         valid_ = false;
@@ -29,38 +24,27 @@ void Socket::create(int domain, int type, int protocol)
     valid_ = true;
 }
 
-
-
-void Socket::close()
-{
+void Socket::close() {
     if (valid_) {
         ::close(socket_);
         valid_ = false;
     }
 }
 
-
-
-void Socket::bind(const Address_t* address, SocketLen_t address_len)
-{
+void Socket::bind(const Address_t *address, SocketLen_t address_len) {
     assert(valid());
     if (::bind(socket_, address, address_len) == -1) {
         throwErrno();
     }
 }
 
-
-
-ssize_t Socket::recvNoExcept(void* buffer, std::size_t length, int flags)
-{
+ssize_t Socket::recvNoExcept(void *buffer, std::size_t length,
+                             int flags) noexcept {
     assert(valid());
     return ::recv(socket_, buffer, length, flags);
 }
 
-
-
-std::size_t Socket::recv(void* buffer, std::size_t length, int flags)
-{
+std::size_t Socket::recv(void *buffer, std::size_t length, int flags) {
     assert(valid());
     ssize_t ret = ::recv(socket_, buffer, length, flags);
     if (ret == -1) {
@@ -72,40 +56,34 @@ std::size_t Socket::recv(void* buffer, std::size_t length, int flags)
     return ret;
 }
 
-
-
-ssize_t Socket::sendNoExcept(void* buffer, std::size_t length, int flags)
-{
+ssize_t Socket::sendNoExcept(void *buffer, std::size_t length,
+                             int flags) noexcept {
     assert(valid());
     return ::send(socket_, buffer, length, flags);
 }
 
-
-
-void Socket::send(void* buffer, std::size_t length, int flags)
-{
+void Socket::send(void *buffer, std::size_t length, int flags) {
     assert(valid());
     ssize_t ret = ::send(socket_, buffer, length, flags);
     if (ret == -1) {
         throwErrno();
     }
     if (ret != length) {
-        throw std::runtime_error("send() did not send all bytes (sent " + std::to_string(ret) + ", requested " + std::to_string(length) + ")");
+        throw std::runtime_error("send() did not send all bytes (sent " +
+                                 std::to_string(ret) + ", requested " +
+                                 std::to_string(length) + ")");
     }
 }
 
-
-
-void Socket::setsockopt(int level, int option_name, const void* option_value, SocketLen_t option_len)
-{
-    if (::setsockopt(socket_, level, option_name, option_value, option_len) == -1) {
+void Socket::setsockopt(int level, int option_name, const void *option_value,
+                        SocketLen_t option_len) {
+    if (::setsockopt(socket_, level, option_name, option_value, option_len) ==
+        -1) {
         throwErrno();
     }
 }
 
-
 } // namespace os
 } // namespace lt
-
 
 #endif
