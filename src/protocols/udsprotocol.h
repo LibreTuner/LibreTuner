@@ -27,30 +27,33 @@
 #include "isotpprotocol.h"
 
 /* Request SIDs */
+/*
 #define UDS_REQ_SESSION 0x10
 #define UDS_REQ_SECURITY 0x27
 #define UDS_REQ_READMEM 0x23
 #define UDS_REQ_REQUESTDOWNLOAD 0x34
 #define UDS_REQ_REQUESTUPLOAD 0x35
-#define UDS_REQ_TRANSFERDATA 0x36
+#define UDS_REQ_TRANSFERDATA 0x36*/
 
 /* Response SIDs (request + 0x40)*/
+/*
 #define UDS_RES_SESSION 0x50
 #define UDS_RES_SECURITY 0x67
 #define UDS_RES_NEGATIVE 0x7F
 #define UDS_RES_READMEM 0x63
 #define UDS_RES_REQUESTUPLOAD 0x75
 #define UDS_RES_REQUESTDOWNLOAD 0x74
-#define UDS_RES_TRANSFERDATA 0x76
+#define UDS_RES_TRANSFERDATA 0x76*/
 
 /* Negative response codes */
 // requestCorrectlyReceivedResponsePending
-#define UDS_NRES_RCRRP 0x78
+/*
+#define UDS_NRES_RCRRP 0x78*/
 
 namespace uds {
 
 struct Packet {
-    uint8_t id;
+	uint8_t id{0};
     std::vector<uint8_t> data;
 };
 

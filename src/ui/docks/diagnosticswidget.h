@@ -4,7 +4,8 @@
 #include <QTableView>
 #include <QWidget>
 
-#include "scanresult.h"
+#include "lt/diagnostics/codes.h"
+#include "models/dtcmodel.h"
 
 class QCheckBox;
 
@@ -23,8 +24,8 @@ private:
     QTableView *listCodes_;
     QCheckBox *checkPending_;
 
-    ScanResult scanResult_;
-    ScanResult pendingScanResult_;
+    DtcModel dtcModel_;
+    DtcModel pendingDtcModel_;
 };
 
 #endif // DIAGNOSTICSWIDGET_H

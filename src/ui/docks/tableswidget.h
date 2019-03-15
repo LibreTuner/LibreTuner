@@ -6,27 +6,26 @@
 #include <memory>
 #include <vector>
 
-#include "definitions/definition.h"
-
-class Tune;
+#include "lt/definition/platform.h"
 
 class QTreeWidget;
 class QAbstractItemModel;
 
-class TablesWidget : public QWidget
-{
+class TablesWidget : public QWidget {
     Q_OBJECT
 public:
     explicit TablesWidget(QWidget *parent = nullptr);
 
 signals:
-    void activated(int index);
+    void activated(const lt::ModelTable *table);
 
 public slots:
-    void setTables(const std::vector<definition::Table> &tables);
+    void setModel(const lt::Model &model);
 
 private:
     QTreeWidget *view_;
 };
+
+Q_DECLARE_METATYPE(const lt::ModelTable *)
 
 #endif // TABLESWIDGET_H

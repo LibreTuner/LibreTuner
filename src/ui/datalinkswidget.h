@@ -7,7 +7,7 @@
 
 #include <QWidget>
 #include <QAbstractItemModel>
-#include "datalink/linkdatabase.h"
+#include "database/links.h"
 
 class DataLinksTreeModel : public QAbstractItemModel {
 public:
@@ -25,11 +25,10 @@ public:
     
     Qt::ItemFlags flags(const QModelIndex & index) const override;
     
-    void setLinks(datalink::LinkDatabase *links);
+    void setLinks(Links *links);
     
 private:
-    datalink::LinkDatabase *links_{nullptr};
-    datalink::LinkDatabase::UpdateConn updateConnection_;
+    Links *links_{nullptr};
 };
 
 

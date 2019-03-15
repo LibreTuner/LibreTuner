@@ -2,7 +2,8 @@
 #define AUTHOPTIONSVIEW_H
 
 #include <QWidget>
-#include "udsauthenticator.h"
+
+#include "lt/auth/auth.h"
 
 class QLineEdit;
 class QSpinBox;
@@ -13,7 +14,7 @@ class AuthOptionsView : public QWidget
 public:
     explicit AuthOptionsView(QWidget *parent = nullptr);
     
-    void setDefaultOptions(const auth::Options &options);
+    void setDefaultOptions(const lt::auth::Options &options);
 
 signals:
 
@@ -24,7 +25,7 @@ private:
     QLineEdit *lineKey_;
     QSpinBox *spinSessionId_;
     
-    auth::Options defaultOptions_;
+    lt::auth::Options defaultOptions_;
 };
 
 #endif // AUTHOPTIONSVIEW_H

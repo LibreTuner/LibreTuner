@@ -25,19 +25,18 @@
 #include <memory>
 #include <thread>
 
-#include "datalinkslistmodel.h"
+#include "database/links.h"
 
-namespace flash {
-class Flashable;
-using FlashablePtr = std::shared_ptr<Flashable>;
-
-class Flasher;
-using FlasherPtr = std::shared_ptr<Flasher>;
+namespace lt {
+class Tune;
+using TunePtr = std::shared_ptr<Tune>;
 }
 
-class Tune;
 class QComboBox;
 class AuthOptionsView;
+class FileSelectWidget;
+class QPushButton;
+class QStackedWidget;
 
 /**
  * @todo write docs
@@ -49,22 +48,35 @@ public:
 
     virtual ~FlasherWindow() override;
     
-    void setTune(Tune *tune);
+    void setTune(const lt::TunePtr &tune);
+
+private slots:
+    void nextClicked();
+    void previousClicked();
     
 private:
     void buttonTuneClicked();
     void buttonFlashClicked();
     // Verifies form entries and enables or disables buttonFlash
     void verify();
+
+    QWidget *createSelectPage();
+    QWidget *createOptionPage();
     
-    Tune *selectedTune_;
+    lt::TunePtr selectedTune_;
     
-    QPushButton *buttonTune_;
     QPushButton *buttonFlash_;
+    QPushButton *buttonNext_;
+    QPushButton *buttonPrevious_;
+    QPushButton *buttonAdvanced_;
+
     QComboBox *comboLink_;
     AuthOptionsView *authOptions_;
-    
-    DataLinksListModel linksModel_;
+    QStackedWidget *stack_;
+
+    LinksListModel linksList_;
+
+	FileSelectWidget *fileSelect_;
 };
 
 #endif // FLASHWINDOW_H

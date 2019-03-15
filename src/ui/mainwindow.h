@@ -19,14 +19,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "canviewer.h"
-#include "downloadwindow.h"
-#include "datalinkswidget.h"
-#include "datalinkslistmodel.h"
-
 #include <QComboBox>
 #include <QLayout>
 #include <QMainWindow>
+
+#include <filesystem>
+
+#include "database/links.h"
+#include "models/tablemodel.h"
+#include "lt/rom/rom.h"
 
 class QListView;
 
@@ -35,21 +36,19 @@ class TablesWidget;
 class TuneData;
 class SidebarWidget;
 class GraphWidget;
-class Table;
-class Tune;
 
-namespace datalink {
-    class Link;
-}
-
-class MainWindow : public QMainWindow { // public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    
-public slots:
-    void datalinkChanged(datalink::Link *link);
+
+    // If newPath is true OR the current tune was not loaded from a file, asks
+    // the user for a path.
+    void saveTune(bool newPath = false);
+
+public slots :
+    void setTable(const lt::ModelTable *modTable);
 
 private slots:
     void on_buttonDownloadRom_clicked();
@@ -57,13 +56,12 @@ private slots:
     void closeEvent(QCloseEvent *event) override;
     
 signals:
-    void tableChanged(Table *table);
+    void tableChanged(lt::Table *table);
+
+    void tuneChanged(const lt::Tune *tune);
 
 private:
-    CanViewer canViewer_;
-    DownloadWindow *downloadWindow_ = nullptr;
-    DatalinksWidget datalinksWindow_;
-    DataLinksListModel linksModel_;
+    bool checkSave();
 
     QComboBox *comboLogVehicles_;
     QComboBox *comboDatalink_;
@@ -87,10 +85,6 @@ private:
     QDockWidget *editorDock_;
     QDockWidget *graphDock_;
     
-    bool changeSelected(Tune *tune);
-    
-    // Returns true if it is safe to discard the tune data
-    bool checkSaveSelected();
 
     void setupMenu();
     void setupStatusBar();
@@ -100,6 +94,8 @@ private:
     
     void saveSettings();
     void loadSettings();
+
+    void setTune(const lt::TunePtr &tune, const std::filesystem::path &path = std::filesystem::path());
 
     QDockWidget *createOverviewDock();
     QDockWidget *createLoggingDock();
@@ -111,8 +107,13 @@ private:
     QDockWidget *createGraphDock();
     
     std::vector<QDockWidget*> docks_;
-    
-    std::shared_ptr<TuneData> selectedTune_;
+
+    std::filesystem::path tunePath_;
+
+    lt::TunePtr tune_;
+
+    LinksListModel linksList_;
+    TableModel tableModel_;
 };
 
 #endif // MAINWINDOW_H

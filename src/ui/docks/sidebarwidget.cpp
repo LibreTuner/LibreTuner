@@ -1,5 +1,6 @@
 #include "sidebarwidget.h"
-#include "table.h"
+
+#include "lt/definition/model.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -44,12 +45,18 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableHeight_->setReadOnly(true);
     tableRange_ = new QLineEdit;
     tableRange_->setReadOnly(true);
+    tableUnit_ = new QLineEdit;
+    tableUnit_->setReadOnly(true);
+    tableDataType_ = new QLineEdit;
+    tableDataType_->setReadOnly(true);
     
     tableForm->addRow(tr("Name"), tableName_);
     tableForm->addRow(tr("Offset"), tableOffset_);
     tableForm->addRow(tr("Width"), tableWidth_);
     tableForm->addRow(tr("Height"), tableHeight_);
     tableForm->addRow(tr("Range"), tableRange_);
+    tableForm->addRow(tr("Unit"), tableUnit_);
+    tableForm->addRow(tr("Data type"), tableDataType_);
     
     
     tableInfo_->setLayout(tableForm);
@@ -82,24 +89,28 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
 
 
 
-void SidebarWidget::fillTableInfo(Table* table)
+void SidebarWidget::fillTableInfo(const lt::ModelTable* mod)
 {
-    if (!table) {
+    if (mod == nullptr) {
         tableName_->setText("N/A");
         tableOffset_->setText("N/A");
         tableWidth_->setText("N/A");
         tableHeight_->setText("N/A");
         tableRange_->setText("N/A");
         tableDescription_->setPlainText("No table selected");
+        tableUnit_->setText("N/A");
+        tableDataType_->setText("N/A");
         return;
     }
+
+    const lt::TableDefinition *table = mod->table;
     
-    tableName_->setText(QString::fromStdString(table->name()));
-    tableOffset_->setText(QString("0x") + QString::number(table->offset(), 16));
-    tableWidth_->setText(QString::number(table->width()));
-    tableHeight_->setText(QString::number(table->height()));
-    tableRange_->setText(QString("%1 - %2").arg(table->minimum()).arg(table->maximum()));
-    tableDescription_->setPlainText(QString::fromStdString(table->description()));
+    tableName_->setText(QString::fromStdString(table->name));
+    tableOffset_->setText(QString("0x") + QString::number(mod->offset, 16));
+    tableWidth_->setText(QString::number(table->width));
+    tableHeight_->setText(QString::number(table->height));
+    tableRange_->setText(QString("%1 - %2").arg(table->minimum).arg(table->maximum));
+    tableDescription_->setPlainText(QString::fromStdString(table->description));
 }
 
 

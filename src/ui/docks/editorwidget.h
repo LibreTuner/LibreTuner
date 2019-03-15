@@ -10,25 +10,24 @@ class QAbstractItemModel;
 class QLabel;
 class VerticalLabel;
 
-class Tune;
-class TuneData;
-class Table;
+class TableModel;
 
 class EditorWidget : public QWidget
 {
 public:
     explicit EditorWidget(QWidget *parent = nullptr);
 
-    void setModel(QAbstractItemModel *model);
-    
-public slots:
-    void tableChanged(Table *table);
-    void tuneChanged(const std::shared_ptr<Tune> &tune);
+    void setModel(TableModel *model);
+
+private slots:
+    void axesChanged();
 
 private:
     QTableView *view_;
     QLabel *labelX_;
     VerticalLabel *labelY_;
+
+    TableModel *model_{nullptr};
 };
 
 #endif // EDITORWIDGET_H

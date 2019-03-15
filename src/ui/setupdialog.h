@@ -6,8 +6,7 @@
 #define LIBRETUNER_DEFINITIONVIEW_H
 
 #include <QDialog>
-#include "datalink/datalink.h"
-#include "definitions/definition.h"
+#include "lt/definition/platform.h"
 
 class QAbstractItemModel;
 class QComboBox;
@@ -23,10 +22,10 @@ public:
     void setDatalinksModel(QAbstractItemModel *model);
 
     // Returns the selected platform or nullptr if none are selected
-    definition::MainPtr platform();
+    lt::PlatformPtr platform();
 
     // Returns the selected datalink or nullptr if none are selected
-    datalink::Link *datalink();
+    lt::DataLink *datalink();
 
 private:
     QComboBox *comboPlatforms_;

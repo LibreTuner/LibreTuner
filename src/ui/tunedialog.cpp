@@ -1,6 +1,5 @@
 #include "tunedialog.h"
 
-#include "rom.h"
 #include "romsview.h"
 
 #include <QVBoxLayout>
@@ -12,7 +11,7 @@ TuneDialog::TuneDialog(QWidget *parent) : QDialog(parent) {
     resize(600, 400);
     
     roms_ = new RomsView;
-    roms_->setModel(new RomsModel(this));
+    //roms_->setModel(new RomsModel(this));
     
     QPushButton *select = new QPushButton(tr("Select"));
     select->setEnabled(false);

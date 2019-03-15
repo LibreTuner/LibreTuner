@@ -19,7 +19,7 @@
 #include "datalog.h"
 #include "logger.h"
 
-
+/*
 bool DataLog::add(uint32_t id, std::pair<DataLog::TimePoint, double> value) {
     Data *data = addPid(id);
     if (data == nullptr) {
@@ -66,3 +66,4 @@ DataLog::Data *DataLog::addPid(uint32_t id) {
     }
     return nullptr;
 }
+*/

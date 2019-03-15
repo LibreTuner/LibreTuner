@@ -17,15 +17,9 @@
  */
 
 #include "libretuner.h"
-#include "definitions/definition.h"
 #include "logger.h"
-#include "rommanager.h"
 #include "timerrunloop.h"
-#include "ui/flasherwindow.h"
 #include "ui/styledwindow.h"
-#include "ui/setupdialog.h"
-#include "ui/datalinkslistmodel.h"
-#include "vehicle.h"
 
 #ifdef WITH_SOCKETCAN
 #include "os/sockethandler.h"
@@ -33,8 +27,7 @@
 #endif
 
 #ifdef WITH_J2534
-#include "j2534/j2534.h"
-#include "datalink/passthru.h"
+
 #endif
 
 #include <QDir>
@@ -45,10 +38,17 @@
 
 #include <future>
 #include <memory>
+#include <fstream>
+
+#include "uiutil.h"
+#include "serializeddata.h"
 
 static LibreTuner *_global;
 
-LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
+namespace fs = std::filesystem;
+
+LibreTuner::LibreTuner(int &argc, char *argv[])
+    : QApplication(argc, argv), roms_(definitions_) {
     _global = this;
 
     Q_INIT_RESOURCE(icons);
@@ -59,6 +59,36 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
     setOrganizationDomain("libretuner.org");
     setApplicationName("LibreTuner");
 
+    // intolib rewrite
+
+    // Setup main path
+    rootPath_ = fs::current_path();
+
+    definitions_.setPath(rootPath_ / "definitions");
+    roms_.setPath(rootPath_ / "roms");
+    links_.setPath(rootPath_ / "links.lts");
+
+    // Load definitions
+    catchCritical([this]() { definitions_.load(); },
+                  tr("Error while loading definitions"));
+
+    // Load roms
+    catchCritical([this]() { roms_.loadRoms(); },
+                  tr("Error while loading ROMs"));
+
+    // Load links
+    catchCritical([this]() { load_datalinks(); },
+                  tr("Error while loading datalinks"));
+
+    // Load DTC descriptions
+    dtcDescriptions_.load();
+
+    currentDatalink_ = links_.getFirst();
+    currentPlatform_ = definitions_.first();
+
+	setWindowIcon(QIcon(":/icons/LibreTuner.png"));
+
+    // Legacy stuff
     {
         QFile f(":qdarkstyle/style.qss");
         if (f.exists()) {
@@ -68,93 +98,20 @@ LibreTuner::LibreTuner(int &argc, char *argv[]) : QApplication(argc, argv) {
         }
     }
 
-    home_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    // home_ =
+    // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
 #ifdef WITH_SOCKETCAN
     SocketHandler::get()->initialize();
 #endif
     TimerRunLoop::get().startWorker();
-
-    try {
-        DefinitionManager::get()->load();
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText(
-            "Could not load definitions: " +
-            QString(e.what()));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("DefinitionManager error");
-        msgBox.exec();
-    }
-
-    try {
-        RomStore::get()->load();
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText(
-            QStringLiteral("Could not load ROM metadata from roms.xml: ") +
-            e.what());
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("RomManager error");
-        msgBox.exec();
-    }
-
-    try {
-        RomStore::get()->loadTunes();
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText(
-            QStringLiteral("Could not load tune metadata from tunes.xml: ") +
-            e.what());
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("TuneManager error");
-        msgBox.exec();
-    }
-    
-    links_.setPath((home_ + "/links.dat").toStdString());
-
-    try {
-        load_datalinks();
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText("Could not load interface data from interfaces.xml: " +
-                       QString(e.what()));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("Datalink error");
-        msgBox.exec();
-    }
-    linkRemovedConn_ = links_.connectRemove([this](datalink::Link *link) {
-        if (link == currentDatalink_) {
-            currentDatalink_ = links_.getFirst();
-            mainWindow_->datalinkChanged(currentDatalink_);
-        }
-    });
-
-    checkHome();
-
-    dtcDescriptions_.load();
-
-
-    setup();
-
-
     mainWindow_ = new MainWindow;
-    mainWindow_->setWindowIcon(QIcon(":/icons/LibreTuner.png"));
     mainWindow_->show();
-
-
-
-    /*QFile file(":/stylesheet.qss");
-    if (file.open(QFile::ReadOnly)) {
-        setStyleSheet(file.readAll());
-        file.close();
-    }*/
 }
 
-
-
-std::shared_ptr<TuneData> LibreTuner::openTune(const std::shared_ptr<Tune> &tune)
-{
+/*
+std::shared_ptr<TuneData>
+LibreTuner::openTune(const std::shared_ptr<Tune> &tune) {
     std::shared_ptr<TuneData> data;
     try {
         data = tune->data();
@@ -168,10 +125,8 @@ std::shared_ptr<TuneData> LibreTuner::openTune(const std::shared_ptr<Tune> &tune
     return data;
 }
 
-
-
 void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
-    /*if (!data) {
+    if (!data) {
         return;
     }
 
@@ -179,18 +134,17 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
     try {
         Flashable flash = data->flashable();
         
+
         if (std::unique_ptr<PlatformLink> link = getVehicleLink()) {
             std::unique_ptr<Flasher> flasher = link->flasher();
             if (!flasher) {
                 QMessageBox(QMessageBox::Critical, "Flash failure",
-                            "Failed to get a valid flash interface for the vehicle "
-                            "link. Is a flash mode set in the definition file and "
-                            "does the datalink support it?")
-                    .exec();
-                return;
+                            "Failed to get a valid flash interface for the
+    vehicle " "link. Is a flash mode set in the definition file and " "does the
+    datalink support it?") .exec(); return;
             }
-            flashWindow_ = std::make_unique<FlasherWindow>(std::move(flasher), std::move(flash));
-            flashWindow_->show();
+            flashWindow_ = std::make_unique<FlasherWindow>(std::move(flasher),
+    std::move(flash)); flashWindow_->show();
         }
     } catch (const std::exception &e) {
         QMessageBox msgBox;
@@ -199,44 +153,10 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         return;
-    }*/
-
-    
-}
-
-
+    }
+}*/
 
 LibreTuner *LibreTuner::get() { return _global; }
-
-
-
-void LibreTuner::checkHome() {
-    QDir home(home_);
-    home.mkpath(".");
-    home.mkdir("roms");
-    home.mkdir("tunes");
-
-    if (!home.exists("definitions")) {
-        home.mkdir("definitions");
-        // Copy definitions
-        QDir dDir(":/definitions");
-
-        for (QFileInfo &info : dDir.entryInfoList(
-                 QDir::Dirs | QDir::NoDotAndDotDot, QDir::NoSort)) {
-            QDir realDefDir(home.path() + "/definitions/" + info.fileName() +
-                            "/");
-            realDefDir.mkpath(".");
-            QDir subDir(info.filePath());
-            for (QFileInfo &i : subDir.entryInfoList(
-                     QDir::Files | QDir::NoDotAndDotDot, QDir::NoSort)) {
-                QFile::copy(i.filePath(),
-                            realDefDir.path() + "/" + i.fileName());
-            }
-        }
-    }
-}
-
-
 
 void LibreTuner::load_datalinks() {
     links_.detect();
@@ -244,55 +164,36 @@ void LibreTuner::load_datalinks() {
     try {
         links_.load();
     } catch (const std::runtime_error &err) {
-        QMessageBox::warning(nullptr, tr("Datalink database error"), tr("Failed to load datalink save data: ") + err.what());
+        QMessageBox::warning(nullptr, tr("Datalink database error"),
+                             tr("Failed to load datalink save data: ") +
+                                 err.what());
     }
 }
 
-
-
-
-LibreTuner::~LibreTuner() {
-    _global = nullptr;
-}
-
-
+LibreTuner::~LibreTuner() { _global = nullptr; }
 
 void LibreTuner::setup() {
-    SetupDialog setup;
-    setup.setDefinitionModel(DefinitionManager::get());
-    DataLinksListModel model;
-    model.setDatabase(&links_);
-    setup.setDatalinksModel(&model);
-    setup.exec();
-    currentDefinition_ = setup.platform();
-    currentDatalink_ = setup.datalink();
+    // SetupDialog setup;
+    // setup.setDefinitionModel(DefinitionManager::get());
+    // DataLinksListModel model;
+    // setup.setDatalinksModel(&model);
+    // setup.exec();
+    // currentDefinition_ = setup.platform();
+    // currentDatalink_ = setup.datalink();
 }
 
-
-
-std::unique_ptr<PlatformLink> LibreTuner::platform_link() {
-    if (!currentDefinition_ || !currentDatalink_) {
-        return nullptr;
-    }
-
-    return std::make_unique<PlatformLink>(currentDefinition_, *currentDatalink_);
-}
-
-
-
-void LibreTuner::saveLinks()
-{
+void LibreTuner::saveLinks() {
     try {
         links_.save();
     } catch (const std::runtime_error &err) {
-        QMessageBox::critical(nullptr, tr("Datalink save error"), tr("Failed to save datalink database: ") + err.what());
+        QMessageBox::critical(nullptr, tr("Datalink save error"),
+                              tr("Failed to save datalink database: ") +
+                                  err.what());
     }
 }
 
-
-
-void LibreTuner::setPlatform(const definition::MainPtr &platform) {
-    currentDefinition_ = platform;
+void LibreTuner::setPlatform(const lt::PlatformPtr &platform) {
+    currentPlatform_ = platform;
 
     if (platform) {
         Logger::debug("Set platform to " + platform->name);
@@ -301,8 +202,7 @@ void LibreTuner::setPlatform(const definition::MainPtr &platform) {
     }
 }
 
-
-void LibreTuner::setDatalink(datalink::Link *link) {
+void LibreTuner::setDatalink(lt::DataLink *link) {
     currentDatalink_ = link;
 
     if (link != nullptr) {
@@ -310,4 +210,132 @@ void LibreTuner::setDatalink(datalink::Link *link) {
     } else {
         Logger::debug("Unset datalink");
     }
+}
+
+lt::PlatformLink LibreTuner::platformLink() const {
+    if (currentDatalink_ == nullptr) {
+        throw std::runtime_error("no datalink is selected");
+    }
+    if (!currentPlatform_) {
+        throw std::runtime_error("no platform is selected");
+    }
+
+    return lt::PlatformLink(*currentDatalink_, *currentPlatform_);
+}
+
+struct TableMeta {
+    std::size_t id;
+    std::vector<uint8_t> data;
+};
+
+struct TuneMeta {
+    std::string id;
+    std::string name;
+    std::string romId;
+    std::string modelId;
+    std::string platformId;
+    std::vector<TableMeta> tables;
+};
+
+namespace serialize {
+template<typename S>
+void serialize(S &s, const TableMeta &table) {
+    s.serialize(table.id);
+    s.serialize(table.data);
+}
+
+template<typename S>
+void serialize(S &s, const TuneMeta &tune) {
+    s.serialize(tune.id);
+    s.serialize(tune.name);
+    s.serialize(tune.romId);
+    s.serialize(tune.modelId);
+    s.serialize(tune.platformId);
+    s.serialize(tune.tables);
+}
+
+template<typename D>
+void deserialize(D &d, TableMeta &table) {
+    d.deserialize(table.id);
+    d.deserialize(table.data);
+}
+
+template<typename D>
+void deserialize(D &d, TuneMeta &tune) {
+    d.deserialize(tune.id);
+    d.deserialize(tune.name);
+    d.deserialize(tune.romId);
+    d.deserialize(tune.modelId);
+    d.deserialize(tune.platformId);
+    d.deserialize(tune.tables);
+}
+}
+
+lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const
+{
+    std::ifstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open tune at " + path.string());
+    }
+
+    std::size_t fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<uint8_t> data(fileSize);
+    file.read(reinterpret_cast<char*>(data.data()), fileSize);
+    file.close();
+
+    using InputAdapter = serialize::InputBufferAdapter<std::vector<uint8_t>>;
+
+    serialize::Deserializer<InputAdapter> ds(data);
+    TuneMeta meta;
+    ds.load(meta);
+
+    const RomMeta *romMeta = roms_.fromId(meta.romId);
+    if (romMeta == nullptr) {
+        throw std::runtime_error("ROM with id " + meta.romId + " does not exist");
+    }
+
+    lt::RomPtr rom = roms_.openRom(*romMeta);
+    lt::TunePtr tune = std::make_shared<lt::Tune>(rom);
+    tune->setId(meta.id);
+    tune->setName(meta.name);
+    for (const TableMeta &table : meta.tables) {
+        tune->setTable(table.id, table.data.data(), table.data.size());
+    }
+
+    return tune;
+}
+
+void LibreTuner::saveTune(const lt::Tune &tune, const std::filesystem::path &path) const
+{
+    TuneMeta meta;
+    meta.id = tune.id();
+    meta.name = tune.name();
+    meta.romId = tune.base()->id();
+    meta.modelId = tune.base()->model()->id;
+    meta.platformId = tune.base()->model()->platform.id;
+
+
+    for (int i = 0; i < tune.tables().size(); ++i) {
+        const lt::TablePtr &table = tune.tables()[i];
+        if (table) {
+            TableMeta tableMeta;
+            tableMeta.id = i;
+            tableMeta.data = table->serialize(tune.base()->model()->platform.endianness);
+            meta.tables.emplace_back(std::move(tableMeta));
+        }
+    }
+
+    std::vector<uint8_t> data;
+    using OutputAdapter = serialize::OutputBufferAdapter<std::vector<uint8_t>>;
+
+    serialize::Serializer<OutputAdapter> s(data);
+
+    s.save(meta);
+
+    std::ofstream file(path, std::ios::binary | std::ios::out);
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open tune for writing at " + path.string());
+    }
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
 }

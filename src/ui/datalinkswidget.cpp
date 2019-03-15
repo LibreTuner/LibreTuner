@@ -12,7 +12,7 @@
 #include <QHeaderView>
 #include <QLineEdit>
 
-#include "datalink/linkdatabase.h"
+#include "database/links.h"
 #include "libretuner.h"
 #include "adddatalinkdialog.h"
 
@@ -49,7 +49,7 @@ int DataLinksTreeModel::columnCount(const QModelIndex& parent) const
     return 2;
 }
 
-Q_DECLARE_METATYPE(datalink::Link *)
+Q_DECLARE_METATYPE(lt::DataLink*)
 
 QVariant DataLinksTreeModel::data(const QModelIndex& index, int role) const {
     if (!links_) {
@@ -73,7 +73,7 @@ QVariant DataLinksTreeModel::data(const QModelIndex& index, int role) const {
         return QVariant();
     }
     
-    datalink::Link *link{nullptr};
+    lt::DataLink *link{nullptr};
     
     if (index.internalId() == 1) {
         // Auto-detected
@@ -110,17 +110,9 @@ QVariant DataLinksTreeModel::headerData(int section, Qt::Orientation orientation
     }
 }
 
-void DataLinksTreeModel::setLinks(datalink::LinkDatabase* links)
+void DataLinksTreeModel::setLinks(Links* links)
 {
     links_ = links;
-    if (links_ != nullptr) {
-        updateConnection_ = links->connectUpdate([this]() {
-            beginResetModel();
-            endResetModel();
-        });
-    } else {
-        updateConnection_.reset();
-    }
 }
 
 

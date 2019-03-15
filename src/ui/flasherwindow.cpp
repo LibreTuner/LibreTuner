@@ -18,17 +18,13 @@
 
 #include "flasherwindow.h"
 
-#include "definitions/definition.h"
-#include "flash/flashable.h"
-#include "flash/flasher.h"
 #include "logger.h"
 #include "libretuner.h"
-#include "tunedialog.h"
-#include "rom.h"
-#include "vehicle.h"
-#include "flash/flashable.h"
 #include "authoptionsview.h"
 #include "backgroundtask.h"
+#include "lt/link/platformlink.h"
+#include "fileselectwidget.h"
+#include "uiutil.h"
 
 #include <cassert>
 
@@ -40,92 +36,84 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QProgressDialog>
+#include <QStackedWidget>
 
-FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent) {
+FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent), linksList_(LT()->links()) {
     setWindowTitle(tr("LibreTuner - Flash"));
-    
-    // Form entries
-    buttonTune_ = new QPushButton(tr("None selected"));
-    buttonTune_->setMinimumWidth(300);
-    buttonTune_->setDefault(true);
-    buttonTune_->setAutoDefault(true);
-    connect(buttonTune_, &QPushButton::clicked, [this]() {
-        buttonTuneClicked();
-    });
-    
-    linksModel_.setDatabase(&LT()->links());
-    
-    comboLink_ = new QComboBox;
-    comboLink_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    comboLink_->setItemDelegate(new QStyledItemDelegate());
-    comboLink_->setModel(&linksModel_);
-    connect(comboLink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
-        verify();
-    });
-    
+    resize(600, 200);
+
     // Buttons
     auto *buttonClose = new QPushButton(tr("Close"));
-    auto *buttonAdvanced = new QPushButton(tr("Advanced"));
-    buttonAdvanced->setCheckable(true);
+    buttonAdvanced_ = new QPushButton(tr("Advanced"));
+    buttonAdvanced_->setCheckable(true);
+    buttonAdvanced_->setVisible(false);
     
     buttonFlash_ = new QPushButton(tr("Flash"));
     buttonFlash_->setEnabled(false);
-
-    // Form
-    QFormLayout *form = new QFormLayout;
-    form->addRow(tr("Tune"), buttonTune_);
-    form->addRow(tr("Link"), comboLink_);
-
-    authOptions_ = new AuthOptionsView;
-    authOptions_->hide();
     
     // Buttons layout
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
     buttonLayout->addWidget(buttonFlash_);
     buttonLayout->addWidget(buttonClose);
-    buttonLayout->addWidget(buttonAdvanced);
+    buttonLayout->addWidget(buttonAdvanced_);
+
+    // Page buttons
+    buttonNext_ = new QPushButton(tr("Next"));
+    buttonPrevious_ = new QPushButton(tr("Previous"));
+    buttonPrevious_->setEnabled(false);
+
+    auto *controlLayout = new QHBoxLayout;
+    controlLayout->setContentsMargins(0, 0, 0, 0);
+    controlLayout->addWidget(buttonPrevious_);
+    controlLayout->addWidget(buttonNext_);
     
-    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
-    connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
-    connect(buttonFlash_, &QPushButton::clicked, this, &FlasherWindow::buttonFlashClicked);
-    
+    // Pages
+    stack_ = new QStackedWidget;
+    stack_->addWidget(createSelectPage());
+    stack_->addWidget(createOptionPage());
+    stack_->setContentsMargins(0, 0, 0, 0);
+
     // Top layout
     auto *topLayout = new QHBoxLayout;
-    topLayout->addLayout(form);
+    topLayout->setContentsMargins(0, 0, 0, 0);
+    topLayout->addWidget(stack_);
     topLayout->addLayout(buttonLayout);
     
     // Main layout
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSizeConstraint(QLayout::SetFixedSize);
+    //layout->setSizeConstraint(QLayout::SetFixedSize);
     
     layout->addLayout(topLayout);
-    layout->addWidget(authOptions_);
+    layout->addLayout(controlLayout);
     
     setLayout(layout);
-}
 
-Q_DECLARE_METATYPE(datalink::Link*)
+
+    connect(buttonNext_, &QPushButton::clicked, this, &FlasherWindow::nextClicked);
+    connect(buttonPrevious_, &QPushButton::clicked, this, &FlasherWindow::previousClicked);
+    connect(buttonAdvanced_, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
+    connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
+    connect(buttonFlash_, &QPushButton::clicked, this, &FlasherWindow::buttonFlashClicked);
+}
 
 void FlasherWindow::buttonFlashClicked()
 {
-    try {
-        auto link = comboLink_->currentData(Qt::UserRole).value<datalink::Link*>();
+   catchCritical([this]() {
+        auto link = comboLink_->currentData(Qt::UserRole).value<lt::DataLink*>();
         if (link == nullptr) {
             Logger::debug("Invalid link when pressing button - verification failed somewhere");
             return;
         }
         
-        if (selectedTune_ == nullptr) {
+        if (!selectedTune_) {
             Logger::debug("Invalid tune when pressing button - verification failed somewhere");
             return;
         }
         
-        std::shared_ptr<TuneData> tuneData = selectedTune_->data();
-        
-        auto platform = selectedTune_->base()->platform();
-        auto platformLink = std::make_unique<PlatformLink>(platform, *link);
-        std::unique_ptr<flash::Flasher> flasher = platformLink->flasher();
+        auto platform = selectedTune_->base()->model()->platform;
+        auto platformLink = std::make_unique<lt::PlatformLink>(*link, platform);
+        lt::FlasherPtr flasher = platformLink->flasher();
         
         if (!flasher) {
             Logger::critical("Failed to create flasher");
@@ -146,7 +134,7 @@ void FlasherWindow::buttonFlashClicked()
         
         // Create task
         BackgroundTask<bool()> task([&]() {
-            return flasher->flash(tuneData->flashable());
+            return flasher->flash(lt::FlashMap::fromTune(*selectedTune_));
         });
         
         bool canceled = false;
@@ -174,42 +162,99 @@ void FlasherWindow::buttonFlashClicked()
                 QMessageBox(QMessageBox::Information, "Flash Finished", "Successfully reprogrammed ECU").exec();
             }
         }
-    } catch (const std::runtime_error &err) {
-        QMessageBox(QMessageBox::Critical, "Flash Error", err.what()).exec();
-    }
+    }, tr("Error while flashing"));
 }
 
 
 
-void FlasherWindow::setTune(Tune* tune)
+void FlasherWindow::setTune(const lt::TunePtr &tune)
 {
     selectedTune_ = tune;
+    if (selectedTune_) {
+        stack_->setCurrentIndex(1);
+        buttonPrevious_->setEnabled(false);
+        buttonNext_->setEnabled(false);
+        buttonAdvanced_->setVisible(true);
+    }
     verify();
 }
 
-
-
-void FlasherWindow::buttonTuneClicked()
+void FlasherWindow::nextClicked()
 {
-    TuneDialog dlg;
-    dlg.exec();
-    
-    selectedTune_ = dlg.selectedTune();
-    verify();
+    // Try to open tune
+    catchCritical([this]() {
+        selectedTune_ = LT()->openTune(fileSelect_->path().toStdString());
+
+        stack_->setCurrentIndex(1);
+        buttonNext_->setEnabled(false);
+        buttonPrevious_->setEnabled(true);
+        buttonAdvanced_->setVisible(true);
+
+        verify();
+    }, "Error opening tune");
+}
+
+void FlasherWindow::previousClicked()
+{
+    stack_->setCurrentIndex(0);
+    buttonPrevious_->setEnabled(false);
+    buttonNext_->setEnabled(true);
+    buttonAdvanced_->setVisible(false);
 }
 
 
 
 void FlasherWindow::verify()
 {
-    if (selectedTune_ == nullptr) {
-        buttonTune_->setText(tr("None selected"));
-    } else {
-        buttonTune_->setText(QString::fromStdString(selectedTune_->name()));
-        authOptions_->setDefaultOptions(selectedTune_->base()->platform()->flashAuthOptions);
-
+    if (selectedTune_ != nullptr) {
+        authOptions_->setDefaultOptions(selectedTune_->base()->model()->platform.flashAuthOptions);
     }
     buttonFlash_->setEnabled(selectedTune_ && comboLink_->currentData(Qt::UserRole).isValid());
+}
+
+QWidget *FlasherWindow::createSelectPage()
+{
+    fileSelect_ = new FileSelectWidget("Open tune", "Tune (*.ltt)");
+
+    auto *layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignTop);
+    layout->addWidget(fileSelect_);
+
+    auto *page = new QWidget;
+    page->setLayout(layout);
+    page->setContentsMargins(0, 0, 0, 0);
+    return page;
+}
+
+QWidget *FlasherWindow::createOptionPage()
+{
+    // Form entries
+    comboLink_ = new QComboBox;
+    comboLink_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    comboLink_->setItemDelegate(new QStyledItemDelegate());
+    comboLink_->setModel(&linksList_);
+    connect(comboLink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
+        verify();
+    });
+
+    // Form
+    QFormLayout *form = new QFormLayout;
+    form->addRow(tr("Link"), comboLink_);
+
+    authOptions_ = new AuthOptionsView;
+    authOptions_->hide();
+
+    auto *layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignTop);
+    layout->addLayout(form);
+    layout->addWidget(authOptions_);
+
+    auto *page = new QWidget;
+    page->setLayout(layout);
+    page->setContentsMargins(0, 0, 0, 0);
+    return page;
 }
 
 
