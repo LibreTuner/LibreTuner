@@ -132,7 +132,7 @@ J2534Ptr J2534::create(Info &&info) {
 
 J2534::~J2534() {
     if (hDll_) {
-        CloseHandle(hDll_);
+        FreeLibrary(reinterpret_cast<HMODULE>(hDll_));
     }
 }
 

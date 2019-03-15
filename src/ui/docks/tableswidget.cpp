@@ -1,13 +1,11 @@
 #include "tableswidget.h"
-#include "definitions/definition.h"
 
-#include <QTreeWidget>
 #include <QAbstractItemModel>
-#include <QVBoxLayout>
 #include <QHeaderView>
+#include <QTreeWidget>
+#include <QVBoxLayout>
 
-TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent)
-{
+TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent) {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
 
@@ -16,27 +14,26 @@ TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent)
 
     layout->addWidget(view_);
     setLayout(layout);
-    
-    connect(view_, &QTreeWidget::itemActivated, [this](const QTreeWidgetItem *item, int column) {
-        emit activated(item->data(0, Qt::UserRole).toInt());
-    });
+
+    connect(view_, &QTreeWidget::itemActivated,
+            [this](const QTreeWidgetItem *item, int column) {
+                emit activated(item->data(0, Qt::UserRole)
+                                   .value<const lt::ModelTable *>());
+            });
 }
 
-
-
-void TablesWidget::setTables(const std::vector<definition::Table> &tables)
-{
+void TablesWidget::setModel(const lt::Model &model) {
     view_->clear();
     std::vector<std::pair<std::string, QTreeWidgetItem *>> categories_;
 
-    for (const definition::Table &def : tables) {
-        if (def.id == -1) {
-            continue;
-        }
+    for (const lt::ModelTable &def : model.tables) {
+        if (def.table == nullptr) { continue; }
         QTreeWidgetItem *par = nullptr;
 
+        const lt::TableDefinition *table = def.table;
+
         for (auto &cat : categories_) {
-            if (cat.first == def.category) {
+            if (cat.first == table->category) {
                 par = cat.second;
                 break;
             }
@@ -44,14 +41,14 @@ void TablesWidget::setTables(const std::vector<definition::Table> &tables)
 
         if (par == nullptr) {
             par = new QTreeWidgetItem(view_);
-            par->setText(0, QString::fromStdString(def.category));
+            par->setText(0, QString::fromStdString(table->category));
             par->setData(0, Qt::UserRole, QVariant(-1));
 
-            categories_.emplace_back(def.category, par);
+            categories_.emplace_back(table->category, par);
         }
 
         auto *item = new QTreeWidgetItem(par);
-        item->setText(0, QString::fromStdString(def.name));
-        item->setData(0, Qt::UserRole, QVariant(def.id));
+        item->setText(0, QString::fromStdString(table->name));
+        item->setData(0, Qt::UserRole, QVariant::fromValue(&def));
     }
 }

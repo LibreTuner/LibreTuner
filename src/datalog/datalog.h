@@ -24,10 +24,9 @@
 #include <vector>
 #include <functional>
 
-#include "vehicle.h"
 #include "util/signal.h"
-#include "definitions/definition.h"
 
+/*
 enum class DataUnit {
     None,
     Percentage,
@@ -60,11 +59,11 @@ public:
     
     using UpdateCall = std::function<void(const Data &info, double value, TimePoint time)>;
 
-    /* adds a point to a dataset. Returns false if the dataset
-     * with the specified id does not exist. */
+    // adds a point to a dataset. Returns false if the dataset
+    // with the specified id does not exist. 
     bool add(uint32_t id, std::pair<TimePoint, double> value);
 
-    /* Adds a value at the current time */
+    // Adds a value at the current time
     bool add(uint32_t id, double value);
 
     // void addData(const DataHead &data);
@@ -91,5 +90,6 @@ private:
     std::shared_ptr<Signal<UpdateCall>> updateSignal_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
+*/
 
 #endif // LIBRETUNER_DATALOG_H

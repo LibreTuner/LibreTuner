@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <cstring>
+#include <algorithm>
 
 namespace serialize {
 
@@ -115,7 +116,7 @@ public:
     InputBufferAdapter(Buffer &buffer) : pointer_(std::begin(buffer)), end_(std::end(buffer)) {}
     
     void read(TValue *data, std::size_t size) {
-        if (pointer_ + size <= end_) {
+        if (size <= std::distance(pointer_, end_)) {
             std::copy(pointer_, pointer_ + size, data);
             pointer_ += size;
             return;

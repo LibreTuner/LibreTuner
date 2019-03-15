@@ -27,7 +27,7 @@
 
 #include <memory>
 
-class Table;
+#include "models/tablemodel.h"
 
 /**
  * @todo write docs
@@ -37,11 +37,13 @@ public:
     explicit GraphWidget(QWidget *parent = nullptr);
     ~GraphWidget() override;
 
+	void setModel(TableModel *model);
+
 public slots:
-    void tableChanged(Table *table);
+    void refresh();
 
 private:
-    Table *table_ {nullptr};
+    TableModel *model_ {nullptr};
     QtDataVisualization::Q3DSurface *surface_;
     QWidget *container_;
     QtCharts::QChart *chart_;

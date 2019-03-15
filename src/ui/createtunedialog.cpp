@@ -19,53 +19,45 @@
 #include "createtunedialog.h"
 #include "ui_createtunedialog.h"
 
+#include "libretuner.h"
 #include "logger.h"
-#include "rommanager.h"
+#include "uiutil.h"
+
 #include <QMessageBox>
 #include <QStyledItemDelegate>
 #include <QVariant>
 
-CreateTuneDialog::CreateTuneDialog(const Rom *base)
+CreateTuneDialog::CreateTuneDialog(const RomMeta *base)
     : ui_(new Ui::CreateTuneDialog) {
     ui_->setupUi(this);
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
-    for (const auto &rom : RomStore::get()->roms()) {
-        ui_->comboBase->addItem(QString::fromStdString(rom->name()),
-                                QVariant(static_cast<qulonglong>(rom->id())));
-        if (base != nullptr && rom.get() == base) {
+    for (const RomMeta &meta : LT()->roms()) {
+        ui_->comboBase->addItem(QString::fromStdString(meta.name),
+                                QString::fromStdString(meta.id));
+        if (base != nullptr && &meta == base) {
             ui_->comboBase->setCurrentIndex(ui_->comboBase->count() - 1);
         }
     }
 }
 
-
-
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
-
-
 void CreateTuneDialog::on_buttonCreate_clicked() {
-    int romId = ui_->comboBase->currentData().toInt();
-    Rom *rom = RomStore::get()->fromId(romId);
-    if (rom == nullptr) {
-        Logger::warning("Rom with ID '" + std::to_string(romId) +
-                        "' no longer exists");
+    std::string romId = ui_->comboBase->currentData().toString().toStdString();
+    RomMeta *meta = LT()->roms().fromId(romId);
+    if (meta == nullptr) {
+        Logger::warning("Rom with ID '" + romId + "' no longer exists");
         return;
     }
 
-    try {
-        RomStore::get()->createTune(*rom,
-                                       ui_->lineName->text().toStdString());
-    } catch (const std::exception &e) {
-        QMessageBox msgBox;
-        msgBox.setText(QStringLiteral("Error while creating tune: ") +
-                       e.what());
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setWindowTitle("Tune creation error");
-        msgBox.exec();
-    }
+    catchWarning(
+        [this, meta]() {
+            lt::RomPtr rom = LT()->roms().openRom(*meta);
+            tune_ = std::make_shared<lt::Tune>(rom);
+        },
+        tr("Error creating tune"));
 
     close();
 }

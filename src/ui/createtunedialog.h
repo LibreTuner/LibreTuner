@@ -21,7 +21,8 @@
 
 #include <QDialog>
 
-#include "styledwindow.h"
+#include "database/roms.h"
+#include "lt/rom/rom.h"
 
 #include <memory>
 
@@ -29,20 +30,21 @@ namespace Ui {
 class CreateTuneDialog;
 }
 
-class Rom;
-
 /**
  * @todo write docs
  */
 class CreateTuneDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit CreateTuneDialog(const Rom *base = nullptr);
+    explicit CreateTuneDialog(const RomMeta *base = nullptr);
 
     ~CreateTuneDialog() override;
 
+    lt::TunePtr tune() const noexcept { return tune_; }
+
 private:
     Ui::CreateTuneDialog *ui_;
+	lt::TunePtr tune_;
 
 private slots:
     void on_buttonCreate_clicked();

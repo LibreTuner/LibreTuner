@@ -42,7 +42,7 @@ AuthOptionsView::AuthOptionsView(QWidget *parent) : QWidget(parent)
 
 
 
-void AuthOptionsView::setDefaultOptions(const auth::Options& options)
+void AuthOptionsView::setDefaultOptions(const lt::auth::Options& options)
 {
     defaultOptions_ = options;
     resetOptions();

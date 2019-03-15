@@ -16,15 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "j2534/j2534.h"
-#include "j2534/j2534caninterface.h"
 #include "libretuner.h"
-#include "logger.h"
-#include "protocols/isotpprotocol.h"
-#include <array>
-#include <iostream>
-#include <shunting-yard.h>
-#include "serializeddata.h"
 
 extern void cparse_startup();
 

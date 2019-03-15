@@ -4,8 +4,10 @@
 
 #include <QWidget>
 
+namespace lt {
+class ModelTable;
+}
 
-class Table;
 class QPlainTextEdit;
 class QLineEdit;
 class QToolButton;
@@ -16,7 +18,7 @@ public:
     explicit SidebarWidget(QWidget *parent = nullptr);
     
 public slots:
-    void fillTableInfo(Table *table);
+    void fillTableInfo(const lt::ModelTable *table);
 
 private slots:
     void on_treeToolButton_clicked(bool checked);
@@ -32,6 +34,8 @@ private:
     QLineEdit *tableWidth_;
     QLineEdit *tableHeight_;
     QLineEdit *tableRange_;
+    QLineEdit *tableUnit_;
+    QLineEdit *tableDataType_;
 };
 
 #endif // SIDEBARWIDGET_H

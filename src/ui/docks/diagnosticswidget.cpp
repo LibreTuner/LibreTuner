@@ -3,7 +3,7 @@
 #include "diagnosticsinterface.h"
 #include "libretuner.h"
 #include "logger.h"
-#include "vehicle.h"
+#include "uiutil.h"
 
 #include <QBoxLayout>
 #include <QHeaderView>
@@ -36,7 +36,7 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
 
     // Lists
     listCodes_ = new QTableView;
-    listCodes_->setModel(&scanResult_);
+    listCodes_->setModel(&dtcModel_);
     listCodes_->horizontalHeader()->setStretchLastSection(true);
     listCodes_->horizontalHeader()->setSectionResizeMode(
         QHeaderView::ResizeToContents);
@@ -46,7 +46,7 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(new QLabel(tr("Pending codes")));
 
     auto *listPending = new QTableView;
-    listPending->setModel(&pendingScanResult_);
+    listPending->setModel(&pendingDtcModel_);
     listPending->horizontalHeader()->setStretchLastSection(true);
     listPending->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     listPending->verticalHeader()->setVisible(false);
@@ -60,40 +60,20 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
 
 void DiagnosticsWidget::scan()
 {
-    std::unique_ptr<PlatformLink> link = LT()->platform_link();
-    if (!link) {
-        QMessageBox(QMessageBox::Critical, "Diagnostics Error", "Invalid platform or data link. Please run setup again").exec();
-        return;
-    }
-    std::unique_ptr<DiagnosticsInterface> diag;
-    try {
-        diag = link->diagnostics();
-    } catch (const std::exception &e) {
-        QMessageBox(QMessageBox::Warning, "No diagnostic interface",
-                    "Failed to load diagnostic interface: " +
-                    QString(e.what()))
-                .exec();
-        return;
-    }
-    if (!diag) {
-        QMessageBox(QMessageBox::Warning, "No diagnostic interface",
-                    "The default datalink does not have a supported "
-                    "diagnostic interface")
-                .exec();
-        return;
-    }
+    catchWarning([this]() {
+        lt::PlatformLink link = LT()->platformLink();
+        lt::DtcScannerPtr scanner = link.dtcScanner();
 
-    // Clear the scan result prior
-    scanResult_.clear();
-    pendingScanResult_.clear();
-    try {
-        diag->scan(scanResult_);
+        // Clear the scan result prior
+        //scanResult_.clear();
+        //pendingScanResult_.clear();
+
+        dtcModel_.setCodes(scanner->scan());
         if (checkPending_->isChecked()) {
-            diag->scanPending(pendingScanResult_);
+            pendingDtcModel_.setCodes(scanner->scanPending());
         }
-    } catch (const std::exception &e) {
-        Logger::critical("Scan error: " + std::string(e.what()));
-    }
+
+    }, tr("Diagnostics Scan Error"));
 }
 
 void DiagnosticsWidget::clear()

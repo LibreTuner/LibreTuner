@@ -1,9 +1,9 @@
 #include "editorwidget.h"
 
-#include "rom.h"
 #include "libretuner.h"
 
 #include "../verticallabel.h"
+#include "models/tablemodel.h"
 
 #include <QTableView>
 #include <QAbstractItemView>
@@ -45,18 +45,27 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent)
 
 
 
-void EditorWidget::setModel(QAbstractItemModel *model)
+void EditorWidget::setModel(TableModel *model)
 {
+    if (model_ != nullptr) {
+        disconnect(model_, &TableModel::modelReset, this, &EditorWidget::axesChanged);
+    }
+    model_ = model;
+    connect(model_, &TableModel::modelReset, this, &EditorWidget::axesChanged);
     view_->setModel(model);
+
+    axesChanged();
 }
 
 
 
-void EditorWidget::tableChanged(Table *table)
+void EditorWidget::axesChanged()
 {
-    setModel(table);
-    
-    if (!table) {
+    if (model_ == nullptr) {
+        return;
+    }
+    lt::Table *table = model_->table();
+    if (table == nullptr) {
         return;
     }
     

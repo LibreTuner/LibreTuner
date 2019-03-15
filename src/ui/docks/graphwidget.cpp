@@ -17,7 +17,7 @@
  */
 
 #include "graphwidget.h"
-#include "table.h"
+#include "lt/rom/table.h"
 
 #include <QChart>
 #include <QHBoxLayout>
@@ -63,10 +63,25 @@ GraphWidget::~GraphWidget()
     delete container_;
 }
 
+void GraphWidget::setModel(TableModel *model)
+{
+    if (model_ != nullptr) {
+        disconnect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
+    }
+    model_ = model;
+    if (model != nullptr) {
+        refresh();
+
+        connect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
+    }
+}
 
 
-void GraphWidget::tableChanged(Table *table) {
-    table_ = table;
+void GraphWidget::refresh() {
+    if (model_ == nullptr) {
+        return;
+    }
+    lt::Table *table = model_->table();
     if (table == nullptr) {
         return;
     }
@@ -74,7 +89,7 @@ void GraphWidget::tableChanged(Table *table) {
     if (table->height() > 1) {
         // Two dimensional
         auto *modelProxy =
-            new QtDataVisualization::QItemModelSurfaceDataProxy(table);
+            new QtDataVisualization::QItemModelSurfaceDataProxy(model_);
         modelProxy->setUseModelCategories(true);
         series3d_->setDrawMode(
             QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
@@ -104,12 +119,11 @@ void GraphWidget::tableChanged(Table *table) {
         if (table->axisX()) {
             for (int x = 0; x < table->width(); ++x) {
                 series->append(table->axisX()->label(x),
-                            table->data(table->index(0, x))
-                                .toFloat()); // Should always be a float
+                            table->get(x, 0)); // Should always be a float
             }
         } else {
             for (int x = 0; x < table->width(); ++x) {
-                series->append(x, table->data(table->index(0, x)).toFloat()); // Should always be a float
+                series->append(x, table->get(x, 0)); // Should always be a float
             }
         }
 

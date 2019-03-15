@@ -11,23 +11,10 @@ set(CMAKE_AUTOMOC ON)
 
 set(libretuner_SRC
     libretuner.cpp
-
     libretuner.h
-    rommanager.cpp
-    rommanager.h
-    rom.cpp
-    rom.h
-    tablegroup.cpp
-    tablegroup.h
-    table.cpp
-    table.h
     endian.h
-    udsauthenticator.cpp
-    udsauthenticator.h
     timer.cpp
     timer.h
-    vehicle.cpp
-    vehicle.h
     logger.cpp
     logger.h
     timerrunloop.cpp
@@ -38,136 +25,67 @@ set(libretuner_SRC
     log.h
     scanresult.cpp
     scanresult.h
-    diagnosticsinterface.cpp
-    diagnosticsinterface.h
     dtcdescriptions.cpp
     dtcdescriptions.h
-    sessionscanner.cpp
-    sessionscanner.h
-    diagnostics.cpp
-    diagnostics.h
-    bytebuffer.cpp
-    bytebuffer.h
     serializeddata.cpp
     serializeddata.h
+    uiutil.h
     
     plugin/plugin.cpp
     plugin/plugin.h
     plugin/pluginstate.cpp
     plugin/pluginstate.h
-    
-    download/downloader.cpp
-    download/downloader.h
-    
-    flash/flasher.cpp
-    flash/flasher.h
-    flash/flashable.cpp
-    flash/flashable.h
-    
-    datalog/datalogger.cpp
-    datalog/datalogger.h
-    datalog/datalog.cpp
-    datalog/datalog.h
-    datalog/datalogdatabase.cpp
-    datalog/datalogdatabase.h
 
     util/signal.cpp
     util/signal.h
 
-    util.hpp
-
-    definitions/definitionmanager.cpp
-    definitions/definitionmanager.h
-    definitions/definition.cpp
-    definitions/definition.h
-    definitions/checksummanager.cpp
-    definitions/checksummanager.h
-    definitions/piddefinitions.cpp
-    definitions/piddefinitions.h
-
     ui/mainwindow.cpp
     ui/mainwindow.h
-    ui/canviewer.cpp
-    ui/canviewer.h
-    ui/canlogview.cpp
-    ui/canlogview.h
-    ui/downloadwindow.cpp
-    ui/downloadwindow.h
-    ui/createtunedialog.cpp
-    ui/createtunedialog.h
     ui/verticallabel.cpp
     ui/verticallabel.h
-    ui/flasherwindow.cpp
-    ui/flasherwindow.h
     ui/titlebar.cpp
     ui/titlebar.h
     ui/styledwindow.cpp
     ui/styledwindow.h
-    ui/dataloggerwindow.cpp
-    ui/dataloggerwindow.h
-    ui/romsview.cpp
-    ui/romsview.h
-    ui/tunedialog.cpp
-    ui/tunedialog.h
-    ui/romexplorer.cpp
-    ui/romexplorer.h
-    ui/setupdialog.cpp
-    ui/setupdialog.h
-    ui/datalinkswidget.cpp
-    ui/datalinkswidget.h
-    ui/authoptionsview.cpp
-    ui/authoptionsview.h
-    ui/sessionscannerdialog.cpp
-    ui/sessionscannerdialog.h
     ui/backgroundtask.cpp
     ui/backgroundtask.h
-    ui/datalogview.cpp
-    ui/datalogview.h
     ui/qcustomplot.cpp
     ui/qcustomplot.h
-    ui/datalinkslistmodel.cpp
-    ui/datalinkslistmodel.h
-    ui/adddatalinkdialog.cpp
-    ui/adddatalinkdialog.h
-    
-    ui/docks/logview.cpp
-    ui/docks/logview.h
-    ui/docks/diagnosticswidget.cpp
-    ui/docks/diagnosticswidget.h
+    ui/createtunedialog.cpp
+    ui/createtunedialog.h
+    ui/fileselectwidget.cpp
+    ui/fileselectwidget.h
+    ui/flasherwindow.cpp
+    ui/flasherwindow.h
+    ui/authoptionsview.cpp
+    ui/authoptionsview.h
+
+    ui/docks/overviewwidget.cpp
+    ui/docks/overviewwidget.h
     ui/docks/sidebarwidget.cpp
     ui/docks/sidebarwidget.h
     ui/docks/tableswidget.cpp
     ui/docks/tableswidget.h
+    ui/docks/logview.h
+    ui/docks/logview.cpp
     ui/docks/editorwidget.cpp
     ui/docks/editorwidget.h
+    ui/docks/diagnosticswidget.cpp
+    ui/docks/diagnosticswidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
-    ui/docks/overviewwidget.cpp
-    ui/docks/overviewwidget.h
-    
-    ui/tunesmodel.cpp
-    ui/tunesmodel.h
 
-    protocols/caninterface.cpp
-    protocols/caninterface.h
-    protocols/canlog.cpp
-    protocols/canlog.h
-    protocols/udsprotocol.cpp
-    protocols/udsprotocol.h
-    protocols/mockcaninterface.cpp
-    protocols/mockcaninterface.h
-    protocols/isotpserver.cpp    
-    
-    protocols/isotpserver.h
-    protocols/isotpprotocol.cpp
-    protocols/isotpprotocol.h
+    models/tablemodel.cpp
+    models/tablemodel.h
+    models/dtcmodel.cpp
+    models/dtcmodel.h
 
-    datalink/datalink.cpp
-    datalink/datalink.h
-    datalink/linkdatabase.cpp
-    datalink/linkdatabase.h
-    
-    )
+    database/definitions.cpp
+    database/definitions.h
+    database/roms.cpp
+    database/roms.h
+    database/links.cpp
+    database/links.h)
 
 if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
@@ -210,7 +128,7 @@ qt5_add_resources(libretuner_SRC
 # Separate the program into a library for testing
 add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua)
+target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua LibLibreTuner)
 
 target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${Boost_INCLUDE_DIRS})
 
