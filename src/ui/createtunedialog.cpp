@@ -56,6 +56,8 @@ void CreateTuneDialog::on_buttonCreate_clicked() {
         [this, meta]() {
             lt::RomPtr rom = LT()->roms().openRom(*meta);
             tune_ = std::make_shared<lt::Tune>(rom);
+            tune_->setId(ui_->lineName->text().toStdString());
+            tune_->setName(ui_->lineName->text().toStdString());
         },
         tr("Error creating tune"));
 

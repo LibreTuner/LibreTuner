@@ -194,6 +194,12 @@ void MainWindow::setTune(const lt::TunePtr &tune, const std::filesystem::path &p
 
     flashCurrentAction_->setEnabled(!!tune);
     saveCurrentAction_->setEnabled(!!tune);
+
+    if (tune) {
+        setWindowTitle(tr("LibreTuner") + " - " + QString::fromStdString(tune->name()));
+    } else {
+        setWindowTitle(tr("LibreTuner"));
+    }
 }
 
 void MainWindow::saveSettings() {
