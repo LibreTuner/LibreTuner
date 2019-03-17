@@ -1,6 +1,5 @@
 #include "diagnosticswidget.h"
 
-#include "diagnosticsinterface.h"
 #include "libretuner.h"
 #include "logger.h"
 #include "uiutil.h"

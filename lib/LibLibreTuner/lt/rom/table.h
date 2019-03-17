@@ -145,7 +145,7 @@ public:
 
         std::visit(
             [&begin, &end, endianness](auto &&vec) {
-                using EntryType = std::decay_t<decltype(vec)>::value_type;
+                using EntryType = typename std::decay_t<decltype(vec)>::value_type;
 
                 if (std::distance(begin, end) / sizeof(EntryType) !=
                     vec.size()) {

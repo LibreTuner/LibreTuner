@@ -29,7 +29,6 @@ class Definitions;
  * Manages ROM files and metadata
  */
 class Roms : public QAbstractItemModel {
-    Q_OBJECT
 public:
     explicit Roms(const Definitions &definitions) : definitions_(definitions) {}
 

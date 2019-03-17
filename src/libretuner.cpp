@@ -21,15 +21,6 @@
 #include "timerrunloop.h"
 #include "ui/styledwindow.h"
 
-#ifdef WITH_SOCKETCAN
-#include "os/sockethandler.h"
-#include "protocols/socketcaninterface.h"
-#endif
-
-#ifdef WITH_J2534
-
-#endif
-
 #include <QDir>
 #include <QMessageBox>
 #include <QStandardPaths>
@@ -86,9 +77,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
     currentDatalink_ = links_.getFirst();
     currentPlatform_ = definitions_.first();
 
-	setWindowIcon(QIcon(":/icons/LibreTuner.png"));
+    setWindowIcon(QIcon(":/icons/LibreTuner.png"));
 
-    // Legacy stuff
     {
         QFile f(":qdarkstyle/style.qss");
         if (f.exists()) {
@@ -98,12 +88,6 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
         }
     }
 
-    // home_ =
-    // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-#ifdef WITH_SOCKETCAN
-    SocketHandler::get()->initialize();
-#endif
     TimerRunLoop::get().startWorker();
     mainWindow_ = new MainWindow;
     mainWindow_->show();

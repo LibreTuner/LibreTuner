@@ -7,19 +7,18 @@
 
 #ifdef WITH_SOCKETCAN
 
-#include "protocols/socketcaninterface.h"
 #include "datalink.h"
 
-namespace datalink {
-    class SocketCanLink : public Link {
+namespace lt {
+    class SocketCanLink : public DataLink {
     public:
         SocketCanLink(const std::string &name, const std::string &device);
 
-        Type type() const override { return Type::SocketCan; }
+        DataLinkType type() const override { return DataLinkType::SocketCan; }
 
-        std::unique_ptr<CanInterface> can(uint32_t baudrate) override;
+        network::CanPtr can(uint32_t baudrate) override;
 
-        Protocol supported_protocols() const override { return Protocol::Can; }
+        NetworkProtocol supportedProtocols() const override { return NetworkProtocol::Can; }
         
         std::string port() const override { return device_; }
 

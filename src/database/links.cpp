@@ -57,8 +57,8 @@ void Links::load() {
     for (const LinkData &link : links) {
         if (link.type == "socketcan") {
 #ifdef WITH_SOCKETCAN
-            manualLinks_.emplace_back(std::make_unique<datalink::SocketCanLink>(
-                link.name, link.port));
+            //manualLinks_.emplace_back(std::make_unique<lt::>(
+            //    link.name, link.port));
 #else
             Logger::warning(
                 "SocketCAN is unuspported on this platform, ignoring link.");

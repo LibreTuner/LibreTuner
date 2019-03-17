@@ -9,10 +9,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+add_definitions(-std=c++17)
+
 set(libretuner_SRC
     libretuner.cpp
     libretuner.h
-    endian.h
     timer.cpp
     timer.h
     logger.cpp
@@ -23,8 +24,6 @@ set(libretuner_SRC
     asyncroutine.h
     log.cpp
     log.h
-    scanresult.cpp
-    scanresult.h
     dtcdescriptions.cpp
     dtcdescriptions.h
     serializeddata.cpp
@@ -89,12 +88,8 @@ set(libretuner_SRC
 
 if (UNIX AND NOT APPLE)
     set(libretuner_SRC ${libretuner_SRC}
-        protocols/socketcaninterface.cpp
-        protocols/socketcaninterface.h
         os/sockethandler.cpp
-        os/sockethandler.h
-        datalink/socketcan.cpp
-        datalink/socketcan.h)
+        os/sockethandler.h)
 endif ()
 
 if (WIN32)
@@ -102,10 +97,7 @@ if (WIN32)
         j2534/j2534.cpp
         j2534/j2534.h
         j2534/j2534caninterface.cpp
-        j2534/j2534caninterface.h
-
-        datalink/passthru.cpp
-        datalink/passthru.h)
+        j2534/j2534caninterface.h)
 endif ()
 
 
@@ -136,6 +128,7 @@ target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRI
 
 if (UNIX AND NOT APPLE)
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_SOCKETCAN=1)
+    target_link_libraries(LibreTuner_lib stdc++fs)
 endif ()
 
 if (WIN32)

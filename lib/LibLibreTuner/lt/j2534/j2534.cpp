@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#ifdef WITH_J2534
+
 #include "j2534.h"
 
 #include <cassert>
@@ -320,3 +323,5 @@ std::vector<Info> detect_interfaces() {
 
 } // namespace j2534
 } // namespace lt
+
+#endif WITH_J2534
