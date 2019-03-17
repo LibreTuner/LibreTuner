@@ -136,7 +136,7 @@ private:
 // String
 template<typename D, class T, class Traits, class Allocator>
 void deserialize(D &d, std::basic_string<T, Traits, Allocator> &string) {
-    typename std::basic_string<T, Traits, Allocator>::size_type size;
+    uint32_t size;
     d.deserialize(size);
     std::vector<T> data(size);
     d.deserialize(data.data(), size);
@@ -146,7 +146,7 @@ void deserialize(D &d, std::basic_string<T, Traits, Allocator> &string) {
 // Vector
 template<typename D, typename T, class Allocator>
 void deserialize(D &d, std::vector<T, Allocator> &vector) {
-    std::size_t size;
+    uint32_t size;
     d.deserialize(size);
     vector.resize(size);
     d.deserialize(vector.data(), size);
@@ -161,19 +161,19 @@ void deserialize(D &d, T (&t)[SIZE]) {
 // Default serializers
 template<typename S, class T, class Traits, class Allocator>
 void serialize(S &s, const std::basic_string<T, Traits, Allocator> &string) {
-    s.serialize(string.size());
+    s.template serialize<uint32_t>(string.size());
     s.serialize(string.c_str(), string.size());
 }
 
 // Vector
 template<typename D, typename T, class Allocator>
 void serialize(D &d, const std::vector<T, Allocator> &vector) {
-    d.serialize(vector.size());
+    d.template serialize<uint32_t>(vector.size());
     d.serialize(vector.data(), vector.size());
 }
 
 template<typename S, typename T>
-void serialize(S &s, const T *data, std::size_t size) {
+void serialize(S &s, const T *data, uint32_t size) {
     s.serialize(size);
     s.serialize(data, size);
 }
@@ -188,7 +188,7 @@ void serialize(D &d, const T (&t)[SIZE]) {
 
 template<typename S>
 void serialize(S &s, const char *string) {
-    std::size_t len = std::strlen(string);
+    uint32_t len = std::strlen(string);
     s.serialize(len);
     s.serialize(string, len);
 }
