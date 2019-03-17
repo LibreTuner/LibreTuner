@@ -81,8 +81,8 @@ RomMeta Roms::loadRom(const fs::path &path) {
 }
 
 void Roms::createPath() {
-    if (!fs::exists(path_)) {
-        fs::create_directories(path_);
+    if (!fs::exists(path_ / "romdata")) {
+        fs::create_directories(path_ / "romdata");
     }
 }
 
@@ -163,12 +163,48 @@ void Roms::loadRoms() {
         return;
     }
 
+    beginResetModel();
     for (auto &sub : fs::directory_iterator(path_)) {
         if (sub.is_regular_file() && sub.path().extension() == fs::path(".lts")) {
             roms_.emplace_back(loadRom(sub.path()));
         }
     }
+    endResetModel();
 }
+
+void Roms::addRom(const lt::RomPtr& rom)
+{
+    createPath();
+    RomMeta meta;
+    meta.id = rom->id();
+    meta.model = rom->model();
+    meta.name = rom->name();
+    
+    saveRom(meta);
+    
+    beginInsertRows(QModelIndex(), roms_.size(), roms_.size());
+    roms_.emplace_back(std::move(meta));
+    endInsertRows();
+}
+
+void Roms::addRom(const lt::Platform& platform, const std::string& id, const std::string& name, const uint8_t* data, const std::size_t size)
+{
+    lt::ModelPtr model = platform.identify(data, size);
+    if (!model) {
+        throw std::runtime_error("model could not be identified");
+    }
+    
+    lt::RomPtr rom = std::make_shared<lt::Rom>(model);
+    rom->setData(std::vector(data, data + size));
+    rom->setId(id);
+    rom->setName(name);
+    
+    // Add metadata
+    addRom(rom);
+    // Save data
+    saveRom(rom);
+}
+
 
 void Roms::saveRom(const RomMeta &meta) {
     createPath();
@@ -211,6 +247,20 @@ lt::RomPtr Roms::openRom(const RomMeta& meta) const {
 	rom->setData(std::move(data));
 
 	return rom;
+}
+
+void Roms::saveRom(const lt::RomPtr& rom)
+{
+    createPath();
+    fs::path path = path_ / "romdata" / rom->id();
+    
+    std::ofstream file(path, std::ios::binary | std::ios::out);
+    if (file.is_open()) {
+        throw std::runtime_error("failed to open rom " + path.string());
+	}
+	
+	file.write(reinterpret_cast<const char*>(rom->data()), rom->size());
+    file.close();
 }
 
 RomMeta *Roms::fromId(const std::string &id) noexcept

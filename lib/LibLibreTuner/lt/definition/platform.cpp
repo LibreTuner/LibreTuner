@@ -26,4 +26,13 @@ const AxisDefinition *Platform::getAxis(const std::string &id) const noexcept {
 	return &it->second;
 }
 
+ModelPtr Platform::identify(const uint8_t *data, size_t size) const noexcept {
+    for (const ModelPtr &model : models) {
+        if (model->isModel(data, size)) {
+            return model;
+        }
+    }
+    return ModelPtr();
+}
+
 } // namespace lt

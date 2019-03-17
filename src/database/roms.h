@@ -40,8 +40,16 @@ public:
 
     /* Saves rom list and metadata */
     void saveRom(const RomMeta &meta);
+    
+    /* Adds rom and saves metadata */
+    void addRom(const lt::RomPtr &rom);
+    
+    /* Adds rom by data. Performs model identification */
+    void addRom(const lt::Platform &platform, const std::string &id, const std::string &name, const uint8_t *data, const std::size_t size);
 
     lt::RomPtr openRom(const RomMeta &meta) const;
+    
+    void saveRom(const lt::RomPtr &rom);
 
     /* Returns the ROM with id or nullptr if the ROM does
      * not exist. Be careful not to store this reference

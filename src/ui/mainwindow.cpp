@@ -21,6 +21,7 @@
 
 #include "datalog/datalog.h"
 
+#include "downloadwindow.h"
 
 #include "docks/graphwidget.h"
 #include "docks/overviewwidget.h"
@@ -500,10 +501,10 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     /*if (downloadWindow_) {
         delete downloadWindow_;
         downloadWindow_ = nullptr;
-    }
+    }*/
 
     DownloadWindow downloadWindow;
-    downloadWindow.exec();*/
+    downloadWindow.exec();
 }
 
 void MainWindow::newLogClicked() {

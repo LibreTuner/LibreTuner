@@ -58,6 +58,8 @@ set(libretuner_SRC
     ui/flasherwindow.h
     ui/authoptionsview.cpp
     ui/authoptionsview.h
+    ui/downloadwindow.cpp
+    ui/downloadwindow.h
 
     ui/docks/overviewwidget.cpp
     ui/docks/overviewwidget.h

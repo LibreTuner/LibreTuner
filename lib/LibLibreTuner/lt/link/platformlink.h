@@ -26,6 +26,7 @@ public:
 
 	DtcScannerPtr dtcScanner();
 	FlasherPtr flasher();
+    download::DownloaderPtr downloader();
 
 private:
     DataLink &datalink_;

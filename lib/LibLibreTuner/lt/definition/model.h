@@ -54,6 +54,8 @@ public:
     const ModelTable *getTable(std::size_t index) const noexcept;
 
     std::size_t getAxisOffset(const std::string &id) const noexcept;
+    
+    bool isModel(const uint8_t *data, std::size_t size) const noexcept;
 };
 using ModelPtr = std::shared_ptr<Model>;
 

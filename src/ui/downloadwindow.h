@@ -24,10 +24,10 @@
 
 #include <memory>
 
+#include "lt/link/platformlink.h"
+
 class QLineEdit;
 class QComboBox;
-class LibreTuner;
-class PlatformLink;
 class AuthOptionsView;
 
 /**
@@ -53,7 +53,7 @@ private:
     QLineEdit *lineId_;
     AuthOptionsView *authOptions_;
 
-    std::unique_ptr<PlatformLink> get_platform_link();
+    lt::PlatformLink getPlatformLink();
 };
 
 #endif // DOWNLOADWINDOW_H

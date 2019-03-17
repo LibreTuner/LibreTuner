@@ -19,15 +19,10 @@
 #include "downloadwindow.h"
 
 
-#include "definitions/definition.h"
-#include "definitions/definitionmanager.h"
 #include "logger.h"
-#include "protocols/socketcaninterface.h"
-#include "vehicle.h"
 #include "libretuner.h"
-#include "rommanager.h"
-#include "download/downloader.h"
 #include "backgroundtask.h"
+#include "uiutil.h"
 
 #include "authoptionsview.h"
 
@@ -52,7 +47,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     setWindowTitle(tr("LibreTuner - Download"));
 
     comboPlatform_ = new QComboBox;
-    comboPlatform_->setModel(DefinitionManager::get());
+    comboPlatform_->setModel(&LT()->definitions());
     
     lineName_ = new QLineEdit;
     lineId_ = new QLineEdit;
@@ -112,11 +107,11 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
 void DownloadWindow::platformChanged(int index)
 {
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<definition::MainPtr>()) {
+    if (!var.canConvert<const lt::PlatformPtr&>()) {
         return;
     }
 
-    auto platform = var.value<definition::MainPtr>();
+    const auto &platform = var.value<lt::PlatformPtr>();
     if (!platform) {
         return;
     }
@@ -128,11 +123,8 @@ void DownloadWindow::platformChanged(int index)
 
 void DownloadWindow::download()
 {
-    try {
-        std::unique_ptr<PlatformLink> pLink = get_platform_link();
-        if (!pLink) {
-            throw std::runtime_error("Invalid platform or data link");
-        }
+    catchCritical([this]() {
+        lt::PlatformLink pLink = getPlatformLink();
 
         // Create progress dialog
         QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0, 100, this);
@@ -141,8 +133,7 @@ void DownloadWindow::download()
         progress.setValue(0);
         progress.show();
 
-
-        std::unique_ptr<download::Downloader> downloader = pLink->downloader();
+        lt::download::DownloaderPtr downloader = pLink.downloader();
         downloader->setProgressCallback([&](float prog) {
             QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
         });
@@ -167,8 +158,7 @@ void DownloadWindow::download()
             }
             auto data = downloader->data();
             try {
-                RomStore::get()->addRom(lineName_->text().toStdString(),
-                                        pLink->definition(), data.first, data.second);
+                LT()->roms().addRom(pLink.platform(), lineId_->text().toStdString(), lineName_->text().toStdString(), data.first, data.second);
                 QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully").exec();
             } catch (const std::runtime_error &err) {
                 QMessageBox msgBox;
@@ -198,9 +188,7 @@ void DownloadWindow::download()
                 }
             }
         }
-    } catch (const std::runtime_error &err) {
-        QMessageBox(QMessageBox::Critical, "Download Error", err.what()).exec();
-    }
+    }, tr("Download error"));
 }
 
 
@@ -209,27 +197,23 @@ void DownloadWindow::closeEvent(QCloseEvent* event)
 {
 }
 
-
-Q_DECLARE_METATYPE(definition::MainPtr)
-
-
-std::unique_ptr<PlatformLink> DownloadWindow::get_platform_link() {
-    datalink::Link *link = LT()->datalink();
+lt::PlatformLink DownloadWindow::getPlatformLink() {
+    lt::DataLink *link = LT()->datalink();
     if (link == nullptr) {
-        return nullptr;
+        throw std::runtime_error("no datalink selected");
     }
 
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<definition::MainPtr>()) {
-        return nullptr;
+    if (!var.canConvert<const lt::PlatformPtr &>()) {
+        throw std::runtime_error("no platform selected");
     }
 
-    auto platform = var.value<definition::MainPtr>();
+    const auto &platform = var.value<lt::PlatformPtr>();
     if (!platform) {
-        return nullptr;
+        throw std::runtime_error("no platform selected");
     }
 
-    return std::make_unique<PlatformLink>(platform, *link);
+    return lt::PlatformLink(*link, *platform);
 }
 
 

@@ -17,4 +17,22 @@ std::size_t Model::getAxisOffset(const std::string& id) const noexcept {
 	return it->second;
 }
 
+bool Model::isModel(const uint8_t *data, std::size_t size) const noexcept {
+    if (identifiers.empty()) {
+        return false;
+    }
+    
+    for (const Identifier &identifier : identifiers) {
+        if (identifier.offset() + identifier.size() > size) {
+            return false;
+        }
+
+        if (!std::equal(data + identifier.offset(), data + identifier.offset() + identifier.size(),
+                       identifier.data())) {
+            return false;
+        }
+    }
+    return true;
+}
+
 }

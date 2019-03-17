@@ -3,6 +3,7 @@
 #include "../network/uds/isotpuds.h"
 #include "../diagnostics/uds.h"
 #include "../flash/mazdat1.h"
+#include "../download/rmadownloader.h"
 
 namespace lt {
 
@@ -35,7 +36,14 @@ FlasherPtr PlatformLink::flasher() {
     if (platform_.flashMode == "mazdat1") {
 		return std::make_unique<MazdaT1Flasher>(uds(), FlashOptions{platform_.flashAuthOptions});
 	}
-    throw std::runtime_error("Invalid flash mode: " + platform_.flashMode);
+    throw std::runtime_error("invalid flash mode: " + platform_.flashMode);
+}
+
+download::DownloaderPtr PlatformLink::downloader() {
+    if (platform_.downloadMode == "mazda23") {
+        return std::make_unique<download::RMADownloader>(uds(), download::Options{platform_.downloadAuthOptions, platform_.romsize});
+    }
+    throw std::runtime_error("invalid download mode: " + platform_.downloadMode);
 }
 
 } // namespace lt
