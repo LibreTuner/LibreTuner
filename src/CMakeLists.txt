@@ -95,11 +95,7 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 if (WIN32)
-    set(libretuner_SRC ${libretuner_SRC}
-        j2534/j2534.cpp
-        j2534/j2534.h
-        j2534/j2534caninterface.cpp
-        j2534/j2534caninterface.h)
+
 endif ()
 
 
@@ -135,6 +131,7 @@ endif ()
 
 if (WIN32)
     target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
+    target_compile_definitions(LibLibreTuner PRIVATE WITH_J2534=1)
 endif (WIN32)
 
 add_executable(LibreTuner main.cpp)
