@@ -53,7 +53,7 @@ private:
 
     // QObject interface
 public:
-    virtual bool eventFilter(QObject *watched, QEvent *event);
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 };
 
 #endif // TITLEBAR_H

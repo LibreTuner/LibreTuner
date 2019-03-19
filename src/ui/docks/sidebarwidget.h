@@ -5,7 +5,7 @@
 #include <QWidget>
 
 namespace lt {
-class ModelTable;
+struct ModelTable;
 }
 
 class QPlainTextEdit;

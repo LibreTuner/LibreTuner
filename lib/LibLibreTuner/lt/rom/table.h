@@ -187,7 +187,7 @@ public:
         return entries_.get<EntryType>(y * width() + x);
     }
 
-    void set(std::size_t x, std::size_t y, EntryType value) noexcept {
+    void set(std::size_t x, std::size_t y, EntryType value) {
         if (!bounds_.withinBounds(value)) {
             throw std::runtime_error("value out of bounds");
         }
