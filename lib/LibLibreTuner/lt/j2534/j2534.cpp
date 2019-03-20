@@ -324,4 +324,4 @@ std::vector<Info> detect_interfaces() {
 } // namespace j2534
 } // namespace lt
 
-#endif WITH_J2534
+#endif // WITH_J2534

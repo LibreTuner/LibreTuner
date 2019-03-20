@@ -197,8 +197,9 @@ QString typeToString(lt::DataLinkType type) {
         return "PassThru";
     case lt::DataLinkType::SocketCan:
         return "SocketCAN";
+    default:
+        return QObject::tr("Invalid");
     }
-    return "Invalid";
 }
 
 

@@ -7,7 +7,7 @@
 
 namespace lt {
 NetworkProtocol passthruToNetworkProtocol(j2534::Protocol passthru) {
-	NetworkProtocol protocol;
+    NetworkProtocol protocol{NetworkProtocol::None};
 	if ((passthru & j2534::Protocol::CAN) != j2534::Protocol::None) {
 		protocol |= NetworkProtocol::Can;
 	}

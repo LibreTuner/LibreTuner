@@ -73,7 +73,6 @@ public:
 
 private:
     std::vector<RomMeta> roms_;
-    std::size_t nextId_{};
 
     const Definitions &definitions_;
 
