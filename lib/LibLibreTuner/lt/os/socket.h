@@ -1,7 +1,7 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#ifdef WITH_SOCKET
+#ifdef WITH_SOCKETCAN
 
 #include <sys/socket.h>
 #include <string.h>

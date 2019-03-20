@@ -11,7 +11,7 @@
 #include <QMessageBox>
 
 #ifdef WITH_SOCKETCAN
-#include "datalink/socketcan.h"
+#include "lt/link/socketcan.h"
 #endif
 
 AddDatalinkDialog::AddDatalinkDialog(QWidget* parent) : QDialog(parent)
@@ -65,7 +65,7 @@ void AddDatalinkDialog::addClicked()
     if (comboType_->currentIndex() == 0) {
         // SocketCAN
 #ifdef WITH_SOCKETCAN
-        LT()->links().add(std::make_unique<datalink::SocketCanLink>(name.toStdString(), linePort_->text().trimmed().toStdString()));
+        LT()->links().add(std::make_unique<lt::SocketCanLink>(name.toStdString(), linePort_->text().trimmed().toStdString()));
         LT()->saveLinks();
         close();
 #endif

@@ -34,6 +34,7 @@
 #include "createtunedialog.h"
 #include "flasherwindow.h"
 #include "uiutil.h"
+#include "datalinkswidget.h"
 
 #include "titlebar.h"
 
@@ -51,6 +52,7 @@
 #include <QFileDialog>
 
 #include <future>
+#include <lt/link/datalink.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), linksList_(LT()->links()) {
@@ -442,7 +444,7 @@ void MainWindow::setupMenu() {
 
     QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
     connect(datalinksAction, &QAction::triggered, [this]() {
-        // datalinksWindow_.show();
+        datalinksWindow_.show();
     });
 
     auto *sessionScanAct = toolsMenu->addAction("Session Scanner");
@@ -474,15 +476,15 @@ void MainWindow::setupStatusBar() {
     comboDatalink_ = new QComboBox;
     comboDatalink_->setModel(&linksList_);
 
-    /*comboDatalink_->setModel(&linksModel_);
     connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [this](int index) { QVariant var =
-    comboDatalink_->currentData(Qt::UserRole); if
-    (!var.canConvert<datalink::Link*>()) { return;
+        [this](int index) {
+            QVariant var = comboDatalink_->currentData(Qt::UserRole);
+            if (!var.canConvert<lt::DataLink*>()) {
+                return;
             }
 
-            LT()->setDatalink(var.value<datalink::Link*>());
-    });*/
+            LT()->setDatalink(var.value<lt::DataLink*>());
+        });
 
     if (LT()->platform()) {
         comboPlatform->setCurrentText(

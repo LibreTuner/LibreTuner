@@ -60,6 +60,10 @@ set(libretuner_SRC
     ui/authoptionsview.h
     ui/downloadwindow.cpp
     ui/downloadwindow.h
+    ui/datalinkswidget.cpp
+    ui/datalinkswidget.h
+    ui/adddatalinkdialog.cpp
+    ui/adddatalinkdialog.h
 
     ui/docks/overviewwidget.cpp
     ui/docks/overviewwidget.h
@@ -129,12 +133,14 @@ target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRI
 
 
 if (UNIX AND NOT APPLE)
-    target_compile_definitions(LibreTuner_lib PRIVATE WITH_SOCKETCAN=1)
+    target_compile_definitions(LibreTuner_lib PUBLIC WITH_SOCKETCAN=1)
+    target_compile_definitions(LibLibreTuner PUBLIC WITH_SOCKETCAN=1)
     target_link_libraries(LibreTuner_lib stdc++fs)
 endif ()
 
 if (WIN32)
-    target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
+    target_compile_definitions(LibreTuner_lib PUBLIC WITH_J2534=1)
+    target_compile_definitions(LibLibreTuner PUBLIC WITH_J2534=1)
 endif (WIN32)
 
 add_executable(LibreTuner main.cpp)

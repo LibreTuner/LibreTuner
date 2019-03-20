@@ -28,6 +28,7 @@
 #include "database/links.h"
 #include "models/tablemodel.h"
 #include "lt/rom/rom.h"
+#include "datalinkswidget.h"
 
 class QListView;
 
@@ -114,6 +115,8 @@ private:
 
     LinksListModel linksList_;
     TableModel tableModel_;
+    
+    DatalinksWidget datalinksWindow_;
 };
 
 #endif // MAINWINDOW_H

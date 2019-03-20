@@ -1,6 +1,6 @@
 #include "socket.h"
 
-#ifdef WITH_SOCKET
+#ifdef WITH_SOCKETCAN
 
 #include <cassert>
 #include <stdexcept>

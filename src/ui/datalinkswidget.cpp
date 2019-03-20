@@ -16,155 +16,6 @@
 #include "libretuner.h"
 #include "adddatalinkdialog.h"
 
-
-
-int DataLinksTreeModel::rowCount(const QModelIndex& parent) const {
-    if (!parent.isValid()) {
-        return 2;
-    }
-    
-    if (!links_) {
-        return 0;
-    }
-    
-    if (parent.internalId() != 0) {
-        // Link-level
-        return 0;
-    }
-    
-    switch (parent.row()) {
-        case 0:
-            return links_->detectedCount();
-        case 1:
-            return links_->manualCount();
-        default:
-            return 0;
-    }
-}
-
-
-
-int DataLinksTreeModel::columnCount(const QModelIndex& parent) const
-{
-    return 2;
-}
-
-Q_DECLARE_METATYPE(lt::DataLink*)
-
-QVariant DataLinksTreeModel::data(const QModelIndex& index, int role) const {
-    if (!links_) {
-        return QVariant();
-    }
-    
-    
-    if (!index.isValid()) {
-        return QVariant();
-    }
-    
-    if (index.internalId() == 0) {
-        if (index.column() != 0 || role != Qt::DisplayRole) {
-            return QVariant();
-        }
-        if (index.row() == 0) {
-            return tr("Auto-detected");
-        } else if (index.row() == 1) {
-            return tr("Manual");
-        }
-        return QVariant();
-    }
-    
-    lt::DataLink *link{nullptr};
-    
-    if (index.internalId() == 1) {
-        // Auto-detected
-        link = links_->getDetected(index.row());
-    } else if (index.internalId() == 2) {
-        link = links_->getManual(index.row());
-    }
-    if (link == nullptr) {
-        return QVariant();
-    }
-    
-    if (role == Qt::DisplayRole) {
-        if (index.column() == 0) {
-            return QString::fromStdString(link->name());
-        }
-    } else if (role == Qt::UserRole) {
-        return QVariant::fromValue(link);
-    }
-    
-    return QVariant();
-}
-
-
-QVariant DataLinksTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role != Qt::DisplayRole || orientation != Qt::Horizontal || section < 0 || section > 1) {
-        return QVariant();
-    }
-    
-    if (section == 0) {
-        return tr("Name");
-    } else {
-        return tr("Type");
-    }
-}
-
-void DataLinksTreeModel::setLinks(Links* links)
-{
-    links_ = links;
-}
-
-
-QModelIndex DataLinksTreeModel::parent(const QModelIndex& child) const {
-    if (child.isValid()) {
-        if (child.internalId() != 0) {
-            // link-level indicies have their internal id set to the parent row + 1
-            return createIndex(child.internalId() - 1, 0, static_cast<quintptr>(0));
-        }
-    }
-    
-    return QModelIndex();
-}
-
-
-
-QModelIndex DataLinksTreeModel::index(int row, int column, const QModelIndex& parent) const {
-    if (!links_) {
-        return QModelIndex();
-    }
-    
-    if (parent.isValid()) {
-        if (parent.internalId() == 0) {
-            // Top level
-            if (parent.row() == 0) {
-                if (row < links_->detectedCount()) {
-                    return createIndex(row, column, parent.row() + 1);
-                }
-            } else if (parent.row() == 1) {
-                if (row < links_->manualCount()) {
-                    return createIndex(row, column, parent.row() + 1);
-                }
-            }
-        }
-        return QModelIndex();
-    }
-    
-    if (row >= 0 && row < 2) {
-        return createIndex(row, column, static_cast<quintptr>(0));
-    }
-    
-    return QModelIndex();
-}
-
-
-Qt::ItemFlags DataLinksTreeModel::flags(const QModelIndex& index) const
-{
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-}
-
-
-
 DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     setWindowTitle(tr("LibreTuner - Datalinks"));
     resize(600, 400);
@@ -177,8 +28,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
 
     auto *linksView = new QTreeView;
     linksView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    linksModel_.setLinks(&LT()->links());
-    linksView->setModel(&linksModel_);
+    linksView->setModel(&LT()->links());
     
     // Layouts
     auto *buttonLayout = new QVBoxLayout;
@@ -207,12 +57,12 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     });
     
     connect(buttonRemove, &QPushButton::clicked, [linksView, this]() {
-        QVariant data = linksModel_.data(linksView->currentIndex(), Qt::UserRole);
-        if (!data.canConvert<datalink::Link*>()) {
+        QVariant data = LT()->links().data(linksView->currentIndex(), Qt::UserRole);
+        if (!data.canConvert<lt::DataLink*>()) {
             return;
         }
         
-        auto *link = data.value<datalink::Link*>();
+        auto *link = data.value<lt::DataLink*>();
         LT()->links().remove(link);
         LT()->saveLinks();
     });

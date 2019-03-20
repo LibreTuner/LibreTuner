@@ -57,8 +57,8 @@ void Links::load() {
     for (const LinkData &link : links) {
         if (link.type == "socketcan") {
 #ifdef WITH_SOCKETCAN
-            //manualLinks_.emplace_back(std::make_unique<lt::>(
-            //    link.name, link.port));
+            manualLinks_.emplace_back(std::make_unique<lt::SocketCanLink>(
+                link.name, link.port));
 #else
             Logger::warning(
                 "SocketCAN is unuspported on this platform, ignoring link.");
@@ -109,7 +109,9 @@ void Links::detect() {
 }
 
 void Links::add(lt::DataLinkPtr &&link) {
+    beginInsertRows(createIndex(1, 0), manualLinks_.size(), manualLinks_.size());
     manualLinks_.emplace_back(std::move(link));
+    endInsertRows();
 }
 
 lt::DataLink *Links::get(std::size_t index) const {
@@ -207,6 +209,9 @@ QVariant Links::data(const QModelIndex &index, int role) const
     }
 
     if (index.internalId() == 0) {
+        if (index.column() != 0) {
+            return QVariant();
+        }
         // root node
         if (role != Qt::DisplayRole) {
             return QVariant();
