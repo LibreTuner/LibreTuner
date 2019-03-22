@@ -52,7 +52,7 @@ public:
     SocketCan(const SocketCan &) = delete;
     SocketCan(SocketCan &&) = delete;
     
-    ~SocketCan() override = default;
+    ~SocketCan() override;
     
     SocketCan(const std::string &ifname);
 

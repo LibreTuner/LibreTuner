@@ -31,6 +31,8 @@ struct UdsResponse {
 
 class Uds {
   public:
+    virtual ~Uds() = default;
+      
     /* Sends a request. May throw an exception. */
     virtual UdsResponse request(uint8_t sid, const uint8_t *data,
                                 size_t size, bool throwNegative = true) = 0;
