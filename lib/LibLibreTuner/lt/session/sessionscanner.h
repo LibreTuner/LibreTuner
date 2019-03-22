@@ -3,12 +3,10 @@
 
 #include <memory>
 
-#include "asyncroutine.h"
+#include "../support/asyncroutine.h"
+#include "../network/uds/uds.h"
 
-namespace uds {
-class Protocol;
-using ProtocolPtr = std::unique_ptr<Protocol>;
-}
+namespace lt {
 
 // Scans for UDS sessions
 class SessionScanner : public AsyncRoutine
@@ -18,7 +16,7 @@ public:
 
     SessionScanner();
 
-    void scan(uds::ProtocolPtr &&protocol, uint8_t minimum = 0, uint8_t maximum = 0xFF);
+    void scan(network::Uds &protocol, uint8_t minimum = 0, uint8_t maximum = 0xFF);
 
     void onSuccess(SuccessCallback &&cb);
 
@@ -27,5 +25,7 @@ private:
 
     void callSuccess(uint8_t session);
 };
+
+}
 
 #endif // SESSIONSCANNER_H

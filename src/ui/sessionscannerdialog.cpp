@@ -14,9 +14,9 @@
 #include <sstream>
 
 #include "libretuner.h"
-#include "vehicle.h"
-#include "sessionscanner.h"
-#include "protocols/udsprotocol.h"
+#include "lt/session/sessionscanner.h"
+
+#include "uiutil.h"
 
 
 SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent)
@@ -60,18 +60,9 @@ SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent)
 
 void SessionScannerDialog::scan()
 {
-    try {
-        std::unique_ptr<PlatformLink> link = LT()->platform_link();
-        if (!link) {
-            QMessageBox(QMessageBox::Critical, tr("Session Scanner Error"), "Failed to create platform link").exec();
-            return;
-        }
-
-        std::unique_ptr<uds::Protocol> uds = link->uds();
-        if (!uds) {
-            QMessageBox(QMessageBox::Critical, tr("Session Scanner Error"), "Failed to create UDS interface").exec();
-            return;
-        }
+    catchCritical([this]() {
+        lt::PlatformLink link = LT()->platformLink();
+        lt::network::UdsPtr uds = link.uds();
 
         sessionIds_->clear();
         buttonStart_->setEnabled(false);
@@ -79,7 +70,7 @@ void SessionScannerDialog::scan()
 
         std::atomic<bool> stopped{false};
 
-        SessionScanner scanner;
+        lt::SessionScanner scanner;
         // Initialize callbacks
         scanner.setProgressCallback([](float progress) {
             // Stub
@@ -97,7 +88,7 @@ void SessionScannerDialog::scan()
 
         // Task
         std::packaged_task<void()> task([&]() {
-            scanner.scan(std::move(uds), spinMinimum_->value(), spinMaximum_->value());
+            scanner.scan(*uds, spinMinimum_->value(), spinMaximum_->value());
         });
 
         auto future = task.get_future();
@@ -115,9 +106,7 @@ void SessionScannerDialog::scan()
         thread.join();
 
         future.get();
-    } catch (const std::runtime_error &error) {
-        QMessageBox(QMessageBox::Critical, tr("Session Scanner Error"), error.what()).exec();
-    }
+    }, tr("Session Scanner Error"));
 
     buttonStart_->setEnabled(true);
     buttonStart_->setText(tr("Scan"));

@@ -64,6 +64,8 @@ set(libretuner_SRC
     ui/datalinkswidget.h
     ui/adddatalinkdialog.cpp
     ui/adddatalinkdialog.h
+    ui/sessionscannerdialog.cpp
+    ui/sessionscannerdialog.h
 
     ui/docks/overviewwidget.cpp
     ui/docks/overviewwidget.h

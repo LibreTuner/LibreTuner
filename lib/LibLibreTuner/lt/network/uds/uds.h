@@ -35,6 +35,8 @@ class Uds {
     /* All requests may throw an exception */
     /* Sends a DiagnosticSessionControl request. Returns parameter record. */
     std::vector<uint8_t> requestSession(uint8_t type);
+    
+    
 
     std::vector<uint8_t> requestSecuritySeed();
 

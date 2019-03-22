@@ -35,6 +35,7 @@
 #include "flasherwindow.h"
 #include "uiutil.h"
 #include "datalinkswidget.h"
+#include "sessionscannerdialog.h"
 
 #include "titlebar.h"
 
@@ -449,8 +450,8 @@ void MainWindow::setupMenu() {
 
     auto *sessionScanAct = toolsMenu->addAction("Session Scanner");
     connect(sessionScanAct, &QAction::triggered, [this]() {
-        /*SessionScannerDialog scanner;
-        scanner.exec();*/
+        SessionScannerDialog scanner;
+        scanner.exec();
     });
 
     /*auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
