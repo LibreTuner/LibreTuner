@@ -125,8 +125,9 @@ void IsoTp::recv(IsoTpPacket& result)
 		return;
 	}
 	if (type == typeFirst) {
-		uint16_t length = ((message[1] & 0x0F) << 8) | message[2];
-		MultiFrameReceiver receiver(length, result, *can_, options_, *this);
+		uint16_t length = ((message[0] & 0x0F) << 8) | message[1];
+        result.append(message.message() + 2, 6);
+		MultiFrameReceiver receiver(length - 6, result, *can_, options_, *this);
 		receiver.recv();
 		return;
 	}
@@ -156,10 +157,12 @@ void IsoTp::sendSingleFrame(const uint8_t *data, std::size_t size) {
     assert(size <= 7);
 
     CanMessage message;
-    message.setId(options_.destId);
+    message.setId(options_.sourceId);
     message[0] = (typeSingle << 4) | (static_cast<uint8_t>(size));
     std::copy(data, data + size, message.message() + 1);
 	message.setLength(size + 1);
+    
+    message.pad();
 
     can_->send(message);
 }
@@ -190,13 +193,15 @@ std::vector<uint8_t> IsoTpPacketReader::readRemaining() {
 void MultiFrameSender::send() {
     // Send first frame
     CanMessage message;
-    message.setId(options_.destId);
+    message.setId(options_.sourceId);
     message[0] = (typeFirst << 4) | ((reader_.remaining() & 0xF00) >> 8);
     message[1] = reader_.remaining() & 0xFF;
 
     std::size_t amountRead = reader_.next(message.message() + 2, 6);
     message.setLength(amountRead + 2);
 
+    message.pad();
+    
     can_.send(message);
 
     waitForFlowControl();
@@ -237,9 +242,10 @@ void MultiFrameSender::waitForFlowControl() {
 void MultiFrameSender::sendConsecFrames() {
 	do {
 		CanMessage message;
-		message.setId(options_.destId);
+		message.setId(options_.sourceId);
 		message[0] = (typeConsec << 4) | nextConsec();
 		message.setLength(reader_.next(message.message() + 1, 7) + 1);
+        message.pad();
 		can_.send(message);
 
 		std::this_thread::sleep_for(separationTime_);
@@ -247,9 +253,10 @@ void MultiFrameSender::sendConsecFrames() {
 }
 
 CanMessage IsoTp::recvNextFrame() {
+    auto start = std::chrono::steady_clock::now();
     CanMessage message;
-    while (can_->recv(message, options_.timeout)) {
-        if (message.id() == options_.sourceId) {
+    while (can_->recv(message, options_.timeout) && (std::chrono::steady_clock::now() - start) < options_.timeout) {
+        if (message.id() == options_.destId) {
             if (message.length() == 0) {
                 throw std::runtime_error("received empty frame");
             }
@@ -296,11 +303,12 @@ uint8_t MultiFrameReceiver::nextConsec()
 void MultiFrameReceiver::sendFlowControl()
 {
 	CanMessage message;
-	message.setId(options_.destId);
+	message.setId(options_.sourceId);
 	message.setLength(3);
 	message[0] = (typeFlow << 4) | 0;
 	message[1] = 0;
 	message[2] = 0;
+    message.pad();
 	can_.send(message);
 }
 

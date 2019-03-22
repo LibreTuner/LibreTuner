@@ -334,7 +334,7 @@ private:
     void write(T *t, std::size_t size) {
         // Serialize each
         for (T *ptr = t; ptr != t + size; ++ptr) {
-            SerializeFunction<Serializer, T>::invoke(*this, *t);
+            SerializeFunction<Serializer, T>::invoke(*this, *ptr);
         }
     }
 };

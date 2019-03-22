@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <queue>
 
 namespace lt {
 namespace network {
@@ -58,11 +59,50 @@ public:
         setId(id);
         setMessage(message, length);
     }
+    
+    // Adds trailing zeros after last byte
+    void pad() noexcept;
 
 private:
     std::array<uint8_t, 8> message_{0};
     uint8_t length_;
     uint32_t id_ = 0;
+};
+
+class CanMessageBuffer {
+public:
+    CanMessageBuffer(std::size_t limit = 200) : limit_(limit) {}
+    
+    void add(const CanMessage &message) {
+        buffer_.emplace(message);
+        if (buffer_.size() > limit_) {
+            buffer_.pop();
+        }
+    }
+    
+    void add(CanMessage &&message) {
+        buffer_.emplace(std::move(message));
+        if (buffer_.size() > limit_) {
+            buffer_.pop();
+        }
+    }
+    
+    bool pop(CanMessage &message) {
+        if (buffer_.empty()) {
+            return false;
+        }
+        CanMessage front = buffer_.front();
+        buffer_.pop();
+        
+        message = std::move(front);
+        return true;
+    }
+    
+    void clear() { buffer_ = std::queue<CanMessage>(); }
+    
+private:
+    std::queue<CanMessage> buffer_;
+    std::size_t limit_{20};
 };
 
 class Can {
@@ -79,6 +119,8 @@ public:
     // Returns false if the timeout expired and no message was read
     virtual bool recv(CanMessage &message,
                       std::chrono::milliseconds timeout) = 0;
+                      
+    virtual void clearBuffer() noexcept {}
 };
 
 using CanPtr = std::unique_ptr<Can>;

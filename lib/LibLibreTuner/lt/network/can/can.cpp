@@ -21,5 +21,12 @@ void CanMessage::setMessage(const uint8_t *message, uint8_t length) {
     length_ = length;
 }
 
+void CanMessage::pad() noexcept {
+    for (auto it = message_.begin() + length_; it < message_.end(); ++it) {
+        *it = 0;
+    }
+    length_ = 8;
+}
+
 } // namespace network
 } // namespace lt

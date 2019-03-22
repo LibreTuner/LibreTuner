@@ -62,10 +62,8 @@ void DiagnosticsWidget::scan()
     catchWarning([this]() {
         lt::PlatformLink link = LT()->platformLink();
         lt::DtcScannerPtr scanner = link.dtcScanner();
-
-        // Clear the scan result prior
-        //scanResult_.clear();
-        //pendingScanResult_.clear();
+        
+        clear();
 
         dtcModel_.setCodes(scanner->scan());
         if (checkPending_->isChecked()) {
@@ -77,5 +75,6 @@ void DiagnosticsWidget::scan()
 
 void DiagnosticsWidget::clear()
 {
-
+    dtcModel_.setCodes(lt::DiagnosticCodes());
+    pendingDtcModel_.setCodes(lt::DiagnosticCodes());
 }

@@ -10,7 +10,9 @@ public:
     DtcModel() = default;
 
     inline void setCodes(lt::DiagnosticCodes &&codes) noexcept {
+        beginResetModel();
         codes_ = std::move(codes);
+        endResetModel();
     }
 
 private:

@@ -39,7 +39,7 @@ DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
 	DiagnosticCodes result;
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
-    for (size_t i = 0; i + 1 < response.data.size(); i += 2) {
+    for (size_t i = 1; i + 1 < response.data.size(); i += 2) {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
 
