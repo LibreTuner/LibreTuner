@@ -13,11 +13,11 @@ void SessionScanner::scan(network::Uds &protocol, uint8_t minimum, uint8_t maxim
 {
     for (int session = minimum; session <= maximum; ++session) {
         notifyProgress(static_cast<float>(session - minimum) / (maximum - minimum));
-        try {
-            protocol.requestSession(static_cast<uint8_t>(session));
+        
+        uint8_t sessionByte = static_cast<uint8_t>(session);
+        network::UdsResponse res = protocol.request(network::UDS_REQ_SESSION, &sessionByte, 1, false);
+        if (!res.negative) {
             callSuccess(static_cast<uint8_t>(session));
-        } catch (const std::runtime_error &err) {
-            // Ignore exception
         }
     }
 }

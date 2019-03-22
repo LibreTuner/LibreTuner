@@ -20,7 +20,6 @@
 
 #include <cassert>
 #include <sstream>
-
 namespace lt {
 namespace auth {
 

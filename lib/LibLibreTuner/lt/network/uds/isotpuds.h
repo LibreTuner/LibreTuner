@@ -13,7 +13,7 @@ public:
 	IsoTpUds(IsoTpPtr&& isotp) : isotp_(std::move(isotp)) { assert(isotp_); }
 
 	// Inherited via Uds
-	virtual UdsResponse request(uint8_t sid, const uint8_t* data, size_t size) override;
+	virtual UdsResponse request(uint8_t sid, const uint8_t* data, size_t size, bool throwNegative) override;
 
 private:
 	IsoTpPtr isotp_;

@@ -121,7 +121,8 @@ void IsoTp::recv(IsoTpPacket& result)
 	CanMessage message = recvNextFrame();
 	uint8_t type = message[0] >> 4;
 	if (type == typeSingle) {
-		result.setData(message.message() + 1, message.length() - 1);
+        uint8_t length = message[0] & 0x0F;
+		result.setData(message.message() + 1, length);
 		return;
 	}
 	if (type == typeFirst) {

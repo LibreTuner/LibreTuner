@@ -5,7 +5,7 @@
 namespace lt {
 namespace network {
 
-UdsResponse IsoTpUds::request(uint8_t sid, const uint8_t* data, size_t size)
+UdsResponse IsoTpUds::request(uint8_t sid, const uint8_t* data, size_t size, bool throwNegative)
 {
 	IsoTpPacket packet;
 	packet.append(&sid, 1);
@@ -24,17 +24,23 @@ UdsResponse IsoTpUds::request(uint8_t sid, const uint8_t* data, size_t size)
 		uint8_t id = res[0];
 
 		if (id == UDS_RES_NEGATIVE) {
-			if (res.size() >= 2) {
-				uint8_t code = res[1];
+			if (res.size() >= 3) {
+				uint8_t code = res[2];
 				if (code == UDS_NRES_RCRRP) {
 					// Response pending
 					continue;
 				}
+				if (!throwNegative) {
+                    return UdsResponse{{}, true, code};
+                }
 				std::stringstream ss;
 				ss << "negative UDS response: 0x" << std::hex << static_cast<int>(code)
 					<< " (" << std::dec << static_cast<int>(code) << ")";
 				throw std::runtime_error(ss.str());
 			}
+			if (!throwNegative) {
+                return UdsResponse{{}, true, 0};
+            }
 			throw std::runtime_error("negative UDS response");
 		}
 

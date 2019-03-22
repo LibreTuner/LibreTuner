@@ -24,13 +24,16 @@ constexpr uint8_t UDS_NRES_RCRRP = 0x78;
 
 struct UdsResponse {
     std::vector<uint8_t> data;
+    
+    bool negative{false};
+    uint8_t negativeCode{0};
 };
 
 class Uds {
   public:
     /* Sends a request. May throw an exception. */
     virtual UdsResponse request(uint8_t sid, const uint8_t *data,
-                                size_t size) = 0;
+                                size_t size, bool throwNegative = true) = 0;
 
     /* All requests may throw an exception */
     /* Sends a DiagnosticSessionControl request. Returns parameter record. */

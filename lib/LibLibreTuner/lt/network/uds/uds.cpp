@@ -31,7 +31,7 @@ std::vector<uint8_t> Uds::requestSecuritySeed() {
         throw std::runtime_error("securityAccessType mismatch");
     }
 
-    res.data.erase(res.data.begin());
+    res.data.erase(res.data.begin(), res.data.begin() + 1);
     return res.data;
 }
 
