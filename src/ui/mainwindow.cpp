@@ -121,9 +121,9 @@ void MainWindow::restoreDocks() {
     // Place docks
 
     // Roms | Central | Sidebar
-    addDockWidget(Qt::TopDockWidgetArea, tablesDock_);
-    splitDockWidget(tablesDock_, overviewDock_, Qt::Horizontal);
-    splitDockWidget(overviewDock_, sidebarDock_, Qt::Horizontal);
+    addDockWidget(Qt::TopDockWidgetArea, overviewDock_);
+    splitDockWidget(overviewDock_, tablesDock_, Qt::Horizontal);
+    splitDockWidget(tablesDock_, sidebarDock_, Qt::Vertical);
 
     // Bottom
     addDockWidget(Qt::BottomDockWidgetArea, logDock_);
