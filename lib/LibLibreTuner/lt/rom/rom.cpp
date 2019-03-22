@@ -24,28 +24,39 @@
 #include <cassert>
 
 namespace lt {
+    
+std::vector<uint8_t> Rom::getRawTableData(const ModelTable *modTable) const {
+    std::size_t offset = modTable->offset;
+    const TableDefinition *def = modTable->table;
+    
+    auto regionBegin = data_.begin() + offset;
+    auto regionEnd = regionBegin + def->byteSize();
+    
+    return std::vector(regionBegin, regionEnd);
+}    
+
+std::vector<uint8_t> Rom::getRawTableData(std::size_t id) const {
+    const ModelTable *modTable = model_->getTable(id);
+    if (modTable == nullptr) {
+        throw std::runtime_error("invalid table id " + std::to_string(id));
+    }
+    
+    return getRawTableData(modTable);
+}
 
 TablePtr Rom::baseTable(std::size_t tableId) const {
-    if (tableId >= model_->tables.size()) {
-        throw std::runtime_error("table id does not exist (" +
-                                 std::to_string(tableId) + ")");
-    }
-
     const ModelTable *modTable = model_->getTable(tableId);
     if (modTable == nullptr) {
         throw std::runtime_error(
             "table does not have matching offset in model definition (" +
             std::to_string(tableId) + ")");
     }
-    std::size_t offset = modTable->offset;
-    const TableDefinition *tabDef = modTable->table;
-
+    
     TablePtr table = std::make_unique<Table>();
-    initializeTable(*table, *tabDef);
-
-	auto regionBegin = data_.begin() + offset;
-	auto regionEnd = regionBegin + tabDef->byteSize();
-    table->deserialize(regionBegin, regionEnd, model_->platform.endianness);
+    initializeTable(*table, *modTable->table);
+    
+    std::vector<uint8_t> raw = getRawTableData(modTable);
+    table->deserialize(raw.begin(), raw.end(), model_->platform.endianness);
 
     return table;
 }

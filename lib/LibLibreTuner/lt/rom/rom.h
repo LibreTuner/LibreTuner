@@ -43,14 +43,17 @@ public:
     void setModel(const ModelPtr &model) { model_ = model; }
 
     inline const uint8_t *data() const noexcept { return data_.data(); }
-	inline std::size_t size() const noexcept { return data_.size(); }
+    inline std::size_t size() const noexcept { return data_.size(); }
 
     // Sets the ROM data
     void setData(std::vector<uint8_t> &&data) { data_ = std::move(data); }
+    
+    std::vector<uint8_t> getRawTableData(std::size_t id) const;
+    std::vector<uint8_t> getRawTableData(const ModelTable *modTable) const;
+  
+    TablePtr baseTable(std::size_t tableId) const;
 
-	TablePtr baseTable(std::size_t tableId) const;
-
-	TablePtr deserializeTable(std::size_t tableId, const uint8_t *data, std::size_t length) const;
+    TablePtr deserializeTable(std::size_t tableId, const uint8_t *data, std::size_t length) const;
 
 private:
     std::string name_;
