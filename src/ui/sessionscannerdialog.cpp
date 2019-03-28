@@ -15,6 +15,7 @@
 
 #include "libretuner.h"
 #include "lt/session/sessionscanner.h"
+#include "backgroundtask.h"
 
 #include "uiutil.h"
 
@@ -67,9 +68,6 @@ void SessionScannerDialog::scan()
         sessionIds_->clear();
         buttonStart_->setEnabled(false);
         buttonStart_->setText(tr("Scanning"));
-
-        std::atomic<bool> stopped{false};
-
         lt::SessionScanner scanner;
         // Initialize callbacks
         scanner.setProgressCallback([](float progress) {
@@ -85,28 +83,12 @@ void SessionScannerDialog::scan()
             });
         });
 
-
-        // Task
-        std::packaged_task<void()> task([&]() {
-            scanner.scan(*uds, spinMinimum_->value(), spinMaximum_->value());
+        BackgroundTask<void()> task([&]() {
+            scanner.scan(*uds, static_cast<uint8_t>(spinMinimum_->value()), static_cast<uint8_t>(spinMaximum_->value()));
         });
 
-        auto future = task.get_future();
-
-        std::thread thread([&future, &stopped, &task]() {
-            task();
-            stopped = true;
-        });
-
-        // Handle Qt events while scanning
-        while (!stopped) {
-            QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-        }
-
-        if (thread.joinable()) {
-            thread.join();
-        }
-        future.get();
+        task();
+        task.future().get();
     }, tr("Session Scanner Error"));
 
     buttonStart_->setEnabled(true);
