@@ -30,7 +30,7 @@ void MazdaT1Flasher::cancel() { canceled_ = true; }
 
 bool MazdaT1Flasher::do_erase() {
     std::array<uint8_t, 3> eraseRequest = {0x00, 0xB2, 0x00};
-    network::UdsResponse res =
+    network::UdsPacket res =
         uds_->request(0xB1, eraseRequest.data(), eraseRequest.size());
     if (canceled_) {
         return false;
@@ -45,7 +45,7 @@ bool MazdaT1Flasher::do_request_download() {
     writeBE<int32_t>(flash_->data().size(), msg.begin() + 4, msg.end());
 
     // Send download request
-    network::UdsResponse _response =
+    network::UdsPacket _response =
         uds_->request(network::UDS_REQ_REQUESTDOWNLOAD, msg.data(), msg.size());
 
     if (canceled_) {
@@ -68,7 +68,7 @@ bool MazdaT1Flasher::sendLoad() {
         sent_ += toSend;
         left_ -= toSend;
 
-        network::UdsResponse res = uds_->request(network::UDS_REQ_TRANSFERDATA,
+        network::UdsPacket res = uds_->request(network::UDS_REQ_TRANSFERDATA,
                                                  data.data(), data.size());
 
         notifyProgress(static_cast<double>(sent_) / flash_->data().size());

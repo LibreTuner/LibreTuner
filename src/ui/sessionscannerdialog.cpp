@@ -103,8 +103,9 @@ void SessionScannerDialog::scan()
             QApplication::processEvents(QEventLoop::WaitForMoreEvents);
         }
 
-        thread.join();
-
+        if (thread.joinable()) {
+            thread.join();
+        }
         future.get();
     }, tr("Session Scanner Error"));
 

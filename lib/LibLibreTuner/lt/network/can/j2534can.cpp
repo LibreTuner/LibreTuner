@@ -90,7 +90,9 @@ bool J2534Can::recv(CanMessage &message, std::chrono::milliseconds timeout) {
         }
         uint32_t id = (msg.Data[0] << 24) | (msg.Data[1] << 16) |
                       (msg.Data[2] << 8) | (msg.Data[3]);
+
         message.setMessage(id, msg.Data + 4, msg.DataSize - 4);
+
         return true;
     }
 }

@@ -2,12 +2,45 @@
 
 #include <array>
 #include <stdexcept>
+#include <sstream>
 
 namespace lt {
 namespace network {
 
+UdsPacket Uds::request(uint8_t sid, const uint8_t *data,
+                         size_t size) {
+    // Receive until we get a non-response-pending packet
+
+    // Build request
+    UdsPacket request(sid, data, size);
+
+    UdsPacket response = requestRaw(request);
+
+    do {
+        if (response.negative()) {
+            uint8_t code = response.negativeCode();
+            if (code == UDS_NRES_RCRRP) {
+                // Response pending
+                response = receiveRaw();
+                continue;
+            }
+            std::stringstream ss;
+            ss << "negative UDS response: 0x" << std::hex << static_cast<int>(code)
+                << " (" << std::dec << static_cast<int>(code) << ")";
+            throw std::runtime_error(ss.str());
+        }
+
+        if (response.code != sid + 0x40) {
+            throw std::runtime_error(
+                "uds response id (" + std::to_string(response.code) + ") does not match expected id (" + std::to_string(sid + 0x40) + ")");
+        }
+        return response;
+    } while (true);
+}
+
+
 std::vector<uint8_t> Uds::requestSession(uint8_t type) {
-    UdsResponse res = request(UDS_REQ_SESSION, &type, 1);
+    UdsPacket res = request(UDS_REQ_SESSION, &type, 1);
     if (res.data.empty()) {
         throw std::runtime_error("received empty session control response");
     }
@@ -22,7 +55,7 @@ std::vector<uint8_t> Uds::requestSession(uint8_t type) {
 
 std::vector<uint8_t> Uds::requestSecuritySeed() {
     uint8_t req[] = {1};
-    UdsResponse res = request(UDS_REQ_SECURITY, req, 1);
+    UdsPacket res = request(UDS_REQ_SECURITY, req, 1);
     if (res.data.empty()) {
         throw std::runtime_error("received empty security access packet");
     }
@@ -40,7 +73,7 @@ void Uds::requestSecurityKey(const uint8_t *key, size_t size) {
     req[0] = 2;
     std::copy(key, key + size, req.data() + 1);
 
-    UdsResponse res = request(UDS_REQ_SECURITY, req.data(), req.size());
+    UdsPacket res = request(UDS_REQ_SECURITY, req.data(), req.size());
     if (res.data.empty()) {
         throw std::runtime_error("received empty security access response");
     }
@@ -57,7 +90,7 @@ std::vector<uint8_t> Uds::requestReadMemoryAddress(uint32_t address,
     req[4] = length >> 8;
     req[5] = length & 0xFF;
 
-    UdsResponse res = request(UDS_REQ_READMEM, req.data(), req.size());
+    UdsPacket res = request(UDS_REQ_READMEM, req.data(), req.size());
 
     return res.data;
 }

@@ -34,7 +34,7 @@ DiagnosticCodes UdsDtcScanner::scanPending() { return scanPid(0x7); }
 DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
-    network::UdsResponse response = uds_->request(pid, nullptr, 0);
+    network::UdsPacket response = uds_->request(pid, nullptr, 0);
 
 	DiagnosticCodes result;
     // Decode results as per
