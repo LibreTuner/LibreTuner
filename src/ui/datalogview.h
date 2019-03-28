@@ -30,10 +30,7 @@ private:
     DataLog *log_{nullptr};
 
     // Map PIDs to graph ids
-    //std::unordered_map<std::size_t, std::size_t> graphs_;
-    std::vector<int> graphs_;
-
-    std::shared_ptr<Signal<DataLog::UpdateCall>::ConnectionType> connection_;
+    std::unordered_map<std::size_t, > graphs_;
 };
 
 #endif // DATALOGVIEW_H

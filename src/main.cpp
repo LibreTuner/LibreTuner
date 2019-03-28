@@ -18,10 +18,7 @@
 
 #include "libretuner.h"
 
-extern void cparse_startup();
-
 int main(int argc, char *argv[]) {
-    cparse_startup();
     LibreTuner app(argc, argv);
     
     return LibreTuner::exec();

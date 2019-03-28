@@ -17,10 +17,10 @@
  */
 
 #include "datalogger.h"
-#include "logger.h"
 
 #include <utility>
 
+extern void cparse_startup();
 
 
 void DataLogger::addPid(uint32_t id, uint16_t code,

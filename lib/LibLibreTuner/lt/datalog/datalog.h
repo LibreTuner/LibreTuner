@@ -16,64 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRETUNER_DATALOG_H
-#define LIBRETUNER_DATALOG_H
+#ifndef LT_DATALOG_H
+#define LT_DATALOG_H
 
 #include <chrono>
 #include <unordered_map>
 #include <vector>
 #include <functional>
+#include <memory>
 
-#include "util/signal.h"
+#include "../definition/platform.h"
 
-/*
-enum class DataUnit {
-    None,
-    Percentage,
-    Degrees,
+namespace lt {
+
+using DataLogTimePoint = std::chrono::steady_clock::time_point;
+
+struct PidLog {
+    explicit PidLog(const Pid &_pid) : pid(_pid) {}
+    
+    void add(std::pair<DataLogTimePoint, double> value) { values.emplace_back(value); }
+    
+    const Pid &pid;
+    std::vector<std::pair<DataLogTimePoint, double>> values;
 };
 
 class DataLog {
 public:
-    explicit DataLog(definition::MainPtr platform);
-
-    using TimePoint = std::chrono::steady_clock::time_point;
-    struct DataHead {
-        std::string name;
-        std::string description;
-        uint32_t id;
-        DataUnit unit;
-    };
-
-    struct Data {
-        definition::Pid &id;
-        std::vector<std::pair<TimePoint, double>> values;
-
-        explicit Data(definition::Pid &mid) : id(mid) {}
-    };
-
+    explicit DataLog(PlatformPtr platform);
+    
     // Returns the time of the first data point
-    TimePoint beginTime() const {
+    DataLogTimePoint beginTime() const {
         return beginTime_;
     }
     
-    using UpdateCall = std::function<void(const Data &info, double value, TimePoint time)>;
-
     // adds a point to a dataset. Returns false if the dataset
     // with the specified id does not exist. 
-    bool add(uint32_t id, std::pair<TimePoint, double> value);
+    void add(const Pid &pid, std::pair<DataLogTimePoint, double> value);
 
     // Adds a value at the current time
-    bool add(uint32_t id, double value);
-
-    // void addData(const DataHead &data);
-
-    // Adds the pid with id `id` from the platform. Returns the added
-    // id or nullptr if the pid does not exist.
-    Data *addPid(uint32_t id);
-
-    std::shared_ptr<Signal<UpdateCall>::ConnectionType> connectUpdate(UpdateCall &&call) { return updateSignal_->connect(std::move(call)) ;}
+    void add(const Pid &pid, double value);
     
+    PidLog *pidLog(const Pid &pid) noexcept;
+
     std::string name() const { return name_; }
     void setName(const std::string &name) { name_ = name; }
 
@@ -81,15 +65,15 @@ public:
     bool empty() const { return empty_; }
 
 private:
-    TimePoint beginTime_;
-    definition::MainPtr platform_;
+    DataLogTimePoint beginTime_;
+    PlatformPtr platform_;
     std::string name_;
     bool empty_{true};
 
-    std::unordered_map<uint32_t, Data> data_;
-    std::shared_ptr<Signal<UpdateCall>> updateSignal_;
+    std::unordered_map<uint32_t, PidLog> data_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
-*/
 
-#endif // LIBRETUNER_DATALOG_H
+}
+
+#endif // LT_DATALOG_H

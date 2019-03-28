@@ -1,5 +1,5 @@
 [submodule "lib/cparse"]
-	path = lib/cparse
+	path = lib/LibLibreTuner/lib/cparse
 	url = https://github.com/LibreTuner/cparse.git
 [submodule "lib/yaml"]
 	path = lib/yaml

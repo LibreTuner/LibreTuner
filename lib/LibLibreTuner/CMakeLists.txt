@@ -5,13 +5,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 
+# Dependencies
 find_package(Threads REQUIRED)
 
+add_subdirectory(lib/cparse)
 
+# Sources
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lt)
 
 
-file(GLOB_RECURSE ROOT_HEADERS ${SOURCE_DIR}/*.h)
+set(ROOT_HEADERS
+    ${SOURCE_DIR}/libretuner.h)
+
 file(GLOB_RECURSE NETWORK_CAN_HEADERS ${SOURCE_DIR}/network/can/*.h)
 file(GLOB_RECURSE NETWORK_ISOTP_HEADERS ${SOURCE_DIR}/network/isotp/*.h)
 file(GLOB_RECURSE NETWORK_UDS_HEADERS ${SOURCE_DIR}/network/uds/*.h)
@@ -27,7 +32,8 @@ file(GLOB_RECURSE ROM_HEADERS ${SOURCE_DIR}/rom/*.h)
 file(GLOB_RECURSE LINK_HEADERS ${SOURCE_DIR}/link/*.h)
 file(GLOB_RECURSE SESSION_HEADERS ${SOURCE_DIR}/session/*.h)
 
-file(GLOB_RECURSE ROOT_SOURCES ${SOURCE_DIR}/*.cpp)
+set(ROOT_SOURCES
+    ${SOURCE_DIR}/context.cpp)
 file(GLOB_RECURSE NETWORK_CAN_SOURCES ${SOURCE_DIR}/network/can/*.cpp)
 file(GLOB_RECURSE NETWORK_ISOTP_SOURCES ${SOURCE_DIR}/network/isotp/*.cpp)
 file(GLOB_RECURSE NETWORK_UDS_SOURCES ${SOURCE_DIR}/network/uds/*.cpp)
@@ -88,6 +94,6 @@ set(SOURCES
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

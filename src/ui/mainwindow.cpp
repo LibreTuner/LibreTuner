@@ -19,8 +19,6 @@
 #include "mainwindow.h"
 #include "libretuner.h"
 
-#include "datalog/datalog.h"
-
 #include "downloadwindow.h"
 
 #include "docks/graphwidget.h"

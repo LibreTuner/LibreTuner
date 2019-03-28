@@ -25,7 +25,7 @@
 #include <atomic>
 
 #include "datalog.h"
-#include "protocols/udsprotocol.h"
+#include "../network/uds/uds.h"
 #include <shunting-yard.h>
 
 enum class PidType {

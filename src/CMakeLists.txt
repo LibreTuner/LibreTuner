@@ -12,6 +12,8 @@ set(CMAKE_AUTOMOC ON)
 add_definitions(-std=c++17)
 
 set(libretuner_SRC
+    main.cpp
+    
     libretuner.cpp
     libretuner.h
     timer.cpp
@@ -95,9 +97,7 @@ set(libretuner_SRC
     database/links.h)
 
 if (UNIX AND NOT APPLE)
-    set(libretuner_SRC ${libretuner_SRC}
-        os/sockethandler.cpp
-        os/sockethandler.h)
+
 endif ()
 
 if (WIN32)
@@ -121,28 +121,25 @@ qt5_add_resources(libretuner_SRC
     resources/qdarkstyle/style.qrc
 )
 
-# Separate the program into a library for testing
-add_library(LibreTuner_lib ${libretuner_SRC})
 
-target_link_libraries(LibreTuner_lib Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua LibLibreTuner)
+add_executable(LibreTuner ${libretuner_SRC})
 
-target_include_directories(LibreTuner_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua LibLibreTuner)
+
+target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 
 if (UNIX AND NOT APPLE)
-    target_compile_definitions(LibreTuner_lib PRIVATE WITH_SOCKETCAN=1)
+    target_compile_definitions(LibreTuner PRIVATE WITH_SOCKETCAN=1)
     target_compile_definitions(LibLibreTuner PRIVATE WITH_SOCKETCAN=1)
-    target_link_libraries(LibreTuner_lib stdc++fs)
+    target_link_libraries(LibreTuner stdc++fs)
 endif ()
 
 if (WIN32)
-    target_compile_definitions(LibreTuner_lib PRIVATE WITH_J2534=1)
+    target_compile_definitions(LibreTuner PRIVATE WITH_J2534=1)
     target_compile_definitions(LibLibreTuner PRIVATE WITH_J2534=1)
 endif (WIN32)
-
-add_executable(LibreTuner main.cpp)
-target_link_libraries(LibreTuner LibreTuner_lib)
 
 
 if (MINGW)
