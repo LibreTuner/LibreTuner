@@ -7,8 +7,10 @@
 #include "../diagnostics/dtcscanner.h"
 #include "../flash/flasher.h"
 #include "../download/downloader.h"
+#include "../datalog/datalogger.h"
 
 namespace lt {
+    
 class PlatformLink {
 public:
 	PlatformLink(DataLink& datalink, const Platform &platform) : datalink_(datalink), platform_(platform) {}
@@ -27,10 +29,12 @@ public:
 	DtcScannerPtr dtcScanner();
 	FlasherPtr flasher();
     download::DownloaderPtr downloader();
+    DataLoggerPtr datalogger(DataLog &log);
 
 private:
     DataLink &datalink_;
 	const Platform &platform_;
 };
+
 } // namespace lt
 #endif

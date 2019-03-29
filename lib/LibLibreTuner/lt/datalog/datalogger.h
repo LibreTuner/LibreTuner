@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBRETUNER_DATALOGGER_H
-#define LIBRETUNER_DATALOGGER_H
+#ifndef LT_DATALOGGER_H
+#define LT_DATALOGGER_H
 
 #include <cstdint>
 #include <mutex>
@@ -28,30 +28,30 @@
 #include "../network/uds/uds.h"
 #include <shunting-yard.h>
 
+namespace lt {
+
 enum class PidType {
     Queried,
 };
 
-class Pid {
+class PidEvaluator {
 public:
-    Pid(uint32_t id, uint16_t code, const std::string &formula);
-    Pid(Pid &&) = default;
-    Pid &operator=(Pid&&) = default;
-    Pid &operator=(const Pid&) = delete;
-    Pid(const Pid &) = delete;
+    PidEvaluator(const Pid &pid_);
+    PidEvaluator(PidEvaluator &&) = default;
+    PidEvaluator &operator=(PidEvaluator&&) = default;
+    PidEvaluator &operator=(const PidEvaluator&) = delete;
+    PidEvaluator(const PidEvaluator &) = delete;
 
     void setX(uint8_t x) { vars_["a"] = x; }
     void setY(uint8_t y) { vars_["b"] = y; }
     void setZ(uint8_t z) { vars_["c"] = z; }
 
     double evaluate() const;
-    uint32_t id() const { return id_; }
-
-    uint16_t code() const { return code_; }
+    inline const Pid &pid() const noexcept { return pid_; }
+    inline uint16_t code() const { return pid_.code; }
 
 private:
-    uint32_t id_;
-    uint16_t code_;
+    const Pid &pid_;
 
     TokenMap vars_;
     calculator expression_;
@@ -74,16 +74,15 @@ public:
 
     virtual void addPid(Pid &&pid) = 0;
 
-    virtual void addPid(uint32_t id, uint16_t code, const std::string &formula);
-
 protected:
     DataLog &log_;
 };
+using DataLoggerPtr = std::unique_ptr<DataLogger>;
 
 
 class UdsDataLogger : public DataLogger {
 public:
-    UdsDataLogger(DataLog &log, std::unique_ptr<uds::Protocol> &&uds);
+    UdsDataLogger(DataLog &log, network::UdsPtr &&uds);
     UdsDataLogger(const UdsDataLogger &) = delete;
     UdsDataLogger(UdsDataLogger &&) = delete;
     UdsDataLogger &operator=(UdsDataLogger&&) = delete;
@@ -93,7 +92,7 @@ public:
 
     void addPid(Pid &&pid) override;
 
-    Pid *nextPid();
+    PidEvaluator *nextPid();
 
     void processNext();
 
@@ -105,12 +104,13 @@ public:
 private:
     std::chrono::steady_clock::time_point freeze_time_;
 
-    std::unique_ptr<uds::Protocol> uds_;
-    std::vector<Pid> pids_;
+    network::UdsPtr uds_;
+    std::vector<PidEvaluator> pids_;
 
     std::atomic<bool> running_{false};
     size_t current_pid_ = 0;
 };
 
+}
 
-#endif // LIBRETUNER_DATALOGGER_H
+#endif // LT_DATALOGGER_H

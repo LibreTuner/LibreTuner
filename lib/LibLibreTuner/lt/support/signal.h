@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+namespace lt {
+
 template <typename Func> class Signal;
 
 template <typename Func> class Connection {
@@ -119,6 +121,8 @@ template <typename Func> size_t Signal<Func>::count() const {
                       }
                   });
     return c;
+}
+
 }
 
 #endif // SIGNAL_H

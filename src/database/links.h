@@ -6,8 +6,6 @@
 #include <functional>
 #include <filesystem>
 
-#include "util/signal.h"
-
 #include "lt/link/datalink.h"
 
 #include <QAbstractItemModel>

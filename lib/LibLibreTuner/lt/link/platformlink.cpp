@@ -46,4 +46,11 @@ download::DownloaderPtr PlatformLink::downloader() {
     throw std::runtime_error("invalid download mode: " + platform_.downloadMode);
 }
 
+DataLoggerPtr PlatformLink::datalogger(DataLog &log) {
+    if (platform_.logMode == "uds") {
+        return std::make_unique<UdsDataLogger>(log, uds());
+    }
+    throw std::runtime_error("invalid log mode: " + platform_.logMode);
+}
+
 } // namespace lt

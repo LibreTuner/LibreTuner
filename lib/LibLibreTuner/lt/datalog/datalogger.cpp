@@ -22,15 +22,20 @@
 
 extern void cparse_startup();
 
+namespace lt {
 
-void DataLogger::addPid(uint32_t id, uint16_t code,
-                        const std::string &formula) {
-    addPid(Pid(id, code, formula));
+
+class CParseInit {
+public:
+    CParseInit() {
+        cparse_startup();
+    }
+};
+
+
+UdsDataLogger::UdsDataLogger(DataLog &log, network::UdsPtr &&uds) : DataLogger(log), uds_(std::move(uds)) {
+    static CParseInit cparseInit;
 }
-
-
-
-UdsDataLogger::UdsDataLogger(DataLog &log, std::unique_ptr<uds::Protocol> &&uds) : DataLogger(log), uds_(std::move(uds)) {}
 
 
 
@@ -38,7 +43,7 @@ void UdsDataLogger::addPid(Pid &&pid) { pids_.emplace_back(std::move(pid)); }
 
 
 
-Pid *UdsDataLogger::nextPid() {
+PidEvaluator *UdsDataLogger::nextPid() {
     if (++current_pid_ >= pids_.size()) {
         current_pid_ = 0;
     }
@@ -54,7 +59,7 @@ void UdsDataLogger::processNext() {
     if (!uds_) {
         disable();
     }
-    Pid *pid = nextPid();
+    PidEvaluator *pid = nextPid();
     if (!pid) {
         // PID list is empty. Disable to avoid infinite loop
         disable();
@@ -67,49 +72,33 @@ void UdsDataLogger::processNext() {
     }
 
     // Request the data
-    std::vector<uint8_t> data;
-    data.emplace_back(0x22); // readDataByIdentifier
-    data.emplace_back(pid->code() >> 8);
-    data.emplace_back(pid->code() & 0xFF);
-    uds::Packet response;
-    uds_->request(data.data(), data.size(), 0x62, response);
+    std::vector<uint8_t> response = uds_->readDataByIdentifier(pid->code());
 
-    response.data.erase(response.data.begin(), response.data.begin() + 2);
-
-    switch (response.data.size()) {
+    switch (response.size()) {
     case 0:
         break;
     default:
     case 3:
-        pid->setZ(response.data[2]);
+        pid->setZ(response[2]);
     case 2:
-        pid->setY(response.data[1]);
+        pid->setY(response[1]);
     case 1:
-        pid->setX(response.data[0]);
+        pid->setX(response[0]);
         break;
     }
 
     double result = pid->evaluate();
-    log_.add(pid->id(), result);
+    log_.add(pid->pid(), result);
 }
 
 
 void UdsDataLogger::run() {
-    /*std::array<uint8_t, 2> data{0x01, 0x02};
-    uds_->request(data, 0x41, [this](uds::Error  error, const uds::Packet
-    &packet) { if (error != uds::Error::Success) { throwError("could not freeze
-    data: " + uds::strError(error)); return;
-      }
-      current_pid_ = 0;
-      processNext();
-    });*/
     running_ = true;
     try {
         while (running_)
             processNext();
     } catch (const std::exception &e) {
         disable();
-        Logger::warning(std::string("Error while running datalogger: ") + e.what() + ". Aborting.");
     }
 }
 
@@ -119,10 +108,12 @@ void UdsDataLogger::disable() { running_ = false; }
 
 
 
-Pid::Pid(uint32_t id, uint16_t code, const std::string &formula)
-    : id_(id), code_(code), expression_(formula.c_str()) {}
+PidEvaluator::PidEvaluator(const Pid &pid)
+    : pid_(pid), expression_(pid.formula.c_str()) {}
 
 
 
 
-double Pid::evaluate() const { return expression_.eval(vars_).asDouble(); }
+double PidEvaluator::evaluate() const { return expression_.eval(vars_).asDouble(); }
+
+}

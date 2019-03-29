@@ -95,5 +95,16 @@ std::vector<uint8_t> Uds::requestReadMemoryAddress(uint32_t address,
     return res.data;
 }
 
+std::vector<uint8_t> Uds::readDataByIdentifier(uint16_t id)
+{
+    std::array<uint8_t, 2> req;
+    req[0] = id >> 8;
+    req[1] = id & 0xFF;
+    
+    UdsPacket res = request(UDS_REQ_READBYID, req.data(), req.size());
+    return res.data;
+}
+
+
 } // namespace network
 } // namespace lt

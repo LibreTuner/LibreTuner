@@ -15,6 +15,7 @@ constexpr uint8_t UDS_REQ_READMEM = 0x23;
 constexpr uint8_t UDS_REQ_REQUESTDOWNLOAD = 0x34;
 constexpr uint8_t UDS_REQ_REQUESTUPLOAD = 0x35;
 constexpr uint8_t UDS_REQ_TRANSFERDATA = 0x36;
+constexpr uint8_t UDS_REQ_READBYID = 0x22;
 
 constexpr uint8_t UDS_RES_NEGATIVE = 0x7F;
 
@@ -66,6 +67,8 @@ class Uds {
     /* ReadMemoryByAddress */
     std::vector<uint8_t> requestReadMemoryAddress(uint32_t address,
                                                   uint16_t length);
+    
+    std::vector<uint8_t> readDataByIdentifier(uint16_t id);
 
 
     // Sends a request but does not throw an exception on negative errors.

@@ -37,9 +37,6 @@ set(libretuner_SRC
     plugin/pluginstate.cpp
     plugin/pluginstate.h
 
-    util/signal.cpp
-    util/signal.h
-
     ui/mainwindow.cpp
     ui/mainwindow.h
     ui/verticallabel.cpp
@@ -83,6 +80,9 @@ set(libretuner_SRC
     ui/docks/diagnosticswidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
+    
+    ui/widget/datalogview.cpp
+    ui/widget/datalogview.h
 
     models/tablemodel.cpp
     models/tablemodel.h

@@ -42,6 +42,8 @@ struct PidLog {
 
 class DataLog {
 public:
+    using AddCallback = std::function<void(const Pid &pid, std::pair<DataLogTimePoint, double> value)>;
+    
     explicit DataLog(PlatformPtr platform);
     
     // Returns the time of the first data point
