@@ -20,12 +20,10 @@
 
 namespace lt {
     
-void DataLog::add(const Pid &pid, std::pair<DataLogTimePoint, double> value) {
+bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     PidLog *log = pidLog(pid);
     if (log == nullptr) {
-        // Create log
-        data_.emplace(pid.id, PidLog(pid));
-        log = pidLog(pid);
+        return false;
     }
 
     if (empty_) {
@@ -33,25 +31,27 @@ void DataLog::add(const Pid &pid, std::pair<DataLogTimePoint, double> value) {
         beginTime_ = std::chrono::steady_clock::now();
     }
 
-    log->add(value);
+    log->entries.emplace_back(std::move(entry));
+    return true;
 }
 
 PidLog *DataLog::pidLog(const Pid &pid) noexcept {
-    auto it = data_.find(pid.id);
-    if (it == data_.end()) {
+    auto it = logs_.find(pid.code);
+    if (it == logs_.end()) {
         return nullptr;
     }
     return &it->second;
 }
 
-void DataLog::add(const Pid &pid, double value) {
-    add(pid, std::make_pair(std::chrono::steady_clock::now(), value));
+PidLog &DataLog::addPid(const Pid &pid) noexcept
+{
+    PidLog log{pid, {}};
+    logs_.emplace(pid.code, std::move(log));
+    return logs_.find(pid.code)->second;
 }
 
-
-
-DataLog::DataLog(PlatformPtr platform) : platform_(std::move(platform)) {
-    beginTime_ = std::chrono::steady_clock::now();
+bool DataLog::add(const Pid &pid, double value) {
+    return add(pid, PidLogEntry{value, std::chrono::steady_clock::now()});
 }
 
 } // namespace lt

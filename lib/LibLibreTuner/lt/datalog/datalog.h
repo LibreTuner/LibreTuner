@@ -25,27 +25,25 @@
 #include <functional>
 #include <memory>
 
-#include "../definition/platform.h"
+#include "pid.h"
 
 namespace lt {
-
 using DataLogTimePoint = std::chrono::steady_clock::time_point;
 
+struct PidLogEntry {
+    double value;
+    DataLogTimePoint time;
+};
+
 struct PidLog {
-    explicit PidLog(const Pid &_pid) : pid(_pid) {}
-    
-    void add(std::pair<DataLogTimePoint, double> value) { values.emplace_back(value); }
-    
-    const Pid &pid;
-    std::vector<std::pair<DataLogTimePoint, double>> values;
+    Pid pid;
+    std::vector<PidLogEntry> entries;
 };
 
 class DataLog {
 public:
-    using AddCallback = std::function<void(const Pid &pid, std::pair<DataLogTimePoint, double> value)>;
-    
-    explicit DataLog(PlatformPtr platform);
-    
+    using AddCallback = std::function<void(const PidLog &pid, const PidLogEntry &entry)>;
+
     // Returns the time of the first data point
     DataLogTimePoint beginTime() const {
         return beginTime_;
@@ -53,12 +51,18 @@ public:
     
     // adds a point to a dataset. Returns false if the dataset
     // with the specified id does not exist. 
-    void add(const Pid &pid, std::pair<DataLogTimePoint, double> value);
+    bool add(const Pid &pid, PidLogEntry value);
 
     // Adds a value at the current time
-    void add(const Pid &pid, double value);
+    bool add(const Pid &pid, double value);
     
+    // Returns the PID log or nullptr if it does not exist. Add with
+    // addPid()
     PidLog *pidLog(const Pid &pid) noexcept;
+
+    // Adds a PID to the log. Overwrites any previous logs with the same
+    // pid.
+    PidLog &addPid(const Pid &pid) noexcept;
 
     std::string name() const { return name_; }
     void setName(const std::string &name) { name_ = name; }
@@ -68,11 +72,10 @@ public:
 
 private:
     DataLogTimePoint beginTime_;
-    PlatformPtr platform_;
     std::string name_;
     bool empty_{true};
 
-    std::unordered_map<uint32_t, PidLog> data_;
+    std::unordered_map<uint32_t, PidLog> logs_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
 

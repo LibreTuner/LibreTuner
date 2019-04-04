@@ -158,8 +158,7 @@ lt::TableDefinition loadTable(std::size_t id, const YAML::Node &node) {
 
 lt::Pid loadPid(const YAML::Node &pid) {
     lt::Pid definition;
-    definition.valid = true;
-    definition.id = static_cast<uint32_t>(pid["id"].as<std::size_t>());
+    // definition.id = static_cast<uint32_t>(pid["id"].as<std::size_t>());
 
     definition.name = pid["name"].as<std::string>();
     definition.description = pid["description"].as<std::string>();
@@ -275,17 +274,17 @@ lt::PlatformPtr loadPlatformDefinition(const std::filesystem::path &path) {
         // Session IDs
         if (auth["sessionid"]) {
             platform->downloadAuthOptions.session =
-                auth["sessionid"].as<std::size_t>();
+                static_cast<uint8_t>(auth["sessionid"].as<std::size_t>());
             platform->flashAuthOptions.session =
                 platform->downloadAuthOptions.session;
         }
         if (auth["download_sessionid"]) {
             platform->downloadAuthOptions.session =
-                auth["download_sessionid"].as<std::size_t>();
+                static_cast<uint8_t>(auth["download_sessionid"].as<std::size_t>());
         }
         if (auth["flash_sessionid"]) {
             platform->flashAuthOptions.session =
-                auth["flash_sessionid"].as<std::size_t>();
+                static_cast<uint8_t>(auth["flash_sessionid"].as<std::size_t>());
         }
     }
 

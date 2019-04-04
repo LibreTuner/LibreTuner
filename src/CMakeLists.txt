@@ -9,8 +9,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
-add_definitions(-std=c++17)
-
 set(libretuner_SRC
     main.cpp
     

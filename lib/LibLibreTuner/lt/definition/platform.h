@@ -9,7 +9,7 @@
 #include "../auth/auth.h"
 #include "../support/types.h"
 #include "model.h"
-#include "pid.h"
+#include "../datalog/pid.h"
 #include "table.h"
 
 namespace lt {

@@ -20,10 +20,37 @@
 
 #include <utility>
 
+#include <shunting-yard.h>
+
 extern void cparse_startup();
 
 namespace lt {
 
+class PidEvaluator{
+public:
+    PidEvaluator(const Pid &pid) : pid_(pid), expression_(pid.formula.c_str()) {}
+    PidEvaluator(PidEvaluator &&) = default;
+    PidEvaluator &operator=(PidEvaluator&&) = default;
+    PidEvaluator &operator=(const PidEvaluator&) = delete;
+    PidEvaluator(const PidEvaluator &) = delete;
+
+    void setX(uint8_t x) { vars_["a"] = x; }
+    void setY(uint8_t y) { vars_["b"] = y; }
+    void setZ(uint8_t z) { vars_["c"] = z; }
+
+    double evaluate() const {
+        return expression_.eval(vars_).asDouble();
+    }
+
+    inline const Pid &pid() const noexcept { return pid_; }
+    inline uint16_t code() const { return pid_.code; }
+
+private:
+    const Pid &pid_;
+
+    TokenMap vars_;
+    calculator expression_;
+};
 
 class CParseInit {
 public:
@@ -32,35 +59,30 @@ public:
     }
 };
 
-
-UdsDataLogger::UdsDataLogger(DataLog &log, network::UdsPtr &&uds) : DataLogger(log), uds_(std::move(uds)) {
+UdsDataLogger::UdsDataLogger(DataLog &log, network::UdsPtr &&uds) : DataLogger(log), uds_(std::move(uds)), iter_(pids_.begin()) {
     static CParseInit cparseInit;
 }
 
+void UdsDataLogger::addPid(Pid pid) { pids_.emplace_front(std::move(pid)); }
 
-
-void UdsDataLogger::addPid(Pid &&pid) { pids_.emplace_back(std::move(pid)); }
-
-
-
-PidEvaluator *UdsDataLogger::nextPid() {
-    if (++current_pid_ >= pids_.size()) {
-        current_pid_ = 0;
-    }
+Pid *UdsDataLogger::nextPid() {
     if (pids_.empty()) {
         return nullptr;
     }
-    return &pids_[current_pid_];
+
+    if (iter_ == pids_.end()) {
+        iter_ = pids_.begin();
+    }
+
+    return &*iter_;
 }
-
-
 
 void UdsDataLogger::processNext() {
     if (!uds_) {
         disable();
     }
-    PidEvaluator *pid = nextPid();
-    if (!pid) {
+    Pid *pid = nextPid();
+    if (pid == nullptr) {
         // PID list is empty. Disable to avoid infinite loop
         disable();
         return;
@@ -72,25 +94,28 @@ void UdsDataLogger::processNext() {
     }
 
     // Request the data
-    std::vector<uint8_t> response = uds_->readDataByIdentifier(pid->code());
+    std::vector<uint8_t> response = uds_->readDataByIdentifier(pid->code);
+
+    PidEvaluator evaluator(*pid);
 
     switch (response.size()) {
     case 0:
         break;
     default:
     case 3:
-        pid->setZ(response[2]);
+        evaluator.setZ(response[2]);
+        // Fallthrough
     case 2:
-        pid->setY(response[1]);
+        evaluator.setY(response[1]);
+        // Fallthrough
     case 1:
-        pid->setX(response[0]);
+        evaluator.setX(response[0]);
         break;
     }
 
-    double result = pid->evaluate();
-    log_.add(pid->pid(), result);
+    double result = evaluator.evaluate();
+    log_.add(*pid, result);
 }
-
 
 void UdsDataLogger::run() {
     running_ = true;
@@ -102,18 +127,6 @@ void UdsDataLogger::run() {
     }
 }
 
-
-
 void UdsDataLogger::disable() { running_ = false; }
 
-
-
-PidEvaluator::PidEvaluator(const Pid &pid)
-    : pid_(pid), expression_(pid.formula.c_str()) {}
-
-
-
-
-double PidEvaluator::evaluate() const { return expression_.eval(vars_).asDouble(); }
-
-}
+} // namespace lt
