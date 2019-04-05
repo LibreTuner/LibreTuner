@@ -67,16 +67,15 @@ public:
 
     void addPid(Pid pid) override;
 
-    Pid *nextPid();
-
-    void processNext();
-
     void disable() override;
 
     /* Starts logging. */
     void run() override;
 
 private:
+    Pid *nextPid();
+    void processNext();
+    
     std::chrono::steady_clock::time_point freeze_time_;
 
     network::UdsPtr uds_;

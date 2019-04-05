@@ -21,10 +21,15 @@ public:
     void setDataLog(lt::DataLogPtr datalog);
     
 private:
+    void onAdded(const lt::PidLog &log, const lt::PidLogEntry &entry) noexcept;
+    
+    QCPGraph *getOrCreateGraph(std::size_t pid) noexcept;
+    
     QCustomPlot *plot_;
     QListWidget *pidList_;
     
     lt::DataLogPtr datalog_;
+    lt::DataLog::AddConnectionPtr connection_;
     
     // Map PIDs to graphs
     std::unordered_map<std::size_t, QCPGraph*> graphs_;

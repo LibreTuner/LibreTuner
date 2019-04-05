@@ -6,39 +6,101 @@
 #include <functional>
 
 namespace lt {
-  
+
+template<typename ...Args>
+class EventState;
+
 template<typename ...Args>
 class EventConnection {
 public:
-    using Func_t = std::function<void(Args...)>;
+    using Func = std::function<void(Args...)>;
+    using State = EventState<Args...>;
     
+    EventConnection(Func &&func, std::weak_ptr<State> &&state) : callback_(std::move(func)), state_(std::move(state)) {
+        
+    }
     
+    // Disconnects from the event
+    void disconnect() noexcept {
+        if (auto state = state_.lock()) {
+            state->disconnect(this);
+        };
+        state_.reset();
+    }
+
+    void operator()(Args &&...args) const {
+        callback_(std::forward<Args...>(args)...);
+    }
+    
+private:
+    Func callback_;
+    std::weak_ptr<State> state_;
 };
 
 template<typename ...Args>
 class EventState {
 public:
-    using Connection_t = EventConnection<Args...>;
+    using Connection = EventConnection<Args...>;
     
-    void dispatch();
+    void dispatch(Args &&...args) const {
+        for (std::weak_ptr<Connection> &connPtr : connections_) {
+            if (auto conn = connPtr.lock()) {
+                *conn(std::forward<Args...>(args)...);
+            }
+        }
+    }
+    
+    // Removes expired connections
+    void removeExpired() noexcept {
+        connections_.remove_if([](auto &conn) {
+            return conn.expired();
+        });
+    }
+    
+    // Adds a connection to the dispatch list
+    void add(std::weak_ptr<Connection> conn) noexcept {
+        connections_.emplace_front(std::move(conn));
+    }
+    
+    // Disconnects a connection
+    void disconnect(Connection *connection) noexcept {
+        connections_.remove_if([connection](auto &c) {
+            if (auto s = c.lock()) {
+                return s.get() == connection;
+            }
+            return true; // connection has expired
+        });
+    }
     
 private:
-    
+    std::forward_list<std::weak_ptr<Connection>> connections_;
 };
 
     
 template<typename ...Args>
 class Event {
 public:
-    using State_t = EventState<Args...>;
-    using Connection_t = typename State_t::Connection_t;
+    using State = EventState<Args...>;
+    using Connection = typename State::Connection;
+    using ConnectionPtr = std::shared_ptr<Connection>;
+    
+    Event() : state_(std::make_shared<State>()) {
+    }
+    
+    // Creates a new connection with a callback
+    template<typename Func>
+    ConnectionPtr connect(Func &&f) noexcept {
+        ConnectionPtr conn = std::make_shared<Connection>(std::forward<Func>(f), state_);
+        state_->add(conn);
+        return conn;
+    }
     
     void operator()() {
-        
+        state_->dispatch();
     }
     
 private:
-    
+    std::shared_ptr<State> state_;
 };
     
 }

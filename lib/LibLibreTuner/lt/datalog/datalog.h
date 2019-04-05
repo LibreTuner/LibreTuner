@@ -26,13 +26,15 @@
 #include <memory>
 
 #include "pid.h"
+#include "../support/event.h"
 
 namespace lt {
 using DataLogTimePoint = std::chrono::steady_clock::time_point;
 
 struct PidLogEntry {
     double value;
-    DataLogTimePoint time;
+    // Miliseconds since log start
+    std::size_t time;
 };
 
 struct PidLog {
@@ -42,7 +44,8 @@ struct PidLog {
 
 class DataLog {
 public:
-    using AddCallback = std::function<void(const PidLog &pid, const PidLogEntry &entry)>;
+    using AddEvent = Event<const PidLog &, const PidLogEntry &>;
+    using AddConnectionPtr = AddEvent::ConnectionPtr;
 
     // Returns the time of the first data point
     DataLogTimePoint beginTime() const {
@@ -69,11 +72,18 @@ public:
 
     // Returns true if the log is empty
     bool empty() const { return empty_; }
+    
+    template<typename Func>
+    inline AddConnectionPtr onAdd(Func &&func) noexcept {
+        return addEvent_.connect(std::forward<Func>(func));
+    }
 
 private:
     DataLogTimePoint beginTime_;
     std::string name_;
     bool empty_{true};
+    
+    AddEvent addEvent_;
 
     std::unordered_map<uint32_t, PidLog> logs_;
 };

@@ -19,7 +19,7 @@
 #include "datalog.h"
 
 namespace lt {
-    
+
 bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     PidLog *log = pidLog(pid);
     if (log == nullptr) {
@@ -51,7 +51,12 @@ PidLog &DataLog::addPid(const Pid &pid) noexcept
 }
 
 bool DataLog::add(const Pid &pid, double value) {
-    return add(pid, PidLogEntry{value, std::chrono::steady_clock::now()});
+    if (empty_) {
+        empty_ = false;
+        beginTime_ = std::chrono::steady_clock::now();
+    }
+    
+    return add(pid, PidLogEntry{value, static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime_).count())});
 }
 
 } // namespace lt
