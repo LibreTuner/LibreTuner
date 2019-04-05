@@ -135,7 +135,7 @@ void DataLoggerWindow::simulate()
 
     // Simulate coolant temp
     for (int i = 0; i < 10; ++i) {
-        log_->add(pid, lt::PidLogEntry{i * 50, (i / 7000.0) * 30 + 30});
+        log_->add(pid, lt::PidLogEntry{(i * 30.0 / 7000) + 30, static_cast<std::size_t>(i * 50)});
     }
 }
 
