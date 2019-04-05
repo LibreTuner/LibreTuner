@@ -27,16 +27,16 @@
 #include <unordered_map>
 
 #include "styledwindow.h"
-#include "datalog/datalog.h"
+#include "lt/datalog/datalog.h"
 
+namespace lt {
 class DataLogger;
+using DataLoggerPtr = std::unique_ptr<DataLogger>;
+}
 
 class QListWidget;
 class QTreeWidgetItem;
 class QListWidgetItem;
-
-class PlatformLink;
-using PlatformLinkPtr = std::shared_ptr<PlatformLink>;
 
 
 class DataLoggerWindow : public QWidget
@@ -60,24 +60,16 @@ public slots:
     void toggleLogger();
     void saveLog();
 
-
-
 private:
-    DataLog log_;
-    std::unique_ptr<DataLogger> logger_;
-    definition::MainPtr definition_;
+    lt::DataLogPtr log_;
+    lt::DataLoggerPtr logger_;
 
     QListWidget *pidList_;
     QTreeWidget *logOutput_;
     QPushButton *buttonLog_;
     
-    std::shared_ptr<Signal<DataLog::UpdateCall>::ConnectionType> connection_;
-    
-    void onLogEntry(const DataLog::Data &data, double value);
-    
     std::unordered_map<uint32_t, QTreeWidgetItem*> outputItems_;
     std::vector<QListWidgetItem*> pidItems_;
-
 
     void reset();
 };

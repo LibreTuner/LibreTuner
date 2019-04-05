@@ -16,7 +16,8 @@ public:
     using Func = std::function<void(Args...)>;
     using State = EventState<Args...>;
     
-    EventConnection(Func &&func, std::weak_ptr<State> &&state) : callback_(std::move(func)), state_(std::move(state)) {
+    template<typename F>
+    EventConnection(F &&func, std::weak_ptr<State> &&state) : callback_(std::forward<F>(func)), state_(std::move(state)) {
         
     }
     
@@ -29,7 +30,7 @@ public:
     }
 
     void operator()(Args &&...args) const {
-        callback_(std::forward<Args...>(args)...);
+        callback_(std::forward<Args>(args)...);
     }
     
 private:
@@ -43,9 +44,9 @@ public:
     using Connection = EventConnection<Args...>;
     
     void dispatch(Args &&...args) const {
-        for (std::weak_ptr<Connection> &connPtr : connections_) {
+        for (const std::weak_ptr<Connection> &connPtr : connections_) {
             if (auto conn = connPtr.lock()) {
-                *conn(std::forward<Args...>(args)...);
+                (*conn)(std::forward<Args>(args)...);
             }
         }
     }
@@ -95,8 +96,8 @@ public:
         return conn;
     }
     
-    void operator()() {
-        state_->dispatch();
+    void operator()(Args &&...args) {
+        state_->dispatch(std::forward<Args>(args)...);
     }
     
 private:

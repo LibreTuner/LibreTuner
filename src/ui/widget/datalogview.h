@@ -18,7 +18,7 @@ class DataLogView : public QWidget
 public:
     explicit DataLogView(QWidget *parent = nullptr);
     
-    void setDataLog(lt::DataLogPtr datalog);
+    void setDataLog(lt::DataLogPtr dataLog);
     
 private:
     void onAdded(const lt::PidLog &log, const lt::PidLogEntry &entry) noexcept;
@@ -26,9 +26,8 @@ private:
     QCPGraph *getOrCreateGraph(std::size_t pid) noexcept;
     
     QCustomPlot *plot_;
-    QListWidget *pidList_;
     
-    lt::DataLogPtr datalog_;
+    lt::DataLogPtr dataLog_;
     lt::DataLog::AddConnectionPtr connection_;
     
     // Map PIDs to graphs

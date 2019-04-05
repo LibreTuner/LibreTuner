@@ -27,15 +27,15 @@
 #include <QHeaderView>
 #include <QTimer>
 
-#include "datalink/datalink.h"
-#include "datalog/datalog.h"
-#include "datalog/datalogger.h"
-#include "definitions/definition.h"
+#include "lt/link/datalink.h"
+#include "lt/datalog/datalogger.h"
+#include "lt/definition/platform.h"
 #include "libretuner.h"
 #include "backgroundtask.h"
-#include "datalogview.h"
+#include "widget/datalogview.h"
+#include "widget/datalogliveview.h"
 
-DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definition_(LT()->platform()), log_(LT()->platform())
+DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), log_(std::make_shared<lt::DataLog>())
 {
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
@@ -47,7 +47,12 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     
     auto *datalogView = new DataLogView;
-    datalogView->setDatalog(&log_);
+    datalogView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    datalogView->setDataLog(log_);
+    
+    auto *dataLogLiveView = new DataLogLiveView;
+    dataLogLiveView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    dataLogLiveView->setDataLog(log_);
 
     /*logOutput_ = new QTreeWidget;
     logOutput_->setHeaderHidden(true);
@@ -58,12 +63,16 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
     buttonLog_ = new QPushButton(tr("Start logging"));
     auto *buttonSave = new QPushButton(tr("Save log"));
     
+    auto *buttonSimulate = new QPushButton(tr("Simulate"));
+    
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(buttonLog_);
     
     auto *logLayout = new QVBoxLayout;
     logLayout->addWidget(datalogView);
+    logLayout->addWidget(dataLogLiveView);
     logLayout->addWidget(buttonLog_);
+    logLayout->addWidget(buttonSimulate);
     
     // PIDs layout
     auto *pidLayout = new QVBoxLayout;
@@ -82,6 +91,9 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), definitio
             &DataLoggerWindow::toggleLogger);
     connect(buttonSave, &QPushButton::clicked, this,
             &DataLoggerWindow::saveLog);
+    connect(buttonSimulate, &QPushButton::clicked, [this]() {
+        simulate();
+    });
     reset();
 }
 
@@ -107,21 +119,24 @@ void DataLoggerWindow::saveLog()
 
 void DataLoggerWindow::simulate()
 {
-    auto start = log_.beginTime();
+    lt::Pid pid;
+    pid.name = "Test";
+    pid.code = 0;
+    log_->addPid(pid);
     
-    static QTimer timer;
+    /*QTimer timer(this);
     timer.setInterval(1);
-    connect(&timer, &QTimer::timeout, [this, start]() {
+    connect(&timer, &QTimer::timeout, [this, &pid]() {
         static std::size_t offset = 0;
-        log_.add(0, std::make_pair(start + std::chrono::milliseconds(offset * 2), 6));
+        log_->add(pid, lt::PidLogEntry{6, offset * 100});
         offset++;
     });
-    timer.start();
+    timer.start();*/
 
     // Simulate coolant temp
-    /*for (int i = 0; i < 10; ++i) {
-        log_.add(0, std::make_pair(start + std::chrono::milliseconds(i * 50), (i / 7000.0) * 30 + 30));
-    }*/
+    for (int i = 0; i < 10; ++i) {
+        log_->add(pid, lt::PidLogEntry{i * 50, (i / 7000.0) * 30 + 30});
+    }
 }
 
 
@@ -131,36 +146,20 @@ void DataLoggerWindow::toggleLogger() {
         return;
     }
     try {
-        std::unique_ptr<PlatformLink> link = LT()->platform_link();
-        if (!link) {
-            QMessageBox::critical(this, "Datalog error", "A platform link could not be created");
-            return;
-        }
-
-        logger_ = link->logger(log_);
-
-        if (!logger_) {
-            QMessageBox::critical(this, "Datalog error", "A datalogger could not be created for the platform link");
-            return;
-        }
-
-        connection_ = log_.connectUpdate([this](const DataLog::Data &data, double value, DataLog::TimePoint time) {
-            QMetaObject::invokeMethod(this, [this, data, value]() {
-               // onLogEntry(data, value);
-            });
-        });
+        lt::PlatformLink link = LT()->platformLink();
+        const lt::Platform &platform = link.platform();
+        logger_ = link.datalogger(*log_);
 
         // Add PIDs
         for (QListWidgetItem *item : pidItems_) {
             if (item->checkState() == Qt::Checked) {
-                definition::Pid *pid = definition_->getPid(item->data(Qt::UserRole).toInt());
-                if (!pid) {
+                const lt::Pid *pid = platform.getPid(item->data(Qt::UserRole).toInt());
+                if (pid == nullptr) {
                     // Should never happen...
                     Logger::warning("Invalid pid " + std::to_string(item->data(Qt::UserRole).toInt()) + " while adding to logger");
                     continue;
                 }
-
-                logger_->addPid(pid->id, pid->code, pid->formula);
+                logger_->addPid(*pid);
             }
         }
 
@@ -181,7 +180,7 @@ void DataLoggerWindow::toggleLogger() {
     }
 }
 
-
+/*
 void DataLoggerWindow::onLogEntry(const DataLog::Data& data, double value)
 {
     QTreeWidgetItem *item;
@@ -197,26 +196,25 @@ void DataLoggerWindow::onLogEntry(const DataLog::Data& data, double value)
     }
     
     item->setData(1, Qt::DisplayRole, value);
-}
+}*/
 
 
 void DataLoggerWindow::reset()
 {
     pidList_->clear();
     //logOutput_->clear();
+    
+    const lt::PlatformPtr &platform = LT()->platform();
 
-    if (!definition_) {
-        Logger::info("No definition");
+    if (!platform) {
+        Logger::info("No platform selected");
         return;
     }
 
-    for (const definition::Pid &pid : definition_->pids) {
-        if (!pid.valid) {
-            continue;
-        }
+    for (const lt::Pid &pid : platform->pids) {
         auto *item = new QListWidgetItem;
         item->setText(QString::fromStdString(pid.name));
-        item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.id));
+        item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.code));
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Unchecked);
         pidList_->addItem(item);

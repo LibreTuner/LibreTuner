@@ -56,7 +56,7 @@ struct Platform {
     ModelPtr identify(const uint8_t *data, size_t size) const noexcept;
 
     // Returns the PID with id `id` or nullptr if none exist
-    Pid *getPid(uint32_t id) const noexcept;
+    const Pid *getPid(uint32_t id) const noexcept;
 
     // Gets the table definition by id or returns nullptr
     const TableDefinition *getTable(std::size_t id) const noexcept;

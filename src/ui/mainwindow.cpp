@@ -29,6 +29,7 @@
 #include "docks/editorwidget.h"
 #include "docks/diagnosticswidget.h"
 
+#include "dataloggerwindow.h"
 #include "createtunedialog.h"
 #include "flasherwindow.h"
 #include "uiutil.h"
@@ -509,9 +510,10 @@ void MainWindow::on_buttonDownloadRom_clicked() {
 }
 
 void MainWindow::newLogClicked() {
-    /*auto *window = new DataLoggerWindow;
+    auto *window = new DataLoggerWindow;
+    window->setAttribute(Qt::WA_DeleteOnClose);
     window->setWindowModality(Qt::WindowModal);
-    window->show();*/
+    window->show();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

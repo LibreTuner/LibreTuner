@@ -32,6 +32,9 @@ bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     }
 
     log->entries.emplace_back(std::move(entry));
+    
+    addEvent_(*log, entry);
+    
     return true;
 }
 

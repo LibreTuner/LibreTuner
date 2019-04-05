@@ -35,4 +35,13 @@ ModelPtr Platform::identify(const uint8_t *data, size_t size) const noexcept {
     return ModelPtr();
 }
 
+const Pid *Platform::getPid(uint32_t id) const noexcept {
+    for (const Pid &pid : pids) {
+        if (pid.code == id) {
+            return &pid;
+        }
+    }
+    return nullptr;
+}
+
 } // namespace lt

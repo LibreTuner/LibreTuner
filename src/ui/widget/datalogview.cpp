@@ -13,10 +13,7 @@ DataLogView::DataLogView(QWidget* parent) : QWidget(parent)
     plot_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     plot_->xAxis->setLabel("Elapsed time (seconds)");
     
-    pidList_ = new QListWidget;
-    
     auto layout = new QHBoxLayout;
-    layout->addWidget(pidList_);
     layout->addWidget(plot_);
     setLayout(layout);
 }
@@ -38,11 +35,17 @@ void DataLogView::onAdded(const lt::PidLog& log, const lt::PidLogEntry& entry) n
     graph->addData(entry.time, entry.value);
 }
 
-void DataLogView::setDataLog(lt::DataLogPtr datalog)
+void DataLogView::setDataLog(lt::DataLogPtr dataLog)
 {
-    datalog_ = std::move(datalog);
+    dataLog_ = std::move(dataLog);
     plot_->clearGraphs();
-    connection_ = datalog_->onAdd([this](const lt::PidLog &log, const lt::PidLogEntry &entry) {
+    
+    if (!dataLog_) {
+        connection_.reset();
+        return;
+    }
+    
+    connection_ = dataLog_->onAdd([this](const lt::PidLog &log, const lt::PidLogEntry &entry) {
         onAdded(log, entry);
     });
 }

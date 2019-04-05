@@ -63,6 +63,8 @@ set(libretuner_SRC
     ui/adddatalinkdialog.h
     ui/sessionscannerdialog.cpp
     ui/sessionscannerdialog.h
+    ui/dataloggerwindow.cpp
+    ui/dataloggerwindow.h
 
     ui/docks/overviewwidget.cpp
     ui/docks/overviewwidget.h
@@ -81,6 +83,8 @@ set(libretuner_SRC
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
+    ui/widget/datalogliveview.cpp
+    ui/widget/datalogliveview.h
 
     models/tablemodel.cpp
     models/tablemodel.h
