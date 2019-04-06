@@ -26,6 +26,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QTimer>
+#include <QSplitter>
 
 #include "lt/link/datalink.h"
 #include "lt/datalog/datalogger.h"
@@ -39,7 +40,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), log_(std:
 {
     setAttribute( Qt::WA_DeleteOnClose, false );
     setWindowTitle("LibreTuner - Data Logger");
-    resize(600, 400);
+    resize(1200, 800);
 
     QLabel *pidLabel = new QLabel("Available PIDs");
     
@@ -54,12 +55,6 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), log_(std:
     dataLogLiveView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     dataLogLiveView->setDataLog(log_);
 
-    /*logOutput_ = new QTreeWidget;
-    logOutput_->setHeaderHidden(true);
-    logOutput_->setColumnCount(2);
-    logOutput_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    logLayout->addWidget(logOutput_);*/
-
     buttonLog_ = new QPushButton(tr("Start logging"));
     auto *buttonSave = new QPushButton(tr("Save log"));
     
@@ -67,10 +62,14 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), log_(std:
     
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(buttonLog_);
+
+    auto *splitter = new QSplitter;
+    splitter->setOrientation(Qt::Vertical);
+    splitter->addWidget(datalogView);
+    splitter->addWidget(dataLogLiveView);
     
     auto *logLayout = new QVBoxLayout;
-    logLayout->addWidget(datalogView);
-    logLayout->addWidget(dataLogLiveView);
+    logLayout->addWidget(splitter);
     logLayout->addWidget(buttonLog_);
     logLayout->addWidget(buttonSimulate);
     
@@ -134,8 +133,8 @@ void DataLoggerWindow::simulate()
     timer.start();*/
 
     // Simulate coolant temp
-    for (int i = 0; i < 10; ++i) {
-        log_->add(pid, lt::PidLogEntry{(i * 30.0 / 7000) + 30, static_cast<std::size_t>(i * 50)});
+    for (int i = 0; i < 400; ++i) {
+        log_->add(pid, lt::PidLogEntry{(i * 30.0 / 400) + 30, static_cast<std::size_t>(i * 50)});
     }
 }
 
@@ -179,25 +178,6 @@ void DataLoggerWindow::toggleLogger() {
         QMessageBox::critical(this, "Datalog error", error.what());
     }
 }
-
-/*
-void DataLoggerWindow::onLogEntry(const DataLog::Data& data, double value)
-{
-    QTreeWidgetItem *item;
-    auto it = outputItems_.find(data.id.id);
-    if (it != outputItems_.end()) {
-        item = it->second;
-    } else {
-        item = new QTreeWidgetItem;
-        item->setText(0, QString::fromStdString(data.id.name));
-        item->setText(1, "...");
-        logOutput_->addTopLevelItem(item);
-        outputItems_.insert({data.id.id, item});
-    }
-    
-    item->setData(1, Qt::DisplayRole, value);
-}*/
-
 
 void DataLoggerWindow::reset()
 {

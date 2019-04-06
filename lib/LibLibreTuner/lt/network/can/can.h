@@ -55,7 +55,7 @@ public:
     void setMessage(const uint8_t *message, uint8_t length);
 
     inline void setMessage(uint32_t id, const uint8_t *message,
-                           uint16_t length) {
+                           uint8_t length) {
         setId(id);
         setMessage(message, length);
     }

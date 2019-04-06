@@ -2,8 +2,9 @@
 
 #include "../qcustomplot.h"
 
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QListWidget>
+#include <QCheckBox>
 
 DataLogView::DataLogView(QWidget* parent) : QWidget(parent)
 {
@@ -12,18 +13,55 @@ DataLogView::DataLogView(QWidget* parent) : QWidget(parent)
     plot_->legend->setVisible(true);
     plot_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     plot_->xAxis->setLabel("Elapsed time (seconds)");
+
+    // Set maximum range
+    connect(plot_->xAxis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged), this, [this](const QCPRange &newRange) {
+        if (dataLog_) {
+            plot_->xAxis->setRange(newRange.bounded(0, dataLog_->maxTime() / 1000.0));
+        }
+    });
+
+    connect(plot_->yAxis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged), this, [this](const QCPRange &newRange) {
+        if (dataLog_) {
+            plot_->yAxis->setRange(newRange.bounded(dataLog_->minValue() - 5.0, dataLog_->maxValue() + 5.0));
+        }
+    });
+
+    checkLive_ = new QCheckBox(tr("Update range with live data"));
+    checkLive_->setCheckState(Qt::Checked);
     
-    auto layout = new QHBoxLayout;
+    auto layout = new QVBoxLayout;
     layout->addWidget(plot_);
+    layout->addWidget(checkLive_);
     setLayout(layout);
 }
 
-QCPGraph * DataLogView::getOrCreateGraph(std::size_t pid) noexcept
+QCPGraph *DataLogView::getOrCreateGraph(const lt::Pid &pid) noexcept
 {
-    auto it = graphs_.find(pid);
+    static const QColor plotColors[] = {
+        Qt::red,
+        Qt::green,
+        Qt::blue,
+        Qt::magenta,
+        Qt::yellow,
+        Qt::gray,
+        Qt::cyan,
+        Qt::darkRed,
+        Qt::darkGreen,
+        Qt::darkBlue,
+        Qt::darkMagenta,
+        Qt::darkYellow,
+        Qt::darkGray,
+        Qt::darkCyan,
+        Qt::lightGray,
+    };
+
+    auto it = graphs_.find(pid.code);
     if (it == graphs_.end()) {
         QCPGraph *graph = plot_->addGraph();
-        graphs_.emplace(pid, graph);
+        graph->setName(QString::fromStdString(pid.name));
+        graph->setPen(QPen(plotColors[graphs_.size() % sizeof(plotColors)]));
+        graphs_.emplace(pid.code, graph);
         return graph;
     }
     return it->second;
@@ -31,8 +69,13 @@ QCPGraph * DataLogView::getOrCreateGraph(std::size_t pid) noexcept
 
 void DataLogView::onAdded(const lt::PidLog& log, const lt::PidLogEntry& entry) noexcept
 {
-    QCPGraph *graph = getOrCreateGraph(log.pid.code);
-    graph->addData(entry.time, entry.value);
+    QCPGraph *graph = getOrCreateGraph(log.pid);
+    graph->addData(static_cast<double>(entry.time) / 1000.0, entry.value);
+
+    if (checkLive_->isChecked()) {
+        plot_->xAxis->setRange(dataLog_->maxTime() / 1000.0, 8, Qt::AlignRight);
+    }
+    plot_->replot();
 }
 
 void DataLogView::setDataLog(lt::DataLogPtr dataLog)

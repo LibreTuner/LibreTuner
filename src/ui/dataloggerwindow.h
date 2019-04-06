@@ -65,10 +65,8 @@ private:
     lt::DataLoggerPtr logger_;
 
     QListWidget *pidList_;
-    QTreeWidget *logOutput_;
     QPushButton *buttonLog_;
-    
-    std::unordered_map<uint32_t, QTreeWidgetItem*> outputItems_;
+
     std::vector<QListWidgetItem*> pidItems_;
 
     void reset();

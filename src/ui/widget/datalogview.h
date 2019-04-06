@@ -9,6 +9,11 @@
 class QCPGraph;
 class QCustomPlot;
 class QListWidget;
+class QCheckBox;
+
+namespace lt {
+    struct Pid;
+}
 
 /**
  * @todo write docs
@@ -23,9 +28,10 @@ public:
 private:
     void onAdded(const lt::PidLog &log, const lt::PidLogEntry &entry) noexcept;
     
-    QCPGraph *getOrCreateGraph(std::size_t pid) noexcept;
+    QCPGraph *getOrCreateGraph(const lt::Pid &pid) noexcept;
     
     QCustomPlot *plot_;
+    QCheckBox *checkLive_;
     
     lt::DataLogPtr dataLog_;
     lt::DataLog::AddConnectionPtr connection_;

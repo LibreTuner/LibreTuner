@@ -67,19 +67,28 @@ public:
     // pid.
     PidLog &addPid(const Pid &pid) noexcept;
 
-    std::string name() const { return name_; }
-    void setName(const std::string &name) { name_ = name; }
+    inline std::string name() const noexcept { return name_; }
+    inline void setName(const std::string &name) noexcept { name_ = name; }
 
     // Returns true if the log is empty
-    bool empty() const { return empty_; }
+    inline bool empty() const noexcept { return empty_; }
     
     template<typename Func>
     inline AddConnectionPtr onAdd(Func &&func) noexcept {
         return addEvent_.connect(std::forward<Func>(func));
     }
 
+    // Returns the last time in milliseconds with an entry
+    inline std::size_t maxTime() const noexcept { return maxTime_; }
+
+    inline double minValue() const noexcept { return minValue_; }
+    inline double maxValue() const noexcept { return maxValue_; }
+
 private:
     DataLogTimePoint beginTime_;
+    std::size_t maxTime_{0};
+    double maxValue_{0};
+    double minValue_{0};
     std::string name_;
     bool empty_{true};
     

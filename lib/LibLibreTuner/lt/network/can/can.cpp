@@ -7,8 +7,9 @@ namespace network {
 
 void Can::send(uint32_t id, const uint8_t *data, size_t length) {
     assert(data != nullptr);
+    assert(length <= 8);
 
-    return send(CanMessage(id, data, length));
+    return send(CanMessage(id, data, static_cast<uint8_t>(length)));
 }
 
 CanMessage::CanMessage(uint32_t id, const uint8_t *message, uint8_t length) {

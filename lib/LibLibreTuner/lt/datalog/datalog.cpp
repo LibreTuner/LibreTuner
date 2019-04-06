@@ -31,10 +31,18 @@ bool DataLog::add(const Pid &pid, PidLogEntry entry) {
         beginTime_ = std::chrono::steady_clock::now();
     }
 
-    log->entries.emplace_back(std::move(entry));
-    
+    log->entries.emplace_back(entry);
+    if (entry.time > maxTime_) {
+        maxTime_ = entry.time;
+    }
+    if (entry.value > maxValue_) {
+        maxValue_ = entry.value;
+    }
+    else if (entry.value < minValue_) {
+        minValue_ = entry.value;
+    }
+
     addEvent_(*log, entry);
-    
     return true;
 }
 
