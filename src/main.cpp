@@ -18,6 +18,8 @@
 
 #include "libretuner.h"
 
+#include <csignal>
+
 int main(int argc, char *argv[]) {
     LibreTuner app(argc, argv);
     

@@ -32,6 +32,7 @@ struct UdsPacket {
             return;
         }
         code = raw[0];
+        data.resize(size - 1);
         std::copy(raw + 1, raw + size, data.begin());
     }
 

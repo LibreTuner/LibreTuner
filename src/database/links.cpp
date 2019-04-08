@@ -144,9 +144,11 @@ lt::DataLink *Links::getManual(std::size_t index) const {
 lt::DataLink *Links::getFirst() const { return get(0); }
 
 void Links::remove(lt::DataLink *link) {
+    beginResetModel();
     manualLinks_.erase(
         std::remove_if(manualLinks_.begin(), manualLinks_.end(),
                        [link](const lt::DataLinkPtr &l) { return l.get() == link; }));
+    endResetModel();
 }
 
 QModelIndex Links::index(int row, int column, const QModelIndex &parent) const
@@ -231,8 +233,14 @@ QVariant Links::data(const QModelIndex &index, int role) const
     int parentRow = index.internalId() - 1;
     if (parentRow == 0) {
         // Auto-detected
+        if (index.row() >= detectedLinks_.size()) {
+            return QVariant();
+        }
         link = detectedLinks_[index.row()].get();
     } else if (parentRow == 1) {
+        if (index.row() >= manualLinks_.size()) {
+            return QVariant();
+        }
         link = manualLinks_[index.row()].get();
     } else {
         return QVariant();

@@ -17,7 +17,7 @@ class BackgroundTask<R(Args...)>
 {
 public:
     template<class F>
-    explicit BackgroundTask(F &&f) : task_(std::move(f)) {}
+    explicit BackgroundTask(F &&f) : task_(std::forward<F>(f)) {}
     
     // Executes the function
     void operator()(Args && ...args) {

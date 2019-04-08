@@ -23,7 +23,7 @@ namespace lt {
 bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     PidLog *log = pidLog(pid);
     if (log == nullptr) {
-        return false;
+        log = &addPid(pid);
     }
 
     if (empty_) {

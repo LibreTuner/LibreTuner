@@ -22,8 +22,9 @@ namespace lt {
         
         std::string port() const override { return device_; }
 
+        void setPort(const std::string &port) noexcept override { device_ = port; }
+
     private:
-        // std::shared_ptr<SocketCanInterface> interface_;
         std::string device_;
 
         // void check_interface();

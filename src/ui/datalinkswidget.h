@@ -9,9 +9,26 @@
 #include <QAbstractItemModel>
 #include "database/links.h"
 
+class QLineEdit;
+class QPushButton;
+class QTreeView;
+
 class DatalinksWidget : public QWidget {
 public:
     explicit DatalinksWidget(QWidget *parent = nullptr);
+    
+
+    
+private:
+    void linkChanged(lt::DataLink *link);
+    lt::DataLink *currentLink() const;
+
+    QLineEdit *lineName_;
+    QLineEdit *linePort_;
+
+    QPushButton *buttonUpdate_;
+    QPushButton *buttonReset_;
+    QTreeView *linksView_;
 };
 
 

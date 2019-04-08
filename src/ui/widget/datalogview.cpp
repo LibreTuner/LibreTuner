@@ -75,12 +75,14 @@ void DataLogView::onAdded(const lt::PidLog& log, const lt::PidLogEntry& entry) n
     if (checkLive_->isChecked()) {
         plot_->xAxis->setRange(dataLog_->maxTime() / 1000.0, 8, Qt::AlignRight);
     }
-    plot_->replot();
+
+    plot_->replot(QCustomPlot::rpQueuedReplot);
 }
 
 void DataLogView::setDataLog(lt::DataLogPtr dataLog)
 {
     dataLog_ = std::move(dataLog);
+    graphs_.clear();
     plot_->clearGraphs();
     
     if (!dataLog_) {

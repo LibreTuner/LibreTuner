@@ -28,9 +28,8 @@ namespace lt {
 
 class PidEvaluator{
 public:
-    PidEvaluator(const Pid &pid) : pid_(pid), expression_(pid.formula.c_str()) {}
+    explicit PidEvaluator(const Pid &pid) : pid_(pid), expression_(pid.formula.c_str()) {}
     PidEvaluator(PidEvaluator &&) = default;
-    PidEvaluator &operator=(PidEvaluator&&) = default;
     PidEvaluator &operator=(const PidEvaluator&) = delete;
     PidEvaluator(const PidEvaluator &) = delete;
 
@@ -74,7 +73,7 @@ Pid *UdsDataLogger::nextPid() {
         iter_ = pids_.begin();
     }
 
-    return &*iter_;
+    return &*iter_++;
 }
 
 void UdsDataLogger::processNext() {

@@ -23,9 +23,9 @@ public:
     
     // Disconnects from the event
     void disconnect() noexcept {
-        if (auto state = state_.lock()) {
+        /*if (auto state = state_.lock()) {
             state->disconnect(this);
-        };
+        };*/
         state_.reset();
     }
 

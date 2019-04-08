@@ -23,7 +23,9 @@ public:
     virtual NetworkProtocol supportedProtocols() const = 0;
 
     // Returns the pretty name of the link for displaying to the user
-    const std::string &name() const { return name_; }
+    inline const std::string &name() const noexcept { return name_; }
+
+    inline void setName(const std::string &name) noexcept { name_ = name; }
 
     // Creates a CAN interface with the specified baudrate. The baudrate
     // may not be supported by the link. Returns nullptr if the interface is
@@ -36,6 +38,7 @@ public:
     // Returns the port or an empty string if no port is used by the datalink
     // type
     virtual std::string port() const = 0;
+    virtual void setPort(const std::string &port) =0;
 
 protected:
     std::string name_;

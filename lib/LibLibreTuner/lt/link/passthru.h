@@ -18,7 +18,7 @@ public:
 
     DataLinkType type() const override { return DataLinkType::PassThru; };
 
-    void setPort(const std::string &port) { port_ = port; }
+    void setPort(const std::string &port) noexcept override { port_ = port; }
 
     std::string port() const override { return port_; }
 

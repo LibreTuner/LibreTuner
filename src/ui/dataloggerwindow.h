@@ -25,8 +25,10 @@
 
 #include <memory>
 #include <unordered_map>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
 
-#include "styledwindow.h"
 #include "lt/datalog/datalog.h"
 
 namespace lt {
@@ -37,7 +39,8 @@ using DataLoggerPtr = std::unique_ptr<DataLogger>;
 class QListWidget;
 class QTreeWidgetItem;
 class QListWidgetItem;
-
+class DataLogView;
+class DataLogLiveView;
 
 class DataLoggerWindow : public QWidget
 {
@@ -49,9 +52,14 @@ public:
 
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
     
     // Simulate PIDs
     void simulate();
+
+    void resetLog();
+
+    void waitForStop();
 
 signals:
 
@@ -66,8 +74,13 @@ private:
 
     QListWidget *pidList_;
     QPushButton *buttonLog_;
+    DataLogView *dataLogView_;
+    DataLogLiveView *dataLogLiveView_;
 
     std::vector<QListWidgetItem*> pidItems_;
+
+    std::condition_variable cv_;
+    std::mutex mutex_;
 
     void reset();
 };

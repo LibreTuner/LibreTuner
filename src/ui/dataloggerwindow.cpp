@@ -47,26 +47,23 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent) : QWidget(parent), log_(std:
     pidList_ = new QListWidget;
     pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     
-    auto *datalogView = new DataLogView;
-    datalogView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    datalogView->setDataLog(log_);
+    dataLogView_ = new DataLogView;
+    dataLogView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    dataLogView_->setDataLog(log_);
     
-    auto *dataLogLiveView = new DataLogLiveView;
-    dataLogLiveView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    dataLogLiveView->setDataLog(log_);
+    dataLogLiveView_ = new DataLogLiveView;
+    dataLogLiveView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    dataLogLiveView_->setDataLog(log_);
 
     buttonLog_ = new QPushButton(tr("Start logging"));
     auto *buttonSave = new QPushButton(tr("Save log"));
     
     auto *buttonSimulate = new QPushButton(tr("Simulate"));
-    
-    auto *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(buttonLog_);
 
     auto *splitter = new QSplitter;
     splitter->setOrientation(Qt::Vertical);
-    splitter->addWidget(datalogView);
-    splitter->addWidget(dataLogLiveView);
+    splitter->addWidget(dataLogView_);
+    splitter->addWidget(dataLogLiveView_);
     
     auto *logLayout = new QVBoxLayout;
     logLayout->addWidget(splitter);
@@ -102,14 +99,25 @@ void DataLoggerWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event)
 }
 
-void DataLoggerWindow::hideEvent(QHideEvent * /*event*/) {
+void DataLoggerWindow::hideEvent(QHideEvent *event) {
     // TODO: ask to save log
-    pidList_->clear();
     if (logger_) {
-        logger_->disable();
+        QMessageBox::warning(nullptr, tr("Close warning"), tr("Cannot close window while data logger is running"));
+        event->ignore();
+    } else {
+        event->accept();
     }
 }
 
+void DataLoggerWindow::closeEvent(QCloseEvent *event) {
+    // TODO: ask to save log
+    if (logger_) {
+        QMessageBox::warning(nullptr, tr("Close warning"), tr("Cannot close window while data logger is running"));
+        event->ignore();
+    } else {
+        event->accept();
+    }
+}
 
 void DataLoggerWindow::saveLog()
 {
@@ -139,6 +147,7 @@ void DataLoggerWindow::simulate()
 }
 
 
+
 void DataLoggerWindow::toggleLogger() {
     if (logger_) {
         logger_->disable();
@@ -147,6 +156,8 @@ void DataLoggerWindow::toggleLogger() {
     try {
         lt::PlatformLink link = LT()->platformLink();
         const lt::Platform &platform = link.platform();
+
+        resetLog();
         logger_ = link.datalogger(*log_);
 
         // Add PIDs
@@ -177,12 +188,16 @@ void DataLoggerWindow::toggleLogger() {
     } catch (const std::runtime_error &error) {
         QMessageBox::critical(this, "Datalog error", error.what());
     }
+
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        cv_.notify_all();
+    }
 }
 
 void DataLoggerWindow::reset()
 {
     pidList_->clear();
-    //logOutput_->clear();
     
     const lt::PlatformPtr &platform = LT()->platform();
 
@@ -203,4 +218,16 @@ void DataLoggerWindow::reset()
 
     // Adjust minimum width to fit all elements
     pidList_->setMinimumWidth(pidList_->sizeHintForColumn(0) + 8 * pidList_->frameWidth());
+}
+
+void DataLoggerWindow::resetLog() {
+    log_ = std::make_shared<lt::DataLog>();
+
+    dataLogView_->setDataLog(log_);
+    dataLogLiveView_->setDataLog(log_);
+}
+
+void DataLoggerWindow::waitForStop() {
+    std::unique_lock<std::mutex> lk(mutex_);
+    cv_.wait(lk, [this]{return !logger_; });
 }
