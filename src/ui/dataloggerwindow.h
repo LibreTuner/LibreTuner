@@ -56,8 +56,6 @@ public:
 
     void resetLog();
 
-    void waitForStop();
-
 signals:
 
 public slots:
