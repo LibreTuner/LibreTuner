@@ -27,7 +27,7 @@ public:
     }
 
     bool recv(CanMessage &message, std::chrono::milliseconds timeout) override {
-        return can_->recv(message, std::move(timeout));
+        return can_->recv(message, timeout);
     }
 
     void clearBuffer() noexcept override {
