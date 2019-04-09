@@ -69,14 +69,16 @@ QCPGraph *DataLogView::getOrCreateGraph(const lt::Pid &pid) noexcept
 
 void DataLogView::onAdded(const lt::PidLog& log, const lt::PidLogEntry& entry) noexcept
 {
-    QCPGraph *graph = getOrCreateGraph(log.pid);
-    graph->addData(static_cast<double>(entry.time) / 1000.0, entry.value);
+    QMetaObject::invokeMethod(this, [this, log, entry] {
+        QCPGraph *graph = getOrCreateGraph(log.pid);
+        graph->addData(static_cast<double>(entry.time) / 1000.0, entry.value);
 
-    if (checkLive_->isChecked()) {
-        plot_->xAxis->setRange(dataLog_->maxTime() / 1000.0, 8, Qt::AlignRight);
-    }
+        if (checkLive_->isChecked()) {
+            plot_->xAxis->setRange(dataLog_->maxTime() / 1000.0, 8, Qt::AlignRight);
+        }
 
-    plot_->replot(QCustomPlot::rpQueuedReplot);
+        plot_->replot(QCustomPlot::rpQueuedReplot);
+    }, Qt::QueuedConnection);
 }
 
 void DataLogView::setDataLog(lt::DataLogPtr dataLog)

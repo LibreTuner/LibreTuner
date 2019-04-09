@@ -25,9 +25,6 @@
 
 #include <memory>
 #include <unordered_map>
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
 
 #include "lt/datalog/datalog.h"
 
@@ -78,9 +75,6 @@ private:
     DataLogLiveView *dataLogLiveView_;
 
     std::vector<QListWidgetItem*> pidItems_;
-
-    std::condition_variable cv_;
-    std::mutex mutex_;
 
     void reset();
 };

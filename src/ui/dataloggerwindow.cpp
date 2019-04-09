@@ -188,11 +188,6 @@ void DataLoggerWindow::toggleLogger() {
     } catch (const std::runtime_error &error) {
         QMessageBox::critical(this, "Datalog error", error.what());
     }
-
-    {
-        std::lock_guard<std::mutex> lk(mutex_);
-        cv_.notify_all();
-    }
 }
 
 void DataLoggerWindow::reset()
@@ -225,9 +220,4 @@ void DataLoggerWindow::resetLog() {
 
     dataLogView_->setDataLog(log_);
     dataLogLiveView_->setDataLog(log_);
-}
-
-void DataLoggerWindow::waitForStop() {
-    std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk, [this]{return !logger_; });
 }
