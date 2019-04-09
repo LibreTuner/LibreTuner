@@ -110,7 +110,7 @@ public:
     Can() = default;
     virtual ~Can() = default;
 
-    // Send a CAN message. The size of data must be <= 8
+    virtual // Send a CAN message. The size of data must be <= 8
     // Returns true if a message was sent
     void send(uint32_t id, const uint8_t *data, size_t length);
 
