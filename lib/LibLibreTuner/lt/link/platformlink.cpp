@@ -1,6 +1,7 @@
 #include "platformlink.h"
 
 #include "../network/uds/isotpuds.h"
+#include "../network/can/canlog.h"
 #include "../diagnostics/uds.h"
 #include "../flash/mazdat1.h"
 #include "../download/rmadownloader.h"
@@ -11,6 +12,9 @@ network::CanPtr PlatformLink::can() {
 	network::CanPtr can = datalink_.can(platform_.baudrate);
 	if (!can) {
 		throw std::runtime_error("CAN is unsupported with the selected datalink");
+	}
+	if (canLog_) {
+        return std::make_unique<network::CanLogProxy>(std::move(can), canLog_);
 	}
 	return can;
 }

@@ -10,6 +10,10 @@
 #include "../datalog/datalogger.h"
 
 namespace lt {
+namespace network {
+    class CanLog;
+    using CanLogPtr = std::shared_ptr<CanLog>;
+}
     
 class PlatformLink {
 public:
@@ -31,9 +35,12 @@ public:
     download::DownloaderPtr downloader();
     DataLoggerPtr datalogger(DataLog &log);
 
+    inline void setCanLog(network::CanLogPtr log) noexcept { canLog_ = std::move(log); }
+
 private:
     DataLink &datalink_;
 	const Platform &platform_;
+	network::CanLogPtr canLog_;
 };
 
 } // namespace lt
