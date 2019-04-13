@@ -29,8 +29,9 @@ public:
         state_.reset();
     }
 
-    void operator()(Args &&...args) const {
-        callback_(std::forward<Args>(args)...);
+    template<typename ...A>
+    void operator()(A &&...args) const {
+        callback_(std::forward<A>(args)...);
     }
     
 private:
@@ -42,11 +43,12 @@ template<typename ...Args>
 class EventState {
 public:
     using Connection = EventConnection<Args...>;
-    
-    void dispatch(Args &&...args) const {
+
+    template<typename ...A>
+    void dispatch(A &&...args) const {
         for (const std::weak_ptr<Connection> &connPtr : connections_) {
             if (auto conn = connPtr.lock()) {
-                (*conn)(std::forward<Args>(args)...);
+                (*conn)(std::forward<A>(args)...);
             }
         }
     }
@@ -95,9 +97,11 @@ public:
         state_->add(conn);
         return conn;
     }
-    
-    void operator()(Args &&...args) {
-        state_->dispatch(std::forward<Args>(args)...);
+
+
+    template<typename ...A>
+    void operator()(A &&...args) {
+        state_->dispatch(std::forward<A>(args)...);
     }
     
 private:
