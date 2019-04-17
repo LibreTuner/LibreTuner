@@ -257,7 +257,7 @@ public:
 
 private:
     TableStorage entries_;
-    std::size_t width_; // row width
+    std::size_t width_{0}; // row width
     double scale_{1.0};
 
     TableBounds<EntryType> bounds_;

@@ -20,7 +20,7 @@ public:
 
     inline bool running() const noexcept { return running_; }
 
-    inline void cancel() noexcept { canceled_ = true; }
+    inline void cancel() noexcept { canceled_ = true; eventCanceled_(); }
 
     template<typename F>
     Event<>::ConnectionPtr onCanceled(F &&f) noexcept {
@@ -43,7 +43,7 @@ private:
     Event<> eventCanceled_;
     Event<double> eventProgress_;
 
-    double progress_;
+    double progress_{0};
 };
 
 using JobPtr = std::shared_ptr<Job>;
@@ -80,7 +80,7 @@ void Job::run(F &&f, Args &&... args) {
     }
     std::packaged_task task(std::forward<F>(f));
     running_ = true;
-    thread_ = std::thread(std::move(task), [&] {
+    thread_ = std::thread([&, task{std::move(task)}] {
         task(JobControl(shared_from_this()), std::forward<Args>(args)...);
         running_ = false;
     });

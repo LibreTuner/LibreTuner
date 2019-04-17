@@ -32,7 +32,7 @@ namespace lt {
 /* ROM Metadata */
 class Rom {
 public:
-	Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
+	explicit Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
 
     const std::string &name() const { return name_; }
     const ModelPtr &model() const { return model_; }
@@ -69,7 +69,7 @@ using RomPtr = std::shared_ptr<Rom>;
 
 class Tune {
 public:
-	Tune(RomPtr rom) : base_(std::move(rom)) {
+	explicit Tune(RomPtr rom) : base_(std::move(rom)) {
         assert(base_);
 	}
 
