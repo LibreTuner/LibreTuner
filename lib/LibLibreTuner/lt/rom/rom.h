@@ -67,6 +67,8 @@ private:
 };
 using RomPtr = std::shared_ptr<Rom>;
 
+using TableVector = std::vector<std::unique_ptr<Table>>;
+
 class Tune {
 public:
 	explicit Tune(RomPtr rom) : base_(std::move(rom)) {
@@ -96,14 +98,14 @@ public:
 
 	TableAxisPtr getAxis(const std::string &id, bool create = true);
 
-	inline std::vector<std::unique_ptr<Table>> &tables() noexcept { return tables_; }
-	inline const std::vector<std::unique_ptr<Table>>& tables() const noexcept { return tables_; }
+	inline TableVector &tables() noexcept { return tables_; }
+	inline const TableVector& tables() const noexcept { return tables_; }
 
 private:
     std::string name_;
 
     RomPtr base_;
-    std::vector<std::unique_ptr<Table>> tables_;
+    TableVector tables_;
 
 	std::unordered_map<std::string, TableAxisPtr> axes_;
 

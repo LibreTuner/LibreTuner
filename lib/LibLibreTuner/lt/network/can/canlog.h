@@ -2,16 +2,36 @@
 #define LT_CANLOG_H
 
 #include "can.h"
+#include "../../support/event.h"
 
 #include <vector>
 #include <memory>
 
 namespace lt::network {
 
-class CanLog {
-
+enum class CanMessageDirection : bool {
+    Inbound,
+    Outbound,
 };
 
+struct CanLogEntry {
+    CanMessageDirection direction;
+    CanMessage message;
+};
+
+struct CanLog {
+    std::vector<CanLogEntry> messages_;
+
+    inline std::size_t size() const noexcept { return messages_.size(); }
+
+    template<typename T>
+    inline void emplace_back(T &&t) {
+        messages_.emplace_back(std::forward<T>(t));
+        eventAdded(messages_.back());
+    }
+
+    Event<CanLogEntry&> eventAdded;
+};
 using CanLogPtr = std::shared_ptr<CanLog>;
 
 // Proxies a CAN interface and logs all sent and received messages
@@ -24,10 +44,17 @@ public:
 
     void send(const CanMessage &message) override {
         can_->send(message);
+        if (log_) {
+            log_->emplace_back(CanLogEntry{CanMessageDirection::Outbound, message});
+        }
     }
 
     bool recv(CanMessage &message, std::chrono::milliseconds timeout) override {
-        return can_->recv(message, timeout);
+        bool res = can_->recv(message, timeout);
+        if (res && log_) {
+            log_->emplace_back(CanLogEntry{CanMessageDirection::Inbound, message});
+        }
+        return res;
     }
 
     void clearBuffer() noexcept override {
