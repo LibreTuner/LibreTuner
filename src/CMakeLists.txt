@@ -80,6 +80,8 @@ set(libretuner_SRC
     ui/docks/diagnosticswidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
+    ui/docks/hexeditwidget.cpp
+    ui/docks/hexeditwidget.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
@@ -96,7 +98,10 @@ set(libretuner_SRC
     database/roms.cpp
     database/roms.h
     database/links.cpp
-    database/links.h)
+    database/links.h
+
+
+    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
 
 if (UNIX AND NOT APPLE)
 
@@ -126,9 +131,9 @@ qt5_add_resources(libretuner_SRC
 
 add_executable(LibreTuner ${libretuner_SRC})
 
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp QHexView sol2 Lua LibLibreTuner)
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp sol2 Lua LibLibreTuner)
 
-target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView)
 
 
 
