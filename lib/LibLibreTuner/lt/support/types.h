@@ -6,9 +6,9 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace lt {
+#include "endianness.h"
 
-enum class Endianness { Big, Little };
+namespace lt {
 
 enum class DataType {
     Uint8,
