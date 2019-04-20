@@ -13,11 +13,11 @@
 
 
 SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
-    tableDescription_ = new QPlainTextEdit;
-    tableDescription_->setReadOnly(true);
-    tableDescription_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    tableDescription_ = new QLabel;
+    tableDescription_->setWordWrap(true);
+    tableDescription_->setAlignment(Qt::AlignCenter);
 
-    QHBoxLayout *tableInfoTitleLayout = new QHBoxLayout;
+    auto *tableInfoTitleLayout = new QHBoxLayout;
     tableInfoButton_ = new QToolButton;
     tableInfoButton_->setArrowType(Qt::DownArrow);
     tableInfoButton_->setAutoRaise(true);
@@ -62,23 +62,23 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfo_->setLayout(tableForm);
     
     // Scroll area
-    QVBoxLayout *scrollLayout = new QVBoxLayout;
-    scrollLayout->setContentsMargins(0, 5, 0, 5);
+    auto *scrollLayout = new QVBoxLayout;
+    scrollLayout->setContentsMargins(5, 0, 5, 0);
     scrollLayout->setAlignment(Qt::AlignTop);
     scrollLayout->addWidget(tableDescription_);
     scrollLayout->addLayout(tableInfoTitleLayout);
     scrollLayout->addWidget(tableInfo_);
     
-    QWidget *scrollWidget = new QWidget;
+    auto *scrollWidget = new QWidget;
     scrollWidget->setContentsMargins(0, 0, 0, 0);
     scrollWidget->setLayout(scrollLayout);
     
-    QScrollArea *scrollArea = new QScrollArea;
+    auto *scrollArea = new QScrollArea;
     scrollArea->setWidget(scrollWidget);
     scrollArea->setWidgetResizable(true);
     
     // Main layout
-    QVBoxLayout *layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     setLayout(layout);
     layout->addWidget(scrollArea);
     // layout->setAlignment(Qt::AlignTop);
@@ -97,7 +97,7 @@ void SidebarWidget::fillTableInfo(const lt::ModelTable* mod)
         tableWidth_->setText("N/A");
         tableHeight_->setText("N/A");
         tableRange_->setText("N/A");
-        tableDescription_->setPlainText("No table selected");
+        tableDescription_->setText("No table selected");
         tableUnit_->setText("N/A");
         tableDataType_->setText("N/A");
         return;
@@ -110,7 +110,7 @@ void SidebarWidget::fillTableInfo(const lt::ModelTable* mod)
     tableWidth_->setText(QString::number(table->width));
     tableHeight_->setText(QString::number(table->height));
     tableRange_->setText(QString("%1 - %2").arg(table->minimum).arg(table->maximum));
-    tableDescription_->setPlainText(QString::fromStdString(table->description));
+    tableDescription_->setText(QString::fromStdString(table->description));
 }
 
 

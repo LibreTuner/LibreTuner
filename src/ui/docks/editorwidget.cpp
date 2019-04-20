@@ -11,6 +11,21 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
+#include <QStyledItemDelegate>
+#include <QPainter>
+
+class TableDelegate : public QStyledItemDelegate {
+public:
+    explicit TableDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QVariant background = index.data(Qt::BackgroundColorRole);
+        if (background.isValid()) {
+            painter->fillRect(option.rect, background.value<QColor>());
+        }
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+};
 
 EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent)
 {
@@ -33,6 +48,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent)
     view_->horizontalHeader()->setMinimumSectionSize(70);
     view_->horizontalHeader()->setStretchLastSection(true);
 
+    view_->setItemDelegate(new TableDelegate);
+
 
     labelY_ = new VerticalLabel("Y-Axis");
     labelY_->setAlignment(Qt::AlignCenter);
@@ -41,6 +58,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent)
 
     layout->addLayout(hLayout);
     setLayout(layout);
+
+    //setStyleSheet("QTableView::item { border: 0; }");
 }
 
 

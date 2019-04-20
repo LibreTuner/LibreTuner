@@ -8,7 +8,7 @@ namespace lt {
 struct ModelTable;
 }
 
-class QPlainTextEdit;
+class QLabel;
 class QLineEdit;
 class QToolButton;
 
@@ -27,7 +27,7 @@ private:
     QToolButton *tableInfoButton_;
     QWidget *tableInfo_;
     
-    QPlainTextEdit *tableDescription_;
+    QLabel *tableDescription_;
     
     QLineEdit *tableName_;
     QLineEdit *tableOffset_;
