@@ -34,10 +34,10 @@ T swap(T t) {
 template<typename T, Endianness from, Endianness to>
 T convert(T t) {
     if constexpr (from == to) {
-        return;
+        return t;
     }
 
-    swap(t);
+    return swap(t);
 }
 
 // Converts from native format to big endian
