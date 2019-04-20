@@ -77,8 +77,9 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
     currentDatalink_ = links_.getFirst();
     currentPlatform_ = definitions_.first();
 
-    setWindowIcon(QIcon(":/icons/LibreTuner.png"));
+    setWindowIcon(QIcon(":/icons/libretuner_transparent.png"));
 
+#ifdef WIN32
     {
         QFile f(":qdarkstyle/style.qss");
         if (f.exists()) {
@@ -87,6 +88,7 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
             setStyleSheet(ts.readAll());
         }
     }
+#endif
 
     TimerRunLoop::get().startWorker();
     mainWindow_ = new MainWindow;
