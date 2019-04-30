@@ -1,11 +1,13 @@
 #include "hexeditwidget.h"
 
 #include <QHBoxLayout>
+#include <QByteArray>
+#include <QIODevice>
 
 HexEditWidget::HexEditWidget(QWidget *parent) : QWidget(parent) {
     buffer_ = new RomHexBuffer;
 
-    auto *document = new QHexDocument(buffer_);
+    /*auto *document = new QHexDocument(buffer_);
     auto *hexView = new QHexView;
     hexView->setDocument(document);
 
@@ -14,7 +16,7 @@ HexEditWidget::HexEditWidget(QWidget *parent) : QWidget(parent) {
 
     layout->addWidget(hexView);
 
-    setLayout(layout);
+    setLayout(layout);*/
 }
 
 int RomHexBuffer::length() const {
