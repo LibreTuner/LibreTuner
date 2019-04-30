@@ -28,14 +28,5 @@
 int main(int argc, char *argv[]) {
     LibreTuner app(argc, argv);
 
-    std::vector<char> into;
-    lt::Serializer<lt::VectorSink<std::vector<char>>> serializer(into);
-
-    std::vector<char> test = {1, 2, 3, 4, 5};
-
-    serializer.serialize(test);
-
-    std::cout << std::accumulate(std::next(into.begin()), into.end(), std::to_string(into[0]), [](std::string s, int n) { return std::move(s) + ' ' + std::to_string(n); }) << std::endl;
-    
     return LibreTuner::exec();
 }
