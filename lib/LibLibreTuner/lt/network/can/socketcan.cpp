@@ -106,7 +106,7 @@ SocketCan::SocketCan(const std::string &ifname) : socket_(PF_CAN, SOCK_RAW, CAN_
     socket_.bind(reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     
     // Set timeout to 1s
-    timeval tv;
+    timeval tv = {0};
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     socket_.setsockopt(SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));

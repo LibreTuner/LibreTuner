@@ -16,19 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
 #include "checksum.h"
 #include "support/util.hpp"
 
 namespace lt {
 
-void Checksum::addModifiable(uint32_t offset, uint32_t size) {
+void Checksum::addModifiable(int offset, int size) {
     modifiable_.emplace_back(offset, size);
 }
 
-Checksum::~Checksum() {}
+Checksum::~Checksum() = default;
 
-uint32_t ChecksumBasic::compute(const uint8_t *data, size_t size,
+uint32_t ChecksumBasic::compute(const uint8_t *data, int size,
                                 bool *ok) const {
+    assert(size >= 0);
     if (size < offset_ + size_) {
         if (ok != nullptr) {
             *ok = false;
@@ -51,13 +54,14 @@ uint32_t ChecksumBasic::compute(const uint8_t *data, size_t size,
     return sum;
 }
 
-void ChecksumBasic::correct(uint8_t *data, size_t size) const {
+void ChecksumBasic::correct(uint8_t *data, int size) const {
+    assert(size >= 0);
     if (size < offset_ + size_) {
         throw std::runtime_error("checksum region exceeds the rom size.");
     }
 
     bool foundMod = false;
-    uint32_t modifiableOffset;
+    int modifiableOffset{0};
 
     // Find a usable modifiable region
     for (const auto &it : modifiable_) {
@@ -73,16 +77,16 @@ void ChecksumBasic::correct(uint8_t *data, size_t size) const {
     }
 
     // Zero the region
-    writeBE<int32_t>(0, data + offset_ + modifiableOffset, data + size);
+    writeBE<int32_t>(0, &data[offset_ + modifiableOffset], data + size);
 
     // compute should never fail after the check above
-    uint32_t oSum = compute(data, size);
+    uint32_t oSum = compute(data, size, nullptr);
 
     uint32_t val = target_ - oSum;
-    writeBE<int32_t>(val, data + offset_ + modifiableOffset, data + size);
+    writeBE<int32_t>(val, &data[offset_ + modifiableOffset], data + size);
 
     // Check if the correction was successful
-    if (compute(data, size) != target_) {
+    if (compute(data, size, nullptr) != target_) {
         throw std::runtime_error(
             "checksum does not equal target after correction");
     }

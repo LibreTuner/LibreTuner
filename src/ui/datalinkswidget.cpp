@@ -78,7 +78,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         LT()->saveLinks();
     });
     
-    connect(linksView_, &QTreeView::activated, [this](const QModelIndex &index) {
+    connect(linksView_, &QTreeView::activated, [this](const QModelIndex &/*index*/) {
         linkChanged(currentLink());
     });
 

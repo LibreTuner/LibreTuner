@@ -43,7 +43,7 @@ public:
     void setModel(const ModelPtr &model) { model_ = model; }
 
     inline const uint8_t *data() const noexcept { return data_.data(); }
-    inline std::size_t size() const noexcept { return data_.size(); }
+    inline int size() const noexcept { return static_cast<int>(data_.size()); }
 
     // Sets the ROM data
     void setData(std::vector<uint8_t> &&data) { data_ = std::move(data); }

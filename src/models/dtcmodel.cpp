@@ -3,10 +3,13 @@
 #include "libretuner.h"
 
 int DtcModel::rowCount(const QModelIndex &parent) const {
+    if (!parent.isValid()) {
+        return 0;
+    }
     return codes_.size();
 }
 
-int DtcModel::columnCount(const QModelIndex &parent) const { return 2; }
+int DtcModel::columnCount(const QModelIndex &/*parent*/) const { return 2; }
 
 QVariant DtcModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole || !index.isValid() || index.column() < 0 ||
@@ -14,7 +17,7 @@ QVariant DtcModel::data(const QModelIndex &index, int role) const {
         return QVariant();
     }
 
-    if (index.row() >= codes_.size() || index.row() < 0) {
+    if (index.row() >= static_cast<int>(codes_.size()) || index.row() < 0) {
         return QVariant();
     }
 
@@ -46,6 +49,8 @@ QVariant DtcModel::headerData(int section, Qt::Orientation orientation,
         return tr("Code");
     case 1:
         return tr("Description");
+    default:
+        break;
     }
     return QVariant();
 }

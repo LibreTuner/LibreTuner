@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef LT_ROM_TABLE_H
 #define LT_ROM_TABLE_H
 
@@ -36,11 +38,11 @@ private:
 template <typename DataType>
 template <typename InputIt>
 MemoryAxis<DataType>::MemoryAxis(std::string name, InputIt begin, InputIt end)
-    : data_(begin, end), name_(name) {}
+    : data_(begin, end), name_(std::move(name)) {}
 
 template <typename DataType>
 double MemoryAxis<DataType>::label(int index) const {
-    if (index < 0 || index >= data_.size()) {
+    if (index < 0 || static_cast<std::size_t>(index) >= data_.size()) {
         return 0;
     }
 
@@ -178,7 +180,9 @@ template <typename EntryType,
 class BasicTable {
 public:
     template <typename T>
-    void initialize(std::size_t width, std::size_t height) {
+    void initialize(int width, int height) {
+        assert(width >= 0);
+        assert(height > 0);
         entries_ = TableStorage::create<T>(width * height);
         width_ = width;
     }
@@ -197,11 +201,11 @@ public:
 		}
     }
 
-    inline std::size_t width() const noexcept { return width_; }
-    inline std::size_t height() const noexcept {
+    inline int width() const noexcept { return width_; }
+    inline int height() const noexcept {
         return entries_.size() / width_;
     }
-    inline std::size_t size() const noexcept { return entries_.size(); }
+    inline int size() const noexcept { return static_cast<int>(entries_.size()); }
 
     template <typename T = EntryType, typename Iter>
     Iter serialize(Iter begin, Iter end) const {
@@ -257,7 +261,7 @@ public:
 
 private:
     TableStorage entries_;
-    std::size_t width_{0}; // row width
+    int width_{0}; // row width
     double scale_{1.0};
 
     TableBounds<EntryType> bounds_;

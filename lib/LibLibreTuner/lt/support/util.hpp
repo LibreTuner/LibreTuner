@@ -19,6 +19,7 @@
 #ifndef LT_UTIL_H
 #define LT_UTIL_H
 
+#include <cassert>
 #include <cstdint>
 #include <iterator>
 #include <utility>
@@ -141,7 +142,13 @@ public:
 
 template <typename T, class InputIt>
 static T readBE(InputIt begin, InputIt end) {
-    if (std::distance(begin, end) < sizeof(T)) {
+    static_assert(sizeof(*std::declval<InputIt>()) == 1,
+                  "Output iterator must be byte iterator");
+
+    auto const max = std::distance(begin, end);
+    assert(max >= 0);
+
+    if (static_cast<std::size_t>(max) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
     return SConverter<T, sizeof(T)>::readBE(std::forward<InputIt>(begin));
@@ -149,7 +156,13 @@ static T readBE(InputIt begin, InputIt end) {
 
 template <typename T, class InputIt>
 static T readLE(InputIt begin, InputIt end) {
-    if (std::distance(begin, end) < sizeof(T)) {
+    static_assert(sizeof(*std::declval<InputIt>()) == 1,
+                  "Output iterator must be byte iterator");
+
+    auto const max = std::distance(begin, end);
+    assert(max >= 0);
+
+    if (static_cast<std::size_t>(max) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
     return SConverter<T, sizeof(T)>::readLE(std::forward<InputIt>(begin));
@@ -172,7 +185,13 @@ static void readLE(InputIt begin, InputIt end, OutputIt out) {
 
 template <typename T, class OutputIt>
 static void writeBE(T t, OutputIt begin, OutputIt end) {
-    if (std::distance(begin, end) < sizeof(T)) {
+    static_assert(sizeof(*std::declval<OutputIt>()) == 1,
+                  "Output iterator must be byte iterator");
+
+    auto const max = std::distance(begin, end);
+    assert(max >= 0);
+
+    if (static_cast<std::size_t>(max) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
     return SConverter<T, sizeof(T)>::writeBE(t, std::forward<OutputIt>(begin));
@@ -180,7 +199,13 @@ static void writeBE(T t, OutputIt begin, OutputIt end) {
 
 template <typename T, class OutputIt>
 static void writeLE(T t, OutputIt begin, OutputIt end) {
-    if (std::distance(begin, end) < sizeof(T)) {
+    static_assert(sizeof(*std::declval<OutputIt>()) == 1,
+                  "Output iterator must be byte iterator");
+
+    auto const max = std::distance(begin, end);
+    assert(max >= 0);
+
+    if (static_cast<std::size_t>(max) < sizeof(T)) {
         throw std::length_error("size of data is less than size of type");
     }
     return SConverter<T, sizeof(T)>::writeLE(t, std::forward<OutputIt>(begin));

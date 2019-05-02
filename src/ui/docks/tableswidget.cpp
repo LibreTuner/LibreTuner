@@ -16,7 +16,7 @@ TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 
     connect(view_, &QTreeWidget::itemActivated,
-            [this](const QTreeWidgetItem *item, int column) {
+            [this](const QTreeWidgetItem *item, int /*column*/) {
                 emit activated(item->data(0, Qt::UserRole)
                                    .value<const lt::ModelTable *>());
             });

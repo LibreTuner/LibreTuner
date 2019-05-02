@@ -28,28 +28,28 @@ namespace lt {
 
 class Checksum {
 public:
-    Checksum(uint32_t offset, uint32_t size, uint32_t target)
+    Checksum(int offset, int size, uint32_t target)
         : offset_(offset), size_(size), target_(target) {}
 
     /* Adds a region modifiable for checksum computation */
-    void addModifiable(uint32_t offset, uint32_t size);
+    void addModifiable(int offset, int size);
 
     /* Corrects the checksum for the data using modifiable sections. */
-    virtual void correct(uint8_t *data, size_t size) const = 0;
+    virtual void correct(uint8_t *data, int size) const = 0;
 
     /* Returns the computed checksum. If length is too small,
      * returns 0 and sets ok to false.*/
-    virtual uint32_t compute(const uint8_t *data, size_t size,
+    virtual uint32_t compute(const uint8_t *data, int size,
                              bool *ok = nullptr) const = 0;
 
 	virtual ~Checksum();
 
 protected:
-    uint32_t offset_;
-    uint32_t size_;
+    int offset_;
+    int size_;
     uint32_t target_;
 
-    std::vector<std::pair<uint32_t, uint32_t>> modifiable_;
+    std::vector<std::pair<int, int>> modifiable_;
 };
 using ChecksumPtr = std::unique_ptr<Checksum>;
 
@@ -59,10 +59,10 @@ public:
     ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
         : Checksum(offset, size, target) {}
 
-    uint32_t compute(const uint8_t *data, size_t size,
-                     bool *ok = nullptr) const override;
+    uint32_t compute(const uint8_t *data, int size,
+                     bool *ok) const override;
 
-    void correct(uint8_t *data, size_t size) const override;
+    void correct(uint8_t *data, int size) const override;
 };
 
 /**

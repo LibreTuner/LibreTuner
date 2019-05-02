@@ -465,7 +465,7 @@ void MainWindow::setupStatusBar() {
     auto *comboPlatform = new QComboBox;
     comboPlatform->setModel(&LT()->definitions());
     connect(comboPlatform, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [comboPlatform](int index) {
+            [comboPlatform](int) {
                 QVariant var = comboPlatform->currentData(Qt::UserRole);
                 if (!var.canConvert<lt::PlatformPtr>()) {
                     return;
@@ -477,7 +477,7 @@ void MainWindow::setupStatusBar() {
     comboDatalink_->setModel(&linksList_);
 
     connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        [this](int index) {
+        [this](int) {
             QVariant var = comboDatalink_->currentData(Qt::UserRole);
             if (!var.canConvert<lt::DataLink*>()) {
                 return;

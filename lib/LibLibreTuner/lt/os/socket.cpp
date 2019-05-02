@@ -7,8 +7,7 @@
 
 #include <unistd.h>
 
-namespace lt {
-namespace os {
+namespace lt::os {
 
 static inline void throwErrno() { throw std::runtime_error(strerror(errno)); }
 
@@ -38,13 +37,13 @@ void Socket::bind(const Address_t *address, SocketLen_t address_len) {
     }
 }
 
-ssize_t Socket::recvNoExcept(void *buffer, std::size_t length,
+ssize_t Socket::recvNoExcept(void *buffer, int length,
                              int flags) noexcept {
     assert(valid());
     return ::recv(socket_, buffer, length, flags);
 }
 
-std::size_t Socket::recv(void *buffer, std::size_t length, int flags) {
+std::size_t Socket::recv(void *buffer, int length, int flags) {
     assert(valid());
     ssize_t ret = ::recv(socket_, buffer, length, flags);
     if (ret == -1) {
@@ -56,13 +55,13 @@ std::size_t Socket::recv(void *buffer, std::size_t length, int flags) {
     return ret;
 }
 
-ssize_t Socket::sendNoExcept(void *buffer, std::size_t length,
+ssize_t Socket::sendNoExcept(void *buffer, int length,
                              int flags) noexcept {
     assert(valid());
     return ::send(socket_, buffer, length, flags);
 }
 
-void Socket::send(void *buffer, std::size_t length, int flags) {
+void Socket::send(void *buffer, int length, int flags) {
     assert(valid());
     ssize_t ret = ::send(socket_, buffer, length, flags);
     if (ret == -1) {
@@ -83,7 +82,6 @@ void Socket::setsockopt(int level, int option_name, const void *option_value,
     }
 }
 
-} // namespace os
 } // namespace lt
 
 #endif

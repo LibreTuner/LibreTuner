@@ -74,7 +74,7 @@ private:
 
 struct TableInitializer {
 	Table &table;
-	std::size_t width, height;
+	int width, height;
 
 	template<typename T>
 	void operator()() {

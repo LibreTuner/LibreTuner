@@ -2,6 +2,7 @@
 #define LT_TABLEDEF_H
 
 #include <string>
+#include <variant>
 #include "../support/types.h"
 
 namespace lt {
@@ -11,20 +12,21 @@ enum class AxisType {
 	Memory,
 };
 
+struct LinearAxisDefinition {
+    double start;
+    double increment;
+};
+
+struct MemoryAxisDefinition {
+    int size;
+};
+
 struct AxisDefinition {
 	std::string name;
 	std::string id;
-	AxisType type;
 	DataType dataType;
-	union {
-		struct {
-			double start;
-			double increment;
-		};
-		struct {
-			std::size_t size;
-		};
-	};
+
+	std::variant<LinearAxisDefinition, MemoryAxisDefinition> def;
 };
 
 struct TableDefinition {
@@ -34,15 +36,15 @@ struct TableDefinition {
 	std::string category;
 	DataType dataType;
 	DataType storedDataType;
-	std::size_t width{1};
-	std::size_t height{1};
+	int width{1};
+	int height{1};
 	double maximum;
 	double minimum;
 	double scale = 1.0;
 	std::string axisX;
 	std::string axisY;
 
-	inline std::size_t byteSize() const noexcept {
+	inline int byteSize() const noexcept {
 		return dataTypeSize(storedDataType) * width * height;
 	}
 };

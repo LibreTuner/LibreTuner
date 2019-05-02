@@ -19,7 +19,7 @@ public:
     Links() = default;
     Links(const Links&) = delete;
     Links &operator=(const Links&) = delete;
-    Links(Links &&database);
+    Links(Links &&database) noexcept;
     
     // Attempts to save link information to file
     void save() const;
@@ -35,24 +35,24 @@ public:
 
     // Get link at index. Detected links are indexed first.
     // Returns nullptr if the index is out of bounds
-    lt::DataLink *get(std::size_t index) const;
+    lt::DataLink *get(int index) const;
     
     // Returns total amount of detected links
-    inline std::size_t detectedCount() const { return detectedLinks_.size(); }
+    inline int detectedCount() const { return detectedLinks_.size(); }
     
     // Returns total amount of manual links
-    inline std::size_t manualCount() const { return manualLinks_.size(); }
+    inline int manualCount() const { return manualLinks_.size(); }
     
     // Returns the total amount of links
-    inline std::size_t count() const { return detectedCount() + manualCount(); }
+    inline int count() const { return detectedCount() + manualCount(); }
     
     // Gets manual link at index.
     // Returns nullptr if the index is out of bounds
-    lt::DataLink *getManual(std::size_t index) const;
+    lt::DataLink *getManual(int index) const;
     
     // Get detected link at index.
     // Returns nullptr if the index is out of bounds
-    lt::DataLink *getDetected(std::size_t index) const;
+    lt::DataLink *getDetected(int index) const;
     
     // Returns the first datalink
     lt::DataLink *getFirst() const;

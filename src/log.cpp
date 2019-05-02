@@ -61,7 +61,7 @@ QVariant Log::data(const QModelIndex &index, int role) const {
         return QVariant();
     }
 
-    if (index.row() >= entries_.size() || index.row() < 0) {
+    if (index.row() < 0 || static_cast<std::size_t>(index.row()) >= entries_.size()) {
         return QVariant();
     }
 

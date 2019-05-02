@@ -114,27 +114,27 @@ void Links::add(lt::DataLinkPtr &&link) {
     endInsertRows();
 }
 
-lt::DataLink *Links::get(std::size_t index) const {
+lt::DataLink *Links::get(int index) const {
     if (index < 0 || index >= count()) {
         return nullptr;
     }
 
-    if (index < detectedLinks_.size()) {
+    if (static_cast<std::size_t>(index) < detectedLinks_.size()) {
         return detectedLinks_[index].get();
     }
     return manualLinks_[index - detectedLinks_.size()].get();
 }
 
-lt::DataLink *Links::getDetected(std::size_t index) const {
-    if (index >= detectedCount()) {
+lt::DataLink *Links::getDetected(int index) const {
+    if (index < 0 || index >= detectedCount()) {
         return nullptr;
     }
 
     return detectedLinks_[index].get();
 }
 
-lt::DataLink *Links::getManual(std::size_t index) const {
-    if (index >= manualCount()) {
+lt::DataLink *Links::getManual(int index) const {
+    if (index < 0 || index >= manualCount()) {
         return nullptr;
     }
 
@@ -147,7 +147,7 @@ void Links::remove(lt::DataLink *link) {
     beginResetModel();
     manualLinks_.erase(
         std::remove_if(manualLinks_.begin(), manualLinks_.end(),
-                       [link](const lt::DataLinkPtr &l) { return l.get() == link; }));
+                       [link](const lt::DataLinkPtr &l) { return l.get() == link; }), manualLinks_.end());
     endResetModel();
 }
 
@@ -233,12 +233,12 @@ QVariant Links::data(const QModelIndex &index, int role) const
     int parentRow = index.internalId() - 1;
     if (parentRow == 0) {
         // Auto-detected
-        if (index.row() >= detectedLinks_.size()) {
+        if (index.row() >= detectedCount()) {
             return QVariant();
         }
         link = detectedLinks_[index.row()].get();
     } else if (parentRow == 1) {
-        if (index.row() >= manualLinks_.size()) {
+        if (index.row() >= manualCount()) {
             return QVariant();
         }
         link = manualLinks_[index.row()].get();
@@ -256,6 +256,8 @@ QVariant Links::data(const QModelIndex &index, int role) const
         break;
     case Qt::UserRole:
         return QVariant::fromValue(link);
+    default:
+        break;
     }
     return QVariant();
 }
@@ -274,11 +276,11 @@ QVariant Links::headerData(int section, Qt::Orientation orientation, int role) c
     return QVariant();
 }
 
-Links::Links(Links &&database)
+Links::Links(Links &&database) noexcept
     : manualLinks_{std::move(database.manualLinks_)},
       detectedLinks_{std::move(database.detectedLinks_)} {}
 
-int LinksListModel::rowCount(const QModelIndex &parent) const
+int LinksListModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return links_.count();
 }

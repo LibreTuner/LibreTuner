@@ -70,7 +70,7 @@ void SessionScannerDialog::scan()
         buttonStart_->setText(tr("Scanning"));
         lt::SessionScanner scanner;
         // Initialize callbacks
-        scanner.setProgressCallback([](float progress) {
+        scanner.setProgressCallback([](float /*progress*/) {
             // Stub
         });
 

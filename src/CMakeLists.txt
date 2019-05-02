@@ -41,8 +41,6 @@ set(libretuner_SRC
     ui/verticallabel.h
     ui/titlebar.cpp
     ui/titlebar.h
-    ui/styledwindow.cpp
-    ui/styledwindow.h
     ui/backgroundtask.cpp
     ui/backgroundtask.h
     ui/qcustomplot.cpp
@@ -153,7 +151,7 @@ endif (WIN32)
 if(MSVC)
   target_compile_options(LibreTuner PRIVATE /W4)
 else()
-  target_compile_options(LibreTuner PRIVATE -Wall -Wextra -pedantic)
+  target_compile_options(LibreTuner PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-missing-braces)
 endif()
 
 

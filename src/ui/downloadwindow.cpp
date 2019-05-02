@@ -104,7 +104,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
 }
 
 
-void DownloadWindow::platformChanged(int index)
+void DownloadWindow::platformChanged(int /*index*/)
 {
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
     if (!var.canConvert<const lt::PlatformPtr&>()) {
@@ -193,7 +193,7 @@ void DownloadWindow::download()
 
 
 
-void DownloadWindow::closeEvent(QCloseEvent* event)
+void DownloadWindow::closeEvent(QCloseEvent* /*event*/)
 {
 }
 

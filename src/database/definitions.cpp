@@ -174,15 +174,6 @@ lt::AxisDefinition loadAxis(const YAML::Node &axis) {
 
     definition.name = axis["name"].as<std::string>();
     definition.id = axis["id"].as<std::string>();
-    definition.type = [&](const std::string &type) -> lt::AxisType {
-        if (type == "linear") {
-            return lt::AxisType::Linear;
-        }
-        if (type == "memory") {
-            return lt::AxisType::Memory;
-        }
-        throw std::runtime_error("invalid axis type");
-    }(axis["type"].as<std::string>());
 
     definition.dataType = [&](const std::string &type) {
         if (type == "float") {
@@ -210,14 +201,30 @@ lt::AxisDefinition loadAxis(const YAML::Node &axis) {
         throw std::runtime_error("invalid datatype");
     }(axis["datatype"].as<std::string>());
 
-    switch (definition.type) {
-    case lt::AxisType::Linear:
-        definition.start = axis["minimum"].as<double>();
-        definition.increment = axis["increment"].as<double>();
-        break;
-    case lt::AxisType::Memory:
-        definition.size = axis["size"].as<std::size_t>();
-        break;
+    auto type = [&](const std::string &type) -> lt::AxisType {
+        if (type == "linear") {
+            return lt::AxisType::Linear;
+        }
+        if (type == "memory") {
+            return lt::AxisType::Memory;
+        }
+        throw std::runtime_error("invalid axis type");
+    }(axis["type"].as<std::string>());
+
+    switch (type) {
+        case lt::AxisType::Linear: {
+            lt::LinearAxisDefinition linear{0};
+            linear.start = axis["minimum"].as<double>();
+            linear.increment = axis["increment"].as<double>();
+            definition.def.emplace<lt::LinearAxisDefinition>(linear);
+            break;
+        }
+        case lt::AxisType::Memory: {
+            lt::MemoryAxisDefinition memory = {0};
+            memory.size = axis["size"].as<std::size_t>();
+            definition.def.emplace<lt::MemoryAxisDefinition>(memory);
+            break;
+        }
     }
     return definition;
 }
@@ -416,7 +423,7 @@ int Definitions::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int Definitions::columnCount(const QModelIndex &parent) const { return 1; }
+int Definitions::columnCount(const QModelIndex &/*parent*/) const { return 1; }
 
 QVariant Definitions::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.column() != 0 ||
@@ -459,7 +466,7 @@ QVariant Definitions::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QVariant Definitions::headerData(int section, Qt::Orientation orientation,
-                                 int role) const {
+QVariant Definitions::headerData(int /*section*/, Qt::Orientation /*orientation*/,
+                                 int /*role*/) const {
     return QVariant();
 }

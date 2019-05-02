@@ -147,6 +147,12 @@ struct ADS {
     lt::TableAxisPtr axis;
 };
 
+
+
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+
 TableAxisPtr Tune::getAxis(const std::string &id, bool create) {
     auto it = axes_.find(id);
     if (it != axes_.end()) {
@@ -162,36 +168,34 @@ TableAxisPtr Tune::getAxis(const std::string &id, bool create) {
         return TableAxisPtr();
     }
 
-    switch (def->type) {
-    case lt::AxisType::Linear: {
-        auto axis = std::make_shared<lt::LinearAxis<double>>(
-            def->name, def->start, def->increment);
-        axes_.emplace(id, axis);
-        return axis;
-    }
-    case lt::AxisType::Memory: {
-        std::size_t offset = base_->model()->getAxisOffset(id);
-        std::size_t size = def->size;
+    auto axis = std::visit(overloaded {
+        [this, def](LinearAxisDefinition linear) {
+            return std::static_pointer_cast<TableAxis>(std::make_shared<LinearAxis<double>>(
+                    def->name, linear.start, linear.increment));
+        },
+        [this, def](MemoryAxisDefinition memory) {
+            int offset = base_->model()->getAxisOffset(def->id);
+            int size = memory.size;
 
-        if (offset + size * dataTypeSize(def->dataType) > base_->size()) {
-            throw std::runtime_error("axis exceeds rom size (rom size: " +
-                                     std::to_string(base_->size()) +
-                                     ", axis ends at " +
-                                     std::to_string(offset + size) + ")");
+            if (offset + size * static_cast<int>(dataTypeSize(def->dataType)) > base_->size()) {
+                throw std::runtime_error("axis exceeds rom size (rom size: " +
+                                         std::to_string(base_->size()) +
+                                         ", axis ends at " +
+                                         std::to_string(offset + size) + ")");
+            }
+
+            ADS ads;
+            ads.data = base_->data() + offset;
+            ads.size = size;
+            ads.name = def->name;
+
+            datatypeToType(def->dataType, ads);
+            return std::static_pointer_cast<TableAxis>(ads.axis);
         }
+    }, def->def);
 
-        ADS ads;
-        ads.data = base_->data() + offset;
-        ads.size = size;
-        ads.name = def->name;
-
-        datatypeToType(def->dataType, ads);
-        axes_.emplace(id, ads.axis);
-        return ads.axis;
-    }
-    }
-
-    return TableAxisPtr();
+    axes_.emplace(id, axis);
+    return axis;
 }
 
 } // namespace lt

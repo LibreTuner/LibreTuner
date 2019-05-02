@@ -105,3 +105,10 @@ add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Set warnings
+if(MSVC)
+	target_compile_options(LibLibreTuner PRIVATE /W4)
+else()
+	target_compile_options(LibLibreTuner PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-missing-braces)
+endif()

@@ -94,7 +94,7 @@ QModelIndex Roms::index(int row, int column, const QModelIndex &parent) const {
     return createIndex(row, column);
 }
 
-QModelIndex Roms::parent(const QModelIndex &child) const {
+QModelIndex Roms::parent(const QModelIndex &/*child*/) const {
     return QModelIndex();
 }
 
@@ -106,7 +106,7 @@ int Roms::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int Roms::columnCount(const QModelIndex &parent) const { return 4; }
+int Roms::columnCount(const QModelIndex &/*parent*/) const { return 4; }
 
 QVariant Roms::data(const QModelIndex &index, int role) const {
     if (index.parent().isValid()) {

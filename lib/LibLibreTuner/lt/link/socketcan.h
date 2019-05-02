@@ -12,7 +12,7 @@
 namespace lt {
     class SocketCanLink : public DataLink {
     public:
-        SocketCanLink(const std::string &name, const std::string &device);
+        SocketCanLink(const std::string &name, std::string device);
 
         DataLinkType type() const override { return DataLinkType::SocketCan; }
 

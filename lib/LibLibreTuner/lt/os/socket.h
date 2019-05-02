@@ -28,7 +28,7 @@ public:
     // Same as create(domain, type, protocol)
     Socket(int domain, int type, int protocol) { create(domain, type, protocol); }
     // Takes ownership of a socket
-    Socket(Socket_t socket) : socket_{socket}, valid_{true} {}
+    explicit Socket(Socket_t socket) : socket_{socket}, valid_{true} {}
     
     Socket(const Socket&) = delete;
     Socket &operator=(const Socket&) = delete;
@@ -45,12 +45,12 @@ public:
     // Binds an address to the socket. Throws an exception on failure
     void bind(const Address_t *address, SocketLen_t address_len);
     
-    std::size_t recv(void *buffer, std::size_t length, int flags);
-    ssize_t recvNoExcept(void *buffer, std::size_t length, int flags) noexcept;
+    std::size_t recv(void *buffer, int length, int flags);
+    ssize_t recvNoExcept(void *buffer, int length, int flags) noexcept;
     
     // Throws an exception on failure or if less than `length` bytes are sent
-    void send(void *buffer, std::size_t length, int flags);
-    ssize_t sendNoExcept(void *buffer, std::size_t length, int flags) noexcept;
+    void send(void *buffer, int length, int flags);
+    ssize_t sendNoExcept(void *buffer, int length, int flags) noexcept;
     
     void setsockopt(int level, int option_name, const void *option_value, SocketLen_t option_len);
     

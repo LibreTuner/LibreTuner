@@ -14,7 +14,7 @@
 namespace lt {
 class DataLink {
 public:
-    explicit DataLink(const std::string &name);
+    explicit DataLink(std::string name);
     virtual ~DataLink() = default;
 
     virtual DataLinkType type() const = 0;

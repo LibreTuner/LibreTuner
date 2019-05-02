@@ -289,11 +289,8 @@ template <class T> IntermediateWidget<T>::~IntermediateWidget() {
 
 template <class T>
 bool StyledWidget<T>::eventFilter(QObject *object, QEvent *event) {
-    Logger::debug("Got event");
     Logger::debug(std::to_string(static_cast<int>(event->type())));
     if (event->type() == QEvent::Show) {
-        Logger::debug("Show");
-        QShowEvent *showEvent = static_cast<QShowEvent *>(event);
         T::show();
     }
     return false;

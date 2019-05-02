@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <cstring>
+#include <cassert>
 #include <algorithm>
 
 namespace serialize {
@@ -115,7 +116,9 @@ public:
     
     InputBufferAdapter(Buffer &buffer) : pointer_(std::begin(buffer)), end_(std::end(buffer)) {}
     
-    void read(TValue *data, std::size_t size) {
+    void read(TValue *data, int size) {
+        assert(size >= 0);
+        assert(end_ > pointer_);
         if (size <= std::distance(pointer_, end_)) {
             std::copy(pointer_, pointer_ + size, data);
             std::advance(pointer_, size);
@@ -136,7 +139,7 @@ private:
 // String
 template<typename D, class T, class Traits, class Allocator>
 void deserialize(D &d, std::basic_string<T, Traits, Allocator> &string) {
-    uint32_t size;
+    uint32_t size{0};
     d.deserialize(size);
     std::vector<T> data(size);
     d.deserialize(data.data(), size);
@@ -146,7 +149,7 @@ void deserialize(D &d, std::basic_string<T, Traits, Allocator> &string) {
 // Vector
 template<typename D, typename T, class Allocator>
 void deserialize(D &d, std::vector<T, Allocator> &vector) {
-    uint32_t size;
+    uint32_t size{0};
     d.deserialize(size);
     vector.resize(size);
     d.deserialize(vector.data(), size);

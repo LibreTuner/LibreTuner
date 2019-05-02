@@ -27,16 +27,19 @@ int RomHexBuffer::length() const {
     return rom_->size();
 }
 
-void RomHexBuffer::insert(int offset, const QByteArray &data) {
+void RomHexBuffer::insert(int /*offset*/, const QByteArray &/*data*/) {
 
 }
 
-void RomHexBuffer::remove(int offset, int length) {
+void RomHexBuffer::remove(int /*offset*/, int /*length*/) {
 
 }
 
 QByteArray RomHexBuffer::read(int offset, int length) {
     if (!rom_) {
+        return QByteArray();
+    }
+    if (offset < 0) {
         return QByteArray();
     }
     if (offset >= rom_->size()) {
@@ -47,7 +50,7 @@ QByteArray RomHexBuffer::read(int offset, int length) {
     return QByteArray(reinterpret_cast<const char*>(&rom_->data()[offset]), size);
 }
 
-void RomHexBuffer::read(QIODevice *iodevice) {
+void RomHexBuffer::read(QIODevice */*iodevice*/) {
 
 }
 
