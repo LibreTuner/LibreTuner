@@ -302,7 +302,7 @@ void LibreTuner::saveTune(const lt::Tune &tune, const std::filesystem::path &pat
     meta.platformId = tune.base()->model()->platform.id;
 
 
-    for (int i = 0; i < tune.tables().size(); ++i) {
+    for (std::size_t i = 0; i < tune.tables().size(); ++i) {
         const lt::TablePtr &table = tune.tables()[i];
         if (table) {
             TableMeta tableMeta;

@@ -12,7 +12,7 @@ namespace endian {
 namespace detail {
     // https://stackoverflow.com/questions/1583791/constexpr-and-endianness
     constexpr uint32_t test = 0x01020304;
-    constexpr uint8_t magic = static_cast<const uint8_t&>(test);
+    constexpr uint8_t magic = (const uint8_t&)(test);
     constexpr bool isLittle = magic == 0x04;
     constexpr bool isBig = magic == 0x01;
 }

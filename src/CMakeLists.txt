@@ -149,7 +149,14 @@ if (WIN32)
 endif (WIN32)
 
 
+# Set warnings
+if(MSVC)
+  target_compile_options(LibreTuner PRIVATE /W4)
+else()
+  target_compile_options(LibreTuner PRIVATE -Wall -Wextra -pedantic)
+endif()
+
+
 if (MINGW)
-    message("Detected MINGW")
-    target_link_options(LibreTuner PRIVATE -mwindows)
-endif(MINGW)
+    target_compile_options(LibreTuner PRIVATE -mwindows)
+endif()

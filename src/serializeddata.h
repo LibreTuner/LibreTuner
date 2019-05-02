@@ -83,7 +83,7 @@ public:
     }
     
     void write(const TValue *data, std::size_t size) {
-        const auto remaining = std::distance(pointer_, end_);
+        const std::size_t remaining = std::distance(pointer_, end_);
         if (remaining < size) {
             // Store current position
             const auto pos = std::distance(std::begin(*buffer_), pointer_);
@@ -94,7 +94,7 @@ public:
         }
         
         std::copy(data, data + size, pointer_);
-        pointer_ += size;
+        std::advance(pointer_, size);
     }
     
 private:
@@ -118,7 +118,7 @@ public:
     void read(TValue *data, std::size_t size) {
         if (size <= std::distance(pointer_, end_)) {
             std::copy(pointer_, pointer_ + size, data);
-            pointer_ += size;
+            std::advance(pointer_, size);
             return;
         }
         throw std::runtime_error("end of buffer");
