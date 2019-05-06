@@ -20,6 +20,7 @@
 #ifdef WITH_J2534
 
 #include "j2534.h"
+#include "../libretuner.h"
 
 #include <cassert>
 #include <sstream>
@@ -36,6 +37,9 @@ DevicePtr J2534::open(const char *port) {
 
     uint32_t deviceId = 0;
     long res;
+    std::stringstream ss;
+    ss << "PassThruOpen(" << reinterpret_cast<std::size_t>(reinterpret_cast<const void *>(port)) << ")";
+    lt::log(ss.str());
     if ((res = PassThruOpen(
              const_cast<void *>(reinterpret_cast<const void *>(port)),
              &deviceId)) != 0) {
@@ -64,6 +68,7 @@ uint32_t J2534::connect(uint32_t device, Protocol protocol, uint32_t flags,
 
     long res;
     uint32_t channel;
+    lt::log("PassThruConnect(" + std::to_string(device) + ", " + std::to_string(static_cast<uint32_t>(protocol)) + ", " + std::to_string(flags) + ", " + std::to_string(baudrate) + ")");
     if ((res = PassThruConnect(device, static_cast<uint32_t>(protocol), flags,
                                baudrate, &channel)) != 0) {
         throw Error(lastError());

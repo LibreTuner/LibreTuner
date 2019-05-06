@@ -80,6 +80,9 @@ set(libretuner_SRC
     ui/docks/graphwidget.h
     ui/docks/hexeditwidget.cpp
     ui/docks/hexeditwidget.h
+
+    ui/windows/definitionswindow.cpp
+    ui/windows/definitionswindow.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h

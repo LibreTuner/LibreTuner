@@ -454,7 +454,8 @@ QVariant Definitions::data(const QModelIndex &index, int role) const {
     const lt::PlatformPtr &platform = platforms_[platformId];
 
     std::size_t modelId = index.row();
-    if (modelId >= platform->models.size()) {
+
+    if (modelId < platform->models.size()) {
         const lt::ModelPtr &model = platform->models[modelId];
         if (role == Qt::DisplayRole) {
             return QString::fromStdString(model->name);

@@ -4,8 +4,7 @@
 
 #include <atomic>
 
-namespace lt {
-namespace download {
+namespace lt::download {
 
 // Downloads using ReadMemoryByAddress (UDS SID 23)
 class RMADownloader : public Downloader {
@@ -35,5 +34,4 @@ class RMADownloader : public Downloader {
     bool update_progress();
 };
 
-} // namespace download
 } // namespace lt

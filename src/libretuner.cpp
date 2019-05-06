@@ -21,6 +21,8 @@
 #include "timerrunloop.h"
 #include "ui/styledwindow.h"
 
+#include "lt/libretuner.h"
+
 #include <QDir>
 #include <QMessageBox>
 #include <QStandardPaths>
@@ -49,6 +51,11 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
 
     setOrganizationDomain("libretuner.org");
     setApplicationName("LibreTuner");
+
+    // Setup LT context
+    lt::setLogCallback([](const std::string &message) {
+        Logger::debug(message);
+    });
 
     // intolib rewrite
 
