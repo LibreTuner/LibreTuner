@@ -22,7 +22,17 @@ void serialize(S &s, const std::vector<T, Allocator> &vec) {
     s.serialize(vec.data(), vec.size());
 }
 
-template<typename Sink, Endianness endianness = endian::current>
+
+// Arithmetic type deserialization
+template<typename T, typename D, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+void deserialize(D &d) {
+    T t;
+    d.read(reinterpret_cast<const uint8_t*>(std::addressof(t)), sizeof(T));
+    return endian::convert<T, D::Endian, endian::current>(t);
+}
+
+
+template<typename Sink, Endianness endianness = Endianness::Little>
 class Serializer {
 public:
     static constexpr Endianness Endian = endianness;
@@ -58,8 +68,23 @@ private:
 template<typename Source, Endianness endianness = Endianness::Little>
 class Deserializer {
 public:
+    static constexpr Endianness Endian = endianness;
 
+    template<typename ...Args>
+    Deserializer(Args &&...args) : source(std::forward<Args>(args)...) {}
 
+    template<typename T>
+    inline void deserialize(const T &t) {
+        ::lt::deserialize(*this, t);
+    }
+
+    // Read raw bytes
+    inline void read(uint8_t *d, std::size_t length) {
+        source.read(d, length);
+    }
+
+private:
+    Source source;
 };
 
 

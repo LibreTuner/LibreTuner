@@ -10,7 +10,7 @@ class VectorSink {
 public:
     VectorSink(Vector &vector) : vector_(vector) {}
 
-    void write(const uint8_t *d, std::size_t length) {
+    void write(const uint8_t *d, int length) {
         vector_.insert(vector_.end(), d, d + length);
     }
 private:
