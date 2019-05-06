@@ -22,6 +22,7 @@
 #include <QComboBox>
 #include <QLayout>
 #include <QMainWindow>
+#include <QPointer>
 
 #include <filesystem>
 
@@ -37,6 +38,7 @@ class TablesWidget;
 class TuneData;
 class SidebarWidget;
 class GraphWidget;
+class DefinitionsWindow;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -117,6 +119,8 @@ private:
     TableModel tableModel_;
     
     DatalinksWidget datalinksWindow_;
+
+    QPointer<DefinitionsWindow> definitionsWindow_;
 };
 
 #endif // MAINWINDOW_H

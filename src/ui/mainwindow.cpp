@@ -29,6 +29,8 @@
 #include "docks/editorwidget.h"
 #include "docks/diagnosticswidget.h"
 
+#include "windows/definitionswindow.h"
+
 #include "dataloggerwindow.h"
 #include "createtunedialog.h"
 #include "flasherwindow.h"
@@ -350,30 +352,35 @@ void MainWindow::setupMenu() {
     QMenu *viewMenu = menuBar->addMenu(tr("&View"));
     QMenu *toolsMenu = menuBar->addMenu(tr("&Tools"));
 
-    auto *openTuneAction = new QAction(tr("&Open Tune"), this);
+    // File menu
+    auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
+    auto *openTuneAction = fileMenu->addAction(tr("&Open Tune"));
     openTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
-    fileMenu->addAction(openTuneAction);
+    auto *createTuneAction = fileMenu->addAction(tr("&New Tune"));
 
-    auto *createTuneAction = new QAction(tr("&New Tune"), this);
     createTuneAction->setShortcut(QKeySequence(Qt::CTRL +Qt::Key_N));
-    fileMenu->addAction(createTuneAction);
+    auto *downloadAction = fileMenu->addAction(tr("&Download ROM"));
 
-    auto *downloadAction = new QAction(tr("&Download ROM"), this);
-    fileMenu->addAction(downloadAction);
-
-    saveCurrentAction_ = new QAction(tr("&Save Tune"), this);
+    saveCurrentAction_ = fileMenu->addAction(tr("&Save Tune"));
     saveCurrentAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
     saveCurrentAction_->setEnabled(false);
-    fileMenu->addAction(saveCurrentAction_);
 
-    flashCurrentAction_ = new QAction(tr("Flash Current Tune"), this);
+    flashCurrentAction_ = fileMenu->addAction(tr("Flash Current Tune"));
     flashCurrentAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     flashCurrentAction_->setEnabled(false);
-    fileMenu->addAction(flashCurrentAction_);
 
-    auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
+    // View menu
+    auto *openPlatformsAction = viewMenu->addAction(tr("Platforms"));
+    connect(openPlatformsAction, &QAction::triggered, [this]() {
+        if (!definitionsWindow_) {
+            definitionsWindow_ = new DefinitionsWindow;
+            definitionsWindow_->setDefinitions(&LT()->definitions());
+        }
+        definitionsWindow_->show();
+    });
 
     QMenu *themeMenu = viewMenu->addMenu(tr("Theme"));
+
     auto *resetLayoutAction = viewMenu->addAction(tr("Reset Layout"));
     connect(resetLayoutAction, &QAction::triggered, [this]() {
         hideAllDocks();
@@ -439,7 +446,7 @@ void MainWindow::setupMenu() {
         }, tr("Error opening tune"));
     });
 
-    QAction *logAct = toolsMenu->addAction(tr("&CAN Log"));
+    QAction *logAction = toolsMenu->addAction(tr("&CAN Log"));
     // connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
 
     QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
@@ -452,11 +459,6 @@ void MainWindow::setupMenu() {
         SessionScannerDialog scanner;
         scanner.exec();
     });
-
-    /*auto *setupAction = toolsMenu->addAction(tr("Run &Setup"));
-    connect(setupAction, &QAction::triggered, [this]() {
-       LT()->setup();
-    });*/
 
     setMenuBar(menuBar);
 }
