@@ -9,6 +9,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 find_package(Threads REQUIRED)
 
 add_subdirectory(lib/cparse)
+add_subdirectory(lib/serial)
+
+# Options
+option(BUILD_TESTS "Build tests" ON)
+
+
+if(BUILD_TESTS)
+	add_subdirectory(test)
+endif()
 
 # Sources
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lt)
@@ -20,6 +29,7 @@ set(ROOT_HEADERS
 file(GLOB_RECURSE NETWORK_CAN_HEADERS ${SOURCE_DIR}/network/can/*.h)
 file(GLOB_RECURSE NETWORK_ISOTP_HEADERS ${SOURCE_DIR}/network/isotp/*.h)
 file(GLOB_RECURSE NETWORK_UDS_HEADERS ${SOURCE_DIR}/network/uds/*.h)
+file(GLOB_RECURSE NETWORK_COMMAND_HEADERS ${SOURCE_DIR}/network/command/*.h)
 file(GLOB_RECURSE OS_HEADERS ${SOURCE_DIR}/os/*.h)
 file(GLOB_RECURSE J2534_HEADERS ${SOURCE_DIR}/j2534/*.h)
 file(GLOB_RECURSE DOWNLOAD_HEADERS ${SOURCE_DIR}/download/*.h)
@@ -39,6 +49,7 @@ set(ROOT_SOURCES
 file(GLOB_RECURSE NETWORK_CAN_SOURCES ${SOURCE_DIR}/network/can/*.cpp)
 file(GLOB_RECURSE NETWORK_ISOTP_SOURCES ${SOURCE_DIR}/network/isotp/*.cpp)
 file(GLOB_RECURSE NETWORK_UDS_SOURCES ${SOURCE_DIR}/network/uds/*.cpp)
+file(GLOB_RECURSE NETWORK_COMMAND_SOURCES ${SOURCE_DIR}/network/command/*.cpp)
 file(GLOB_RECURSE OS_SOURCES ${SOURCE_DIR}/os/*.cpp)
 file(GLOB_RECURSE J2534_SOURCES ${SOURCE_DIR}/j2534/*.cpp)
 file(GLOB_RECURSE DOWNLOAD_SOURCES ${SOURCE_DIR}/download/*.cpp)
@@ -57,12 +68,14 @@ file(GLOB_RECURSE SERIALIZE_SOURCES ${SOURCE_DIR}/serialize/*.cpp)
 set(NETWORK_HEADERS
     ${NETWORK_CAN_HEADERS}
     ${NETWORK_ISOTP_HEADERS}
-    ${NETWORK_UDS_HEADERS})
+    ${NETWORK_UDS_HEADERS}
+	${NETWORK_COMMAND_HEADERS})
 
 set(NETWORK_SOURCES
     ${NETWORK_CAN_SOURCES}
     ${NETWORK_ISOTP_SOURCES}
-    ${NETWORK_UDS_SOURCES})
+    ${NETWORK_UDS_SOURCES}
+	${NETWORK_COMMAND_SOURCES})
 
 
 
@@ -102,7 +115,7 @@ set(SOURCES
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 

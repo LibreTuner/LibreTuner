@@ -1,7 +1,6 @@
 #include "isotpuds.h"
 
-namespace lt {
-namespace network {
+namespace lt::network {
 
 UdsPacket IsoTpUds::requestRaw(const UdsPacket &packet) {
     IsoTpPacket isotpPacket;
@@ -22,5 +21,4 @@ UdsPacket IsoTpUds::receiveRaw()
     return UdsPacket(data.data(), data.size());
 }
 
-}
 }

@@ -16,3 +16,6 @@
 [submodule "lib/catch"]
 	path = lib/catch
 	url = https://github.com/catchorg/Catch2.git
+[submodule "lib/LibLibreTuner/lib/serial"]
+	path = lib/LibLibreTuner/lib/serial
+	url = git@github.com:Altenius/SerialPP.git

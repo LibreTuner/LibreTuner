@@ -7,16 +7,12 @@
 #include <chrono>
 #include <vector>
 
-namespace lt {
-namespace network {
+namespace lt::network {
 
-    
 struct IsoTpOptions {
     uint32_t sourceId = 0x7E0, destId = 0x7E8;
     std::chrono::milliseconds timeout{1000};  
 };
-
-
 
 class IsoTpPacket {
 public:
@@ -60,7 +56,7 @@ private:
 
 class IsoTpPacketReader {
 public:
-	IsoTpPacketReader(const IsoTpPacket &packet) : packet_(packet) {};
+	explicit IsoTpPacketReader(const IsoTpPacket &packet) : packet_(packet) {};
 
 	inline std::size_t remaining() const { return packet_.size()  - pointer_; }
 
@@ -76,43 +72,19 @@ private:
 	std::size_t pointer_{ 0 };
 };
 
-// ISO 15765-2 transport layer (ISO-TP) for sending large packets over CAN
 class IsoTp {
 public:
-    // Takes ownership of a CAN interface
-    IsoTp(CanPtr &&can = CanPtr(), IsoTpOptions options = IsoTpOptions());
-    ~IsoTp();
-
-    void recv(IsoTpPacket &result);
+    virtual void recv(IsoTpPacket &result) =0;
 
     // Sends a request and waits for a response
-    void request(const IsoTpPacket &req, IsoTpPacket &result);
+    virtual void request(const IsoTpPacket &req, IsoTpPacket &result) =0;
 
-    void send(const IsoTpPacket &packet);
+    virtual void send(const IsoTpPacket &packet) =0;
 
-    inline void setCan(CanPtr &&can) { can_ = std::move(can); }
-
-    // May return nullptr
-    inline Can *can() { return can_.get(); }
-
-    inline void setOptions(const IsoTpOptions &options) { options_ = options; }
-
-    inline const IsoTpOptions &options() const { return options_; }
-
-	// Receives next CAN message with proper id
-	CanMessage recvNextFrame();
-	CanMessage recvNextFrame(uint8_t expectedType);
-
-private:
-    CanPtr can_;
-    IsoTpOptions options_;
-
-	void sendSingleFrame(const uint8_t *data, std::size_t size);
+    virtual void setOptions(const IsoTpOptions &options) =0;
 };
-
 using IsoTpPtr = std::unique_ptr<IsoTp>;
 
-} // namespace network
 } // namespace lt
 
 #endif // ISOTP_H
