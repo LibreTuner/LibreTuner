@@ -14,6 +14,7 @@
 #endif
 
 #include <QString>
+#include <lt/link/elm.h>
 
 struct LinkData {
     std::string type;
@@ -57,12 +58,14 @@ void Links::load() {
     for (const LinkData &link : links) {
         if (link.type == "socketcan") {
 #ifdef WITH_SOCKETCAN
-            manualLinks_.emplace_back(std::make_unique<lt::SocketCanLink>(
-                link.name, link.port));
+            manualLinks_.emplace_back(
+                std::make_unique<lt::SocketCanLink>(link.name, link.port));
 #else
             Logger::warning(
                 "SocketCAN is unuspported on this platform, ignoring link.");
 #endif
+        } else if (link.type == "elm") {
+            manualLinks_.emplace_back(std::make_unique<lt::ElmDataLink>(link.name, link.port));
         } else {
             throw std::runtime_error("Unknown datalink type: " + link.type);
         }
@@ -80,6 +83,8 @@ void Links::save() const {
         std::string type;
         if (link->type() == lt::DataLinkType::SocketCan) {
             type = "socketcan";
+        } else if (link->type() == lt::DataLinkType::Elm) {
+            type = "elm";
         }
         LinkData data;
         data.type = type;
@@ -109,7 +114,8 @@ void Links::detect() {
 }
 
 void Links::add(lt::DataLinkPtr &&link) {
-    beginInsertRows(createIndex(1, 0), manualLinks_.size(), manualLinks_.size());
+    beginInsertRows(createIndex(1, 0), manualLinks_.size(),
+                    manualLinks_.size());
     manualLinks_.emplace_back(std::move(link));
     endInsertRows();
 }
@@ -145,30 +151,29 @@ lt::DataLink *Links::getFirst() const { return get(0); }
 
 void Links::remove(lt::DataLink *link) {
     beginResetModel();
-    manualLinks_.erase(
-        std::remove_if(manualLinks_.begin(), manualLinks_.end(),
-                       [link](const lt::DataLinkPtr &l) { return l.get() == link; }), manualLinks_.end());
+    manualLinks_.erase(std::remove_if(manualLinks_.begin(), manualLinks_.end(),
+                                      [link](const lt::DataLinkPtr &l) {
+                                          return l.get() == link;
+                                      }),
+                       manualLinks_.end());
     endResetModel();
 }
 
-QModelIndex Links::index(int row, int column, const QModelIndex &parent) const
-{
+QModelIndex Links::index(int row, int column, const QModelIndex &parent) const {
     if (parent.isValid() && parent.internalId() == 0) {
         return createIndex(row, column, parent.row() + 1);
     }
     return createIndex(row, column);
 }
 
-QModelIndex Links::parent(const QModelIndex &child) const
-{
+QModelIndex Links::parent(const QModelIndex &child) const {
     if (child.internalId() != 0) {
         return createIndex(child.internalId() - 1, 0);
     }
     return QModelIndex();
 }
 
-int Links::rowCount(const QModelIndex &parent) const
-{
+int Links::rowCount(const QModelIndex &parent) const {
     if (!parent.isValid()) {
         return 2;
     }
@@ -187,11 +192,7 @@ int Links::rowCount(const QModelIndex &parent) const
     return 0;
 }
 
-int Links::columnCount(const QModelIndex &parent) const
-{
-    return 2;
-}
-
+int Links::columnCount(const QModelIndex &/*parent*/) const { return 2; }
 
 QString typeToString(lt::DataLinkType type) {
     switch (type) {
@@ -199,14 +200,14 @@ QString typeToString(lt::DataLinkType type) {
         return "PassThru";
     case lt::DataLinkType::SocketCan:
         return "SocketCAN";
+    case lt::DataLinkType::Elm:
+        return "ELM327/ST";
     default:
         return QObject::tr("Invalid");
     }
 }
 
-
-QVariant Links::data(const QModelIndex &index, int role) const
-{
+QVariant Links::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.column() > 1 || index.column() < 0) {
         return QVariant();
     }
@@ -262,8 +263,8 @@ QVariant Links::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant Links::headerData(int section, Qt::Orientation orientation, int role) const
-{
+QVariant Links::headerData(int section, Qt::Orientation orientation,
+                           int role) const {
     if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -280,13 +281,11 @@ Links::Links(Links &&database) noexcept
     : manualLinks_{std::move(database.manualLinks_)},
       detectedLinks_{std::move(database.detectedLinks_)} {}
 
-int LinksListModel::rowCount(const QModelIndex &/*parent*/) const
-{
+int LinksListModel::rowCount(const QModelIndex & /*parent*/) const {
     return links_.count();
 }
 
-QVariant LinksListModel::data(const QModelIndex &index, int role) const
-{
+QVariant LinksListModel::data(const QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() > links_.count()) {
         return QVariant();
     }

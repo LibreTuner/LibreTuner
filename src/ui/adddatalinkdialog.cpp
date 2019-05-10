@@ -13,6 +13,7 @@
 #ifdef WITH_SOCKETCAN
 #include "lt/link/socketcan.h"
 #endif
+#include "lt/link/elm.h"
 
 AddDatalinkDialog::AddDatalinkDialog(QWidget* parent) : QDialog(parent)
 {
@@ -20,8 +21,8 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget* parent) : QDialog(parent)
     
     // Form
     comboType_ = new QComboBox;
-    // Only SocketCAN is supported here
     comboType_->addItem("SocketCAN");
+    comboType_->addItem("ELM327/ST");
     
     lineName_ = new QLineEdit;
     linePort_ = new QLineEdit;
@@ -61,16 +62,30 @@ void AddDatalinkDialog::addClicked()
         QMessageBox::warning(this, tr("Invalid name"), tr("Datalink name must not be empty"));
         return;
     }
-    
-    if (comboType_->currentIndex() == 0) {
+
+    std::string name_s = name.toStdString();
+    std::string port = linePort_->text().trimmed().toStdString();
+
+
+    switch (comboType_->currentIndex()) {
+    case 0:
         // SocketCAN
-#ifdef WITH_SOCKETCAN
-        LT()->links().add(std::make_unique<lt::SocketCanLink>(name.toStdString(), linePort_->text().trimmed().toStdString()));
+    #ifdef WITH_SOCKETCAN
+        LT()->links().add(
+                std::make_unique<lt::SocketCanLink>(name_s, port));
         LT()->saveLinks();
         close();
-#endif
-    } else {
+    #endif
+        break;
+    case 1:
+        // ELM327
+        LT()->links().add(std::make_unique<lt::ElmDataLink>(name_s, port));
+        LT()->saveLinks();
+        close();
+        break;
+    default:
         QMessageBox::warning(this, tr("Unsupported type"), tr("The selected datalink type is unsupported on this platform"));
+        break;
     }
 }
 
