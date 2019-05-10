@@ -47,6 +47,7 @@ IsoTpElm::IsoTpElm(Elm327Ptr device, IsoTpOptions options)
     device_->setProtocol(ElmProtocol::ISO_15765_4_CAN_11bit_500);
     // Disable printing spaces
     device_->setPrintSpaces(false);
+    device_->setHeaders(false);
 
     updateOptions();
 }
@@ -73,9 +74,9 @@ void IsoTpElm::request(const IsoTpPacket &req, IsoTpPacket &result) {
 void IsoTpElm::send(const IsoTpPacket &packet) {
     // Format packet into hex string
     std::stringstream ss;
-    ss << std::hex << std::setw(2) << std::setfill('0');
     for (uint8_t ch : packet) {
-        ss << ch;
+        ss << std::hex << std::setw(2) << std::setfill('0')
+           << static_cast<uint32_t>(ch);
     }
 
     std::vector<std::string> response = device_->sendCommand(ss.str());
@@ -129,17 +130,21 @@ void IsoTpElm::processResponse(std::vector<std::string> &response) {
             auto msgBegin = delim + 1;
             std::string message = detail::decodeHex(msgBegin, line.end());
             expectedLength -= message.size();
+            if (expectedLength < 0) {
+                // Remove extra bytes
+                std::size_t toRemove =
+                    std::min<std::size_t>(message.size(), -expectedLength);
+                message.erase(message.begin() + (message.size() - toRemove),
+                              message.end());
+                expectedLength += toRemove;
+            }
             // Can ranges please come sooner?
             packet.append(reinterpret_cast<const uint8_t *>(message.c_str()),
                           message.length());
 
-            if (expectedLength == 0) {
+            if (expectedLength <= 0) {
                 buffer_.emplace(std::move(packet));
                 packet.clear();
-            } else if (expectedLength < 0) {
-                throw std::runtime_error(
-                    "packet length exceeded expected length by at least " +
-                    std::to_string(-expectedLength) + " bytes");
             }
             continue;
         }

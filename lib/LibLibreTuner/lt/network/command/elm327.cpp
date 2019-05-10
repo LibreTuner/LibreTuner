@@ -12,8 +12,8 @@ void Elm327::open() { device_.open(); }
 
 void Elm327::setProtocol(ElmProtocol protocol) {
     std::stringstream ss;
-    ss << "AT SP " << std::hex << static_cast<uint8_t>(protocol);
-    writeLine(ss.str());
+    ss << "AT SP " << std::hex << static_cast<uint32_t>(protocol);
+    sendCommand(ss.str());
 }
 
 void Elm327::writeLine(std::string line) {
@@ -28,6 +28,8 @@ void Elm327::writeLine(std::string line) {
 
 std::vector<std::string> Elm327::sendCommand(const std::string &command) {
     writeLine(command);
+    // Ignore echo
+    reader_.readLine();
 
     std::vector<std::string> response;
 
@@ -37,6 +39,15 @@ std::vector<std::string> Elm327::sendCommand(const std::string &command) {
         if (line == ">") {
             break;
         }
+
+        if (line == "?") {
+            throw std::runtime_error("received ? from elm");
+        }
+
+        if (line == "CAN ERROR") {
+            throw std::runtime_error("received CAN ERROR");
+        }
+
         response.emplace_back(std::move(line));
     }
     return response;

@@ -21,7 +21,7 @@ network::CanPtr ElmDataLink::can(uint32_t baudrate) {
 }
 
 void ElmDataLink::createDevice() {
-    if (device_) {
+    if (device_ && device_->isOpen()) {
         return;
     }
     device_ = std::make_shared<network::Elm327>();

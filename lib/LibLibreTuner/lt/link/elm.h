@@ -29,7 +29,7 @@ public:
 private:
     std::string port_;
     network::Elm327Ptr device_;
-    int uartBaudrate_{38400};
+    int uartBaudrate_{115200};
 };
 
 } // namespace lt
