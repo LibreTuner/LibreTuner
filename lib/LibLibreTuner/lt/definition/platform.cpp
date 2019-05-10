@@ -20,10 +20,10 @@ ModelPtr Platform::findModel(const std::string &id) const noexcept {
 
 const AxisDefinition *Platform::getAxis(const std::string &id) const noexcept {
     auto it = axes.find(id);
-	if (it == axes.end()) {
-		return nullptr;
-	}
-	return &it->second;
+    if (it == axes.end()) {
+        return nullptr;
+    }
+    return &it->second;
 }
 
 ModelPtr Platform::identify(const uint8_t *data, size_t size) const noexcept {

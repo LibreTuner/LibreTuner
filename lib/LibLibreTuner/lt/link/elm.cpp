@@ -6,17 +6,14 @@
 
 namespace lt {
 
-ElmDataLink::ElmDataLink(const std::string &name, std::string port) : DataLink(name), port_(std::move(port)) {
-
-}
+ElmDataLink::ElmDataLink(const std::string &name, std::string port)
+    : DataLink(name), port_(std::move(port)) {}
 
 NetworkProtocol ElmDataLink::supportedProtocols() const {
     return NetworkProtocol::IsoTp;
 }
 
-DataLinkType ElmDataLink::type() const {
-    return DataLinkType::Elm;
-}
+DataLinkType ElmDataLink::type() const { return DataLinkType::Elm; }
 
 network::CanPtr ElmDataLink::can(uint32_t baudrate) {
     // TODO: Look into CAN support with USER1 & USER2
@@ -38,9 +35,7 @@ void ElmDataLink::createDevice() {
     device_->open();
 }
 
-void ElmDataLink::setPort(const std::string &port) {
-    port_ = port;
-}
+void ElmDataLink::setPort(const std::string &port) { port_ = port; }
 
 network::IsoTpPtr ElmDataLink::isotp(const network::IsoTpOptions &options) {
     createDevice();
@@ -48,4 +43,4 @@ network::IsoTpPtr ElmDataLink::isotp(const network::IsoTpOptions &options) {
     return std::make_unique<network::IsoTpElm>(device_, options);
 }
 
-}
+} // namespace lt

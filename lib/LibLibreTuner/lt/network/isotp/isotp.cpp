@@ -19,4 +19,4 @@ void IsoTpPacket::append(const uint8_t *data, size_t size) {
     data_.insert(data_.begin() + data_.size(), data, data + size);
 }
 
-} // namespace lt
+} // namespace lt::network

@@ -19,9 +19,9 @@
 #ifndef LT_DTCCODE_H
 #define LT_DTCCODE_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 namespace lt {
 

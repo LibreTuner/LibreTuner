@@ -5,11 +5,11 @@
 #include "uiutil.h"
 
 #include <QBoxLayout>
+#include <QCheckBox>
 #include <QHeaderView>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QCheckBox>
-#include <QLabel>
 
 DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     auto *layout = new QVBoxLayout;
@@ -47,34 +47,35 @@ DiagnosticsWidget::DiagnosticsWidget(QWidget *parent) : QWidget(parent) {
     auto *listPending = new QTableView;
     listPending->setModel(&pendingDtcModel_);
     listPending->horizontalHeader()->setStretchLastSection(true);
-    listPending->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    listPending->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
     listPending->verticalHeader()->setVisible(false);
     layout->addWidget(listPending);
 
     setLayout(layout);
 
     connect(buttonScan, &QPushButton::clicked, this, &DiagnosticsWidget::scan);
-    connect(buttonClear, &QPushButton::clicked, this, &DiagnosticsWidget::clear);
+    connect(buttonClear, &QPushButton::clicked, this,
+            &DiagnosticsWidget::clear);
 }
 
-void DiagnosticsWidget::scan()
-{
-    catchWarning([this]() {
-        lt::PlatformLink link = LT()->platformLink();
-        lt::DtcScannerPtr scanner = link.dtcScanner();
-        
-        clear();
+void DiagnosticsWidget::scan() {
+    catchWarning(
+        [this]() {
+            lt::PlatformLink link = LT()->platformLink();
+            lt::DtcScannerPtr scanner = link.dtcScanner();
 
-        dtcModel_.setCodes(scanner->scan());
-        if (checkPending_->isChecked()) {
-            pendingDtcModel_.setCodes(scanner->scanPending());
-        }
+            clear();
 
-    }, tr("Diagnostics Scan Error"));
+            dtcModel_.setCodes(scanner->scan());
+            if (checkPending_->isChecked()) {
+                pendingDtcModel_.setCodes(scanner->scanPending());
+            }
+        },
+        tr("Diagnostics Scan Error"));
 }
 
-void DiagnosticsWidget::clear()
-{
+void DiagnosticsWidget::clear() {
     dtcModel_.setCodes(lt::DiagnosticCodes());
     pendingDtcModel_.setCodes(lt::DiagnosticCodes());
 }

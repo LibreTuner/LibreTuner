@@ -8,24 +8,12 @@
 
 namespace lt {
 
+template <Endianness e> class ByteOrder {};
 
-
-
-
-template<Endianness e>
-class ByteOrder {
-
+template <> class ByteOrder<Endianness::Little> {
+    template <typename T> T convert(T t) {}
 };
 
-template<>
-class ByteOrder<Endianness::Little> {
-    template<typename T>
-    T convert(T t) {
+} // namespace lt
 
-    }
-};
-
-}
-
-
-#endif //LIBRETUNER_BYTEORDER_H
+#endif // LIBRETUNER_BYTEORDER_H

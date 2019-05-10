@@ -4,10 +4,10 @@
 namespace lt {
 NetworkProtocol passthruToNetworkProtocol(j2534::Protocol passthru) {
     NetworkProtocol protocol{NetworkProtocol::None};
-	if ((passthru & j2534::Protocol::CAN) != j2534::Protocol::None) {
-		protocol |= NetworkProtocol::Can;
-	}
-	return protocol;
+    if ((passthru & j2534::Protocol::CAN) != j2534::Protocol::None) {
+        protocol |= NetworkProtocol::Can;
+    }
+    return protocol;
 }
 
 PassThruLink::PassThruLink(j2534::Info &&info)
@@ -38,7 +38,9 @@ void PassThruLink::checkDevice() {
     }
 }
 
-NetworkProtocol PassThruLink::supportedProtocols() const { return passthruToNetworkProtocol(info_.protocols); }
+NetworkProtocol PassThruLink::supportedProtocols() const {
+    return passthruToNetworkProtocol(info_.protocols);
+}
 
 std::vector<std::unique_ptr<PassThruLink>> detect_passthru_links() {
     std::vector<j2534::Info> info = j2534::detect_interfaces();
@@ -46,8 +48,7 @@ std::vector<std::unique_ptr<PassThruLink>> detect_passthru_links() {
     std::vector<std::unique_ptr<PassThruLink>> links;
 
     for (j2534::Info &i : info) {
-        links.emplace_back(
-            std::make_unique<PassThruLink>(std::move(i)));
+        links.emplace_back(std::make_unique<PassThruLink>(std::move(i)));
     }
 
     return links;

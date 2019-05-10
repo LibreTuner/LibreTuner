@@ -29,8 +29,7 @@ void Checksum::addModifiable(int offset, int size) {
 
 Checksum::~Checksum() = default;
 
-uint32_t ChecksumBasic::compute(const uint8_t *data, int size,
-                                bool *ok) const {
+uint32_t ChecksumBasic::compute(const uint8_t *data, int size, bool *ok) const {
     assert(size >= 0);
     if (size < offset_ + size_) {
         if (ok != nullptr) {

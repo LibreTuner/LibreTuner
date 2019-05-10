@@ -20,8 +20,7 @@ enum class DataType {
     Int32,
 };
 
-template <typename Func>
-inline void datatypeToType(DataType type, Func &func) {
+template <typename Func> inline void datatypeToType(DataType type, Func &func) {
     switch (type) {
     case DataType::Float:
         func.template operator()<float>();
@@ -69,33 +68,33 @@ inline std::size_t dataTypeSize(DataType type) {
 }
 
 enum class DataLinkType {
-	SocketCan,
-	PassThru,
-	Elm,
-	Invalid,
+    SocketCan,
+    PassThru,
+    Elm,
+    Invalid,
 };
 
 enum class NetworkProtocol {
-	None = 0,
-	Can = 0x1,
-	IsoTp = 0x2,
+    None = 0,
+    Can = 0x1,
+    IsoTp = 0x2,
 };
 
 inline NetworkProtocol operator|(NetworkProtocol lhs, NetworkProtocol rhs) {
-	using DType = std::underlying_type<NetworkProtocol>::type;
-	return static_cast<NetworkProtocol>(static_cast<DType>(lhs) |
-		static_cast<DType>(rhs));
+    using DType = std::underlying_type<NetworkProtocol>::type;
+    return static_cast<NetworkProtocol>(static_cast<DType>(lhs) |
+                                        static_cast<DType>(rhs));
 }
 
-inline NetworkProtocol& operator|=(NetworkProtocol& lhs, NetworkProtocol rhs) {
-	lhs = lhs | rhs;
-	return lhs;
+inline NetworkProtocol &operator|=(NetworkProtocol &lhs, NetworkProtocol rhs) {
+    lhs = lhs | rhs;
+    return lhs;
 }
 
 inline NetworkProtocol operator&(NetworkProtocol lhs, NetworkProtocol rhs) {
-	using DType = std::underlying_type<NetworkProtocol>::type;
-	return static_cast<NetworkProtocol>(static_cast<DType>(lhs) &
-		static_cast<DType>(rhs));
+    using DType = std::underlying_type<NetworkProtocol>::type;
+    return static_cast<NetworkProtocol>(static_cast<DType>(lhs) &
+                                        static_cast<DType>(rhs));
 }
 
 } // namespace lt

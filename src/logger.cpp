@@ -18,17 +18,12 @@
 
 #include "logger.h"
 #include "libretuner.h"
-#include <iostream>
 #include <QMetaObject>
+#include <iostream>
 
-Logger::Logger() {
-    qRegisterMetaType<Logger::Mode>("Mode");
-}
+Logger::Logger() { qRegisterMetaType<Logger::Mode>("Mode"); }
 
-
-
-Logger &Logger::get()
-{
+Logger &Logger::get() {
     static Logger logger;
     return logger;
 }

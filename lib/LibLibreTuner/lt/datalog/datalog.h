@@ -20,13 +20,13 @@
 #define LT_DATALOG_H
 
 #include <chrono>
-#include <unordered_map>
-#include <vector>
 #include <functional>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
-#include "pid.h"
 #include "../support/event.h"
+#include "pid.h"
 
 namespace lt {
 using DataLogTimePoint = std::chrono::steady_clock::time_point;
@@ -48,17 +48,15 @@ public:
     using AddConnectionPtr = AddEvent::ConnectionPtr;
 
     // Returns the time of the first data point
-    DataLogTimePoint beginTime() const {
-        return beginTime_;
-    }
-    
+    DataLogTimePoint beginTime() const { return beginTime_; }
+
     // adds a point to a dataset. Returns false if the dataset
-    // with the specified id does not exist. 
+    // with the specified id does not exist.
     bool add(const Pid &pid, PidLogEntry value);
 
     // Adds a value at the current time
     bool add(const Pid &pid, double value);
-    
+
     // Returns the PID log or nullptr if it does not exist. Add with
     // addPid()
     PidLog *pidLog(const Pid &pid) noexcept;
@@ -72,8 +70,8 @@ public:
 
     // Returns true if the log is empty
     inline bool empty() const noexcept { return empty_; }
-    
-    template<typename Func>
+
+    template <typename Func>
     inline AddConnectionPtr onAdd(Func &&func) noexcept {
         return addEvent_.connect(std::forward<Func>(func));
     }
@@ -91,13 +89,13 @@ private:
     double minValue_{0};
     std::string name_;
     bool empty_{true};
-    
+
     AddEvent addEvent_;
 
     std::unordered_map<uint32_t, PidLog> logs_;
 };
 using DataLogPtr = std::shared_ptr<DataLog>;
 
-}
+} // namespace lt
 
 #endif // LT_DATALOG_H

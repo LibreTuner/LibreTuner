@@ -19,9 +19,9 @@
 #include "graphwidget.h"
 #include "lt/rom/table.h"
 
+#include <QCategory3DAxis>
 #include <QChart>
 #include <QHBoxLayout>
-#include <QCategory3DAxis>
 
 using namespace QtCharts;
 
@@ -40,10 +40,10 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
     setLayout(hLayout);
     hLayout->addWidget(container_);
     hLayout->addWidget(chartView_);
-    
+
     series3d_ = new QtDataVisualization::QSurface3DSeries;
     // I have no fucking clue if Q3DSeries takes ownership of series
-    
+
     surface_->addSeries(series3d_);
     surface_->setHorizontalAspectRatio(1.0);
 
@@ -57,14 +57,9 @@ GraphWidget::GraphWidget(QWidget *parent) : QWidget(parent) {
         QtDataVisualization::Q3DTheme::ColorStyleRangeGradient);
 }
 
+GraphWidget::~GraphWidget() { delete container_; }
 
-GraphWidget::~GraphWidget()
-{
-    delete container_;
-}
-
-void GraphWidget::setModel(TableModel *model)
-{
+void GraphWidget::setModel(TableModel *model) {
     if (model_ != nullptr) {
         disconnect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
     }
@@ -75,7 +70,6 @@ void GraphWidget::setModel(TableModel *model)
         connect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
     }
 }
-
 
 void GraphWidget::refresh() {
     if (model_ == nullptr) {
@@ -119,7 +113,7 @@ void GraphWidget::refresh() {
         if (table->axisX()) {
             for (int x = 0; x < table->width(); ++x) {
                 series->append(table->axisX()->label(x),
-                            table->get(x, 0)); // Should always be a float
+                               table->get(x, 0)); // Should always be a float
             }
         } else {
             for (int x = 0; x < table->width(); ++x) {
@@ -130,7 +124,7 @@ void GraphWidget::refresh() {
         chart_->removeAllSeries();
         chart_->addSeries(series);
         chart_->createDefaultAxes();
-        
+
         if (table->axisX()) {
             chart_->axisX()->setTitleText(
                 QString::fromStdString(table->axisX()->name()));

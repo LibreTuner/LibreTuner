@@ -21,9 +21,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 #include <utility>
 #include <vector>
-#include <stdexcept>
 
 namespace lt {
 namespace download {

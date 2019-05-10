@@ -37,8 +37,6 @@ void LogView::setModel(QAbstractItemModel *model) {
     }
 }
 
-
-
 void LogView::rowsInserted(const QModelIndex &parent, int first, int last) {
     if (parent.isValid()) {
         return;

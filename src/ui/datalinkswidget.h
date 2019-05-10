@@ -5,9 +5,9 @@
 #ifndef LIBRETUNER_INTERFACESDIALOG_H
 #define LIBRETUNER_INTERFACESDIALOG_H
 
-#include <QWidget>
-#include <QAbstractItemModel>
 #include "database/links.h"
+#include <QAbstractItemModel>
+#include <QWidget>
 
 class QLineEdit;
 class QPushButton;
@@ -16,9 +16,7 @@ class QTreeView;
 class DatalinksWidget : public QWidget {
 public:
     explicit DatalinksWidget(QWidget *parent = nullptr);
-    
 
-    
 private:
     void linkChanged(lt::DataLink *link);
     lt::DataLink *currentLink() const;
@@ -31,5 +29,4 @@ private:
     QTreeView *linksView_;
 };
 
-
-#endif //LIBRETUNER_INTERFACESDIALOG_H
+#endif // LIBRETUNER_INTERFACESDIALOG_H

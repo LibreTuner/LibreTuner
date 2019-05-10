@@ -24,15 +24,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "table.h"
 #include "../definition/model.h"
+#include "table.h"
 
 namespace lt {
 
 /* ROM Metadata */
 class Rom {
 public:
-	explicit Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
+    explicit Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
 
     const std::string &name() const { return name_; }
     const ModelPtr &model() const { return model_; }
@@ -47,13 +47,14 @@ public:
 
     // Sets the ROM data
     void setData(std::vector<uint8_t> &&data) { data_ = std::move(data); }
-    
+
     std::vector<uint8_t> getRawTableData(std::size_t id) const;
     std::vector<uint8_t> getRawTableData(const ModelTable *modTable) const;
-  
+
     TablePtr baseTable(std::size_t tableId) const;
 
-    TablePtr deserializeTable(std::size_t tableId, const uint8_t *data, std::size_t length) const;
+    TablePtr deserializeTable(std::size_t tableId, const uint8_t *data,
+                              std::size_t length) const;
 
 private:
     std::string name_;
@@ -71,35 +72,33 @@ using TableVector = std::vector<std::unique_ptr<Table>>;
 
 class Tune {
 public:
-	explicit Tune(RomPtr rom) : base_(std::move(rom)) {
-        assert(base_);
-	}
+    explicit Tune(RomPtr rom) : base_(std::move(rom)) { assert(base_); }
 
     inline const std::string &name() const noexcept { return name_; }
     inline const std::string &id() const noexcept { return id_; }
     inline const RomPtr &base() const noexcept { return base_; }
 
-	// Returns true if any table is dirty
-	bool dirty() const noexcept;
+    // Returns true if any table is dirty
+    bool dirty() const noexcept;
 
-	// Clears dirty bit of all tables
-	void clearDirty() noexcept;
+    // Clears dirty bit of all tables
+    void clearDirty() noexcept;
 
     void setId(const std::string &id) { id_ = id; }
     void setName(const std::string &name) { name_ = name; }
     void setBase(const RomPtr &rom) { base_ = rom; }
 
-	// Gets table by id. Returns nullptr if the table does not exist
-	// If `create` is true and the table has not been initialized, creates
-	// the table from the ROM data and definitions.
+    // Gets table by id. Returns nullptr if the table does not exist
+    // If `create` is true and the table has not been initialized, creates
+    // the table from the ROM data and definitions.
     Table *getTable(std::size_t id, bool create = true);
 
     Table *setTable(std::size_t id, const uint8_t *data, std::size_t length);
 
-	TableAxisPtr getAxis(const std::string &id, bool create = true);
+    TableAxisPtr getAxis(const std::string &id, bool create = true);
 
-	inline TableVector &tables() noexcept { return tables_; }
-	inline const TableVector& tables() const noexcept { return tables_; }
+    inline TableVector &tables() noexcept { return tables_; }
+    inline const TableVector &tables() const noexcept { return tables_; }
 
 private:
     std::string name_;
@@ -107,7 +106,7 @@ private:
     RomPtr base_;
     TableVector tables_;
 
-	std::unordered_map<std::string, TableAxisPtr> axes_;
+    std::unordered_map<std::string, TableAxisPtr> axes_;
 
     std::string id_;
 };

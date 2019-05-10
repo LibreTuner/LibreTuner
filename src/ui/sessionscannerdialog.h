@@ -9,8 +9,7 @@ class QPushButton;
 class QSpinBox;
 
 // Scans sessions
-class SessionScannerDialog : public QDialog
-{
+class SessionScannerDialog : public QDialog {
     Q_OBJECT
 public:
     explicit SessionScannerDialog(QWidget *parent = nullptr);

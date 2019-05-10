@@ -36,15 +36,11 @@ private:
     ProgressCallback progressCallback_;
 };
 
-
-
 void AsyncRoutine::notifyProgress(float progress) {
     if (progressCallback_) {
         progressCallback_(progress);
     }
 }
-
-
 
 void AsyncRoutine::setProgressCallback(AsyncRoutine::ProgressCallback &&cb) {
     progressCallback_ = std::move(cb);

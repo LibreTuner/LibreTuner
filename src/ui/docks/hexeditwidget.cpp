@@ -1,7 +1,7 @@
 #include "hexeditwidget.h"
 
-#include <QHBoxLayout>
 #include <QByteArray>
+#include <QHBoxLayout>
 #include <QIODevice>
 
 HexEditWidget::HexEditWidget(QWidget *parent) : QWidget(parent) {
@@ -27,13 +27,9 @@ int RomHexBuffer::length() const {
     return rom_->size();
 }
 
-void RomHexBuffer::insert(int /*offset*/, const QByteArray &/*data*/) {
+void RomHexBuffer::insert(int /*offset*/, const QByteArray & /*data*/) {}
 
-}
-
-void RomHexBuffer::remove(int /*offset*/, int /*length*/) {
-
-}
+void RomHexBuffer::remove(int /*offset*/, int /*length*/) {}
 
 QByteArray RomHexBuffer::read(int offset, int length) {
     if (!rom_) {
@@ -47,16 +43,15 @@ QByteArray RomHexBuffer::read(int offset, int length) {
     }
     int size = std::min<int>(rom_->size() - offset, length);
 
-    return QByteArray(reinterpret_cast<const char*>(&rom_->data()[offset]), size);
+    return QByteArray(reinterpret_cast<const char *>(&rom_->data()[offset]),
+                      size);
 }
 
-void RomHexBuffer::read(QIODevice */*iodevice*/) {
-
-}
+void RomHexBuffer::read(QIODevice * /*iodevice*/) {}
 
 void RomHexBuffer::write(QIODevice *iodevice) {
     if (!rom_) {
         return;
     }
-    iodevice->write(reinterpret_cast<const char*>(rom_->data()), rom_->size());
+    iodevice->write(reinterpret_cast<const char *>(rom_->data()), rom_->size());
 }

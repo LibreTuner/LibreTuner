@@ -21,9 +21,9 @@
 #include "lt/serialize/serialize.h"
 #include "lt/serialize/sinks.h"
 
+#include <algorithm>
 #include <csignal>
 #include <iostream>
-#include <algorithm>
 
 int main(int argc, char *argv[]) {
     LibreTuner app(argc, argv);

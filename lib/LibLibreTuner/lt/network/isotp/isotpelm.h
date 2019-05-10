@@ -1,8 +1,8 @@
 #ifndef LT_ISOTPELM_H
 #define LT_ISOTPELM_H
 
-#include "isotp.h"
 #include "../command/elm327.h"
+#include "isotp.h"
 
 #include <queue>
 
@@ -34,7 +34,6 @@ private:
     void processResponse(std::vector<std::string> &response);
 };
 
-}
+} // namespace lt::network
 
-
-#endif //LIBRETUNER_ISOTPELM_H
+#endif // LIBRETUNER_ISOTPELM_H

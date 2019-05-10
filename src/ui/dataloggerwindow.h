@@ -31,7 +31,7 @@
 namespace lt {
 class DataLogger;
 using DataLoggerPtr = std::unique_ptr<DataLogger>;
-}
+} // namespace lt
 
 class QListWidget;
 class QTreeWidgetItem;
@@ -39,8 +39,7 @@ class QListWidgetItem;
 class DataLogView;
 class DataLogLiveView;
 
-class DataLoggerWindow : public QWidget
-{
+class DataLoggerWindow : public QWidget {
     Q_OBJECT
 public:
     explicit DataLoggerWindow(QWidget *parent = nullptr);
@@ -50,7 +49,7 @@ public:
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-    
+
     // Simulate PIDs
     void simulate();
 
@@ -72,7 +71,7 @@ private:
     DataLogView *dataLogView_;
     DataLogLiveView *dataLogLiveView_;
 
-    std::vector<QListWidgetItem*> pidItems_;
+    std::vector<QListWidgetItem *> pidItems_;
 
     void reset();
 };

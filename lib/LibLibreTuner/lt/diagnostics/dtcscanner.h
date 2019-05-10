@@ -25,7 +25,7 @@
 namespace lt {
 
 class DtcScanner {
-  public:
+public:
     virtual ~DtcScanner() = default;
 
     /* Scans the interface for codes and fills result */

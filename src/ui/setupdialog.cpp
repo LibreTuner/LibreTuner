@@ -6,11 +6,11 @@
 
 #include <QAbstractItemModel>
 #include <QComboBox>
-#include <QVBoxLayout>
 #include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QStyledItemDelegate>
+#include <QVBoxLayout>
 
 SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("LibreTuner - Initial Setup"));
@@ -30,16 +30,12 @@ SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
     layout->addLayout(formLayout);
 
     auto *buttonFinish = new QPushButton(tr("Finish"));
-    connect(buttonFinish, &QPushButton::clicked, [this]() {
-        close();
-    });
+    connect(buttonFinish, &QPushButton::clicked, [this]() { close(); });
 
     layout->addWidget(buttonFinish);
 
     setLayout(layout);
 }
-
-
 
 void SetupDialog::setDefinitionModel(QAbstractItemModel *model) {
     comboPlatforms_->setModel(model);
@@ -60,14 +56,13 @@ void SetupDialog::setDatalinksModel(QAbstractItemModel *model) {
     comboDatalinks_->setModel(model);
 }
 
-
-Q_DECLARE_METATYPE(datalink::Link*);
+Q_DECLARE_METATYPE(datalink::Link *);
 
 datalink::Link *SetupDialog::datalink() {
     QVariant var = comboDatalinks_->currentData(Qt::UserRole);
-    if (!var.canConvert<datalink::Link*>()) {
+    if (!var.canConvert<datalink::Link *>()) {
         return nullptr;
     }
 
-    return var.value<datalink::Link*>();
+    return var.value<datalink::Link *>();
 }

@@ -2,10 +2,10 @@
 
 #include "../../support/util.hpp"
 
-#include <cassert>
-#include <sstream>
-#include <iomanip>
 #include <algorithm>
+#include <cassert>
+#include <iomanip>
+#include <sstream>
 
 namespace lt::network {
 namespace detail {
@@ -22,8 +22,7 @@ inline uint8_t hexToInt(char c) {
     throw std::runtime_error(std::string("invalid hex character: ") + c);
 }
 
-template<typename Iter>
-std::string decodeHex(Iter begin, Iter end) {
+template <typename Iter> std::string decodeHex(Iter begin, Iter end) {
     std::string decoded;
     for (auto it = begin; it != end; ++it) {
         uint8_t byte = hexToInt(*it) << 4;
@@ -35,9 +34,10 @@ std::string decodeHex(Iter begin, Iter end) {
     }
     return decoded;
 }
-}
+} // namespace detail
 
-IsoTpElm::IsoTpElm(Elm327Ptr device, IsoTpOptions options) : device_(std::move(device)), options_(options) {
+IsoTpElm::IsoTpElm(Elm327Ptr device, IsoTpOptions options)
+    : device_(std::move(device)), options_(options) {
     assert(device_);
     if (!device_->isOpen()) {
         throw std::runtime_error("Elm327 device is not open");
@@ -110,13 +110,15 @@ void IsoTpElm::processResponse(std::vector<std::string> &response) {
 
             if (!packet.empty()) {
                 // Last multi-line response was incomplete
-                throw std::runtime_error("message did not meet expected length");
+                throw std::runtime_error(
+                    "message did not meet expected length");
             }
             std::size_t pos;
             expectedLength = std::stoul(line, &pos, 16);
             if (pos != 3) {
                 // Non-numeric character somewhere
-                throw std::runtime_error("unexpected character in response: " + line);
+                throw std::runtime_error("unexpected character in response: " +
+                                         line);
             }
             continue;
         }
@@ -128,13 +130,16 @@ void IsoTpElm::processResponse(std::vector<std::string> &response) {
             std::string message = detail::decodeHex(msgBegin, line.end());
             expectedLength -= message.size();
             // Can ranges please come sooner?
-            packet.append(reinterpret_cast<const uint8_t*>(message.c_str()), message.length());
+            packet.append(reinterpret_cast<const uint8_t *>(message.c_str()),
+                          message.length());
 
             if (expectedLength == 0) {
                 buffer_.emplace(std::move(packet));
                 packet.clear();
             } else if (expectedLength < 0) {
-                throw std::runtime_error("packet length exceeded expected length by at least " + std::to_string(-expectedLength) + " bytes");
+                throw std::runtime_error(
+                    "packet length exceeded expected length by at least " +
+                    std::to_string(-expectedLength) + " bytes");
             }
             continue;
         }
@@ -146,9 +151,10 @@ void IsoTpElm::processResponse(std::vector<std::string> &response) {
 
         // Single-line message
         std::string message = detail::decodeHex(line.begin(), line.end());
-        packet.append(reinterpret_cast<const uint8_t*>(message.c_str()), message.length());
+        packet.append(reinterpret_cast<const uint8_t *>(message.c_str()),
+                      message.length());
         buffer_.emplace(std::move(packet));
         packet.clear();
     }
 }
-}
+} // namespace lt::network

@@ -40,15 +40,17 @@ public:
 
     /* Saves rom list and metadata */
     void saveRom(const RomMeta &meta);
-    
+
     /* Adds rom and saves metadata */
     void addRom(const lt::RomPtr &rom);
-    
+
     /* Adds rom by data. Performs model identification */
-    void addRom(const lt::Platform &platform, const std::string &id, const std::string &name, const uint8_t *data, const std::size_t size);
+    void addRom(const lt::Platform &platform, const std::string &id,
+                const std::string &name, const uint8_t *data,
+                const std::size_t size);
 
     lt::RomPtr openRom(const RomMeta &meta) const;
-    
+
     void saveRom(const lt::RomPtr &rom);
 
     /* Returns the ROM with id or nullptr if the ROM does
@@ -85,12 +87,14 @@ private:
 
     // QAbstractItemModel interface
 public:
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    virtual QModelIndex index(int row, int column,
+                              const QModelIndex &parent) const override;
     virtual QModelIndex parent(const QModelIndex &child) const override;
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                                int role) const override;
 };
 
 #endif

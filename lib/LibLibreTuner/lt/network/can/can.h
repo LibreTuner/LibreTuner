@@ -59,7 +59,7 @@ public:
         setId(id);
         setMessage(message, length);
     }
-    
+
     // Adds trailing zeros after last byte
     void pad() noexcept;
 
@@ -72,34 +72,34 @@ private:
 class CanMessageBuffer {
 public:
     CanMessageBuffer(std::size_t limit = 200) : limit_(limit) {}
-    
+
     void add(const CanMessage &message) {
         buffer_.emplace(message);
         if (buffer_.size() > limit_) {
             buffer_.pop();
         }
     }
-    
+
     void add(CanMessage &&message) {
         buffer_.emplace(std::move(message));
         if (buffer_.size() > limit_) {
             buffer_.pop();
         }
     }
-    
+
     bool pop(CanMessage &message) {
         if (buffer_.empty()) {
             return false;
         }
         CanMessage front = buffer_.front();
         buffer_.pop();
-        
+
         message = std::move(front);
         return true;
     }
-    
+
     void clear() { buffer_ = std::queue<CanMessage>(); }
-    
+
 private:
     std::queue<CanMessage> buffer_;
     std::size_t limit_{20};
@@ -111,15 +111,16 @@ public:
     virtual ~Can() = default;
 
     virtual // Send a CAN message. The size of data must be <= 8
-    // Returns true if a message was sent
-    void send(uint32_t id, const uint8_t *data, size_t length);
+        // Returns true if a message was sent
+        void
+        send(uint32_t id, const uint8_t *data, size_t length);
 
     virtual void send(const CanMessage &message) = 0;
 
     // Returns false if the timeout expired and no message was read
     virtual bool recv(CanMessage &message,
                       std::chrono::milliseconds timeout) = 0;
-                      
+
     virtual void clearBuffer() noexcept {}
 };
 

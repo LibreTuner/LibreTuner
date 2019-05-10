@@ -42,7 +42,7 @@ public:
     virtual uint32_t compute(const uint8_t *data, int size,
                              bool *ok = nullptr) const = 0;
 
-	virtual ~Checksum();
+    virtual ~Checksum();
 
 protected:
     int offset_;
@@ -59,8 +59,7 @@ public:
     ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
         : Checksum(offset, size, target) {}
 
-    uint32_t compute(const uint8_t *data, int size,
-                     bool *ok) const override;
+    uint32_t compute(const uint8_t *data, int size, bool *ok) const override;
 
     void correct(uint8_t *data, int size) const override;
 };
@@ -71,7 +70,9 @@ public:
 class Checksums {
 public:
     /* Adds a basic type checksum */
-	inline void add(ChecksumPtr &&checksum) { checksums_.emplace_back(std::move(checksum)); }
+    inline void add(ChecksumPtr &&checksum) {
+        checksums_.emplace_back(std::move(checksum));
+    }
 
     /* Corrects the checksums for the data using modifiable sections.
      * Returns (false, errmsg) on failure and (true, "") on success. */

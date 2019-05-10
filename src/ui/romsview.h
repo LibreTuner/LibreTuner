@@ -1,9 +1,9 @@
 #ifndef ROMSWIDGET_H
 #define ROMSWIDGET_H
 
-#include <QWidget>
 #include <QAbstractItemModel>
 #include <QTreeView>
+#include <QWidget>
 
 #include <memory>
 
@@ -25,23 +25,23 @@ public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role) const;
 
 private:
     RomStore *roms_ = nullptr;
 };
 
-
-class RomsView : public QTreeView
-{
+class RomsView : public QTreeView {
     Q_OBJECT
 public:
-    explicit RomsView (QWidget *parent = nullptr);
-    
+    explicit RomsView(QWidget *parent = nullptr);
+
     Tune *selectedTune();
-    
+
 private slots:
-    void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) override;
+    void selectionChanged(const QItemSelection &selected,
+                          const QItemSelection &deselected) override;
 
 signals:
     void tuneChanged();

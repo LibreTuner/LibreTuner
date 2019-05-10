@@ -1,7 +1,7 @@
 #include <utility>
 
-#include "datalink.h"
 #include "../network/isotp/isotpcan.h"
+#include "datalink.h"
 
 namespace lt {
 DataLink::DataLink(std::string name) : name_(std::move(name)) {}

@@ -1,6 +1,3 @@
 #include "tableext.h"
 
-namespace lt {
-
-
-}
+namespace lt {}

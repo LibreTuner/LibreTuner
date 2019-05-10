@@ -36,30 +36,31 @@ struct UdsPacket {
         std::copy(raw + 1, raw + size, data.begin());
     }
 
-    UdsPacket(uint8_t _code, const uint8_t *payload, std::size_t size) : data(payload, payload + size), code(_code) {}
+    UdsPacket(uint8_t _code, const uint8_t *payload, std::size_t size)
+        : data(payload, payload + size), code(_code) {}
 
     UdsPacket() = default;
 
     bool empty() const noexcept { return data.empty() && code == 0; }
 
     bool negative() const noexcept { return code == UDS_RES_NEGATIVE; }
-    uint8_t negativeCode() const noexcept { return data.size() > 1 ? 0 : data[1]; }
+    uint8_t negativeCode() const noexcept {
+        return data.size() > 1 ? 0 : data[1];
+    }
 };
 
 class Uds {
-  public:
+public:
     virtual ~Uds() = default;
-      
+
     /* Sends a request. May throw an exception. Throws an
        exception if a negative response is received. (Not
        including RCRRP). */
-    UdsPacket request(uint8_t sid, const uint8_t *data,
-                                size_t size);
+    UdsPacket request(uint8_t sid, const uint8_t *data, size_t size);
 
     /* All requests may throw an exception */
     /* Sends a DiagnosticSessionControl request. Returns parameter record. */
     std::vector<uint8_t> requestSession(uint8_t type);
-    
 
     std::vector<uint8_t> requestSecuritySeed();
 
@@ -68,15 +69,14 @@ class Uds {
     /* ReadMemoryByAddress */
     std::vector<uint8_t> requestReadMemoryAddress(uint32_t address,
                                                   uint16_t length);
-    
-    std::vector<uint8_t> readDataByIdentifier(uint16_t id);
 
+    std::vector<uint8_t> readDataByIdentifier(uint16_t id);
 
     // Sends a request but does not throw an exception on negative errors.
     // Must not handle RCRRP or other negative responses.
-    virtual UdsPacket requestRaw(const UdsPacket &packet) =0;
+    virtual UdsPacket requestRaw(const UdsPacket &packet) = 0;
 
-    virtual UdsPacket receiveRaw() =0;
+    virtual UdsPacket receiveRaw() = 0;
 };
 using UdsPtr = std::unique_ptr<Uds>;
 

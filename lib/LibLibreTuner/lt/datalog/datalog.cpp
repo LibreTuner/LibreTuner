@@ -37,8 +37,7 @@ bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     }
     if (entry.value > maxValue_) {
         maxValue_ = entry.value;
-    }
-    else if (entry.value < minValue_) {
+    } else if (entry.value < minValue_) {
         minValue_ = entry.value;
     }
 
@@ -54,8 +53,7 @@ PidLog *DataLog::pidLog(const Pid &pid) noexcept {
     return &it->second;
 }
 
-PidLog &DataLog::addPid(const Pid &pid) noexcept
-{
+PidLog &DataLog::addPid(const Pid &pid) noexcept {
     PidLog log{pid, {}};
     logs_.emplace(pid.code, std::move(log));
     return logs_.find(pid.code)->second;
@@ -66,8 +64,14 @@ bool DataLog::add(const Pid &pid, double value) {
         empty_ = false;
         beginTime_ = std::chrono::steady_clock::now();
     }
-    
-    return add(pid, PidLogEntry{value, static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime_).count())});
+
+    return add(
+        pid,
+        PidLogEntry{value,
+                    static_cast<std::size_t>(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - beginTime_)
+                            .count())});
 }
 
 } // namespace lt

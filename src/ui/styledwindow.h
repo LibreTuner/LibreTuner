@@ -89,8 +89,6 @@ public:
     explicit StyledDialog(QWidget *parent = nullptr);
 };
 
-
-
 template <class T> void StyledWidget<T>::setTitle(const QString &title) {
 #ifdef _WIN32
     titleBar_->setTitle(title);

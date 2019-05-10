@@ -22,8 +22,6 @@
 #include <QFile>
 #include <QXmlStreamReader>
 
-
-
 void DtcDescriptions::load() {
     QFile file(":/codes.xml");
     if (!file.open(QFile::ReadOnly)) {
@@ -76,8 +74,6 @@ void DtcDescriptions::load() {
     Logger::info("Loaded " + std::to_string(descriptions_.size()) +
                  " DTC descriptions");
 }
-
-
 
 std::pair<bool, std::string>
 DtcDescriptions::get(const std::string &code) const {

@@ -1,8 +1,8 @@
 #include "roms.h"
 
 #include "definitions.h"
-#include "serializeddata.h"
 #include "lt/rom/rom.h"
+#include "serializeddata.h"
 
 #include "logger.h"
 
@@ -94,7 +94,7 @@ QModelIndex Roms::index(int row, int column, const QModelIndex &parent) const {
     return createIndex(row, column);
 }
 
-QModelIndex Roms::parent(const QModelIndex &/*child*/) const {
+QModelIndex Roms::parent(const QModelIndex & /*child*/) const {
     return QModelIndex();
 }
 
@@ -106,7 +106,7 @@ int Roms::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int Roms::columnCount(const QModelIndex &/*parent*/) const { return 4; }
+int Roms::columnCount(const QModelIndex & /*parent*/) const { return 4; }
 
 QVariant Roms::data(const QModelIndex &index, int role) const {
     if (index.parent().isValid()) {
@@ -165,46 +165,46 @@ void Roms::loadRoms() {
 
     beginResetModel();
     for (auto &sub : fs::directory_iterator(path_)) {
-        if (sub.is_regular_file() && sub.path().extension() == fs::path(".lts")) {
+        if (sub.is_regular_file() &&
+            sub.path().extension() == fs::path(".lts")) {
             roms_.emplace_back(loadRom(sub.path()));
         }
     }
     endResetModel();
 }
 
-void Roms::addRom(const lt::RomPtr& rom)
-{
+void Roms::addRom(const lt::RomPtr &rom) {
     createPath();
     RomMeta meta;
     meta.id = rom->id();
     meta.model = rom->model();
     meta.name = rom->name();
-    
+
     saveRom(meta);
-    
+
     beginInsertRows(QModelIndex(), roms_.size(), roms_.size());
     roms_.emplace_back(std::move(meta));
     endInsertRows();
 }
 
-void Roms::addRom(const lt::Platform& platform, const std::string& id, const std::string& name, const uint8_t* data, const std::size_t size)
-{
+void Roms::addRom(const lt::Platform &platform, const std::string &id,
+                  const std::string &name, const uint8_t *data,
+                  const std::size_t size) {
     lt::ModelPtr model = platform.identify(data, size);
     if (!model) {
         throw std::runtime_error("model could not be identified");
     }
-    
+
     lt::RomPtr rom = std::make_shared<lt::Rom>(model);
     rom->setData(std::vector(data, data + size));
     rom->setId(id);
     rom->setName(name);
-    
+
     // Add metadata
     addRom(rom);
     // Save data
     saveRom(rom);
 }
-
 
 void Roms::saveRom(const RomMeta &meta) {
     createPath();
@@ -226,45 +226,43 @@ void Roms::saveRom(const RomMeta &meta) {
     file.close();
 }
 
-lt::RomPtr Roms::openRom(const RomMeta& meta) const {
-	fs::path path = path_ / "romdata" / meta.id;
-	
-	auto rom = std::make_shared<lt::Rom>(meta.model);
-	rom->setId(meta.id);
-	rom->setName(meta.name);
+lt::RomPtr Roms::openRom(const RomMeta &meta) const {
+    fs::path path = path_ / "romdata" / meta.id;
+
+    auto rom = std::make_shared<lt::Rom>(meta.model);
+    rom->setId(meta.id);
+    rom->setName(meta.name);
 
     std::ifstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
-	if (!file.is_open()) {
-		throw std::runtime_error("failed to open rom " + path.string());
-	}
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open rom " + path.string());
+    }
 
     auto fileSize = file.tellg();
     std::vector<uint8_t> data(fileSize);
     file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char*>(data.data()), fileSize);
+    file.read(reinterpret_cast<char *>(data.data()), fileSize);
     file.close();
 
-	rom->setData(std::move(data));
+    rom->setData(std::move(data));
 
-	return rom;
+    return rom;
 }
 
-void Roms::saveRom(const lt::RomPtr& rom)
-{
+void Roms::saveRom(const lt::RomPtr &rom) {
     createPath();
     fs::path path = path_ / "romdata" / rom->id();
-    
+
     std::ofstream file(path, std::ios::binary | std::ios::out);
     if (file.is_open()) {
         throw std::runtime_error("failed to open rom " + path.string());
-	}
-	
-	file.write(reinterpret_cast<const char*>(rom->data()), rom->size());
+    }
+
+    file.write(reinterpret_cast<const char *>(rom->data()), rom->size());
     file.close();
 }
 
-RomMeta *Roms::fromId(const std::string &id) noexcept
-{
+RomMeta *Roms::fromId(const std::string &id) noexcept {
     for (RomMeta &rom : roms_) {
         if (rom.id == id) {
             return &rom;
@@ -273,8 +271,7 @@ RomMeta *Roms::fromId(const std::string &id) noexcept
     return nullptr;
 }
 
-const RomMeta *Roms::fromId(const std::string &id) const noexcept
-{
+const RomMeta *Roms::fromId(const std::string &id) const noexcept {
     for (const RomMeta &rom : roms_) {
         if (rom.id == id) {
             return &rom;
@@ -282,4 +279,3 @@ const RomMeta *Roms::fromId(const std::string &id) const noexcept
     }
     return nullptr;
 }
-

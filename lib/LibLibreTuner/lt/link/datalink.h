@@ -38,7 +38,7 @@ public:
     // Returns the port or an empty string if no port is used by the datalink
     // type
     virtual std::string port() const = 0;
-    virtual void setPort(const std::string &port) =0;
+    virtual void setPort(const std::string &port) = 0;
 
 protected:
     std::string name_;

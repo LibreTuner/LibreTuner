@@ -3,17 +3,15 @@
 
 #include <QDialog>
 
-
 class RomsView;
 class Tune;
 
-class TuneDialog : public QDialog
-{
+class TuneDialog : public QDialog {
 public:
     explicit TuneDialog(QWidget *parent = nullptr);
-    
+
     Tune *selectedTune();
-    
+
 private:
     RomsView *roms_;
 };

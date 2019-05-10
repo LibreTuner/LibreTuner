@@ -1,19 +1,14 @@
 #include "elm327.h"
 
-#include <stdexcept>
-#include <sstream>
 #include <iomanip>
-
+#include <sstream>
+#include <stdexcept>
 
 namespace lt::network {
 
-Elm327::Elm327() : reader_(device_) {
+Elm327::Elm327() : reader_(device_) {}
 
-}
-
-void Elm327::open() {
-    device_.open();
-}
+void Elm327::open() { device_.open(); }
 
 void Elm327::setProtocol(ElmProtocol protocol) {
     std::stringstream ss;
@@ -23,7 +18,8 @@ void Elm327::setProtocol(ElmProtocol protocol) {
 
 void Elm327::writeLine(std::string line) {
     if (!isOpen()) {
-        throw std::runtime_error("attempted to write line to closed connection");
+        throw std::runtime_error(
+            "attempted to write line to closed connection");
     }
     line += "\r";
 
@@ -95,4 +91,4 @@ void Elm327::setTimeout(uint8_t timeout) {
     sendBasicCommand(ss.str());
 }
 
-}
+} // namespace lt::network

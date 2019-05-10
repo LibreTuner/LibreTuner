@@ -22,8 +22,7 @@
 
 namespace lt {
 
-UdsDtcScanner::UdsDtcScanner(network::UdsPtr &&uds)
-    : uds_(std::move(uds)) {
+UdsDtcScanner::UdsDtcScanner(network::UdsPtr &&uds) : uds_(std::move(uds)) {
     assert(uds_);
 }
 
@@ -36,7 +35,7 @@ DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
     network::UdsPacket response = uds_->request(pid, nullptr, 0);
 
-	DiagnosticCodes result;
+    DiagnosticCodes result;
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
     for (size_t i = 1; i + 1 < response.data.size(); i += 2) {
@@ -45,7 +44,7 @@ DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
 
         result.emplace_back(std::move(code));
     }
-	return result;
+    return result;
 }
 
 } // namespace lt

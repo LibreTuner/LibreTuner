@@ -6,7 +6,6 @@
 class TunesModel : public QAbstractListModel {
     Q_OBJECT
 public:
-    
 };
 
 #endif

@@ -18,37 +18,34 @@
 
 #include "downloadwindow.h"
 
-
-#include "logger.h"
-#include "libretuner.h"
 #include "backgroundtask.h"
+#include "libretuner.h"
+#include "logger.h"
 #include "uiutil.h"
 
 #include "authoptionsview.h"
 
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QGroupBox>
-#include <QPushButton>
-#include <QThread>
-#include <QProgressDialog>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QPushButton>
+#include <QThread>
+#include <QVBoxLayout>
 
-#include <utility>
-#include <thread>
 #include <atomic>
+#include <thread>
+#include <utility>
 
-
-DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
-{
+DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("LibreTuner - Download"));
 
     comboPlatform_ = new QComboBox;
     comboPlatform_->setModel(&LT()->definitions());
-    
+
     lineName_ = new QLineEdit;
     lineId_ = new QLineEdit;
 
@@ -57,10 +54,10 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     form->addRow(tr("Platform"), comboPlatform_);
     form->addRow(tr("Name"), lineName_);
     form->addRow(tr("Id"), lineId_);
-    
+
     auto *groupDetails = new QGroupBox(tr("ROM Details"));
     groupDetails->setLayout(form);
-    
+
     // Buttons
     auto *buttonDownload = new QPushButton(tr("Download"));
     buttonDownload->setDefault(true);
@@ -68,7 +65,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     auto *buttonClose = new QPushButton(tr("Close"));
     auto *buttonAdvanced = new QPushButton(tr("Advanced"));
     buttonAdvanced->setCheckable(true);
-    
+
     // Extension
     authOptions_ = new AuthOptionsView;
     authOptions_->hide();
@@ -78,7 +75,7 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     buttonLayout->addWidget(buttonDownload);
     buttonLayout->addWidget(buttonClose);
     buttonLayout->addWidget(buttonAdvanced);
-    
+
     // Top layout
     auto *topLayout = new QHBoxLayout;
     topLayout->addWidget(groupDetails);
@@ -89,25 +86,23 @@ DownloadWindow::DownloadWindow(QWidget* parent) : QDialog(parent)
     layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->addLayout(topLayout);
     layout->addWidget(authOptions_);
-    
+
     setLayout(layout);
-    
-    connect(buttonDownload, &QPushButton::clicked, [this]() {
-        download();
-    });
+
+    connect(buttonDownload, &QPushButton::clicked, [this]() { download(); });
     connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
-    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
-    
-    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DownloadWindow::platformChanged);
-    
+    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_,
+            &QWidget::setVisible);
+
+    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &DownloadWindow::platformChanged);
+
     platformChanged(comboPlatform_->currentIndex());
 }
 
-
-void DownloadWindow::platformChanged(int /*index*/)
-{
+void DownloadWindow::platformChanged(int /*index*/) {
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<const lt::PlatformPtr&>()) {
+    if (!var.canConvert<const lt::PlatformPtr &>()) {
         return;
     }
 
@@ -115,87 +110,95 @@ void DownloadWindow::platformChanged(int /*index*/)
     if (!platform) {
         return;
     }
-    
+
     authOptions_->setDefaultOptions(platform->downloadAuthOptions);
 }
 
+void DownloadWindow::download() {
+    catchCritical(
+        [this]() {
+            lt::PlatformLink pLink = getPlatformLink();
 
+            // Create progress dialog
+            QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0,
+                                     100, this);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.setWindowTitle(tr("LibreTuner - Download"));
+            progress.setValue(0);
+            progress.show();
 
-void DownloadWindow::download()
-{
-    catchCritical([this]() {
-        lt::PlatformLink pLink = getPlatformLink();
+            lt::download::DownloaderPtr downloader = pLink.downloader();
+            downloader->setProgressCallback([&](float prog) {
+                QMetaObject::invokeMethod(&progress, "setValue",
+                                          Qt::QueuedConnection,
+                                          Q_ARG(int, prog * 100));
+            });
 
-        // Create progress dialog
-        QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0, 100, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setWindowTitle(tr("LibreTuner - Download"));
-        progress.setValue(0);
-        progress.show();
+            BackgroundTask<bool()> task(
+                [&]() -> bool { return downloader->download(); });
 
-        lt::download::DownloaderPtr downloader = pLink.downloader();
-        downloader->setProgressCallback([&](float prog) {
-            QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
-        });
-        
-        BackgroundTask<bool()> task([&]() -> bool {
-            return downloader->download();
-        });
-        
-        bool canceled = false;
-        
-        connect(&progress, &QProgressDialog::canceled, [&downloader, &canceled]() {
-            downloader->cancel();
-            canceled = true;
-        });
+            bool canceled = false;
 
-        task();
-        
-        if (!canceled) {
-            bool success = task.future().get();
-            if (!success) {
-                throw std::runtime_error("Unknown error");
-            }
-            auto data = downloader->data();
-            try {
-                LT()->roms().addRom(pLink.platform(), lineId_->text().toStdString(), lineName_->text().toStdString(), data.first, data.second);
-                QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully").exec();
-            } catch (const std::runtime_error &err) {
-                QMessageBox msgBox;
-                msgBox.setWindowTitle("Download Error");
-                msgBox.setText("The ROM was downloaded, but an error occurred while saving. Would you like to save the binary data?");
-                msgBox.setInformativeText(err.what());
-                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                msgBox.setDefaultButton(QMessageBox::Yes);
+            connect(&progress, &QProgressDialog::canceled,
+                    [&downloader, &canceled]() {
+                        downloader->cancel();
+                        canceled = true;
+                    });
 
-                int ret = msgBox.exec();
-                if (ret == QMessageBox::Yes) {
-                    QString fileName = QFileDialog::getSaveFileName(this,
-                                                                    tr("Save ROM"), "",
-                                                                    tr("Binary (*.bin);;All Files (*)"));
-                    if (fileName.isEmpty()) {
-                        return;
+            task();
+
+            if (!canceled) {
+                bool success = task.future().get();
+                if (!success) {
+                    throw std::runtime_error("Unknown error");
+                }
+                auto data = downloader->data();
+                try {
+                    LT()->roms().addRom(pLink.platform(),
+                                        lineId_->text().toStdString(),
+                                        lineName_->text().toStdString(),
+                                        data.first, data.second);
+                    QMessageBox(QMessageBox::Information, "Download Finished",
+                                "ROM downloaded successfully")
+                        .exec();
+                } catch (const std::runtime_error &err) {
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("Download Error");
+                    msgBox.setText(
+                        "The ROM was downloaded, but an error occurred while "
+                        "saving. Would you like to save the binary data?");
+                    msgBox.setInformativeText(err.what());
+                    msgBox.setStandardButtons(QMessageBox::Yes |
+                                              QMessageBox::No);
+                    msgBox.setDefaultButton(QMessageBox::Yes);
+
+                    int ret = msgBox.exec();
+                    if (ret == QMessageBox::Yes) {
+                        QString fileName = QFileDialog::getSaveFileName(
+                            this, tr("Save ROM"), "",
+                            tr("Binary (*.bin);;All Files (*)"));
+                        if (fileName.isEmpty()) {
+                            return;
+                        }
+
+                        QFile file(fileName);
+                        if (!file.open(QIODevice::WriteOnly)) {
+                            QMessageBox::information(this,
+                                                     tr("Unable to open file"),
+                                                     file.errorString());
+                            return;
+                        }
+                        file.write(reinterpret_cast<const char *>(data.first),
+                                   static_cast<qint64>(data.second));
+                        file.close();
                     }
-
-                    QFile file(fileName);
-                    if (!file.open(QIODevice::WriteOnly)) {
-                        QMessageBox::information(this, tr("Unable to open file"),
-                                                 file.errorString());
-                        return;
-                    }
-                    file.write(reinterpret_cast<const char*>(data.first), static_cast<qint64>(data.second));
-                    file.close();
                 }
             }
-        }
-    }, tr("Download error"));
+        },
+        tr("Download error"));
 }
 
-
-
-void DownloadWindow::closeEvent(QCloseEvent* /*event*/)
-{
-}
+void DownloadWindow::closeEvent(QCloseEvent * /*event*/) {}
 
 lt::PlatformLink DownloadWindow::getPlatformLink() {
     lt::DataLink *link = LT()->datalink();
@@ -216,7 +219,4 @@ lt::PlatformLink DownloadWindow::getPlatformLink() {
     return lt::PlatformLink(*link, *platform);
 }
 
-
-
-DownloadWindow::~DownloadWindow()
-= default;
+DownloadWindow::~DownloadWindow() = default;

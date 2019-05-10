@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOG_H
 #define LOG_H
 
@@ -36,7 +35,6 @@ public:
     Log(const Log &) = delete;
     Log(Log &&) = delete;
     Log &operator=(const Log &) = delete;
-
 
     /* Adds to the end of log */
     void appendEntry(LogEntry &&entry);

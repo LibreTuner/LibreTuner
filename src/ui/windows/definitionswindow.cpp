@@ -7,8 +7,6 @@
 DefinitionsWindow::DefinitionsWindow(QWidget *parent) : QWidget(parent) {
     platformsView_ = new QTreeView;
 
-
-
     auto *layout = new QHBoxLayout;
     layout->addWidget(platformsView_);
     setLayout(layout);

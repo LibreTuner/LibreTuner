@@ -9,7 +9,8 @@
 class RomHexBuffer : public QHexBuffer {
     Q_OBJECT
 public:
-    explicit RomHexBuffer(lt::RomPtr rom = lt::RomPtr()) : rom_(std::move(rom)) {}
+    explicit RomHexBuffer(lt::RomPtr rom = lt::RomPtr())
+        : rom_(std::move(rom)) {}
 
     int length() const override;
     void insert(int offset, const QByteArray &data) override;
@@ -29,11 +30,12 @@ class HexEditWidget : public QWidget {
 public:
     explicit HexEditWidget(QWidget *parent = nullptr);
 
-    inline void setRom(lt::RomPtr rom) noexcept { buffer_->setRom(std::move(rom)); }
+    inline void setRom(lt::RomPtr rom) noexcept {
+        buffer_->setRom(std::move(rom));
+    }
 
 private:
     RomHexBuffer *buffer_;
 };
 
-
-#endif //LIBRETUNER_HEXEDITWIDGET_H
+#endif // LIBRETUNER_HEXEDITWIDGET_H

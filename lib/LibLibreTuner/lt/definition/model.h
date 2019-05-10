@@ -31,14 +31,14 @@ private:
 };
 
 struct ModelTable {
-	const TableDefinition* table{nullptr};
-	std::size_t offset;
+    const TableDefinition *table{nullptr};
+    std::size_t offset;
 };
 
 /* Model definition. Includes the table locations */
 struct Model {
 public:
-	explicit Model(const Platform& _platform) : platform(_platform) {}
+    explicit Model(const Platform &_platform) : platform(_platform) {}
 
     const Platform &platform;
     std::string id;
@@ -54,7 +54,7 @@ public:
     const ModelTable *getTable(std::size_t index) const noexcept;
 
     std::size_t getAxisOffset(const std::string &id) const noexcept;
-    
+
     bool isModel(const uint8_t *data, std::size_t size) const noexcept;
 };
 using ModelPtr = std::shared_ptr<Model>;

@@ -27,9 +27,9 @@
 #include <filesystem>
 
 #include "database/links.h"
-#include "models/tablemodel.h"
-#include "lt/rom/rom.h"
 #include "datalinkswidget.h"
+#include "lt/rom/rom.h"
+#include "models/tablemodel.h"
 
 class QListView;
 
@@ -50,14 +50,14 @@ public:
     // the user for a path.
     void saveTune(bool newPath = false);
 
-public slots :
+public slots:
     void setTable(const lt::ModelTable *modTable);
 
 private slots:
     void on_buttonDownloadRom_clicked();
     void newLogClicked();
     void closeEvent(QCloseEvent *event) override;
-    
+
 signals:
     void tableChanged(lt::Table *table);
 
@@ -74,7 +74,7 @@ private:
     TablesWidget *tables_;
     EditorWidget *editor_;
     GraphWidget *graph_;
-    
+
     QAction *flashCurrentAction_;
     QAction *saveCurrentAction_;
 
@@ -87,18 +87,18 @@ private:
     QDockWidget *tablesDock_;
     QDockWidget *editorDock_;
     QDockWidget *graphDock_;
-    
 
     void setupMenu();
     void setupStatusBar();
-    
+
     void hideAllDocks();
     void restoreDocks();
-    
+
     void saveSettings();
     void loadSettings();
 
-    void setTune(const lt::TunePtr &tune, const std::filesystem::path &path = std::filesystem::path());
+    void setTune(const lt::TunePtr &tune,
+                 const std::filesystem::path &path = std::filesystem::path());
 
     QDockWidget *createOverviewDock();
     QDockWidget *createLoggingDock();
@@ -108,8 +108,8 @@ private:
     QDockWidget *createTablesDock();
     QDockWidget *createEditorDock();
     QDockWidget *createGraphDock();
-    
-    std::vector<QDockWidget*> docks_;
+
+    std::vector<QDockWidget *> docks_;
 
     std::filesystem::path tunePath_;
 
@@ -117,7 +117,7 @@ private:
 
     LinksListModel linksList_;
     TableModel tableModel_;
-    
+
     DatalinksWidget datalinksWindow_;
 
     QPointer<DefinitionsWindow> definitionsWindow_;

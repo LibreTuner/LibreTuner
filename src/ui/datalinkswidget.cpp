@@ -4,22 +4,22 @@
 
 #include "datalinkswidget.h"
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QFormLayout>
-#include <QTreeView>
-#include <QPushButton>
+#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QTreeView>
+#include <QVBoxLayout>
 
+#include "adddatalinkdialog.h"
 #include "database/links.h"
 #include "libretuner.h"
-#include "adddatalinkdialog.h"
 
 DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     setWindowTitle(tr("LibreTuner - Datalinks"));
     resize(600, 400);
-    
+
     auto *buttonAdd = new QPushButton(tr("Add"));
     auto *buttonRemove = new QPushButton(tr("Remove"));
 
@@ -27,7 +27,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     buttonUpdate_->setEnabled(false);
     buttonReset_ = new QPushButton(tr("Reset"));
     buttonReset_->setEnabled(false);
-    
+
     lineName_ = new QLineEdit;
     linePort_ = new QLineEdit;
     lineName_->setEnabled(false);
@@ -36,7 +36,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     linksView_ = new QTreeView;
     linksView_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     linksView_->setModel(&LT()->links());
-    
+
     // Layouts
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
@@ -54,7 +54,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     auto *layoutOpt = new QHBoxLayout;
     layoutOpt->addLayout(formLayout);
     layoutOpt->addLayout(layoutOptButtons);
-    
+
     auto *linksLayout = new QVBoxLayout;
     linksLayout->addWidget(linksView_);
     linksLayout->addLayout(layoutOpt);
@@ -68,7 +68,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         AddDatalinkDialog dlg;
         dlg.exec();
     });
-    
+
     connect(buttonRemove, &QPushButton::clicked, [this]() {
         auto *link = currentLink();
         if (link == nullptr) {
@@ -77,10 +77,10 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         LT()->links().remove(link);
         LT()->saveLinks();
     });
-    
-    connect(linksView_, &QTreeView::activated, [this](const QModelIndex &/*index*/) {
-        linkChanged(currentLink());
-    });
+
+    connect(
+        linksView_, &QTreeView::activated,
+        [this](const QModelIndex & /*index*/) { linkChanged(currentLink()); });
 
     connect(buttonUpdate_, &QPushButton::clicked, [this]() {
         lt::DataLink *link = currentLink();
@@ -112,20 +112,19 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     });
 }
 
-void DatalinksWidget::linkChanged(lt::DataLink *link)
-{
+void DatalinksWidget::linkChanged(lt::DataLink *link) {
     buttonUpdate_->setEnabled(false);
     buttonReset_->setEnabled(false);
 
     if (link == nullptr) {
         lineName_->clear();
         linePort_->clear();
-        
+
         lineName_->setEnabled(false);
         linePort_->setEnabled(false);
         return;
     }
-    
+
     lineName_->setText(QString::fromStdString(link->name()));
     linePort_->setText(QString::fromStdString(link->port()));
     lineName_->setEnabled(true);
@@ -133,10 +132,11 @@ void DatalinksWidget::linkChanged(lt::DataLink *link)
 }
 
 lt::DataLink *DatalinksWidget::currentLink() const {
-    QVariant data = LT()->links().data(linksView_->currentIndex(), Qt::UserRole);
-    if (!data.canConvert<lt::DataLink*>()) {
+    QVariant data =
+        LT()->links().data(linksView_->currentIndex(), Qt::UserRole);
+    if (!data.canConvert<lt::DataLink *>()) {
         return nullptr;
     }
 
-    return data.value<lt::DataLink*>();
+    return data.value<lt::DataLink *>();
 }

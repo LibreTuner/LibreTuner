@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "../auth/auth.h"
+#include "../datalog/pid.h"
 #include "../support/types.h"
 #include "model.h"
-#include "../datalog/pid.h"
 #include "table.h"
 
 namespace lt {
@@ -61,7 +61,7 @@ struct Platform {
     // Gets the table definition by id or returns nullptr
     const TableDefinition *getTable(std::size_t id) const noexcept;
 
-	const AxisDefinition *getAxis(const std::string &id) const noexcept;
+    const AxisDefinition *getAxis(const std::string &id) const noexcept;
 };
 using PlatformPtr = std::shared_ptr<Platform>;
 

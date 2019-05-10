@@ -19,17 +19,13 @@
 #include "verticallabel.h"
 
 #include <QPainter>
-#include <QStyle>
 #include <QPainterPath>
+#include <QStyle>
 
 VerticalLabel::VerticalLabel(QWidget *parent) : QLabel(parent) {}
 
-
-
 VerticalLabel::VerticalLabel(const QString &text, QWidget *parent)
     : QLabel(text, parent) {}
-
-
 
 void VerticalLabel::paintEvent(QPaintEvent *) {
     QPainter painter(this);
@@ -44,14 +40,10 @@ void VerticalLabel::paintEvent(QPaintEvent *) {
     painter.drawText(0, 0, height(), width(), alignment(), text());
 }
 
-
-
 QSize VerticalLabel::minimumSizeHint() const {
     QSize s = QLabel::minimumSizeHint();
     return {s.height(), s.width()};
 }
-
-
 
 QSize VerticalLabel::sizeHint() const {
     QSize s = QLabel::sizeHint();

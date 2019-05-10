@@ -16,9 +16,11 @@
 
 namespace lt {
 namespace network {
-    
-bool SocketCanReceiver::recv(CanMessage &message, std::chrono::milliseconds timeout) {
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
+bool SocketCanReceiver::recv(CanMessage &message,
+                             std::chrono::milliseconds timeout) {
+    std::chrono::steady_clock::time_point start =
+        std::chrono::steady_clock::now();
     while ((std::chrono::steady_clock::now() - start) < timeout) {
         if (!running_) {
             if (result_.valid()) {
@@ -27,21 +29,20 @@ bool SocketCanReceiver::recv(CanMessage &message, std::chrono::milliseconds time
             // If the result did not throw an exception, it was stop()'d
             throw std::runtime_error("SocketCAN receiver thread is inactive");
         }
-        
+
         if (buffer_.pop(message)) {
             return true;
         }
-        
+
         std::unique_lock lk(mutex_);
-        received_.wait_for(lk, timeout - (std::chrono::steady_clock::now() - start));
+        received_.wait_for(lk, timeout -
+                                   (std::chrono::steady_clock::now() - start));
     }
     // Timed out
     return false;
 }
 
-SocketCanReceiver::~SocketCanReceiver() {
-    stop();
-}
+SocketCanReceiver::~SocketCanReceiver() { stop(); }
 
 void SocketCanReceiver::work() {
     while (!stop_) {
@@ -71,29 +72,24 @@ void SocketCanReceiver::start() {
     if (running_) {
         return;
     }
-    
+
     stop_ = false;
     running_ = true;
     receiver_ = std::thread([this]() {
-        std::packaged_task<void()> task([this]() {
-            work();
-        });
-        
+        std::packaged_task<void()> task([this]() { work(); });
+
         result_ = task.get_future();
         task();
         running_ = false;
     });
 }
 
-void SocketCanReceiver::clearBuffer() {
-    buffer_.clear();
-}
+void SocketCanReceiver::clearBuffer() { buffer_.clear(); }
 
-SocketCan::~SocketCan() {
-    
-}
-    
-SocketCan::SocketCan(const std::string &ifname) : socket_(PF_CAN, SOCK_RAW, CAN_RAW), receiver_(socket_) {
+SocketCan::~SocketCan() {}
+
+SocketCan::SocketCan(const std::string &ifname)
+    : socket_(PF_CAN, SOCK_RAW, CAN_RAW), receiver_(socket_) {
     sockaddr_can addr = {};
     ifreq ifr;
 
@@ -103,40 +99,34 @@ SocketCan::SocketCan(const std::string &ifname) : socket_(PF_CAN, SOCK_RAW, CAN_
     addr.can_family = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 
-    socket_.bind(reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
-    
+    socket_.bind(reinterpret_cast<sockaddr *>(&addr), sizeof(addr));
+
     // Set timeout to 1s
     timeval tv = {0};
     tv.tv_sec = 1;
     tv.tv_usec = 0;
     socket_.setsockopt(SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-    
+
     receiver_.start();
 }
-    
 
-    
 void SocketCan::send(const CanMessage &message) {
     can_frame frame = {0};
-    
+
     frame.can_dlc = message.length();
     frame.can_id = message.id();
-    std::copy(message.message(), message.message() + message.length(), frame.data);
-    
+    std::copy(message.message(), message.message() + message.length(),
+              frame.data);
+
     socket_.send(&frame, sizeof(can_frame), 0);
 }
 
-
-
-bool SocketCan::recv(CanMessage &message,
-                      std::chrono::milliseconds timeout) {
+bool SocketCan::recv(CanMessage &message, std::chrono::milliseconds timeout) {
     return receiver_.recv(message, timeout);
 }
-    
-void SocketCan::clearBuffer() noexcept {
-    receiver_.clearBuffer();
-}
-    
+
+void SocketCan::clearBuffer() noexcept { receiver_.clearBuffer(); }
+
 } // namespace network
 } // namespace lt
 

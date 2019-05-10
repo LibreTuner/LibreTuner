@@ -11,4 +11,4 @@ void JobControl::setProgress(double progress) noexcept {
     job_->eventProgress_(progress);
 }
 
-}
+} // namespace lt

@@ -12,8 +12,7 @@ class VerticalLabel;
 
 class TableModel;
 
-class EditorWidget : public QWidget
-{
+class EditorWidget : public QWidget {
 public:
     explicit EditorWidget(QWidget *parent = nullptr);
 

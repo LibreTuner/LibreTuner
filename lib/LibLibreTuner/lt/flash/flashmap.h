@@ -31,18 +31,18 @@ class Tune;
  * Describes regions of memory to be reprogrammed
  */
 class FlashMap {
-  public:
+public:
     FlashMap(const std::vector<uint8_t> &data, std::size_t offset);
-	FlashMap(std::vector<uint8_t> &&data, std::size_t offset);
+    FlashMap(std::vector<uint8_t> &&data, std::size_t offset);
 
-	static FlashMap fromTune(Tune &tune);
+    static FlashMap fromTune(Tune &tune);
 
     // The address offset the data should be flashed to
     size_t offset() const { return offset_; }
 
     const std::vector<uint8_t> &data() const { return data_; }
 
-  private:
+private:
     std::vector<uint8_t> data_;
     std::size_t offset_;
 };

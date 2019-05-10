@@ -1,9 +1,9 @@
 #ifndef LT_JOB_H
 #define LT_JOB_H
 
-#include <vector>
 #include <future>
 #include <thread>
+#include <vector>
 
 #include "event.h"
 
@@ -15,20 +15,21 @@ class Job : public std::enable_shared_from_this<Job> {
 public:
     friend JobControl;
 
-    template<typename F, class ...Args>
-    void run(F &&f, Args &&...args);
+    template <typename F, class... Args> void run(F &&f, Args &&... args);
 
     inline bool running() const noexcept { return running_; }
 
-    inline void cancel() noexcept { canceled_ = true; eventCanceled_(); }
+    inline void cancel() noexcept {
+        canceled_ = true;
+        eventCanceled_();
+    }
 
-    template<typename F>
-    Event<>::ConnectionPtr onCanceled(F &&f) noexcept {
+    template <typename F> Event<>::ConnectionPtr onCanceled(F &&f) noexcept {
         return eventCanceled_.connect(std::forward<F>(f));
     }
 
     // Called when progress changes
-    template<typename F>
+    template <typename F>
     Event<double>::ConnectionPtr onProgress(F &&f) noexcept {
         return eventProgress_.connect(std::forward<F>(f));
     }
@@ -52,8 +53,8 @@ class JobControl {
 public:
     explicit JobControl(JobPtr job) : job_(std::move(job)) {}
 
-    JobControl(const JobControl&) = delete;
-    JobControl &operator=(const JobControl&) = delete;
+    JobControl(const JobControl &) = delete;
+    JobControl &operator=(const JobControl &) = delete;
 
     inline bool canceled() const noexcept { return job_->canceled_; }
 
@@ -65,16 +66,11 @@ private:
 
 class JobPool {
 public:
-
 private:
     std::vector<JobPtr> jobs_;
 };
 
-
-
-
-template<typename F, class... Args>
-void Job::run(F &&f, Args &&... args) {
+template <typename F, class... Args> void Job::run(F &&f, Args &&... args) {
     if (running_) {
         throw std::runtime_error("run() called on active job");
     }
@@ -86,9 +82,6 @@ void Job::run(F &&f, Args &&... args) {
     });
 }
 
+} // namespace lt
 
-
-}
-
-
-#endif //LIBRETUNER_JOB_H
+#endif // LIBRETUNER_JOB_H

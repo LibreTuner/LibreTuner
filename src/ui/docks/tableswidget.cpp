@@ -15,11 +15,12 @@ TablesWidget::TablesWidget(QWidget *parent) : QWidget(parent) {
     layout->addWidget(view_);
     setLayout(layout);
 
-    connect(view_, &QTreeWidget::itemActivated,
-            [this](const QTreeWidgetItem *item, int /*column*/) {
-                emit activated(item->data(0, Qt::UserRole)
-                                   .value<const lt::ModelTable *>());
-            });
+    connect(
+        view_, &QTreeWidget::itemActivated,
+        [this](const QTreeWidgetItem *item, int /*column*/) {
+            emit activated(
+                item->data(0, Qt::UserRole).value<const lt::ModelTable *>());
+        });
 }
 
 void TablesWidget::setModel(const lt::Model &model) {
@@ -27,7 +28,9 @@ void TablesWidget::setModel(const lt::Model &model) {
     std::vector<std::pair<std::string, QTreeWidgetItem *>> categories_;
 
     for (const lt::ModelTable &def : model.tables) {
-        if (def.table == nullptr) { continue; }
+        if (def.table == nullptr) {
+            continue;
+        }
         QTreeWidgetItem *par = nullptr;
 
         const lt::TableDefinition *table = def.table;

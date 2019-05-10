@@ -44,7 +44,7 @@ public:
 
 private:
     Ui::CreateTuneDialog *ui_;
-	lt::TunePtr tune_;
+    lt::TunePtr tune_;
 
 private slots:
     void on_buttonCreate_clicked();

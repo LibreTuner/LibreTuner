@@ -9,7 +9,7 @@ int DtcModel::rowCount(const QModelIndex &parent) const {
     return codes_.size();
 }
 
-int DtcModel::columnCount(const QModelIndex &/*parent*/) const { return 2; }
+int DtcModel::columnCount(const QModelIndex & /*parent*/) const { return 2; }
 
 QVariant DtcModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole || !index.isValid() || index.column() < 0 ||

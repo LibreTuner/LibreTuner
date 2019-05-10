@@ -18,27 +18,28 @@
 
 #include "flasherwindow.h"
 
-#include "logger.h"
-#include "libretuner.h"
 #include "authoptionsview.h"
 #include "backgroundtask.h"
-#include "lt/link/platformlink.h"
 #include "fileselectwidget.h"
+#include "libretuner.h"
+#include "logger.h"
+#include "lt/link/platformlink.h"
 #include "uiutil.h"
 
 #include <cassert>
 
+#include <QComboBox>
+#include <QFormLayout>
 #include <QMessageBox>
+#include <QProgressDialog>
+#include <QPushButton>
+#include <QStackedWidget>
 #include <QString>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
-#include <QFormLayout>
-#include <QComboBox>
-#include <QPushButton>
-#include <QProgressDialog>
-#include <QStackedWidget>
 
-FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent), linksList_(LT()->links()) {
+FlasherWindow::FlasherWindow(QWidget *parent)
+    : QDialog(parent), linksList_(LT()->links()) {
     setWindowTitle(tr("LibreTuner - Flash"));
     resize(600, 200);
 
@@ -47,10 +48,10 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent), linksList_(LT()
     buttonAdvanced_ = new QPushButton(tr("Advanced"));
     buttonAdvanced_->setCheckable(true);
     buttonAdvanced_->setVisible(false);
-    
+
     buttonFlash_ = new QPushButton(tr("Flash"));
     buttonFlash_->setEnabled(false);
-    
+
     // Buttons layout
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
@@ -67,7 +68,7 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent), linksList_(LT()
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->addWidget(buttonPrevious_);
     controlLayout->addWidget(buttonNext_);
-    
+
     // Pages
     stack_ = new QStackedWidget;
     stack_->addWidget(createSelectPage());
@@ -79,96 +80,111 @@ FlasherWindow::FlasherWindow(QWidget *parent) : QDialog(parent), linksList_(LT()
     topLayout->setContentsMargins(0, 0, 0, 0);
     topLayout->addWidget(stack_);
     topLayout->addLayout(buttonLayout);
-    
+
     // Main layout
     QVBoxLayout *layout = new QVBoxLayout;
-    //layout->setSizeConstraint(QLayout::SetFixedSize);
-    
+    // layout->setSizeConstraint(QLayout::SetFixedSize);
+
     layout->addLayout(topLayout);
     layout->addLayout(controlLayout);
-    
+
     setLayout(layout);
 
-
-    connect(buttonNext_, &QPushButton::clicked, this, &FlasherWindow::nextClicked);
-    connect(buttonPrevious_, &QPushButton::clicked, this, &FlasherWindow::previousClicked);
-    connect(buttonAdvanced_, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
+    connect(buttonNext_, &QPushButton::clicked, this,
+            &FlasherWindow::nextClicked);
+    connect(buttonPrevious_, &QPushButton::clicked, this,
+            &FlasherWindow::previousClicked);
+    connect(buttonAdvanced_, &QAbstractButton::toggled, authOptions_,
+            &QWidget::setVisible);
     connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
-    connect(buttonFlash_, &QPushButton::clicked, this, &FlasherWindow::buttonFlashClicked);
+    connect(buttonFlash_, &QPushButton::clicked, this,
+            &FlasherWindow::buttonFlashClicked);
 }
 
-void FlasherWindow::buttonFlashClicked()
-{
-   catchCritical([this]() {
-        auto link = comboLink_->currentData(Qt::UserRole).value<lt::DataLink*>();
-        if (link == nullptr) {
-            Logger::debug("Invalid link when pressing button - verification failed somewhere");
-            return;
-        }
-        
-        if (!selectedTune_) {
-            Logger::debug("Invalid tune when pressing button - verification failed somewhere");
-            return;
-        }
-        
-        auto platform = selectedTune_->base()->model()->platform;
-        auto platformLink = std::make_unique<lt::PlatformLink>(*link, platform);
-        lt::FlasherPtr flasher = platformLink->flasher();
-        
-        if (!flasher) {
-            Logger::critical("Failed to create flasher");
-            QMessageBox(QMessageBox::Critical, tr("Flash failure"), tr("Failed to create flasher for the selected platform and datalink")).exec();
-            return;
-        }
-
-        // Create progress dialog
-        QProgressDialog progress(tr("Flashing tune..."), tr("Abort"), 0, 100, this);
-        progress.setWindowModality(Qt::WindowModal);
-        progress.setWindowTitle(tr("LibreTuner - Flash"));
-        progress.setValue(0);
-        progress.show();
-
-        flasher->setProgressCallback([&](float prog) {
-            QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
-        });
-        
-        // Create task
-        BackgroundTask<bool()> task([&]() {
-            return flasher->flash(lt::FlashMap::fromTune(*selectedTune_));
-        });
-        
-        bool canceled = false;
-        
-        connect(&progress, &QProgressDialog::canceled, [&]() {
-            // Alert the user of possible bricking
-            QMessageBox msgBox;
-            msgBox.setText("Are you sure you want to cancel reprogramming");
-            msgBox.setInformativeText("Canceling the reprogramming task WILL leave the ECU in an inoperable state.");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setDefaultButton(QMessageBox::No);
-            
-            if (msgBox.exec() == QMessageBox::Yes) {
-                flasher->cancel();
-                canceled = true;
+void FlasherWindow::buttonFlashClicked() {
+    catchCritical(
+        [this]() {
+            auto link =
+                comboLink_->currentData(Qt::UserRole).value<lt::DataLink *>();
+            if (link == nullptr) {
+                Logger::debug("Invalid link when pressing button - "
+                              "verification failed somewhere");
+                return;
             }
-        });
-        
-        task();
 
-        if (!canceled) {
-            if (!task.future().get()) {
-                throw std::runtime_error("Unknown error");
-            } else {
-                QMessageBox(QMessageBox::Information, "Flash Finished", "Successfully reprogrammed ECU").exec();
+            if (!selectedTune_) {
+                Logger::debug("Invalid tune when pressing button - "
+                              "verification failed somewhere");
+                return;
             }
-        }
-    }, tr("Error while flashing"));
+
+            auto platform = selectedTune_->base()->model()->platform;
+            auto platformLink =
+                std::make_unique<lt::PlatformLink>(*link, platform);
+            lt::FlasherPtr flasher = platformLink->flasher();
+
+            if (!flasher) {
+                Logger::critical("Failed to create flasher");
+                QMessageBox(QMessageBox::Critical, tr("Flash failure"),
+                            tr("Failed to create flasher for the selected "
+                               "platform and datalink"))
+                    .exec();
+                return;
+            }
+
+            // Create progress dialog
+            QProgressDialog progress(tr("Flashing tune..."), tr("Abort"), 0,
+                                     100, this);
+            progress.setWindowModality(Qt::WindowModal);
+            progress.setWindowTitle(tr("LibreTuner - Flash"));
+            progress.setValue(0);
+            progress.show();
+
+            flasher->setProgressCallback([&](float prog) {
+                QMetaObject::invokeMethod(&progress, "setValue",
+                                          Qt::QueuedConnection,
+                                          Q_ARG(int, prog * 100));
+            });
+
+            // Create task
+            BackgroundTask<bool()> task([&]() {
+                return flasher->flash(lt::FlashMap::fromTune(*selectedTune_));
+            });
+
+            bool canceled = false;
+
+            connect(&progress, &QProgressDialog::canceled, [&]() {
+                // Alert the user of possible bricking
+                QMessageBox msgBox;
+                msgBox.setText("Are you sure you want to cancel reprogramming");
+                msgBox.setInformativeText(
+                    "Canceling the reprogramming task WILL leave the ECU in an "
+                    "inoperable state.");
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::No);
+
+                if (msgBox.exec() == QMessageBox::Yes) {
+                    flasher->cancel();
+                    canceled = true;
+                }
+            });
+
+            task();
+
+            if (!canceled) {
+                if (!task.future().get()) {
+                    throw std::runtime_error("Unknown error");
+                } else {
+                    QMessageBox(QMessageBox::Information, "Flash Finished",
+                                "Successfully reprogrammed ECU")
+                        .exec();
+                }
+            }
+        },
+        tr("Error while flashing"));
 }
 
-
-
-void FlasherWindow::setTune(const lt::TunePtr &tune)
-{
+void FlasherWindow::setTune(const lt::TunePtr &tune) {
     selectedTune_ = tune;
     if (selectedTune_) {
         stack_->setCurrentIndex(1);
@@ -179,41 +195,39 @@ void FlasherWindow::setTune(const lt::TunePtr &tune)
     verify();
 }
 
-void FlasherWindow::nextClicked()
-{
+void FlasherWindow::nextClicked() {
     // Try to open tune
-    catchCritical([this]() {
-        selectedTune_ = LT()->openTune(fileSelect_->path().toStdString());
+    catchCritical(
+        [this]() {
+            selectedTune_ = LT()->openTune(fileSelect_->path().toStdString());
 
-        stack_->setCurrentIndex(1);
-        buttonNext_->setEnabled(false);
-        buttonPrevious_->setEnabled(true);
-        buttonAdvanced_->setVisible(true);
+            stack_->setCurrentIndex(1);
+            buttonNext_->setEnabled(false);
+            buttonPrevious_->setEnabled(true);
+            buttonAdvanced_->setVisible(true);
 
-        verify();
-    }, "Error opening tune");
+            verify();
+        },
+        "Error opening tune");
 }
 
-void FlasherWindow::previousClicked()
-{
+void FlasherWindow::previousClicked() {
     stack_->setCurrentIndex(0);
     buttonPrevious_->setEnabled(false);
     buttonNext_->setEnabled(true);
     buttonAdvanced_->setVisible(false);
 }
 
-
-
-void FlasherWindow::verify()
-{
+void FlasherWindow::verify() {
     if (selectedTune_ != nullptr) {
-        authOptions_->setDefaultOptions(selectedTune_->base()->model()->platform.flashAuthOptions);
+        authOptions_->setDefaultOptions(
+            selectedTune_->base()->model()->platform.flashAuthOptions);
     }
-    buttonFlash_->setEnabled(selectedTune_ && comboLink_->currentData(Qt::UserRole).isValid());
+    buttonFlash_->setEnabled(selectedTune_ &&
+                             comboLink_->currentData(Qt::UserRole).isValid());
 }
 
-QWidget *FlasherWindow::createSelectPage()
-{
+QWidget *FlasherWindow::createSelectPage() {
     fileSelect_ = new FileSelectWidget("Open tune", "Tune (*.ltt)");
 
     auto *layout = new QVBoxLayout;
@@ -227,16 +241,14 @@ QWidget *FlasherWindow::createSelectPage()
     return page;
 }
 
-QWidget *FlasherWindow::createOptionPage()
-{
+QWidget *FlasherWindow::createOptionPage() {
     // Form entries
     comboLink_ = new QComboBox;
     comboLink_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     comboLink_->setItemDelegate(new QStyledItemDelegate());
     comboLink_->setModel(&linksList_);
-    connect(comboLink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
-        verify();
-    });
+    connect(comboLink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this](int) { verify(); });
 
     // Form
     QFormLayout *form = new QFormLayout;
@@ -256,8 +268,5 @@ QWidget *FlasherWindow::createOptionPage()
     page->setContentsMargins(0, 0, 0, 0);
     return page;
 }
-
-
-
 
 FlasherWindow::~FlasherWindow() {}

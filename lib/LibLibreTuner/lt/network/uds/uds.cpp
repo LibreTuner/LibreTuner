@@ -1,14 +1,13 @@
 #include "uds.h"
 
 #include <array>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 namespace lt {
 namespace network {
 
-UdsPacket Uds::request(uint8_t sid, const uint8_t *data,
-                         size_t size) {
+UdsPacket Uds::request(uint8_t sid, const uint8_t *data, size_t size) {
     // Receive until we get a non-response-pending packet
 
     // Build request
@@ -25,19 +24,21 @@ UdsPacket Uds::request(uint8_t sid, const uint8_t *data,
                 continue;
             }
             std::stringstream ss;
-            ss << "negative UDS response: 0x" << std::hex << static_cast<int>(code)
-                << " (" << std::dec << static_cast<int>(code) << ")";
+            ss << "negative UDS response: 0x" << std::hex
+               << static_cast<int>(code) << " (" << std::dec
+               << static_cast<int>(code) << ")";
             throw std::runtime_error(ss.str());
         }
 
         if (response.code != sid + 0x40) {
-            throw std::runtime_error(
-                "uds response id (" + std::to_string(response.code) + ") does not match expected id (" + std::to_string(sid + 0x40) + ")");
+            throw std::runtime_error("uds response id (" +
+                                     std::to_string(response.code) +
+                                     ") does not match expected id (" +
+                                     std::to_string(sid + 0x40) + ")");
         }
         return response;
     } while (true);
 }
-
 
 std::vector<uint8_t> Uds::requestSession(uint8_t type) {
     UdsPacket res = request(UDS_REQ_SESSION, &type, 1);
@@ -95,16 +96,14 @@ std::vector<uint8_t> Uds::requestReadMemoryAddress(uint32_t address,
     return res.data;
 }
 
-std::vector<uint8_t> Uds::readDataByIdentifier(uint16_t id)
-{
+std::vector<uint8_t> Uds::readDataByIdentifier(uint16_t id) {
     std::array<uint8_t, 2> req;
     req[0] = id >> 8;
     req[1] = id & 0xFF;
-    
+
     UdsPacket res = request(UDS_REQ_READBYID, req.data(), req.size());
     return res.data;
 }
-
 
 } // namespace network
 } // namespace lt

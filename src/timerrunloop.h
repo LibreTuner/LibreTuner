@@ -67,5 +67,4 @@ private:
     std::atomic<bool> running_;
 };
 
-
 #endif // LIBRETUNER_TIMERRUNLOOP_H

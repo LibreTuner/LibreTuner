@@ -2,15 +2,14 @@
 
 #include "lt/definition/model.h"
 
-#include <QVBoxLayout>
+#include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QScrollArea>
 #include <QPlainTextEdit>
+#include <QScrollArea>
 #include <QToolButton>
-#include <QFormLayout>
-
+#include <QVBoxLayout>
 
 SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableDescription_ = new QLabel;
@@ -23,7 +22,8 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfoButton_->setAutoRaise(true);
     tableInfoButton_->setCheckable(true);
 
-    connect(tableInfoButton_, &QToolButton::clicked, this, &SidebarWidget::on_treeToolButton_clicked);
+    connect(tableInfoButton_, &QToolButton::clicked, this,
+            &SidebarWidget::on_treeToolButton_clicked);
 
     tableInfoTitleLayout->addWidget(tableInfoButton_);
     tableInfoTitleLayout->addWidget(new QLabel(tr("Table Info:")));
@@ -33,7 +33,7 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfo_->setContentsMargins(0, 0, 0, 0);
     auto *tableForm = new QFormLayout;
     tableForm->setSizeConstraint(QFormLayout::SetMaximumSize);
-    
+
     // Build tree widget
     tableName_ = new QLineEdit;
     tableName_->setReadOnly(true);
@@ -49,7 +49,7 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableUnit_->setReadOnly(true);
     tableDataType_ = new QLineEdit;
     tableDataType_->setReadOnly(true);
-    
+
     tableForm->addRow(tr("Name"), tableName_);
     tableForm->addRow(tr("Offset"), tableOffset_);
     tableForm->addRow(tr("Width"), tableWidth_);
@@ -57,10 +57,9 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableForm->addRow(tr("Range"), tableRange_);
     tableForm->addRow(tr("Unit"), tableUnit_);
     tableForm->addRow(tr("Data type"), tableDataType_);
-    
-    
+
     tableInfo_->setLayout(tableForm);
-    
+
     // Scroll area
     auto *scrollLayout = new QVBoxLayout;
     scrollLayout->setContentsMargins(5, 0, 5, 0);
@@ -68,29 +67,26 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     scrollLayout->addWidget(tableDescription_);
     scrollLayout->addLayout(tableInfoTitleLayout);
     scrollLayout->addWidget(tableInfo_);
-    
+
     auto *scrollWidget = new QWidget;
     scrollWidget->setContentsMargins(0, 0, 0, 0);
     scrollWidget->setLayout(scrollLayout);
-    
+
     auto *scrollArea = new QScrollArea;
     scrollArea->setWidget(scrollWidget);
     scrollArea->setWidgetResizable(true);
-    
+
     // Main layout
     auto *layout = new QVBoxLayout;
     setLayout(layout);
     layout->addWidget(scrollArea);
     // layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
-    
+
     fillTableInfo(nullptr);
 }
 
-
-
-void SidebarWidget::fillTableInfo(const lt::ModelTable* mod)
-{
+void SidebarWidget::fillTableInfo(const lt::ModelTable *mod) {
     if (mod == nullptr) {
         tableName_->setText("N/A");
         tableOffset_->setText("N/A");
@@ -104,16 +100,15 @@ void SidebarWidget::fillTableInfo(const lt::ModelTable* mod)
     }
 
     const lt::TableDefinition *table = mod->table;
-    
+
     tableName_->setText(QString::fromStdString(table->name));
     tableOffset_->setText(QString("0x") + QString::number(mod->offset, 16));
     tableWidth_->setText(QString::number(table->width));
     tableHeight_->setText(QString::number(table->height));
-    tableRange_->setText(QString("%1 - %2").arg(table->minimum).arg(table->maximum));
+    tableRange_->setText(
+        QString("%1 - %2").arg(table->minimum).arg(table->maximum));
     tableDescription_->setText(QString::fromStdString(table->description));
 }
-
-
 
 void SidebarWidget::on_treeToolButton_clicked(bool checked) {
     if (checked) {

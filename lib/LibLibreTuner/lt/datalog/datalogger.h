@@ -19,18 +19,16 @@
 #ifndef LT_DATALOGGER_H
 #define LT_DATALOGGER_H
 
+#include <atomic>
 #include <cstdint>
+#include <forward_list>
 #include <mutex>
 #include <string>
-#include <atomic>
-#include <forward_list>
 
-#include "datalog.h"
 #include "../network/uds/uds.h"
+#include "datalog.h"
 
 namespace lt {
-
-
 
 class DataLogger;
 
@@ -54,15 +52,14 @@ protected:
 };
 using DataLoggerPtr = std::unique_ptr<DataLogger>;
 
-
 class UdsDataLogger : public DataLogger {
 public:
     UdsDataLogger(DataLog &log, network::UdsPtr &&uds);
     UdsDataLogger(const UdsDataLogger &) = delete;
     UdsDataLogger(UdsDataLogger &&) = delete;
-    UdsDataLogger &operator=(UdsDataLogger&&) = delete;
-    UdsDataLogger &operator=(const UdsDataLogger&) = delete;
-    
+    UdsDataLogger &operator=(UdsDataLogger &&) = delete;
+    UdsDataLogger &operator=(const UdsDataLogger &) = delete;
+
     ~UdsDataLogger() override = default;
 
     void addPid(Pid pid) override;
@@ -75,7 +72,7 @@ public:
 private:
     Pid *nextPid();
     void processNext();
-    
+
     std::chrono::steady_clock::time_point freeze_time_;
 
     network::UdsPtr uds_;
@@ -86,6 +83,6 @@ private:
     size_t current_pid_ = 0;
 };
 
-}
+} // namespace lt
 
 #endif // LT_DATALOGGER_H

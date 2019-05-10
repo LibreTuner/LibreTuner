@@ -1,9 +1,9 @@
 #ifndef LT_ELM327_H
 #define LT_ELM327_H
 
-#include <serial/device.h>
-#include <serial/bufferedreader.h>
 #include <memory>
+#include <serial/bufferedreader.h>
+#include <serial/device.h>
 
 namespace lt::network {
 
@@ -12,13 +12,13 @@ enum class ElmProtocol : uint8_t {
     SAE_J1850_PWM = 1,
     SAE_J1850_VPW = 2,
     ISO_9141_2 = 3,
-    ISO_14230_4_KWP_5_Baud = 4, // 5 baud init
-    ISO_14230_4_KWP_Fast = 5, // fast init
+    ISO_14230_4_KWP_5_Baud = 4,    // 5 baud init
+    ISO_14230_4_KWP_Fast = 5,      // fast init
     ISO_15765_4_CAN_11bit_500 = 6, // ISO_TP w/ 11 bit id @ 500kbaud
     ISO_15765_4_CAN_29bit_500 = 7, // // ISO_TP w/ 29 bit id @ 500kbaud
     ISO_15765_4_CAN_11bit_250 = 8, // ISO_TP w/ 11 bit id @ 250kbaud
     ISO_15765_4_CAN_29bit_250 = 9, // // ISO_TP w/ 29 bit id @ 250kbaud
-    SAE_J1939_CAN = 0xA, // 29 bit ID @ 250kbaud (adjustable)
+    SAE_J1939_CAN = 0xA,           // 29 bit ID @ 250kbaud (adjustable)
     USER1_CAN = 0xB,
     USER2_CAN = 0xC,
 };
@@ -60,10 +60,12 @@ public:
     // Sets timeout byte (0 = 0ms, 0xFF = 1000ms)
     void setTimeout(uint8_t timeout);
 
-    // Sends a command and waits for a response. Returns response separated into lines.
+    // Sends a command and waits for a response. Returns response separated into
+    // lines.
     std::vector<std::string> sendCommand(const std::string &command);
 
-    // Same as `sendCommand()` but throws an exception if the response is not "OK"
+    // Same as `sendCommand()` but throws an exception if the response is not
+    // "OK"
     void sendBasicCommand(const std::string &command);
 
 private:
@@ -72,7 +74,6 @@ private:
 };
 using Elm327Ptr = std::shared_ptr<Elm327>;
 
-}
+} // namespace lt::network
 
-
-#endif //LT_ELM327_H
+#endif // LT_ELM327_H

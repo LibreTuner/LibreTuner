@@ -32,21 +32,21 @@ namespace auth {
 
 class UdsAuthenticator {
 public:
-	UdsAuthenticator(network::Uds& uds, Options options);
-	/* Start authentication */
-	void auth();
+    UdsAuthenticator(network::Uds &uds, Options options);
+    /* Start authentication */
+    void auth();
 
-	uint32_t generateKey(uint32_t parameter, const uint8_t* seed, size_t size);
+    uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t size);
 
 private:
-	network::Uds& uds_;
-	Options options_;
+    network::Uds &uds_;
+    Options options_;
 
-	void do_session();
-	void do_request_seed();
-	void do_send_key(uint32_t key);
+    void do_session();
+    void do_request_seed();
+    void do_send_key(uint32_t key);
 };
-} // namespace uds
-}
+} // namespace auth
+} // namespace lt
 
 #endif // UDSAUTHENTICATOR_H

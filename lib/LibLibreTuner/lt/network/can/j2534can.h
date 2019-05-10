@@ -23,28 +23,27 @@
 #include <memory>
 #include <thread>
 
-#include "j2534/j2534.h"
 #include "can.h"
-
+#include "j2534/j2534.h"
 
 namespace lt {
 namespace network {
 
 class J2534Can : public Can {
-  public:
+public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
     J2534Can(const j2534::DevicePtr &device, uint32_t baudrate = 500000);
 
     virtual ~J2534Can() override;
 
     // Can interface
-  public:
+public:
     virtual void send(const CanMessage &message) override;
     // Returns true if a message was received before the timeout
     virtual bool recv(CanMessage &message,
                       std::chrono::milliseconds timeout) override;
 
-  private:
+private:
     j2534::Channel channel_;
 };
 

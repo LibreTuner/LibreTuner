@@ -5,8 +5,8 @@
 #ifndef LIBRETUNER_DEFINITIONVIEW_H
 #define LIBRETUNER_DEFINITIONVIEW_H
 
-#include <QDialog>
 #include "lt/definition/platform.h"
+#include <QDialog>
 
 class QAbstractItemModel;
 class QComboBox;
@@ -32,5 +32,4 @@ private:
     QComboBox *comboDatalinks_;
 };
 
-
-#endif //LIBRETUNER_DEFINITIONVIEW_H
+#endif // LIBRETUNER_DEFINITIONVIEW_H

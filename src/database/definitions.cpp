@@ -212,19 +212,19 @@ lt::AxisDefinition loadAxis(const YAML::Node &axis) {
     }(axis["type"].as<std::string>());
 
     switch (type) {
-        case lt::AxisType::Linear: {
-            lt::LinearAxisDefinition linear{0};
-            linear.start = axis["minimum"].as<double>();
-            linear.increment = axis["increment"].as<double>();
-            definition.def.emplace<lt::LinearAxisDefinition>(linear);
-            break;
-        }
-        case lt::AxisType::Memory: {
-            lt::MemoryAxisDefinition memory = {0};
-            memory.size = axis["size"].as<std::size_t>();
-            definition.def.emplace<lt::MemoryAxisDefinition>(memory);
-            break;
-        }
+    case lt::AxisType::Linear: {
+        lt::LinearAxisDefinition linear{0};
+        linear.start = axis["minimum"].as<double>();
+        linear.increment = axis["increment"].as<double>();
+        definition.def.emplace<lt::LinearAxisDefinition>(linear);
+        break;
+    }
+    case lt::AxisType::Memory: {
+        lt::MemoryAxisDefinition memory = {0};
+        memory.size = axis["size"].as<std::size_t>();
+        definition.def.emplace<lt::MemoryAxisDefinition>(memory);
+        break;
+    }
     }
     return definition;
 }
@@ -254,7 +254,8 @@ lt::PlatformPtr loadPlatformDefinition(const std::filesystem::path &path) {
         const auto &transfer = root["transfer"];
         if (transfer["flashmode"]) {
             platform->flashMode = transfer["flashmode"].as<std::string>();
-            std::transform(platform->flashMode.begin(), platform->flashMode.end(),
+            std::transform(platform->flashMode.begin(),
+                           platform->flashMode.end(),
                            platform->flashMode.begin(), ::tolower);
         }
 
@@ -286,8 +287,8 @@ lt::PlatformPtr loadPlatformDefinition(const std::filesystem::path &path) {
                 platform->downloadAuthOptions.session;
         }
         if (auth["download_sessionid"]) {
-            platform->downloadAuthOptions.session =
-                static_cast<uint8_t>(auth["download_sessionid"].as<std::size_t>());
+            platform->downloadAuthOptions.session = static_cast<uint8_t>(
+                auth["download_sessionid"].as<std::size_t>());
         }
         if (auth["flash_sessionid"]) {
             platform->flashAuthOptions.session =
@@ -360,8 +361,8 @@ void Definitions::loadPlatform(const fs::path &path) {
             continue;
         }
         if (modelEntry.is_regular_file()) {
-            lt::ModelPtr model =
-                loadModel(*platform, YAML::LoadFile(modelEntry.path().string()));
+            lt::ModelPtr model = loadModel(
+                *platform, YAML::LoadFile(modelEntry.path().string()));
             platform->models.emplace_back(std::move(model));
         }
     }
@@ -378,8 +379,7 @@ lt::PlatformPtr Definitions::fromId(const std::string &id) const noexcept {
     return lt::PlatformPtr();
 }
 
-lt::PlatformPtr Definitions::first() const noexcept
-{
+lt::PlatformPtr Definitions::first() const noexcept {
     if (platforms_.empty()) {
         return lt::PlatformPtr();
     }
@@ -423,7 +423,7 @@ int Definitions::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int Definitions::columnCount(const QModelIndex &/*parent*/) const { return 1; }
+int Definitions::columnCount(const QModelIndex & /*parent*/) const { return 1; }
 
 QVariant Definitions::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.column() != 0 ||
@@ -467,7 +467,8 @@ QVariant Definitions::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QVariant Definitions::headerData(int /*section*/, Qt::Orientation /*orientation*/,
+QVariant Definitions::headerData(int /*section*/,
+                                 Qt::Orientation /*orientation*/,
                                  int /*role*/) const {
     return QVariant();
 }

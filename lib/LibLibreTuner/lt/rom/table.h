@@ -125,7 +125,8 @@ public:
         std::vector<uint8_t> serialized;
         std::visit(
             [&serialized, endianness](auto &&vec) {
-                using EntryType = typename std::decay_t<decltype(vec)>::value_type;
+                using EntryType =
+                    typename std::decay_t<decltype(vec)>::value_type;
                 serialized.resize(vec.size() * sizeof(EntryType));
                 if (endianness == Endianness::Big) {
                     writeBE<EntryType>(vec.begin(), vec.end(),
@@ -147,7 +148,8 @@ public:
 
         std::visit(
             [&begin, &end, endianness](auto &&vec) {
-                using EntryType = typename std::decay_t<decltype(vec)>::value_type;
+                using EntryType =
+                    typename std::decay_t<decltype(vec)>::value_type;
 
                 if (std::distance(begin, end) / sizeof(EntryType) !=
                     vec.size()) {
@@ -179,8 +181,7 @@ template <typename EntryType,
           typename = std::enable_if_t<std::is_arithmetic<EntryType>::value>>
 class BasicTable {
 public:
-    template <typename T>
-    void initialize(int width, int height) {
+    template <typename T> void initialize(int width, int height) {
         assert(width >= 0);
         assert(height > 0);
         entries_ = TableStorage::create<T>(width * height);
@@ -195,17 +196,17 @@ public:
         if (!bounds_.withinBounds(value)) {
             throw std::runtime_error("value out of bounds");
         }
-		if (get(x, y) != value) {
-			setDirty();
-			entries_.set<EntryType>(y * width() + x, value);
-		}
+        if (get(x, y) != value) {
+            setDirty();
+            entries_.set<EntryType>(y * width() + x, value);
+        }
     }
 
     inline int width() const noexcept { return width_; }
-    inline int height() const noexcept {
-        return entries_.size() / width_;
+    inline int height() const noexcept { return entries_.size() / width_; }
+    inline int size() const noexcept {
+        return static_cast<int>(entries_.size());
     }
-    inline int size() const noexcept { return static_cast<int>(entries_.size()); }
 
     template <typename T = EntryType, typename Iter>
     Iter serialize(Iter begin, Iter end) const {
@@ -218,8 +219,8 @@ public:
 
     template <typename Iter>
     inline void deserialize(Iter begin, Iter end, Endianness endianness) {
-        entries_.deserialize(std::forward<Iter>(begin),
-                                std::forward<Iter>(end), endianness);
+        entries_.deserialize(std::forward<Iter>(begin), std::forward<Iter>(end),
+                             endianness);
     }
 
     inline std::string name() const noexcept { return name_; }
@@ -255,9 +256,9 @@ public:
     inline double scale() const noexcept { return scale_; }
     inline void setScale(double scale) noexcept { scale_ = scale; }
 
-	inline void setDirty() noexcept { dirty_ = true; }
-	inline void clearDirty() noexcept { dirty_ = false; }
-	inline bool dirty() const noexcept { return dirty_; }
+    inline void setDirty() noexcept { dirty_ = true; }
+    inline void clearDirty() noexcept { dirty_ = false; }
+    inline bool dirty() const noexcept { return dirty_; }
 
 private:
     TableStorage entries_;
@@ -270,7 +271,7 @@ private:
 
     TableAxisPtr axisX_;
     TableAxisPtr axisY_;
-	bool dirty_{false};
+    bool dirty_{false};
 };
 
 using Table = BasicTable<double>;

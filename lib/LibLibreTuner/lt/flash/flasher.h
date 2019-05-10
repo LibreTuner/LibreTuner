@@ -23,8 +23,8 @@
 #include <memory>
 #include <string>
 
-#include "../support/asyncroutine.h"
 #include "../auth/auth.h"
+#include "../support/asyncroutine.h"
 #include "flashmap.h"
 
 class PlatformLink;
@@ -39,7 +39,7 @@ struct FlashOptions {
  * An interface for flashing ROMs
  */
 class Flasher : public AsyncRoutine {
-  public:
+public:
     virtual ~Flasher() = default;
 
     /* Flash map. Returns false if canceled. */

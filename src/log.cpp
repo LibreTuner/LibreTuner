@@ -16,16 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "log.h"
 
 #include <QColor>
 
-Log::Log() {
-    connect(&Logger::get(), &Logger::appended, this, &Log::append);
-}
-
-
+Log::Log() { connect(&Logger::get(), &Logger::appended, this, &Log::append); }
 
 void Log::appendEntry(LogEntry &&entry) {
     beginInsertRows(QModelIndex(), entries_.size(), entries_.size());
@@ -35,13 +30,9 @@ void Log::appendEntry(LogEntry &&entry) {
     endInsertRows();
 }
 
-
-
 void Log::append(Logger::Mode mode, const QString &text) {
     appendEntry({mode, text.toStdString()});
 }
-
-
 
 int Log::rowCount(const QModelIndex &parent) const {
     if (parent.isValid()) {
@@ -49,8 +40,6 @@ int Log::rowCount(const QModelIndex &parent) const {
     }
     return entries_.size();
 }
-
-
 
 QVariant Log::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) {
@@ -61,7 +50,8 @@ QVariant Log::data(const QModelIndex &index, int role) const {
         return QVariant();
     }
 
-    if (index.row() < 0 || static_cast<std::size_t>(index.row()) >= entries_.size()) {
+    if (index.row() < 0 ||
+        static_cast<std::size_t>(index.row()) >= entries_.size()) {
         return QVariant();
     }
 

@@ -9,7 +9,8 @@ namespace lt::network {
 class IsoTpCan : public IsoTp {
 public:
     // Takes ownership of a CAN interface
-    explicit IsoTpCan(CanPtr &&can = CanPtr(), IsoTpOptions options = IsoTpOptions());
+    explicit IsoTpCan(CanPtr &&can = CanPtr(),
+                      IsoTpOptions options = IsoTpOptions());
     ~IsoTpCan();
 
     void recv(IsoTpPacket &result) override;
@@ -24,7 +25,9 @@ public:
     // May return nullptr
     inline Can *can() { return can_.get(); }
 
-    void setOptions(const IsoTpOptions &options) override { options_ = options; }
+    void setOptions(const IsoTpOptions &options) override {
+        options_ = options;
+    }
 
     inline const IsoTpOptions &options() const { return options_; }
 
@@ -38,7 +41,6 @@ private:
 
     void sendSingleFrame(const uint8_t *data, std::size_t size);
 };
-}
+} // namespace lt::network
 
-
-#endif //LIBRETUNER_ISOTPCAN_H
+#endif // LIBRETUNER_ISOTPCAN_H

@@ -38,7 +38,7 @@ class DownloadWindow : public QDialog {
 public:
     explicit DownloadWindow(QWidget *parent = nullptr);
     ~DownloadWindow() override;
-    
+
 public slots:
     void download();
     void platformChanged(int index);
@@ -46,7 +46,7 @@ public slots:
     // QWidget interface
 protected:
     void closeEvent(QCloseEvent *event) override;
-    
+
 private:
     QComboBox *comboPlatform_;
     QLineEdit *lineName_;

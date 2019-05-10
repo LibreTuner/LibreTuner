@@ -6,8 +6,7 @@
 class QLineEdit;
 class QPushButton;
 
-class FileSelectWidget : public QWidget
-{
+class FileSelectWidget : public QWidget {
     Q_OBJECT
 public:
     enum Mode {
@@ -15,9 +14,13 @@ public:
         MODE_SAVE,
     };
 
-    FileSelectWidget(const QString &caption = QString(), const QString &filter = QString(), Mode mode = MODE_OPEN, QWidget *parent = nullptr);
+    FileSelectWidget(const QString &caption = QString(),
+                     const QString &filter = QString(), Mode mode = MODE_OPEN,
+                     QWidget *parent = nullptr);
 
-    inline void setCaption(const QString &caption) noexcept { caption_ = caption; }
+    inline void setCaption(const QString &caption) noexcept {
+        caption_ = caption;
+    }
     inline void setFilter(const QString &filter) noexcept { filter_ = filter; }
     inline void setMode(Mode mode) noexcept { mode_ = mode; }
 

@@ -1,8 +1,8 @@
 #ifndef LT_ELM_DATALINK_H
 #define LT_ELM_DATALINK_H
 
-#include "datalink.h"
 #include "../network/command/elm327.h"
+#include "datalink.h"
 
 namespace lt {
 
@@ -32,7 +32,6 @@ private:
     int uartBaudrate_{38400};
 };
 
-}
+} // namespace lt
 
-
-#endif //LT_ELM_DATALINK_H
+#endif // LT_ELM_DATALINK_H

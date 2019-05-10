@@ -37,8 +37,7 @@ void Socket::bind(const Address_t *address, SocketLen_t address_len) {
     }
 }
 
-ssize_t Socket::recvNoExcept(void *buffer, int length,
-                             int flags) noexcept {
+ssize_t Socket::recvNoExcept(void *buffer, int length, int flags) noexcept {
     assert(valid());
     return ::recv(socket_, buffer, length, flags);
 }
@@ -55,8 +54,7 @@ std::size_t Socket::recv(void *buffer, int length, int flags) {
     return ret;
 }
 
-ssize_t Socket::sendNoExcept(void *buffer, int length,
-                             int flags) noexcept {
+ssize_t Socket::sendNoExcept(void *buffer, int length, int flags) noexcept {
     assert(valid());
     return ::send(socket_, buffer, length, flags);
 }
@@ -82,6 +80,6 @@ void Socket::setsockopt(int level, int option_name, const void *option_value,
     }
 }
 
-} // namespace lt
+} // namespace lt::os
 
 #endif

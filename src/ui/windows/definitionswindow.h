@@ -1,8 +1,8 @@
 #ifndef LIBRETUNER_DEFINITIONSWINDOW_H
 #define LIBRETUNER_DEFINITIONSWINDOW_H
 
-#include <QWidget>
 #include <QTreeView>
+#include <QWidget>
 
 class Definitions;
 
@@ -17,5 +17,4 @@ private:
     QTreeView *platformsView_;
 };
 
-
-#endif //LIBRETUNER_DEFINITIONSWINDOW_H
+#endif // LIBRETUNER_DEFINITIONSWINDOW_H

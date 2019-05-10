@@ -19,8 +19,8 @@
 #ifndef FLASHWINDOW_H
 #define FLASHWINDOW_H
 
-#include <QWidget>
 #include <QDialog>
+#include <QWidget>
 
 #include <memory>
 #include <thread>
@@ -30,7 +30,7 @@
 namespace lt {
 class Tune;
 using TunePtr = std::shared_ptr<Tune>;
-}
+} // namespace lt
 
 class QComboBox;
 class AuthOptionsView;
@@ -47,13 +47,13 @@ public:
     explicit FlasherWindow(QWidget *parent = nullptr);
 
     virtual ~FlasherWindow() override;
-    
+
     void setTune(const lt::TunePtr &tune);
 
 private slots:
     void nextClicked();
     void previousClicked();
-    
+
 private:
     void buttonTuneClicked();
     void buttonFlashClicked();
@@ -62,9 +62,9 @@ private:
 
     QWidget *createSelectPage();
     QWidget *createOptionPage();
-    
+
     lt::TunePtr selectedTune_;
-    
+
     QPushButton *buttonFlash_;
     QPushButton *buttonNext_;
     QPushButton *buttonPrevious_;
@@ -76,7 +76,7 @@ private:
 
     LinksListModel linksList_;
 
-	FileSelectWidget *fileSelect_;
+    FileSelectWidget *fileSelect_;
 };
 
 #endif // FLASHWINDOW_H

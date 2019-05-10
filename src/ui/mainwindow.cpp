@@ -21,27 +21,28 @@
 
 #include "downloadwindow.h"
 
+#include "docks/diagnosticswidget.h"
+#include "docks/editorwidget.h"
 #include "docks/graphwidget.h"
+#include "docks/logview.h"
 #include "docks/overviewwidget.h"
 #include "docks/sidebarwidget.h"
 #include "docks/tableswidget.h"
-#include "docks/logview.h"
-#include "docks/editorwidget.h"
-#include "docks/diagnosticswidget.h"
 
 #include "windows/definitionswindow.h"
 
-#include "dataloggerwindow.h"
 #include "createtunedialog.h"
-#include "flasherwindow.h"
-#include "uiutil.h"
 #include "datalinkswidget.h"
+#include "dataloggerwindow.h"
+#include "flasherwindow.h"
 #include "sessionscannerdialog.h"
+#include "uiutil.h"
 
 #include "titlebar.h"
 
 #include <QAction>
 #include <QDockWidget>
+#include <QFileDialog>
 #include <QListView>
 #include <QMenu>
 #include <QMenuBar>
@@ -51,7 +52,6 @@
 #include <QSettings>
 #include <QStatusBar>
 #include <QWindowStateChangeEvent>
-#include <QFileDialog>
 
 #include <future>
 #include <lt/link/datalink.h>
@@ -86,14 +86,14 @@ MainWindow::MainWindow(QWidget *parent)
     loadSettings();
 }
 
-void MainWindow::saveTune(bool newPath)
-{
+void MainWindow::saveTune(bool newPath) {
     if (!tune_) {
         return;
     }
 
     if (tunePath_.empty() || newPath) {
-        QString qPath = QFileDialog::getSaveFileName(this, tr("Save tune"), QString(), tr("Tune file (*.ltt)"));
+        QString qPath = QFileDialog::getSaveFileName(
+            this, tr("Save tune"), QString(), tr("Tune file (*.ltt)"));
         if (qPath.isNull()) {
             return;
         }
@@ -170,10 +170,12 @@ bool MainWindow::checkSave() {
     switch (mb.exec()) {
     case QMessageBox::Save:
         // Save then accept
-        catchCritical([this]() {
-            saveTune();
-            return true;
-        }, tr("Error while saving tune"));
+        catchCritical(
+            [this]() {
+                saveTune();
+                return true;
+            },
+            tr("Error while saving tune"));
         return false;
     case QMessageBox::Discard:
         return true;
@@ -183,8 +185,8 @@ bool MainWindow::checkSave() {
     }
 }
 
-void MainWindow::setTune(const lt::TunePtr &tune, const std::filesystem::path &path)
-{
+void MainWindow::setTune(const lt::TunePtr &tune,
+                         const std::filesystem::path &path) {
     // Save any previous tunes
     if (!checkSave()) {
         return;
@@ -201,7 +203,8 @@ void MainWindow::setTune(const lt::TunePtr &tune, const std::filesystem::path &p
     saveCurrentAction_->setEnabled(!!tune);
 
     if (tune) {
-        setWindowTitle(tr("LibreTuner") + " - " + QString::fromStdString(tune->name()));
+        setWindowTitle(tr("LibreTuner") + " - " +
+                       QString::fromStdString(tune->name()));
     } else {
         setWindowTitle(tr("LibreTuner"));
     }
@@ -277,8 +280,7 @@ QDockWidget *MainWindow::createSidebarDock() {
     return dock;
 }
 
-void MainWindow::setTable(const lt::ModelTable *modTable)
-{
+void MainWindow::setTable(const lt::ModelTable *modTable) {
     if (modTable == nullptr) {
         // Don't change
         return;
@@ -288,11 +290,13 @@ void MainWindow::setTable(const lt::ModelTable *modTable)
 
     const lt::TableDefinition *tabDef = modTable->table;
 
-    catchWarning([this, tabDef]() {
-        lt::Table *tab = tune_->getTable(tabDef->id, true);
-        tableModel_.setTable(tab);
-        emit tableChanged(tab);
-    }, tr("Error creating table"));
+    catchWarning(
+        [this, tabDef]() {
+            lt::Table *tab = tune_->getTable(tabDef->id, true);
+            tableModel_.setTable(tab);
+            emit tableChanged(tab);
+        },
+        tr("Error creating table"));
 }
 
 QDockWidget *MainWindow::createTablesDock() {
@@ -300,7 +304,7 @@ QDockWidget *MainWindow::createTablesDock() {
     dock->setObjectName("tables");
     tables_ = new TablesWidget(dock);
     dock->setWidget(tables_);
-    
+
     connect(tables_, &TablesWidget::activated, this, &MainWindow::setTable);
     connect(this, &MainWindow::tuneChanged, [this](const lt::Tune *tune) {
         if (tune == nullptr) {
@@ -358,7 +362,7 @@ void MainWindow::setupMenu() {
     openTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     auto *createTuneAction = fileMenu->addAction(tr("&New Tune"));
 
-    createTuneAction->setShortcut(QKeySequence(Qt::CTRL +Qt::Key_N));
+    createTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     auto *downloadAction = fileMenu->addAction(tr("&Download ROM"));
 
     saveCurrentAction_ = fileMenu->addAction(tr("&Save Tune"));
@@ -417,14 +421,11 @@ void MainWindow::setupMenu() {
             return;
         }
 
-
         setTune(dlg.tune());
     });
 
     connect(saveCurrentAction_, &QAction::triggered, [this]() {
-        catchCritical([this]() {
-            saveTune();
-        }, tr("Error saving tune"));
+        catchCritical([this]() { saveTune(); }, tr("Error saving tune"));
     });
 
     connect(downloadAction, &QAction::triggered, this,
@@ -435,24 +436,26 @@ void MainWindow::setupMenu() {
         if (!checkSave()) {
             return;
         }
-        QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Tune"), QString(), tr("Tune Files (*.ltt)"));
+        QString fileName = QFileDialog::getOpenFileName(
+            nullptr, tr("Open Tune"), QString(), tr("Tune Files (*.ltt)"));
         if (fileName.isNull()) {
             return;
         }
 
-        catchCritical([this, &fileName]() {
-            std::filesystem::path path(fileName.toStdString());
-            setTune(LT()->openTune(path), path);
-        }, tr("Error opening tune"));
+        catchCritical(
+            [this, &fileName]() {
+                std::filesystem::path path(fileName.toStdString());
+                setTune(LT()->openTune(path), path);
+            },
+            tr("Error opening tune"));
     });
 
     QAction *logAction = toolsMenu->addAction(tr("&CAN Log"));
     // connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
 
     QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
-    connect(datalinksAction, &QAction::triggered, [this]() {
-        datalinksWindow_.show();
-    });
+    connect(datalinksAction, &QAction::triggered,
+            [this]() { datalinksWindow_.show(); });
 
     auto *sessionScanAct = toolsMenu->addAction("Session Scanner");
     connect(sessionScanAct, &QAction::triggered, [this]() {
@@ -479,14 +482,14 @@ void MainWindow::setupStatusBar() {
     comboDatalink_->setModel(&linksList_);
 
     connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        [this](int) {
-            QVariant var = comboDatalink_->currentData(Qt::UserRole);
-            if (!var.canConvert<lt::DataLink*>()) {
-                return;
-            }
+            [this](int) {
+                QVariant var = comboDatalink_->currentData(Qt::UserRole);
+                if (!var.canConvert<lt::DataLink *>()) {
+                    return;
+                }
 
-            LT()->setDatalink(var.value<lt::DataLink*>());
-        });
+                LT()->setDatalink(var.value<lt::DataLink *>());
+            });
 
     if (LT()->platform()) {
         comboPlatform->setCurrentText(

@@ -65,7 +65,8 @@ void Links::load() {
                 "SocketCAN is unuspported on this platform, ignoring link.");
 #endif
         } else if (link.type == "elm") {
-            manualLinks_.emplace_back(std::make_unique<lt::ElmDataLink>(link.name, link.port));
+            manualLinks_.emplace_back(
+                std::make_unique<lt::ElmDataLink>(link.name, link.port));
         } else {
             throw std::runtime_error("Unknown datalink type: " + link.type);
         }
@@ -192,7 +193,7 @@ int Links::rowCount(const QModelIndex &parent) const {
     return 0;
 }
 
-int Links::columnCount(const QModelIndex &/*parent*/) const { return 2; }
+int Links::columnCount(const QModelIndex & /*parent*/) const { return 2; }
 
 QString typeToString(lt::DataLinkType type) {
     switch (type) {

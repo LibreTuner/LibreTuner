@@ -8,16 +8,16 @@
 namespace lt {
 
 class UdsDtcScanner : public DtcScanner {
-  public:
+public:
     explicit UdsDtcScanner(network::UdsPtr &&uds);
 
     virtual DiagnosticCodes scan() override;
     virtual DiagnosticCodes scanPending() override;
 
-  private:
+private:
     network::UdsPtr uds_;
 
-	DiagnosticCodes scanPid(uint8_t pid = 0x3);
+    DiagnosticCodes scanPid(uint8_t pid = 0x3);
 };
 
 } // namespace lt

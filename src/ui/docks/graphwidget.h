@@ -37,13 +37,13 @@ public:
     explicit GraphWidget(QWidget *parent = nullptr);
     ~GraphWidget() override;
 
-	void setModel(TableModel *model);
+    void setModel(TableModel *model);
 
 public slots:
     void refresh();
 
 private:
-    TableModel *model_ {nullptr};
+    TableModel *model_{nullptr};
     QtDataVisualization::Q3DSurface *surface_;
     QWidget *container_;
     QtCharts::QChart *chart_;

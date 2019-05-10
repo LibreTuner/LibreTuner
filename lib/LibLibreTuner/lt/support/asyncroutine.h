@@ -24,35 +24,30 @@
 
 namespace lt {
 
-class AsyncRoutine
-{
+class AsyncRoutine {
 public:
-	using ProgressCallback = std::function<void(float progress)>;
+    using ProgressCallback = std::function<void(float progress)>;
 
-	inline void setProgressCallback(ProgressCallback&& cb);
+    inline void setProgressCallback(ProgressCallback &&cb);
 
 protected:
-	/* Used to safely call callbacks */
-	inline void notifyProgress(float progress);
+    /* Used to safely call callbacks */
+    inline void notifyProgress(float progress);
 
 private:
-	ProgressCallback progressCallback_;
+    ProgressCallback progressCallback_;
 };
 
-
-
 void AsyncRoutine::notifyProgress(float progress) {
-	if (progressCallback_) {
-		progressCallback_(progress);
-	}
+    if (progressCallback_) {
+        progressCallback_(progress);
+    }
 }
 
-
-
-void AsyncRoutine::setProgressCallback(AsyncRoutine::ProgressCallback&& cb) {
-	progressCallback_ = std::move(cb);
+void AsyncRoutine::setProgressCallback(AsyncRoutine::ProgressCallback &&cb) {
+    progressCallback_ = std::move(cb);
 }
 
-}
+} // namespace lt
 
 #endif // ASYNCROUTINE_H

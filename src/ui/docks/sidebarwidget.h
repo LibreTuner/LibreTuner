@@ -1,7 +1,6 @@
 #ifndef SIDEBARWIDGET_H
 #define SIDEBARWIDGET_H
 
-
 #include <QWidget>
 
 namespace lt {
@@ -16,7 +15,7 @@ class SidebarWidget : public QWidget {
     Q_OBJECT
 public:
     explicit SidebarWidget(QWidget *parent = nullptr);
-    
+
 public slots:
     void fillTableInfo(const lt::ModelTable *table);
 
@@ -26,9 +25,9 @@ private slots:
 private:
     QToolButton *tableInfoButton_;
     QWidget *tableInfo_;
-    
+
     QLabel *tableDescription_;
-    
+
     QLineEdit *tableName_;
     QLineEdit *tableOffset_;
     QLineEdit *tableWidth_;

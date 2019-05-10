@@ -17,8 +17,8 @@
  */
 
 #include "flashmap.h"
-#include "../rom/rom.h"
 #include "../definition/platform.h"
+#include "../rom/rom.h"
 #include "../rom/tableext.h"
 
 #include <cassert>
@@ -26,41 +26,43 @@
 namespace lt {
 
 FlashMap::FlashMap(const std::vector<uint8_t> &data, std::size_t offset)
-    : data_(data), offset_(offset) {
-
-}
+    : data_(data), offset_(offset) {}
 
 FlashMap::FlashMap(std::vector<uint8_t> &&data, std::size_t offset)
-	: data_(std::move(data)), offset_(offset) {
+    : data_(std::move(data)), offset_(offset) {}
 
-}
+FlashMap FlashMap::fromTune(Tune &tune) {
+    const lt::RomPtr &rom = tune.base();
 
-FlashMap FlashMap::fromTune(Tune& tune) {
-	const lt::RomPtr &rom = tune.base();
+    const lt::ModelPtr &model = rom->model();
+    const lt::Platform &platform = model->platform;
 
-	const lt::ModelPtr &model = rom->model();
-	const lt::Platform &platform = model->platform;
+    std::size_t offset = platform.flashOffset;
 
-	std::size_t offset = platform.flashOffset;
+    std::vector<uint8_t> data(rom->data() + offset,
+                              rom->data() + rom->size() - offset);
 
-	std::vector<uint8_t> data(rom->data() + offset, rom->data() + rom->size() - offset);
+    // Try each table
+    for (const lt::ModelTable &modTable : model->tables) {
+        if (modTable.table == nullptr) {
+            continue;
+        }
 
-	// Try each table
-	for (const lt::ModelTable& modTable : model->tables) {
-		if (modTable.table == nullptr) { continue; }
+        const TableDefinition *tableDef = modTable.table;
+        std::size_t tableOffset = modTable.offset;
 
-		const TableDefinition *tableDef = modTable.table;
-		std::size_t tableOffset = modTable.offset;
-		
-		Table *table = tune.getTable(tableDef->id, false);
-		if (table == nullptr) { continue; }
+        Table *table = tune.getTable(tableDef->id, false);
+        if (table == nullptr) {
+            continue;
+        }
 
         std::vector<uint8_t> serialized = table->serialize(platform.endianness);
 
-        std::copy(serialized.begin(), serialized.end(), data.begin() + tableOffset - offset);
-	}
+        std::copy(serialized.begin(), serialized.end(),
+                  data.begin() + tableOffset - offset);
+    }
 
-	return FlashMap(std::move(data), offset);
+    return FlashMap(std::move(data), offset);
 }
 
 } // namespace lt

@@ -24,23 +24,23 @@
 #include <cassert>
 
 namespace lt {
-    
+
 std::vector<uint8_t> Rom::getRawTableData(const ModelTable *modTable) const {
     std::size_t offset = modTable->offset;
     const TableDefinition *def = modTable->table;
-    
+
     auto regionBegin = data_.begin() + offset;
     auto regionEnd = regionBegin + def->byteSize();
-    
+
     return std::vector(regionBegin, regionEnd);
-}    
+}
 
 std::vector<uint8_t> Rom::getRawTableData(std::size_t id) const {
     const ModelTable *modTable = model_->getTable(id);
     if (modTable == nullptr) {
         throw std::runtime_error("invalid table id " + std::to_string(id));
     }
-    
+
     return getRawTableData(modTable);
 }
 
@@ -51,10 +51,10 @@ TablePtr Rom::baseTable(std::size_t tableId) const {
             "table does not have matching offset in model definition (" +
             std::to_string(tableId) + ")");
     }
-    
+
     TablePtr table = std::make_unique<Table>();
     initializeTable(*table, *modTable->table);
-    
+
     std::vector<uint8_t> raw = getRawTableData(modTable);
     table->deserialize(raw.begin(), raw.end(), model_->platform.endianness);
 
@@ -62,20 +62,20 @@ TablePtr Rom::baseTable(std::size_t tableId) const {
 }
 
 bool Tune::dirty() const noexcept {
-	for (const TablePtr& table : tables_) {
-		if (table && table->dirty()) {
-			return true;
-		}
-	}
-	return false;
+    for (const TablePtr &table : tables_) {
+        if (table && table->dirty()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Tune::clearDirty() noexcept {
-	for (const TablePtr& table : tables_) {
-		if (table && table->dirty()) {
-			table->clearDirty();
-		}
-	}
+    for (const TablePtr &table : tables_) {
+        if (table && table->dirty()) {
+            table->clearDirty();
+        }
+    }
 }
 
 Table *Tune::getTable(std::size_t id, bool create) {
@@ -88,14 +88,14 @@ Table *Tune::getTable(std::size_t id, bool create) {
     if (create) {
         TablePtr table = base_->baseTable(id);
 
-		const TableDefinition* def = base_->model()->platform.getTable(id);
+        const TableDefinition *def = base_->model()->platform.getTable(id);
 
-		if (!def->axisX.empty()) {
-			table->setAxisX(getAxis(def->axisX, true));
-		}
-		if (!def->axisY.empty()) {
-			table->setAxisY(getAxis(def->axisY, true));
-		}
+        if (!def->axisX.empty()) {
+            table->setAxisX(getAxis(def->axisX, true));
+        }
+        if (!def->axisY.empty()) {
+            table->setAxisY(getAxis(def->axisY, true));
+        }
 
         if (id >= tables_.size()) {
             tables_.resize(id + 1);
@@ -106,8 +106,7 @@ Table *Tune::getTable(std::size_t id, bool create) {
     return nullptr;
 }
 
-Table *Tune::setTable(std::size_t id, const uint8_t *data,
-                        std::size_t length) {
+Table *Tune::setTable(std::size_t id, const uint8_t *data, std::size_t length) {
     TablePtr table = std::make_unique<Table>();
 
     const TableDefinition *def = base_->model()->platform.getTable(id);
@@ -116,7 +115,8 @@ Table *Tune::setTable(std::size_t id, const uint8_t *data,
     }
 
     initializeTable(*table, *def);
-	table->deserialize(data, data + length, base_->model()->platform.endianness);
+    table->deserialize(data, data + length,
+                       base_->model()->platform.endianness);
 
     if (!def->axisX.empty()) {
         table->setAxisX(getAxis(def->axisX, true));
@@ -125,18 +125,19 @@ Table *Tune::setTable(std::size_t id, const uint8_t *data,
         table->setAxisY(getAxis(def->axisY, true));
     }
 
-	if (id >= tables_.size()) {
-		tables_.resize(id + 1);
-	}
-	tables_[id] = std::move(table);
-	return tables_[id].get();
+    if (id >= tables_.size()) {
+        tables_.resize(id + 1);
+    }
+    tables_[id] = std::move(table);
+    return tables_[id].get();
 }
 
 struct ADS {
     template <typename T> void operator()() {
         std::vector<T> des(size);
         readBE<T>(data, data + size * sizeof(T), des.begin());
-        auto memoryAxis = std::make_shared<lt::MemoryAxis<T>>(name, des.begin(), des.end());
+        auto memoryAxis =
+            std::make_shared<lt::MemoryAxis<T>>(name, des.begin(), des.end());
 
         axis = std::static_pointer_cast<lt::TableAxis>(memoryAxis);
     }
@@ -147,11 +148,8 @@ struct ADS {
     lt::TableAxisPtr axis;
 };
 
-
-
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> overloaded(Ts...)->overloaded<Ts...>;
 
 TableAxisPtr Tune::getAxis(const std::string &id, bool create) {
     auto it = axes_.find(id);
@@ -168,31 +166,35 @@ TableAxisPtr Tune::getAxis(const std::string &id, bool create) {
         return TableAxisPtr();
     }
 
-    auto axis = std::visit(overloaded {
-        [this, def](LinearAxisDefinition linear) {
-            return std::static_pointer_cast<TableAxis>(std::make_shared<LinearAxis<double>>(
-                    def->name, linear.start, linear.increment));
-        },
-        [this, def](MemoryAxisDefinition memory) {
-            int offset = base_->model()->getAxisOffset(def->id);
-            int size = memory.size;
+    auto axis = std::visit(
+        overloaded{[this, def](LinearAxisDefinition linear) {
+                       return std::static_pointer_cast<TableAxis>(
+                           std::make_shared<LinearAxis<double>>(
+                               def->name, linear.start, linear.increment));
+                   },
+                   [this, def](MemoryAxisDefinition memory) {
+                       int offset = base_->model()->getAxisOffset(def->id);
+                       int size = memory.size;
 
-            if (offset + size * static_cast<int>(dataTypeSize(def->dataType)) > base_->size()) {
-                throw std::runtime_error("axis exceeds rom size (rom size: " +
-                                         std::to_string(base_->size()) +
-                                         ", axis ends at " +
-                                         std::to_string(offset + size) + ")");
-            }
+                       if (offset + size * static_cast<int>(
+                                               dataTypeSize(def->dataType)) >
+                           base_->size()) {
+                           throw std::runtime_error(
+                               "axis exceeds rom size (rom size: " +
+                               std::to_string(base_->size()) +
+                               ", axis ends at " +
+                               std::to_string(offset + size) + ")");
+                       }
 
-            ADS ads;
-            ads.data = base_->data() + offset;
-            ads.size = size;
-            ads.name = def->name;
+                       ADS ads;
+                       ads.data = base_->data() + offset;
+                       ads.size = size;
+                       ads.name = def->name;
 
-            datatypeToType(def->dataType, ads);
-            return std::static_pointer_cast<TableAxis>(ads.axis);
-        }
-    }, def->def);
+                       datatypeToType(def->dataType, ads);
+                       return std::static_pointer_cast<TableAxis>(ads.axis);
+                   }},
+        def->def);
 
     axes_.emplace(id, axis);
     return axis;

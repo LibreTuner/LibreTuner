@@ -19,9 +19,8 @@
 #ifndef LT_LOGGER_H
 #define LT_LOGGER_H
 
-#include <string>
 #include <QObject>
-
+#include <string>
 
 /* Static logger */
 class Logger : public QObject {
@@ -39,9 +38,13 @@ public:
 
     void log(Mode mode, const std::string &message);
 
-    static void debug(const std::string &message) { Logger::get().log(Mode::Debug, message); }
+    static void debug(const std::string &message) {
+        Logger::get().log(Mode::Debug, message);
+    }
 
-    static void info(const std::string &message) { Logger::get().log(Mode::Info, message); }
+    static void info(const std::string &message) {
+        Logger::get().log(Mode::Info, message);
+    }
 
     static void warning(const std::string &message) {
         Logger::get().log(Mode::Warning, message);
@@ -53,10 +56,10 @@ public:
 
     virtual ~Logger() = default;
 
-    Logger(Logger&&) = delete;
-    Logger(const Logger&) = delete;
-    Logger &operator=(Logger&&) = delete;
-    Logger &operator=(const Logger&) = delete;
+    Logger(Logger &&) = delete;
+    Logger(const Logger &) = delete;
+    Logger &operator=(Logger &&) = delete;
+    Logger &operator=(const Logger &) = delete;
 
 signals:
     void appended(Mode mode, const QString &message);
@@ -68,6 +71,5 @@ private:
 };
 
 Q_DECLARE_METATYPE(Logger::Mode)
-
 
 #endif // LT_LOGGER_H

@@ -227,7 +227,6 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
         break;
     }
 
-
     case WM_SIZE: {
         RECT winrect;
         GetClientRect(msg->hwnd, &winrect);
@@ -261,7 +260,6 @@ template <class T> void StyledWidget<T>::changeEvent(QEvent *e) {
     QWidget::changeEvent(e);
 }
 #endif
-
 
 StyledWindow::StyledWindow(QWidget *parent) : StyledWidget<QWidget>(parent) {}
 

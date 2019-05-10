@@ -24,11 +24,8 @@
 
 #include <memory>
 
-
-
 // TODO: Maybe not store a copy of the TuneMeta, but the tune id for later
 // lookup to avoid unecessary memory usage
-
 
 /**
  * Widget displaying a tune for the tunes tab.

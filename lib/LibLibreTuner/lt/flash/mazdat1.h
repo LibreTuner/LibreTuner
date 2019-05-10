@@ -1,19 +1,19 @@
 #ifndef LT_MAZDAT1
 #define LT_MAZDAT1
 
-#include "flasher.h"
 #include "../network/uds/uds.h"
+#include "flasher.h"
 
 namespace lt {
 
 class MazdaT1Flasher : public Flasher {
-  public:
+public:
     MazdaT1Flasher(network::UdsPtr &&uds_, FlashOptions &&options);
 
     bool flash(const FlashMap &flashmap) override;
     void cancel() override;
 
-  private:
+private:
     network::UdsPtr uds_;
 
     const FlashMap *flash_;

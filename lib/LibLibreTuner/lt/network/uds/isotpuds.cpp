@@ -11,8 +11,7 @@ UdsPacket IsoTpUds::requestRaw(const UdsPacket &packet) {
     return receiveRaw();
 }
 
-UdsPacket IsoTpUds::receiveRaw()
-{
+UdsPacket IsoTpUds::receiveRaw() {
     IsoTpPacket res;
     isotp_->recv(res);
 
@@ -21,4 +20,4 @@ UdsPacket IsoTpUds::receiveRaw()
     return UdsPacket(data.data(), data.size());
 }
 
-}
+} // namespace lt::network

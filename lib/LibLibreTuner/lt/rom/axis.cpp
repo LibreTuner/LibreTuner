@@ -4,4 +4,4 @@ namespace lt {
 
 TableAxis::~TableAxis() {}
 
-}
+} // namespace lt

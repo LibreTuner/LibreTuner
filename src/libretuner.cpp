@@ -29,12 +29,12 @@
 #include <QStyledItemDelegate>
 #include <QTextStream>
 
+#include <fstream>
 #include <future>
 #include <memory>
-#include <fstream>
 
-#include "uiutil.h"
 #include "serializeddata.h"
+#include "uiutil.h"
 
 static LibreTuner *_global;
 
@@ -53,9 +53,8 @@ LibreTuner::LibreTuner(int &argc, char *argv[])
     setApplicationName("LibreTuner");
 
     // Setup LT context
-    lt::setLogCallback([](const std::string &message) {
-        Logger::debug(message);
-    });
+    lt::setLogCallback(
+        [](const std::string &message) { Logger::debug(message); });
 
     // intolib rewrite
 
@@ -126,7 +125,7 @@ void LibreTuner::flashTune(const std::shared_ptr<TuneData> &data) {
 
     try {
         Flashable flash = data->flashable();
-        
+
 
         if (std::unique_ptr<PlatformLink> link = getVehicleLink()) {
             std::unique_ptr<Flasher> flasher = link->flasher();
@@ -231,14 +230,12 @@ struct TuneMeta {
 };
 
 namespace serialize {
-template<typename S>
-void serialize(S &s, const TableMeta &table) {
+template <typename S> void serialize(S &s, const TableMeta &table) {
     s.serialize(table.id);
     s.serialize(table.data);
 }
 
-template<typename S>
-void serialize(S &s, const TuneMeta &tune) {
+template <typename S> void serialize(S &s, const TuneMeta &tune) {
     s.serialize(tune.id);
     s.serialize(tune.name);
     s.serialize(tune.romId);
@@ -247,14 +244,12 @@ void serialize(S &s, const TuneMeta &tune) {
     s.serialize(tune.tables);
 }
 
-template<typename D>
-void deserialize(D &d, TableMeta &table) {
+template <typename D> void deserialize(D &d, TableMeta &table) {
     d.deserialize(table.id);
     d.deserialize(table.data);
 }
 
-template<typename D>
-void deserialize(D &d, TuneMeta &tune) {
+template <typename D> void deserialize(D &d, TuneMeta &tune) {
     d.deserialize(tune.id);
     d.deserialize(tune.name);
     d.deserialize(tune.romId);
@@ -262,10 +257,9 @@ void deserialize(D &d, TuneMeta &tune) {
     d.deserialize(tune.platformId);
     d.deserialize(tune.tables);
 }
-}
+} // namespace serialize
 
-lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const
-{
+lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const {
     std::ifstream file(path, std::ios::binary | std::ios::in | std::ios::ate);
     if (!file.is_open()) {
         throw std::runtime_error("failed to open tune at " + path.string());
@@ -274,7 +268,7 @@ lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const
     std::size_t fileSize = file.tellg();
     file.seekg(0, std::ios::beg);
     std::vector<uint8_t> data(fileSize);
-    file.read(reinterpret_cast<char*>(data.data()), fileSize);
+    file.read(reinterpret_cast<char *>(data.data()), fileSize);
     file.close();
 
     using InputAdapter = serialize::InputBufferAdapter<std::vector<uint8_t>>;
@@ -285,7 +279,8 @@ lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const
 
     const RomMeta *romMeta = roms_.fromId(meta.romId);
     if (romMeta == nullptr) {
-        throw std::runtime_error("ROM with id " + meta.romId + " does not exist");
+        throw std::runtime_error("ROM with id " + meta.romId +
+                                 " does not exist");
     }
 
     lt::RomPtr rom = roms_.openRom(*romMeta);
@@ -299,8 +294,8 @@ lt::TunePtr LibreTuner::openTune(const std::filesystem::path &path) const
     return tune;
 }
 
-void LibreTuner::saveTune(const lt::Tune &tune, const std::filesystem::path &path) const
-{
+void LibreTuner::saveTune(const lt::Tune &tune,
+                          const std::filesystem::path &path) const {
     TuneMeta meta;
     meta.id = tune.id();
     meta.name = tune.name();
@@ -308,13 +303,13 @@ void LibreTuner::saveTune(const lt::Tune &tune, const std::filesystem::path &pat
     meta.modelId = tune.base()->model()->id;
     meta.platformId = tune.base()->model()->platform.id;
 
-
     for (std::size_t i = 0; i < tune.tables().size(); ++i) {
         const lt::TablePtr &table = tune.tables()[i];
         if (table) {
             TableMeta tableMeta;
             tableMeta.id = i;
-            tableMeta.data = table->serialize(tune.base()->model()->platform.endianness);
+            tableMeta.data =
+                table->serialize(tune.base()->model()->platform.endianness);
             meta.tables.emplace_back(std::move(tableMeta));
         }
     }
@@ -328,7 +323,8 @@ void LibreTuner::saveTune(const lt::Tune &tune, const std::filesystem::path &pat
 
     std::ofstream file(path, std::ios::binary | std::ios::out);
     if (!file.is_open()) {
-        throw std::runtime_error("failed to open tune for writing at " + path.string());
+        throw std::runtime_error("failed to open tune for writing at " +
+                                 path.string());
     }
-    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+    file.write(reinterpret_cast<const char *>(data.data()), data.size());
 }

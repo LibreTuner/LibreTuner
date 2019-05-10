@@ -8,14 +8,14 @@ namespace lt::download {
 
 // Downloads using ReadMemoryByAddress (UDS SID 23)
 class RMADownloader : public Downloader {
-  public:
+public:
     RMADownloader(network::UdsPtr &&uds, Options &&options);
 
     bool download() override;
     void cancel() override;
     virtual std::pair<const uint8_t *, size_t> data() override;
 
-  private:
+private:
     network::UdsPtr uds_;
 
     auth::Options authOptions_;
@@ -34,4 +34,4 @@ class RMADownloader : public Downloader {
     bool update_progress();
 };
 
-} // namespace lt
+} // namespace lt::download

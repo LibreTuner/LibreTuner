@@ -12,6 +12,6 @@ struct Pid {
     std::string formula;
     std::string unit;
 };
-}
+} // namespace lt
 
 #endif // DATALOG_PID_H

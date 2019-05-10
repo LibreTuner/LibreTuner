@@ -34,7 +34,7 @@ struct Options {
 };
 
 class Downloader : public AsyncRoutine {
-  public:
+public:
     virtual ~Downloader() = default;
 
     /* Starts downloading. Calls updateProgress if possible.
