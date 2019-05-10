@@ -4,6 +4,8 @@
 #include "isotp.h"
 #include "../command/elm327.h"
 
+#include <queue>
+
 namespace lt::network {
 
 class IsoTpElm : public IsoTp {
@@ -25,6 +27,11 @@ public:
 private:
     Elm327Ptr device_;
     IsoTpOptions options_;
+
+    std::queue<IsoTpPacket> buffer_;
+
+    // Extracts packets from ELM327 response and fills buffer
+    void processResponse(std::vector<std::string> &response);
 };
 
 }

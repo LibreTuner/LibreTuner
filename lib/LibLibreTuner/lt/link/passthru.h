@@ -1,7 +1,3 @@
-//
-// Created by altenius on 12/20/18.
-//
-
 #ifndef LT_PASSTHRU_H
 #define LT_PASSTHRU_H
 

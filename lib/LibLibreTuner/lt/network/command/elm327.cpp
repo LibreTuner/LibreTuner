@@ -30,10 +30,10 @@ void Elm327::writeLine(std::string line) {
     device_.write(line);
 }
 
-std::string Elm327::sendCommand(const std::string &command) {
+std::vector<std::string> Elm327::sendCommand(const std::string &command) {
     writeLine(command);
 
-    std::string response;
+    std::vector<std::string> response;
 
     std::string line;
     while (true) {
@@ -41,18 +41,15 @@ std::string Elm327::sendCommand(const std::string &command) {
         if (line == ">") {
             break;
         }
-        if (!response.empty()) {
-            response += '\n';
-        }
-        response += line;
+        response.emplace_back(std::move(line));
     }
     return response;
 }
 
 void Elm327::sendBasicCommand(const std::string &command) {
-    std::string response = sendCommand(command);
-    if (response != "OK") {
-        throw std::runtime_error("received invalid response \"" + response + R"(", expected "OK")");
+    std::vector<std::string> response = sendCommand(command);
+    if (response.size() != 1 || response.front() != "OK") {
+        throw std::runtime_error("received invalid response, expected \"OK\"");
     }
 }
 

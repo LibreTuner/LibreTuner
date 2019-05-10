@@ -32,8 +32,8 @@ public:
     // not supported.
     virtual network::CanPtr can(uint32_t baudrate);
 
-    // Currently a stub. Returns nullptr.
-    virtual network::IsoTpPtr isotp();
+    // Tries to create a device wrapped around can()
+    virtual network::IsoTpPtr isotp(const network::IsoTpOptions &options);
 
     // Returns the port or an empty string if no port is used by the datalink
     // type

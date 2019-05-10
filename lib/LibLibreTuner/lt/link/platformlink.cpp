@@ -1,5 +1,6 @@
 #include "platformlink.h"
 
+#include "../network/isotp/isotpcan.h"
 #include "../network/uds/isotpuds.h"
 #include "../network/can/canlog.h"
 #include "../diagnostics/uds.h"
@@ -20,11 +21,10 @@ network::CanPtr PlatformLink::can() {
 }
 
 network::IsoTpPtr PlatformLink::isotp() {
-	network::IsoTpPtr isotp = datalink_.isotp();
+	network::IsoTpPtr isotp = datalink_.isotp(network::IsoTpOptions{platform_.serverId, platform_.serverId + 8});
 	if (!isotp) {
-		isotp = std::make_unique<network::IsoTp>(can());
+	    throw std::runtime_error("isotp is unsupported with the selected data link");
 	}
-	isotp->setOptions(network::IsoTpOptions{platform_.serverId, platform_.serverId + 8});
 	return isotp;
 }
 

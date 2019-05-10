@@ -39,10 +39,12 @@ public:
     }
 
 	inline std::vector<uint8_t>::iterator begin() { return data_.begin(); }
+    inline std::vector<uint8_t>::const_iterator begin() const { return data_.begin(); }
     inline std::vector<uint8_t>::const_iterator cbegin() const {
         return data_.cbegin(); }
 
     inline std::vector<uint8_t>::iterator end() { return data_.end(); }
+    inline std::vector<uint8_t>::const_iterator end() const { return data_.end(); }
     inline std::vector<uint8_t>::const_iterator cend() const { return data_.cend(); }
 
 	inline uint8_t *data() { return data_.data(); }

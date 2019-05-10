@@ -1,12 +1,8 @@
-#include <utility>
-
-//
-// Created by altenius on 12/20/18.
-//
-
 #ifdef WITH_SOCKETCAN
 
 #include "socketcan.h"
+
+#include <utility>
 
 #include "../network/can/socketcan.h"
 

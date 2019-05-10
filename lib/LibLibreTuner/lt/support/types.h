@@ -71,12 +71,14 @@ inline std::size_t dataTypeSize(DataType type) {
 enum class DataLinkType {
 	SocketCan,
 	PassThru,
+	Elm,
 	Invalid,
 };
 
 enum class NetworkProtocol {
 	None = 0,
 	Can = 0x1,
+	IsoTp = 0x2,
 };
 
 inline NetworkProtocol operator|(NetworkProtocol lhs, NetworkProtocol rhs) {

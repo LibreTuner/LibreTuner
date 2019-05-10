@@ -1,5 +1,5 @@
 #ifndef LT_ELM327_H
-#define LTELM327_H
+#define LT_ELM327_H
 
 #include <serial/device.h>
 #include <serial/bufferedreader.h>
@@ -60,8 +60,8 @@ public:
     // Sets timeout byte (0 = 0ms, 0xFF = 1000ms)
     void setTimeout(uint8_t timeout);
 
-    // Sends a command and waits for a response
-    std::string sendCommand(const std::string &command);
+    // Sends a command and waits for a response. Returns response separated into lines.
+    std::vector<std::string> sendCommand(const std::string &command);
 
     // Same as `sendCommand()` but throws an exception if the response is not "OK"
     void sendBasicCommand(const std::string &command);
@@ -75,4 +75,4 @@ using Elm327Ptr = std::shared_ptr<Elm327>;
 }
 
 
-#endif //LIBRETUNER_ELM327_H
+#endif //LT_ELM327_H

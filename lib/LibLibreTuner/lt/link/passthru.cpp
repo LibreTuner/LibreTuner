@@ -1,7 +1,3 @@
-//
-// Created by altenius on 12/20/18.
-//
-
 #include "passthru.h"
 #include "../network/can/j2534can.h"
 
