@@ -9,11 +9,7 @@ class DtcModel : public QAbstractTableModel {
 public:
     DtcModel() = default;
 
-    inline void setCodes(lt::DiagnosticCodes &&codes) noexcept {
-        beginResetModel();
-        codes_ = std::move(codes);
-        endResetModel();
-    }
+    void setCodes(lt::DiagnosticCodes &&codes);
 
 private:
     lt::DiagnosticCodes codes_;

@@ -3,7 +3,7 @@
 #include "libretuner.h"
 
 int DtcModel::rowCount(const QModelIndex &parent) const {
-    if (!parent.isValid()) {
+    if (parent.isValid()) {
         return 0;
     }
     return codes_.size();
@@ -53,4 +53,10 @@ QVariant DtcModel::headerData(int section, Qt::Orientation orientation,
         break;
     }
     return QVariant();
+}
+
+void DtcModel::setCodes(lt::DiagnosticCodes &&codes) {
+    beginResetModel();
+    codes_ = std::move(codes);
+    endResetModel();
 }
