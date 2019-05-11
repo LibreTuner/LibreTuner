@@ -6,7 +6,7 @@
 
 namespace lt::network {
 
-Elm327::Elm327(std::string port, serial::Settings serialSettings) : device_(std::move(port), serialSettings), reader_(device_) {}
+Elm327::Elm327(std::string port, serial::Settings serialSettings) : device_(port, serialSettings), reader_(device_) {}
 
 void Elm327::open() { device_.open(); }
 
@@ -28,14 +28,15 @@ void Elm327::writeLine(std::string line) {
 
 std::vector<std::string> Elm327::sendCommand(const std::string &command) {
     writeLine(command);
-    // Ignore echo
-    reader_.readLine();
 
     std::vector<std::string> response;
 
     std::string line;
     while (true) {
         line = reader_.readLine(">");
+        if (line.empty()) {
+            continue;
+        }
         if (line == ">") {
             break;
         }
@@ -46,6 +47,9 @@ std::vector<std::string> Elm327::sendCommand(const std::string &command) {
 
         if (line == "CAN ERROR") {
             throw std::runtime_error("received CAN ERROR");
+        }
+        if (line == "NO DATA") {
+            throw std::runtime_error("received no data");
         }
 
         response.emplace_back(std::move(line));

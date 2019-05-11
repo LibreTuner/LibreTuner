@@ -43,7 +43,7 @@ IsoTpElm::IsoTpElm(Elm327Ptr device, IsoTpOptions options)
         throw std::runtime_error("Elm327 device is not open");
     }
 
-    // Disable echo
+    // Disable  echo
     device_->setEcho(false);
     // Set protocol
     device_->setProtocol(ElmProtocol::ISO_15765_4_CAN_11bit_500);
