@@ -25,7 +25,7 @@ enum class ElmProtocol : uint8_t {
 
 class Elm327 {
 public:
-    Elm327();
+    Elm327(std::string port = "", serial::Settings serialSettings = serial::Settings{});
 
     // Opens serial device
     void open();

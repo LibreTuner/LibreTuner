@@ -1,7 +1,3 @@
-//
-// Created by altenius on 12/20/18.
-//
-
 #ifndef LT_DATALINK_H
 #define LT_DATALINK_H
 
@@ -12,6 +8,30 @@
 #include "../support/types.h"
 
 namespace lt {
+
+enum class DataLinkFlags : unsigned {
+    None = 0,
+    Port = 1 << 1,
+    Baudrate = 1 << 2,
+};
+
+inline DataLinkFlags operator|(DataLinkFlags lhs, DataLinkFlags rhs) {
+    using DType = std::underlying_type<DataLinkFlags>::type;
+    return static_cast<DataLinkFlags>(static_cast<DType>(lhs) |
+                                      static_cast<DType>(rhs));
+}
+
+inline DataLinkFlags &operator|=(DataLinkFlags &lhs, DataLinkFlags rhs) {
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+inline DataLinkFlags operator&(DataLinkFlags lhs, DataLinkFlags rhs) {
+    using DType = std::underlying_type<DataLinkFlags>::type;
+    return static_cast<DataLinkFlags>(static_cast<DType>(lhs) &
+                                      static_cast<DType>(rhs));
+}
+
 class DataLink {
 public:
     explicit DataLink(std::string name);
@@ -39,6 +59,18 @@ public:
     // type
     virtual std::string port() const = 0;
     virtual void setPort(const std::string &port) = 0;
+
+    // Returns a list of available ports
+    virtual std::vector<std::string> ports() {
+        return std::vector<std::string>();
+    }
+
+    virtual DataLinkFlags flags() const noexcept { return DataLinkFlags::None; }
+
+    // Baudrate for COM-based links
+    virtual void setBaudrate(int /*baudrate*/) {}
+
+    virtual int baudrate() { return 0; }
 
 protected:
     std::string name_;

@@ -20,6 +20,7 @@ struct LinkData {
     std::string type;
     std::string name;
     std::string port;
+    int baudrate;
 };
 
 namespace serialize {
@@ -27,12 +28,14 @@ template <typename D> void deserialize(D &d, LinkData &link) {
     d.deserialize(link.type);
     d.deserialize(link.name);
     d.deserialize(link.port);
+    d.deserialize(link.baudrate);
 }
 
 template <typename S> void serialize(S &s, const LinkData &link) {
     s.serialize(link.type);
     s.serialize(link.name);
     s.serialize(link.port);
+    s.serialize(link.baudrate);
 }
 } // namespace serialize
 
@@ -65,8 +68,8 @@ void Links::load() {
                 "SocketCAN is unuspported on this platform, ignoring link.");
 #endif
         } else if (link.type == "elm") {
-            manualLinks_.emplace_back(
-                std::make_unique<lt::ElmDataLink>(link.name, link.port));
+            manualLinks_.emplace_back(std::make_unique<lt::ElmDataLink>(
+                link.name, link.port, link.baudrate));
         } else {
             throw std::runtime_error("Unknown datalink type: " + link.type);
         }
@@ -91,6 +94,7 @@ void Links::save() const {
         data.type = type;
         data.name = link->name();
         data.port = link->port();
+        data.baudrate = link->baudrate();
         links.emplace_back(std::move(data));
     }
 

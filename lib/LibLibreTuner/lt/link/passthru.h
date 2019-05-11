@@ -22,6 +22,8 @@ public:
 
     network::CanPtr can(uint32_t baudrate) override;
 
+    DataLinkFlags flags() const noexcept override;
+
 private:
     std::string port_;
     // device_ must be destructed before interface_

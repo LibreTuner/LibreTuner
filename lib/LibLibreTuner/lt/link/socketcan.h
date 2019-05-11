@@ -22,6 +22,8 @@ public:
 
     void setPort(const std::string &port) noexcept override { device_ = port; }
 
+    DataLinkFlags flags() const noexcept override;
+
 private:
     std::string device_;
 

@@ -13,6 +13,9 @@ SocketCanLink::SocketCanLink(const std::string &name, std::string device)
 network::CanPtr SocketCanLink::can(uint32_t /*baudrate*/) {
     return std::make_unique<network::SocketCan>(device_);
 }
+
+DataLinkFlags SocketCanLink::flags() const noexcept { return DataLinkFlags::Port; }
+
 } // namespace lt
 
 #endif

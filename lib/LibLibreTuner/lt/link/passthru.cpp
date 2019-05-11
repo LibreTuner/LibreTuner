@@ -42,11 +42,16 @@ NetworkProtocol PassThruLink::supportedProtocols() const {
     return passthruToNetworkProtocol(info_.protocols);
 }
 
+DataLinkFlags PassThruLink::flags() const noexcept {
+    return DataLinkFlags::Port;
+}
+
 std::vector<std::unique_ptr<PassThruLink>> detect_passthru_links() {
     std::vector<j2534::Info> info = j2534::detect_interfaces();
 
     std::vector<std::unique_ptr<PassThruLink>> links;
 
+    links.reserve(info.size());
     for (j2534::Info &i : info) {
         links.emplace_back(std::make_unique<PassThruLink>(std::move(i)));
     }

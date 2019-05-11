@@ -1,7 +1,3 @@
-//
-// Created by altenius on 12/21/18.
-//
-
 #include "datalinkswidget.h"
 
 #include <QFormLayout>
@@ -9,6 +5,7 @@
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -30,14 +27,26 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
 
     lineName_ = new QLineEdit;
     linePort_ = new QLineEdit;
+    comboPort_ = new QComboBox;
     lineName_->setEnabled(false);
     linePort_->setEnabled(false);
+    comboPort_->setEnabled(false);
+
+    spinBaudrate_ = new QSpinBox;
+    spinBaudrate_->setVisible(false);
+    spinBaudrate_->setMinimum(1);
+    spinBaudrate_->setMaximum(4000000);
 
     linksView_ = new QTreeView;
     linksView_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     linksView_->setModel(&LT()->links());
 
     // Layouts
+    auto *portLayout = new QVBoxLayout;
+    portLayout->setContentsMargins(0, 0, 0, 0);
+    portLayout->addWidget(comboPort_);
+    portLayout->addWidget(linePort_);
+
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
     buttonLayout->addWidget(buttonAdd);
@@ -45,9 +54,11 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
 
     auto *formLayout = new QFormLayout;
     formLayout->addRow(tr("Name"), lineName_);
-    formLayout->addRow(tr("Port"), linePort_);
+    formLayout->addRow(tr("Port"), portLayout);
+    formLayout->addRow(tr("Baudrate"), spinBaudrate_);
 
     auto *layoutOptButtons = new QVBoxLayout;
+    layoutOptButtons->setAlignment(Qt::AlignTop);
     layoutOptButtons->addWidget(buttonUpdate_);
     layoutOptButtons->addWidget(buttonReset_);
 
@@ -89,46 +100,77 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         }
 
         link->setName(lineName_->text().toStdString());
-        link->setPort(linePort_->text().toStdString());
+
+        if (comboPort_->currentIndex() == 0) {
+            link->setPort(linePort_->text().toStdString());
+        } else {
+            link->setPort(comboPort_->currentText().toStdString());
+        }
+        link->setBaudrate(spinBaudrate_->value());
         LT()->saveLinks();
-        buttonUpdate_->setEnabled(false);
-        buttonReset_->setEnabled(false);
+        setButtonsEnabled(false);
     });
 
     connect(buttonReset_, &QPushButton::clicked, [this]() {
         linkChanged(currentLink());
-        buttonUpdate_->setEnabled(false);
-        buttonReset_->setEnabled(false);
+        setButtonsEnabled(false);
     });
 
-    connect(lineName_, &QLineEdit::textEdited, [this]() {
-        buttonUpdate_->setEnabled(true);
-        buttonReset_->setEnabled(true);
-    });
+    connect(lineName_, &QLineEdit::textEdited,
+            [this]() { setButtonsEnabled(true); });
 
-    connect(linePort_, &QLineEdit::textEdited, [this]() {
-        buttonUpdate_->setEnabled(true);
-        buttonReset_->setEnabled(true);
-    });
+    connect(comboPort_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [=](int index) {
+                setButtonsEnabled(true);
+                linePort_->setEnabled(index == 0);
+            });
+
+    connect(linePort_, &QLineEdit::textEdited,
+            [this]() { setButtonsEnabled(true); });
+
+    connect(spinBaudrate_, &QSpinBox::editingFinished,
+            [this]() { setButtonsEnabled(true); });
 }
 
 void DatalinksWidget::linkChanged(lt::DataLink *link) {
-    buttonUpdate_->setEnabled(false);
-    buttonReset_->setEnabled(false);
-
     if (link == nullptr) {
         lineName_->clear();
         linePort_->clear();
+        spinBaudrate_->clear();
 
         lineName_->setEnabled(false);
         linePort_->setEnabled(false);
+        comboPort_->setEnabled(false);
+        spinBaudrate_->setVisible(false);
+
+        setButtonsEnabled(false);
         return;
     }
 
     lineName_->setText(QString::fromStdString(link->name()));
     linePort_->setText(QString::fromStdString(link->port()));
+    spinBaudrate_->setValue(link->baudrate());
     lineName_->setEnabled(true);
-    linePort_->setEnabled(true);
+    if ((link->flags() & lt::DataLinkFlags::Port) !=
+    lt::DataLinkFlags::None) {
+        linePort_->setEnabled(true);
+        comboPort_->setEnabled(true);
+        comboPort_->clear();
+        std::vector<std::string> ports = link->ports();
+        comboPort_->addItem("Other");
+
+        for (const std::string &port : ports) {
+            comboPort_->addItem(QString::fromStdString(port));
+            if (port == link->port()) {
+                comboPort_->setCurrentText(QString::fromStdString(port));
+                linePort_->setEnabled(false);
+                linePort_->clear();
+            }
+        }
+    }
+    spinBaudrate_->setVisible((link->flags() & lt::DataLinkFlags::Baudrate) !=
+                              lt::DataLinkFlags::None);
+    setButtonsEnabled(false);
 }
 
 lt::DataLink *DatalinksWidget::currentLink() const {
@@ -139,4 +181,8 @@ lt::DataLink *DatalinksWidget::currentLink() const {
     }
 
     return data.value<lt::DataLink *>();
+}
+void DatalinksWidget::setButtonsEnabled(bool enabled) {
+    buttonUpdate_->setEnabled(enabled);
+    buttonReset_->setEnabled(enabled);
 }
