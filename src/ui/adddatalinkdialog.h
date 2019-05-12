@@ -5,6 +5,7 @@
 
 class QLineEdit;
 class QComboBox;
+class QSpinBox;
 
 /**
  * @todo write docs
@@ -19,6 +20,7 @@ private slots:
 
 private:
     QComboBox *comboType_;
+    QSpinBox *spinBaudrate_;
     QLineEdit *lineName_;
     QLineEdit *linePort_;
 };

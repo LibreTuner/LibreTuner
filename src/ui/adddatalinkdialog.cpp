@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QVBoxLayout>
 
 #ifdef WITH_SOCKETCAN
@@ -25,6 +26,10 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
 
     lineName_ = new QLineEdit;
     linePort_ = new QLineEdit;
+    spinBaudrate_ = new QSpinBox;
+    spinBaudrate_->setRange(0, 4000000);
+    spinBaudrate_->setValue(115200);
+    spinBaudrate_->setEnabled(false);
 
     // Buttons
     auto *buttonAdd = new QPushButton(tr("Add"));
@@ -35,6 +40,7 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     form->addRow(tr("Type"), comboType_);
     form->addRow(tr("Name"), lineName_);
     form->addRow(tr("Port"), linePort_);
+    form->addRow(tr("Baudrate"), spinBaudrate_);
 
     // Button layout
     auto *buttonLayout = new QVBoxLayout;
@@ -52,6 +58,11 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     connect(buttonCancel, &QPushButton::clicked, this, &QDialog::close);
     connect(buttonAdd, &QPushButton::clicked, this,
             &AddDatalinkDialog::addClicked);
+
+    connect(comboType_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this](int index) {
+                spinBaudrate_->setEnabled(index == 1); // Only enable for ELM327
+            });
 }
 
 void AddDatalinkDialog::addClicked() {
@@ -76,7 +87,7 @@ void AddDatalinkDialog::addClicked() {
         break;
     case 1:
         // ELM327
-        LT()->links().add(std::make_unique<lt::ElmDataLink>(name_s, port));
+        LT()->links().add(std::make_unique<lt::ElmDataLink>(name_s, port, spinBaudrate_->value()));
         LT()->saveLinks();
         close();
         break;
