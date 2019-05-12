@@ -27,6 +27,7 @@ void Elm327::writeLine(std::string line) {
 }
 
 std::vector<std::string> Elm327::sendCommand(const std::string &command) {
+    reader_.clear();
     writeLine(command);
 
     std::vector<std::string> response;
