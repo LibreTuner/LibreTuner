@@ -87,7 +87,7 @@ Q_DECLARE_METATYPE(lt::DataLink *)
 
 class LinksListModel : public QAbstractListModel {
 public:
-    LinksListModel(const Links &links) : links_(links) {}
+    explicit LinksListModel(const Links &links);
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
