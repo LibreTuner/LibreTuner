@@ -102,7 +102,7 @@ set(libretuner_SRC
     database/links.h
 
 
-    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
+    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS} ui/widget/CustomCombo.cpp ui/widget/CustomCombo.h)
 
 if (UNIX AND NOT APPLE)
 
