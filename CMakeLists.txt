@@ -17,7 +17,7 @@ add_subdirectory(lib/yaml)
 add_subdirectory(lib/QHexView)
 add_subdirectory(lib/lua)
 add_subdirectory(lib/sol2)
-add_subdirectory(lib/catch)
+#add_subdirectory(lib/catch)
 
 
 add_subdirectory(lib/LibLibreTuner)

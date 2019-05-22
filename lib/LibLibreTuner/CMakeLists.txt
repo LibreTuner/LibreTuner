@@ -12,11 +12,11 @@ add_subdirectory(lib/cparse)
 add_subdirectory(lib/serial)
 
 # Options
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 
 
 if(BUILD_TESTS)
-	add_subdirectory(test)
+        #add_subdirectory(test)
 endif()
 
 # Sources

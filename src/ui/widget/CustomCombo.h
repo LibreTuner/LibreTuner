@@ -4,13 +4,23 @@
 #include <QWidget>
 
 class QComboBox;
+class QLineEdit;
+class QAbstractItemModel;
+
+class CustomComboProxy;
 
 class CustomCombo : public QWidget {
 public:
     explicit CustomCombo(QWidget *parent = nullptr);
 
+    void setModel(QAbstractItemModel *model);
+
+    QString value();
+
 private:
     QComboBox *combo_;
+    QLineEdit *line_;
+    CustomComboProxy *model_;
 };
 
 
