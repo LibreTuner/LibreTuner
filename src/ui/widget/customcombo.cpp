@@ -1,4 +1,4 @@
-#include "CustomCombo.h"
+#include "customcombo.h"
 
 #include <QComboBox>
 #include <QVBoxLayout>
@@ -29,9 +29,19 @@ public:
         return QAbstractProxyModel::data(proxyIndex, role);
     }
 
+    Qt::ItemFlags flags(const QModelIndex &index) const override {
+        if (index.row() == 0 && index.column() == 0) {
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        }
+        return QAbstractProxyModel::flags(index);
+    }
+
     QModelIndex index(int row, int column, const QModelIndex &parent) const override {
         if (sourceModel() == nullptr || parent.isValid() || row >= rowCount(QModelIndex())) {
             return QModelIndex();
+        }
+        if (row == 0 && column == 0) {
+            return createIndex(0, 0, nullptr);
         }
         return mapFromSource(sourceModel()->index(row - 1, column));
     }
