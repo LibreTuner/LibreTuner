@@ -13,6 +13,7 @@
 
 #include "widget/customcombo.h"
 #include "../models/serialportmodel.h"
+#include "uiutil.h"
 
 #ifdef WITH_SOCKETCAN
 #include "lt/link/socketcan.h"
@@ -35,7 +36,9 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     spinBaudrate_->setEnabled(false);
 
     auto *serialModel = new SerialPortModel(this);
-    serialModel->setPorts(serial::enumeratePorts());
+    catchWarning([serialModel]() {
+        serialModel->setPorts(serial::enumeratePorts());
+    }, tr("Error enumerating serial ports"));
     comboPort_->setModel(serialModel);
 
     // Buttons
