@@ -6,6 +6,7 @@
 class QLineEdit;
 class QComboBox;
 class QSpinBox;
+class CustomCombo;
 
 /**
  * @todo write docs
@@ -22,7 +23,7 @@ private:
     QComboBox *comboType_;
     QSpinBox *spinBaudrate_;
     QLineEdit *lineName_;
-    QLineEdit *linePort_;
+    CustomCombo *comboPort_;
 };
 
 #endif // ADDDATALINKDIALOG_H

@@ -88,11 +88,15 @@ set(libretuner_SRC
     ui/widget/datalogview.h
     ui/widget/datalogliveview.cpp
     ui/widget/datalogliveview.h
+    ui/widget/customcombo.cpp
+    ui/widget/customcombo.h
 
     models/tablemodel.cpp
     models/tablemodel.h
     models/dtcmodel.cpp
     models/dtcmodel.h
+    models/serialportmodel.cpp
+    models/serialportmodel.h
 
     database/definitions.cpp
     database/definitions.h
@@ -102,7 +106,7 @@ set(libretuner_SRC
     database/links.h
 
 
-    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS} ui/widget/CustomCombo.cpp ui/widget/CustomCombo.h)
+    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
 
 if (UNIX AND NOT APPLE)
 

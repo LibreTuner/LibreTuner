@@ -11,6 +11,9 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+#include "widget/customcombo.h"
+#include "../models/serialportmodel.h"
+
 #ifdef WITH_SOCKETCAN
 #include "lt/link/socketcan.h"
 #endif
@@ -25,11 +28,15 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     comboType_->addItem("ELM327/ST");
 
     lineName_ = new QLineEdit;
-    linePort_ = new QLineEdit;
+    comboPort_ = new CustomCombo;
     spinBaudrate_ = new QSpinBox;
     spinBaudrate_->setRange(0, 4000000);
     spinBaudrate_->setValue(115200);
     spinBaudrate_->setEnabled(false);
+
+    auto *serialModel = new SerialPortModel(this);
+    serialModel->setPorts(serial::enumeratePorts());
+    comboPort_->setModel(serialModel);
 
     // Buttons
     auto *buttonAdd = new QPushButton(tr("Add"));
@@ -39,7 +46,7 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     auto *form = new QFormLayout;
     form->addRow(tr("Type"), comboType_);
     form->addRow(tr("Name"), lineName_);
-    form->addRow(tr("Port"), linePort_);
+    form->addRow(tr("Port"), comboPort_);
     form->addRow(tr("Baudrate"), spinBaudrate_);
 
     // Button layout
@@ -74,7 +81,7 @@ void AddDatalinkDialog::addClicked() {
     }
 
     std::string name_s = name.toStdString();
-    std::string port = linePort_->text().trimmed().toStdString();
+    std::string port = comboPort_->value().trimmed().toStdString();
 
     switch (comboType_->currentIndex()) {
     case 0:
