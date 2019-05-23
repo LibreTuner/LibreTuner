@@ -9,9 +9,14 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
+#include "serial/device.h"
+
 #include "adddatalinkdialog.h"
 #include "database/links.h"
 #include "libretuner.h"
+#include "models/serialportmodel.h"
+#include "uiutil.h"
+#include "widget/customcombo.h"
 
 DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     setWindowTitle(tr("LibreTuner - Datalinks"));
@@ -26,11 +31,15 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     buttonReset_->setEnabled(false);
 
     lineName_ = new QLineEdit;
-    linePort_ = new QLineEdit;
-    comboPort_ = new QComboBox;
+    comboPort_ = new CustomCombo;
     lineName_->setEnabled(false);
-    linePort_->setEnabled(false);
     comboPort_->setEnabled(false);
+
+    auto *serialModel = new SerialPortModel(this);
+    catchWarning(
+        [serialModel]() { serialModel->setPorts(serial::enumeratePorts()); },
+        tr("Error enumerating serial ports"));
+    comboPort_->setModel(serialModel);
 
     spinBaudrate_ = new QSpinBox;
     spinBaudrate_->setVisible(false);
@@ -45,7 +54,6 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     auto *portLayout = new QVBoxLayout;
     portLayout->setContentsMargins(0, 0, 0, 0);
     portLayout->addWidget(comboPort_);
-    portLayout->addWidget(linePort_);
 
     auto *buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
@@ -100,12 +108,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         }
 
         link->setName(lineName_->text().toStdString());
-
-        if (comboPort_->currentIndex() == 0) {
-            link->setPort(linePort_->text().toStdString());
-        } else {
-            link->setPort(comboPort_->currentText().toStdString());
-        }
+        link->setPort(comboPort_->value().toStdString());
         link->setBaudrate(spinBaudrate_->value());
         LT()->saveLinks();
         setButtonsEnabled(false);
@@ -119,13 +122,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     connect(lineName_, &QLineEdit::textEdited,
             [this]() { setButtonsEnabled(true); });
 
-    connect(comboPort_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [=](int index) {
-                setButtonsEnabled(true);
-                linePort_->setEnabled(index == 0);
-            });
-
-    connect(linePort_, &QLineEdit::textEdited,
+    connect(comboPort_, &CustomCombo::valueChanged,
             [this]() { setButtonsEnabled(true); });
 
     connect(spinBaudrate_, &QSpinBox::editingFinished,
@@ -135,11 +132,9 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
 void DatalinksWidget::linkChanged(lt::DataLink *link) {
     if (link == nullptr) {
         lineName_->clear();
-        linePort_->clear();
         spinBaudrate_->clear();
 
         lineName_->setEnabled(false);
-        linePort_->setEnabled(false);
         comboPort_->setEnabled(false);
         spinBaudrate_->setVisible(false);
 
@@ -148,25 +143,11 @@ void DatalinksWidget::linkChanged(lt::DataLink *link) {
     }
 
     lineName_->setText(QString::fromStdString(link->name()));
-    linePort_->setText(QString::fromStdString(link->port()));
     spinBaudrate_->setValue(link->baudrate());
     lineName_->setEnabled(true);
-    if ((link->flags() & lt::DataLinkFlags::Port) !=
-    lt::DataLinkFlags::None) {
-        linePort_->setEnabled(true);
+    if ((link->flags() & lt::DataLinkFlags::Port) != lt::DataLinkFlags::None) {
         comboPort_->setEnabled(true);
-        comboPort_->clear();
-        std::vector<std::string> ports = link->ports();
-        comboPort_->addItem("Other");
-
-        for (const std::string &port : ports) {
-            comboPort_->addItem(QString::fromStdString(port));
-            if (port == link->port()) {
-                comboPort_->setCurrentText(QString::fromStdString(port));
-                linePort_->setEnabled(false);
-                linePort_->clear();
-            }
-        }
+        comboPort_->setValue(QString::fromStdString(link->port()));
     }
     spinBaudrate_->setVisible((link->flags() & lt::DataLinkFlags::Baudrate) !=
                               lt::DataLinkFlags::None);

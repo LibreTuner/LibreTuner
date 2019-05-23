@@ -9,6 +9,7 @@ class QPushButton;
 class QTreeView;
 class QSpinBox;
 class QComboBox;
+class CustomCombo;
 
 namespace lt {
 class DataLink;
@@ -25,8 +26,7 @@ private:
     void setButtonsEnabled(bool enabled);
 
     QLineEdit *lineName_;
-    QLineEdit *linePort_;
-    QComboBox *comboPort_;
+    CustomCombo *comboPort_;
     QSpinBox *spinBaudrate_;
 
     QPushButton *buttonUpdate_;

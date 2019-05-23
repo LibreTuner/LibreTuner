@@ -11,9 +11,9 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#include "widget/customcombo.h"
 #include "../models/serialportmodel.h"
 #include "uiutil.h"
+#include "widget/customcombo.h"
 
 #ifdef WITH_SOCKETCAN
 #include "lt/link/socketcan.h"
@@ -36,9 +36,9 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     spinBaudrate_->setEnabled(false);
 
     auto *serialModel = new SerialPortModel(this);
-    catchWarning([serialModel]() {
-        serialModel->setPorts(serial::enumeratePorts());
-    }, tr("Error enumerating serial ports"));
+    catchWarning(
+        [serialModel]() { serialModel->setPorts(serial::enumeratePorts()); },
+        tr("Error enumerating serial ports"));
     comboPort_->setModel(serialModel);
 
     // Buttons
@@ -97,7 +97,8 @@ void AddDatalinkDialog::addClicked() {
         break;
     case 1:
         // ELM327
-        LT()->links().add(std::make_unique<lt::ElmDataLink>(name_s, port, spinBaudrate_->value()));
+        LT()->links().add(std::make_unique<lt::ElmDataLink>(
+            name_s, port, spinBaudrate_->value()));
         LT()->saveLinks();
         close();
         break;

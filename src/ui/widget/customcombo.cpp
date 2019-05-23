@@ -1,16 +1,18 @@
 #include "customcombo.h"
 
-#include <QComboBox>
-#include <QVBoxLayout>
 #include <QAbstractProxyModel>
+#include <QComboBox>
 #include <QLineEdit>
+#include <QVBoxLayout>
 
 class CustomComboProxy : public QAbstractProxyModel {
 public:
-    explicit CustomComboProxy(QObject *parent = nullptr) : QAbstractProxyModel(parent) {}
+    explicit CustomComboProxy(QObject *parent = nullptr)
+        : QAbstractProxyModel(parent) {}
 
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const override {
-        if ((proxyIndex.row() == 0 && proxyIndex.column() == 0) || sourceModel() == nullptr) {
+        if ((proxyIndex.row() == 0 && proxyIndex.column() == 0) ||
+            sourceModel() == nullptr) {
             return QModelIndex();
         }
 
@@ -18,11 +20,13 @@ public:
     }
 
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override {
-        return createIndex(sourceIndex.row() + 1, sourceIndex.column(), sourceIndex.internalPointer());
+        return createIndex(sourceIndex.row() + 1, sourceIndex.column(),
+                           sourceIndex.internalPointer());
     }
 
     QVariant data(const QModelIndex &proxyIndex, int role) const override {
-        if (proxyIndex.row() == 0 && proxyIndex.column() == 0 && role == Qt::DisplayRole) {
+        if (proxyIndex.row() == 0 && proxyIndex.column() == 0 &&
+            role == Qt::DisplayRole) {
             return tr("Custom");
         }
 
@@ -36,8 +40,10 @@ public:
         return QAbstractProxyModel::flags(index);
     }
 
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override {
-        if (sourceModel() == nullptr || parent.isValid() || row >= rowCount(QModelIndex())) {
+    QModelIndex index(int row, int column,
+                      const QModelIndex &parent) const override {
+        if (sourceModel() == nullptr || parent.isValid() ||
+            row >= rowCount(QModelIndex())) {
             return QModelIndex();
         }
         if (row == 0 && column == 0) {
@@ -57,9 +63,7 @@ public:
         return sourceModel()->rowCount(QModelIndex()) + 1;
     }
 
-    int columnCount(const QModelIndex &parent) const override {
-        return 1;
-    }
+    int columnCount(const QModelIndex &parent) const override { return 1; }
 };
 
 CustomCombo::CustomCombo(QWidget *parent) : QWidget(parent) {
@@ -77,9 +81,14 @@ CustomCombo::CustomCombo(QWidget *parent) : QWidget(parent) {
 
     setLayout(layout);
 
-    connect(combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-        line_->setEnabled(index == 0);
-    });
+    connect(combo_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this](int index) {
+                line_->setEnabled(index == 0);
+                emit valueChanged();
+            });
+
+    connect(line_, &QLineEdit::textChanged,
+            [this](const QString &s) { emit valueChanged(); });
 }
 
 void CustomCombo::setModel(QAbstractItemModel *model) {
@@ -95,3 +104,16 @@ QString CustomCombo::value() {
     return var.toString();
 }
 
+void CustomCombo::setValue(const QString &value) {
+    // Check model for value
+    for (int i = 0; i < model_->rowCount(QModelIndex()); ++i) {
+        if (model_->data(model_->index(i, 0, QModelIndex()), Qt::UserRole)
+                .toString() == value) {
+            combo_->setCurrentIndex(i);
+            line_->clear();
+            return;
+        }
+    }
+    combo_->setCurrentIndex(0);
+    line_->setText(value);
+}
