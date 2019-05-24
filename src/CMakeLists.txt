@@ -90,6 +90,8 @@ set(libretuner_SRC
     ui/widget/datalogliveview.h
     ui/widget/customcombo.cpp
     ui/widget/customcombo.h
+    ui/widget/datalinksettings.cpp
+    ui/widget/datalinksettings.h
 
     models/tablemodel.cpp
     models/tablemodel.h
