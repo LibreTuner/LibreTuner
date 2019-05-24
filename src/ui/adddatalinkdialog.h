@@ -3,10 +3,9 @@
 
 #include <QDialog>
 
-class QLineEdit;
 class QComboBox;
-class QSpinBox;
-class CustomCombo;
+
+class DataLinkSettings;
 
 /**
  * @todo write docs
@@ -19,11 +18,11 @@ public:
 private slots:
     void addClicked();
 
+    void typeIndexChanged(int index);
+
 private:
+    DataLinkSettings *settings_;
     QComboBox *comboType_;
-    QSpinBox *spinBaudrate_;
-    QLineEdit *lineName_;
-    CustomCombo *comboPort_;
 };
 
 #endif // ADDDATALINKDIALOG_H

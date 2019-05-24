@@ -14,6 +14,7 @@
 #include "../models/serialportmodel.h"
 #include "uiutil.h"
 #include "widget/customcombo.h"
+#include "widget/datalinksettings.h"
 
 #ifdef WITH_SOCKETCAN
 #include "lt/link/socketcan.h"
@@ -23,34 +24,23 @@
 AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("LibreTuner - Add Datalink"));
 
-    // Form
+    // Type combo
     comboType_ = new QComboBox;
     comboType_->addItem("SocketCAN");
     comboType_->addItem("ELM327/ST");
 
-    lineName_ = new QLineEdit;
-    comboPort_ = new CustomCombo;
-    spinBaudrate_ = new QSpinBox;
-    spinBaudrate_->setRange(0, 4000000);
-    spinBaudrate_->setValue(115200);
-    spinBaudrate_->setEnabled(false);
-
-    auto *serialModel = new SerialPortModel(this);
-    catchWarning(
-        [serialModel]() { serialModel->setPorts(serial::enumeratePorts()); },
-        tr("Error enumerating serial ports"));
-    comboPort_->setModel(serialModel);
+    // Settings
+    settings_ = new DataLinkSettings;
 
     // Buttons
     auto *buttonAdd = new QPushButton(tr("Add"));
     auto *buttonCancel = new QPushButton(tr("Cancel"));
 
     // Form layout
-    auto *form = new QFormLayout;
-    form->addRow(tr("Type"), comboType_);
-    form->addRow(tr("Name"), lineName_);
-    form->addRow(tr("Port"), comboPort_);
-    form->addRow(tr("Baudrate"), spinBaudrate_);
+    auto *form = new QVBoxLayout;
+    form->setContentsMargins(0, 0, 0, 0);
+    form->addWidget(comboType_);
+    form->addWidget(settings_);
 
     // Button layout
     auto *buttonLayout = new QVBoxLayout;
@@ -70,27 +60,24 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
             &AddDatalinkDialog::addClicked);
 
     connect(comboType_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this](int index) {
-                spinBaudrate_->setEnabled(index == 1); // Only enable for ELM327
-            });
+            this, &AddDatalinkDialog::typeIndexChanged);
+    typeIndexChanged(0);
 }
 
 void AddDatalinkDialog::addClicked() {
-    QString name = lineName_->text().trimmed();
-    if (name.isEmpty()) {
+    std::string name = settings_->name().trimmed().toStdString();
+    if (name.empty()) {
         QMessageBox::warning(this, tr("Invalid name"),
                              tr("Datalink name must not be empty"));
         return;
     }
 
-    std::string name_s = name.toStdString();
-    std::string port = comboPort_->value().trimmed().toStdString();
-
     switch (comboType_->currentIndex()) {
     case 0:
         // SocketCAN
 #ifdef WITH_SOCKETCAN
-        LT()->links().add(std::make_unique<lt::SocketCanLink>(name_s, port));
+        LT()->links().add(std::make_unique<lt::SocketCanLink>(
+            name, settings_->port().toStdString()));
         LT()->saveLinks();
         close();
 #endif
@@ -98,7 +85,7 @@ void AddDatalinkDialog::addClicked() {
     case 1:
         // ELM327
         LT()->links().add(std::make_unique<lt::ElmDataLink>(
-            name_s, port, spinBaudrate_->value()));
+            name, settings_->port().toStdString(), settings_->baudrate()));
         LT()->saveLinks();
         close();
         break;
@@ -108,4 +95,22 @@ void AddDatalinkDialog::addClicked() {
             tr("The selected datalink type is unsupported on this platform"));
         break;
     }
+}
+
+void AddDatalinkDialog::typeIndexChanged(int index) {
+    switch (index) {
+    case 0: // SocketCAN
+        settings_->setFlags(lt::DataLinkFlags::Port |
+                            lt::DataLinkFlags::Baudrate);
+        settings_->setPortType(lt::DataLinkPortType::NetworkCan);
+        break;
+    case 1: // ELM
+        settings_->setFlags(lt::DataLinkFlags::Port |
+                            lt::DataLinkFlags::Baudrate);
+        settings_->setPortType(lt::DataLinkPortType::Serial);
+        break;
+    default:
+        settings_->setFlags(lt::DataLinkFlags::None);
+    }
+    settings_->setPort("");
 }

@@ -4,13 +4,9 @@
 #include <QAbstractItemModel>
 #include <QWidget>
 
-class QLineEdit;
 class QPushButton;
 class QTreeView;
-class QSpinBox;
-class QComboBox;
-class CustomCombo;
-class QCheckBox;
+class DataLinkSettings;
 
 namespace lt {
 class DataLink;
@@ -26,14 +22,10 @@ private:
 
     void setButtonsEnabled(bool enabled);
 
-    QLineEdit *lineName_;
-    CustomCombo *comboPort_;
-    QSpinBox *spinBaudrate_;
-    QCheckBox *checkBaudrate_;
-
     QPushButton *buttonUpdate_;
     QPushButton *buttonReset_;
     QTreeView *linksView_;
+    DataLinkSettings *settings_;
 };
 
 #endif // LIBRETUNER_INTERFACESDIALOG_H

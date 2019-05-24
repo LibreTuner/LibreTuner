@@ -21,7 +21,9 @@ public:
 
     template<typename T>
     void setPorts(T &&t) {
+        beginResetModel();
         ports_ = std::forward<T>(t);
+        endResetModel();
     }
 
 private:

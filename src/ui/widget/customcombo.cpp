@@ -52,7 +52,7 @@ public:
         return mapFromSource(sourceModel()->index(row - 1, column));
     }
 
-    QModelIndex parent(const QModelIndex &child) const override {
+    QModelIndex parent(const QModelIndex & /*child*/) const override {
         return QModelIndex();
     }
 
@@ -63,7 +63,27 @@ public:
         return sourceModel()->rowCount(QModelIndex()) + 1;
     }
 
-    int columnCount(const QModelIndex &parent) const override { return 1; }
+    int columnCount(const QModelIndex & /*parent*/) const override { return 1; }
+
+    void resetProxy() {
+        beginResetModel();
+        endResetModel();
+    }
+
+    void setSourceModel(QAbstractItemModel *sourceModel) override {
+        if (this->sourceModel() != nullptr) {
+            disconnect(this->sourceModel(), &QAbstractItemModel::modelReset,
+                       this, &CustomComboProxy::resetProxy);
+        }
+        beginResetModel();
+        QAbstractProxyModel::setSourceModel(sourceModel);
+        endResetModel();
+
+        if (sourceModel != nullptr) {
+            connect(sourceModel, &QAbstractItemModel::modelReset, this,
+                    &CustomComboProxy::resetProxy);
+        }
+    }
 };
 
 CustomCombo::CustomCombo(QWidget *parent) : QWidget(parent) {
@@ -88,7 +108,7 @@ CustomCombo::CustomCombo(QWidget *parent) : QWidget(parent) {
             });
 
     connect(line_, &QLineEdit::textChanged,
-            [this](const QString &s) { emit valueChanged(); });
+            [this](const QString & /*s*/) { emit valueChanged(); });
 }
 
 void CustomCombo::setModel(QAbstractItemModel *model) {
