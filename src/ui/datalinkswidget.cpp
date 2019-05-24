@@ -8,6 +8,7 @@
 #include <QSpinBox>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QCheckBox>
 
 #include "serial/device.h"
 
@@ -46,6 +47,9 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     spinBaudrate_->setMinimum(1);
     spinBaudrate_->setMaximum(4000000);
 
+    checkBaudrate_ = new QCheckBox(tr("Change baudrate"));
+    checkBaudrate_->setChecked(true);
+
     linksView_ = new QTreeView;
     linksView_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     linksView_->setModel(&LT()->links());
@@ -60,10 +64,15 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     buttonLayout->addWidget(buttonAdd);
     buttonLayout->addWidget(buttonRemove);
 
+    auto *baudrateLayout = new QHBoxLayout;
+    baudrateLayout->setContentsMargins(0, 0, 0, 0);
+    baudrateLayout->addWidget(spinBaudrate_);
+    baudrateLayout->addWidget(checkBaudrate_);
+
     auto *formLayout = new QFormLayout;
     formLayout->addRow(tr("Name"), lineName_);
     formLayout->addRow(tr("Port"), portLayout);
-    formLayout->addRow(tr("Baudrate"), spinBaudrate_);
+    formLayout->addRow(tr("Baudrate"), baudrateLayout);
 
     auto *layoutOptButtons = new QVBoxLayout;
     layoutOptButtons->setAlignment(Qt::AlignTop);
@@ -109,7 +118,7 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
 
         link->setName(lineName_->text().toStdString());
         link->setPort(comboPort_->value().toStdString());
-        link->setBaudrate(spinBaudrate_->value());
+        link->setBaudrate(checkBaudrate_->isChecked() ? spinBaudrate_->value() : 0);
         LT()->saveLinks();
         setButtonsEnabled(false);
     });
@@ -117,6 +126,10 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     connect(buttonReset_, &QPushButton::clicked, [this]() {
         linkChanged(currentLink());
         setButtonsEnabled(false);
+    });
+
+    connect(checkBaudrate_, &QCheckBox::stateChanged, [this](int state) {
+      spinBaudrate_->setEnabled(state == Qt::Checked);
     });
 
     connect(lineName_, &QLineEdit::textEdited,
@@ -149,8 +162,16 @@ void DatalinksWidget::linkChanged(lt::DataLink *link) {
         comboPort_->setEnabled(true);
         comboPort_->setValue(QString::fromStdString(link->port()));
     }
-    spinBaudrate_->setVisible((link->flags() & lt::DataLinkFlags::Baudrate) !=
-                              lt::DataLinkFlags::None);
+
+    bool baudrateSupported = (link->flags() & lt::DataLinkFlags::Baudrate) !=
+                             lt::DataLinkFlags::None;
+    spinBaudrate_->setVisible(baudrateSupported);
+    checkBaudrate_->setVisible(baudrateSupported);
+    checkBaudrate_->setChecked(link->baudrate() != 0);
+    if (link->baudrate() == 0) {
+        spinBaudrate_->setEnabled(false);
+    }
+
     setButtonsEnabled(false);
 }
 

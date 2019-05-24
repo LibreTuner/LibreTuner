@@ -10,6 +10,7 @@ class QTreeView;
 class QSpinBox;
 class QComboBox;
 class CustomCombo;
+class QCheckBox;
 
 namespace lt {
 class DataLink;
@@ -28,6 +29,7 @@ private:
     QLineEdit *lineName_;
     CustomCombo *comboPort_;
     QSpinBox *spinBaudrate_;
+    QCheckBox *checkBaudrate_;
 
     QPushButton *buttonUpdate_;
     QPushButton *buttonReset_;

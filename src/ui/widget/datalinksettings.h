@@ -1,14 +1,15 @@
-//
-// Created by Jacob on 5/24/2019.
-//
-
 #ifndef LIBRETUNER_DATALINKSETTINGS_H
 #define LIBRETUNER_DATALINKSETTINGS_H
 
+#include <QWidget>
 
+#include "lt/link/datalink.h"
 
-class DataLinkSettings {
-
+class DataLinkSettings : public QWidget {
+    Q_OBJECT
+public:
+    DataLinkSettings(lt::DataLinkFlags flags, QWidget *parent = nullptr);
+private:
 };
 
 
