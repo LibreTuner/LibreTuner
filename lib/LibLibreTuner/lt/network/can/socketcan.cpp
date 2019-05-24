@@ -89,7 +89,7 @@ void SocketCanReceiver::clearBuffer() { buffer_.clear(); }
 SocketCan::~SocketCan() {}
 
 SocketCan::SocketCan(const std::string &ifname)
-    : socket_(PF_CAN, SOCK_RAW, CAN_RAW), receiver_(socket_) {
+    : socket_(AF_CAN, SOCK_RAW, CAN_RAW), receiver_(socket_) {
     sockaddr_can addr = {};
     ifreq ifr;
 

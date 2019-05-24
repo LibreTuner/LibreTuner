@@ -22,7 +22,10 @@ public:
 
     void setPort(const std::string &port) noexcept override { device_ = port; }
 
+    // Supports port (network can)
     DataLinkFlags flags() const noexcept override;
+
+    DataLinkPortType portType() const override;
 
 private:
     std::string device_;

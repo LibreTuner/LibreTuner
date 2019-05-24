@@ -16,6 +16,10 @@ network::CanPtr SocketCanLink::can(uint32_t /*baudrate*/) {
 
 DataLinkFlags SocketCanLink::flags() const noexcept { return DataLinkFlags::Port; }
 
+DataLinkPortType SocketCanLink::portType() const {
+    return DataLinkPortType::NetworkCan;
+}
+
 } // namespace lt
 
 #endif

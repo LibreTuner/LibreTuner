@@ -32,6 +32,11 @@ inline DataLinkFlags operator&(DataLinkFlags lhs, DataLinkFlags rhs) {
                                       static_cast<DType>(rhs));
 }
 
+enum class DataLinkPortType {
+    Serial,
+    NetworkCan,
+};
+
 class DataLink {
 public:
     explicit DataLink(std::string name);
@@ -59,6 +64,9 @@ public:
     // type
     virtual std::string port() const = 0;
     virtual void setPort(const std::string &port) = 0;
+
+    // Returns datalink port type (defaults to serial)
+    virtual DataLinkPortType portType() const { return DataLinkPortType::Serial; }
 
     // Returns a list of available ports
     virtual std::vector<std::string> ports() {
