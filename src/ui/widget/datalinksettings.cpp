@@ -34,6 +34,7 @@ DataLinkSettings::DataLinkSettings(lt::DataLinkFlags flags, QWidget *parent)
     spinBaudrate_->setRange(0, 4000000);
     spinBaudrate_->setValue(115200);
     spinBaudrate_->setSpecialValueText(tr("Unchanged"));
+    spinBaudrate_->setEnabled(false);
 
     checkBaudrate_ = new QCheckBox(tr("Use system baudrate"));
     checkBaudrate_->setChecked(true);
