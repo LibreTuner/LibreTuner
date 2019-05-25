@@ -254,8 +254,8 @@ void Roms::saveRom(const lt::RomPtr &rom) {
     fs::path path = path_ / "romdata" / rom->id();
 
     std::ofstream file(path, std::ios::binary | std::ios::out);
-    if (file.is_open()) {
-        throw std::runtime_error("failed to open rom " + path.string());
+    if (!file.is_open()) {
+        throw std::runtime_error("failed to open rom data for saving " + path.string());
     }
 
     file.write(reinterpret_cast<const char *>(rom->data()), rom->size());
