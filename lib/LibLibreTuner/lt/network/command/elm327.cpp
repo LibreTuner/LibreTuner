@@ -38,6 +38,9 @@ std::vector<std::string> Elm327::sendCommand(const std::string &command) {
         if (line.empty()) {
             continue;
         }
+        if (line == command && response.empty()) {
+            continue;
+        }
         if (line == ">") {
             break;
         }
