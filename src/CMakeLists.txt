@@ -43,8 +43,6 @@ set(libretuner_SRC
     ui/titlebar.h
     ui/backgroundtask.cpp
     ui/backgroundtask.h
-    ui/qcustomplot.cpp
-    ui/qcustomplot.h
     ui/createtunedialog.cpp
     ui/createtunedialog.h
     ui/fileselectwidget.cpp
@@ -61,33 +59,16 @@ set(libretuner_SRC
     ui/adddatalinkdialog.h
     ui/sessionscannerdialog.cpp
     ui/sessionscannerdialog.h
-    ui/dataloggerwindow.cpp
-    ui/dataloggerwindow.h
-
     ui/docks/overviewwidget.cpp
     ui/docks/overviewwidget.h
-    ui/docks/sidebarwidget.cpp
-    ui/docks/sidebarwidget.h
-    ui/docks/tableswidget.cpp
-    ui/docks/tableswidget.h
-    ui/docks/logview.h
-    ui/docks/logview.cpp
-    ui/docks/editorwidget.cpp
-    ui/docks/editorwidget.h
     ui/docks/diagnosticswidget.cpp
     ui/docks/diagnosticswidget.h
-    ui/docks/graphwidget.cpp
-    ui/docks/graphwidget.h
-    ui/docks/hexeditwidget.cpp
-    ui/docks/hexeditwidget.h
+    ui/docks/logview.cpp
+    ui/docks/logview.h
 
     ui/windows/definitionswindow.cpp
     ui/windows/definitionswindow.h
     
-    ui/widget/datalogview.cpp
-    ui/widget/datalogview.h
-    ui/widget/datalogliveview.cpp
-    ui/widget/datalogliveview.h
     ui/widget/customcombo.cpp
     ui/widget/customcombo.h
     ui/widget/datalinksettings.cpp
@@ -138,7 +119,7 @@ qt5_add_resources(libretuner_SRC
 
 add_executable(LibreTuner ${libretuner_SRC})
 
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp sol2 Lua LibLibreTuner)
+target_link_libraries(LibreTuner Qt5::Widgets cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp sol2 Lua LibLibreTuner)
 
 target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView)
 

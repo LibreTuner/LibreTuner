@@ -50,17 +50,11 @@ public:
     // the user for a path.
     void saveTune(bool newPath = false);
 
-public slots:
-    void setTable(const lt::ModelTable *modTable);
-
 private slots:
     void on_buttonDownloadRom_clicked();
-    void newLogClicked();
     void closeEvent(QCloseEvent *event) override;
 
 signals:
-    void tableChanged(lt::Table *table);
-
     void tuneChanged(const lt::Tune *tune);
 
 private:
@@ -81,12 +75,7 @@ private:
     // Docks
     QDockWidget *logDock_;
     QDockWidget *overviewDock_;
-    QDockWidget *loggingDock_;
     QDockWidget *diagnosticsDock_;
-    QDockWidget *sidebarDock_;
-    QDockWidget *tablesDock_;
-    QDockWidget *editorDock_;
-    QDockWidget *graphDock_;
 
     void setupMenu();
     void setupStatusBar();
@@ -101,13 +90,8 @@ private:
                  const std::filesystem::path &path = std::filesystem::path());
 
     QDockWidget *createOverviewDock();
-    QDockWidget *createLoggingDock();
     QDockWidget *createDiagnosticsDock();
     QDockWidget *createLogDock();
-    QDockWidget *createSidebarDock();
-    QDockWidget *createTablesDock();
-    QDockWidget *createEditorDock();
-    QDockWidget *createGraphDock();
 
     std::vector<QDockWidget *> docks_;
 

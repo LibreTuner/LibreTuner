@@ -22,18 +22,13 @@
 #include "downloadwindow.h"
 
 #include "docks/diagnosticswidget.h"
-#include "docks/editorwidget.h"
-#include "docks/graphwidget.h"
 #include "docks/logview.h"
 #include "docks/overviewwidget.h"
-#include "docks/sidebarwidget.h"
-#include "docks/tableswidget.h"
 
 #include "windows/definitionswindow.h"
 
 #include "createtunedialog.h"
 #include "datalinkswidget.h"
-#include "dataloggerwindow.h"
 #include "flasherwindow.h"
 #include "sessionscannerdialog.h"
 #include "uiutil.h"
@@ -74,12 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Create docks
     logDock_ = createLogDock();
     overviewDock_ = createOverviewDock();
-    loggingDock_ = createLoggingDock();
     diagnosticsDock_ = createDiagnosticsDock();
-    sidebarDock_ = createSidebarDock();
-    tablesDock_ = createTablesDock();
-    editorDock_ = createEditorDock();
-    graphDock_ = createGraphDock();
 
     restoreDocks();
 
@@ -123,18 +113,11 @@ void MainWindow::restoreDocks() {
 
     // Roms | Central | Sidebar
     addDockWidget(Qt::TopDockWidgetArea, overviewDock_);
-    splitDockWidget(overviewDock_, tablesDock_, Qt::Horizontal);
-    splitDockWidget(tablesDock_, sidebarDock_, Qt::Vertical);
-
     // Bottom
     addDockWidget(Qt::BottomDockWidgetArea, logDock_);
 
     // Top (central)
-
-    tabifyDockWidget(overviewDock_, loggingDock_);
     tabifyDockWidget(overviewDock_, diagnosticsDock_);
-    tabifyDockWidget(overviewDock_, editorDock_);
-    tabifyDockWidget(overviewDock_, graphDock_);
 }
 
 void MainWindow::loadSettings() {
@@ -192,9 +175,6 @@ void MainWindow::setTune(const lt::TunePtr &tune,
         return;
     }
 
-    tableModel_.setTable(nullptr);
-    emit tableChanged(nullptr);
-
     tune_ = tune;
     tunePath_ = path;
     emit tuneChanged(tune_.get());
@@ -218,35 +198,6 @@ void MainWindow::saveSettings() {
     settings.setValue("mainwindow/state", saveState());
 }
 
-QDockWidget *MainWindow::createLoggingDock() {
-    QDockWidget *dock = new QDockWidget("Logging", this);
-    dock->setObjectName("logging");
-    auto *widget = new QWidget;
-    auto *layout = new QVBoxLayout();
-
-    auto *hlayout = new QHBoxLayout();
-    layout->addLayout(hlayout);
-
-    QPushButton *buttonNewLog = new QPushButton(tr("New Log"));
-    hlayout->addWidget(buttonNewLog);
-    connect(buttonNewLog, &QPushButton::clicked, this,
-            &MainWindow::newLogClicked);
-
-    comboLogVehicles_ = new QComboBox();
-    QSizePolicy policy = comboLogVehicles_->sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    comboLogVehicles_->setSizePolicy(policy);
-    hlayout->addWidget(comboLogVehicles_);
-
-    listLogs_ = new QListView;
-    layout->addWidget(listLogs_);
-
-    widget->setLayout(layout);
-    dock->setWidget(widget);
-    docks_.emplace_back(dock);
-    return dock;
-}
-
 QDockWidget *MainWindow::createDiagnosticsDock() {
     QDockWidget *dock = new QDockWidget("Diagnostics", this);
     dock->setObjectName("diagnostics");
@@ -267,82 +218,11 @@ QDockWidget *MainWindow::createLogDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createSidebarDock() {
-    QDockWidget *dock = new QDockWidget("Sidebar", this);
-    dock->setObjectName("dock");
-    dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
-
-    sidebar_ = new SidebarWidget;
-    sidebar_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    dock->setWidget(sidebar_);
-
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-void MainWindow::setTable(const lt::ModelTable *modTable) {
-    if (modTable == nullptr) {
-        // Don't change
-        return;
-    }
-
-    sidebar_->fillTableInfo(modTable);
-
-    const lt::TableDefinition *tabDef = modTable->table;
-
-    catchWarning(
-        [this, tabDef]() {
-            lt::Table *tab = tune_->getTable(tabDef->id, true);
-            tableModel_.setTable(tab);
-            emit tableChanged(tab);
-        },
-        tr("Error creating table"));
-}
-
-QDockWidget *MainWindow::createTablesDock() {
-    QDockWidget *dock = new QDockWidget("Tables", this);
-    dock->setObjectName("tables");
-    tables_ = new TablesWidget(dock);
-    dock->setWidget(tables_);
-
-    connect(tables_, &TablesWidget::activated, this, &MainWindow::setTable);
-    connect(this, &MainWindow::tuneChanged, [this](const lt::Tune *tune) {
-        if (tune == nullptr) {
-            return;
-        }
-        tables_->setModel(*tune->base()->model());
-    });
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-QDockWidget *MainWindow::createEditorDock() {
-    QDockWidget *dock = new QDockWidget("Editor", this);
-    dock->setObjectName("editor");
-    editor_ = new EditorWidget(dock);
-    editor_->setModel(&tableModel_);
-    dock->setWidget(editor_);
-    docks_.emplace_back(dock);
-    return dock;
-}
-
 QDockWidget *MainWindow::createOverviewDock() {
     QDockWidget *dock = new QDockWidget("Overview", this);
     dock->setObjectName("overview");
 
     dock->setWidget(new OverviewWidget);
-
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-QDockWidget *MainWindow::createGraphDock() {
-    QDockWidget *dock = new QDockWidget("Graph", this);
-
-    graph_ = new GraphWidget(dock);
-    dock->setWidget(graph_);
-    dock->setObjectName("graph");
-    graph_->setModel(&tableModel_);
 
     docks_.emplace_back(dock);
     return dock;
@@ -512,13 +392,6 @@ void MainWindow::on_buttonDownloadRom_clicked() {
 
     DownloadWindow downloadWindow;
     downloadWindow.exec();
-}
-
-void MainWindow::newLogClicked() {
-    auto *window = new DataLoggerWindow;
-    window->setAttribute(Qt::WA_DeleteOnClose);
-    window->setWindowModality(Qt::WindowModal);
-    window->show();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
