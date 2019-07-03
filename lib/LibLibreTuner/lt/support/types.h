@@ -8,8 +8,29 @@
 
 #include "endianness.h"
 
-namespace lt {
+// Ugly macro
+#define ENABLE_BITMASK(Enum)                                                   \
+    inline Enum operator|(Enum lhs, Enum rhs) {                                \
+        using UType = std::underlying_type_t<Enum>;                            \
+        return static_cast<Enum>(static_cast<UType>(lhs) |                     \
+                                 static_cast<UType>(rhs));                     \
+    }                                                                          \
+    inline Enum operator&(Enum lhs, Enum rhs) {                                \
+        using UType = std::underlying_type_t<Enum>;                            \
+        return static_cast<Enum>(static_cast<UType>(lhs) &                     \
+                                 static_cast<UType>(rhs));                     \
+    }                                                                          \
+    inline Enum &operator|=(Enum &lhs, Enum rhs) {                             \
+        lhs = lhs | rhs;                                                       \
+        return lhs;                                                            \
+    }                                                                          \
+    inline Enum &operator&=(Enum &lhs, Enum rhs) {                             \
+        lhs = lhs & rhs;                                                       \
+        return lhs;                                                            \
+    }
 
+namespace lt {
+// Datatype
 enum class DataType {
     Uint8,
     Uint16,
@@ -74,28 +95,12 @@ enum class DataLinkType {
     Invalid,
 };
 
-enum class NetworkProtocol {
+enum class NetworkProtocol : unsigned {
     None = 0,
     Can = 0x1,
     IsoTp = 0x2,
 };
-
-inline NetworkProtocol operator|(NetworkProtocol lhs, NetworkProtocol rhs) {
-    using DType = std::underlying_type<NetworkProtocol>::type;
-    return static_cast<NetworkProtocol>(static_cast<DType>(lhs) |
-                                        static_cast<DType>(rhs));
-}
-
-inline NetworkProtocol &operator|=(NetworkProtocol &lhs, NetworkProtocol rhs) {
-    lhs = lhs | rhs;
-    return lhs;
-}
-
-inline NetworkProtocol operator&(NetworkProtocol lhs, NetworkProtocol rhs) {
-    using DType = std::underlying_type<NetworkProtocol>::type;
-    return static_cast<NetworkProtocol>(static_cast<DType>(lhs) &
-                                        static_cast<DType>(rhs));
-}
+ENABLE_BITMASK(NetworkProtocol)
 
 } // namespace lt
 

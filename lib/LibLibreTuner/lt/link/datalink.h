@@ -6,6 +6,7 @@
 
 #include "../network/network.h"
 #include "../support/types.h"
+#include "../support/util.hpp"
 
 namespace lt {
 
@@ -14,23 +15,7 @@ enum class DataLinkFlags : unsigned {
     Port = 1 << 1,
     Baudrate = 1 << 2,
 };
-
-inline DataLinkFlags operator|(DataLinkFlags lhs, DataLinkFlags rhs) {
-    using DType = std::underlying_type<DataLinkFlags>::type;
-    return static_cast<DataLinkFlags>(static_cast<DType>(lhs) |
-                                      static_cast<DType>(rhs));
-}
-
-inline DataLinkFlags &operator|=(DataLinkFlags &lhs, DataLinkFlags rhs) {
-    lhs = lhs | rhs;
-    return lhs;
-}
-
-inline DataLinkFlags operator&(DataLinkFlags lhs, DataLinkFlags rhs) {
-    using DType = std::underlying_type<DataLinkFlags>::type;
-    return static_cast<DataLinkFlags>(static_cast<DType>(lhs) &
-                                      static_cast<DType>(rhs));
-}
+ENABLE_BITMASK(DataLinkFlags)
 
 enum class DataLinkPortType {
     Serial,
@@ -85,5 +70,6 @@ protected:
 };
 using DataLinkPtr = std::unique_ptr<DataLink>;
 } // namespace lt
+
 
 #endif // LT_DATALINK_H

@@ -19,12 +19,12 @@
 #ifndef LT_UTIL_H
 #define LT_UTIL_H
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <iterator>
-#include <utility>
 #include <string>
-#include <algorithm>
+#include <utility>
 
 namespace lt {
 template <typename T, int Size> class SConverter {};
@@ -235,9 +235,12 @@ static void writeLE(InputIt values, InputIt end, OutputIt out) {
 }
 
 inline void remove_whitespace(std::string &string) {
-    string.erase(std::remove_if(string.begin(), string.end(), [](char ch) {
-        return std::isspace(static_cast<unsigned char>(ch));
-    }), string.end());
+    string.erase(std::remove_if(string.begin(), string.end(),
+                                [](char ch) {
+                                    return std::isspace(
+                                        static_cast<unsigned char>(ch));
+                                }),
+                 string.end());
 }
 
 } // namespace lt
@@ -247,4 +250,5 @@ template <class T> struct make_shared_enabler : public T {
     explicit make_shared_enabler(Args &&... args)
         : T(std::forward<Args>(args)...) {}
 };
+
 #endif // LT_UTIL_H

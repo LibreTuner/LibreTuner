@@ -1,5 +1,8 @@
 #include "passthru.h"
 #include "../network/can/j2534can.h"
+#include "../support/types.h"
+
+
 
 namespace lt {
 NetworkProtocol passthruToNetworkProtocol(j2534::Protocol passthru) {
