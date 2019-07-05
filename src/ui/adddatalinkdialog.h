@@ -10,10 +10,11 @@ class DataLinkSettings;
 /**
  * @todo write docs
  */
-class AddDatalinkDialog : public QDialog {
+class AddDatalinkDialog : public QDialog
+{
     Q_OBJECT
 public:
-    explicit AddDatalinkDialog(QWidget *parent = nullptr);
+    explicit AddDatalinkDialog(QWidget * parent = nullptr);
 
 private slots:
     void addClicked();
@@ -21,8 +22,8 @@ private slots:
     void typeIndexChanged(int index);
 
 private:
-    DataLinkSettings *settings_;
-    QComboBox *comboType_;
+    DataLinkSettings * settings_;
+    QComboBox * comboType_;
 };
 
 #endif // ADDDATALINKDIALOG_H

@@ -36,13 +36,14 @@
 #include "widget/datalogliveview.h"
 #include "widget/datalogview.h"
 
-DataLoggerWindow::DataLoggerWindow(QWidget *parent)
-    : QWidget(parent), log_(std::make_shared<lt::DataLog>()) {
+DataLoggerWindow::DataLoggerWindow(QWidget * parent)
+    : QWidget(parent), log_(std::make_shared<lt::DataLog>())
+{
     setAttribute(Qt::WA_DeleteOnClose, false);
     setWindowTitle("LibreTuner - Data Logger");
     resize(1200, 800);
 
-    QLabel *pidLabel = new QLabel("Available PIDs");
+    QLabel * pidLabel = new QLabel("Available PIDs");
 
     pidList_ = new QListWidget;
     pidList_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -57,27 +58,27 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent)
     dataLogLiveView_->setDataLog(log_);
 
     buttonLog_ = new QPushButton(tr("Start logging"));
-    auto *buttonSave = new QPushButton(tr("Save log"));
+    auto * buttonSave = new QPushButton(tr("Save log"));
 
-    auto *buttonSimulate = new QPushButton(tr("Simulate"));
+    auto * buttonSimulate = new QPushButton(tr("Simulate"));
 
-    auto *splitter = new QSplitter;
+    auto * splitter = new QSplitter;
     splitter->setOrientation(Qt::Vertical);
     splitter->addWidget(dataLogView_);
     splitter->addWidget(dataLogLiveView_);
 
-    auto *logLayout = new QVBoxLayout;
+    auto * logLayout = new QVBoxLayout;
     logLayout->addWidget(splitter);
     logLayout->addWidget(buttonLog_);
     logLayout->addWidget(buttonSimulate);
 
     // PIDs layout
-    auto *pidLayout = new QVBoxLayout;
+    auto * pidLayout = new QVBoxLayout;
     pidLayout->addWidget(pidLabel);
     pidLayout->addWidget(pidList_);
 
     // Main layout
-    auto *hlayout = new QHBoxLayout;
+    auto * hlayout = new QHBoxLayout;
     hlayout->addLayout(pidLayout);
     hlayout->addLayout(logLayout);
 
@@ -94,35 +95,44 @@ DataLoggerWindow::DataLoggerWindow(QWidget *parent)
 
 DataLoggerWindow::~DataLoggerWindow() = default;
 
-void DataLoggerWindow::showEvent(QShowEvent *event) { Q_UNUSED(event) }
+void DataLoggerWindow::showEvent(QShowEvent * event) { Q_UNUSED(event) }
 
-void DataLoggerWindow::hideEvent(QHideEvent *event) {
+void DataLoggerWindow::hideEvent(QHideEvent * event)
+{
     // TODO: ask to save log
-    if (logger_) {
+    if (logger_)
+    {
         QMessageBox::warning(
             nullptr, tr("Close warning"),
             tr("Cannot close window while data logger is running"));
         event->ignore();
-    } else {
+    }
+    else
+    {
         event->accept();
     }
 }
 
-void DataLoggerWindow::closeEvent(QCloseEvent *event) {
+void DataLoggerWindow::closeEvent(QCloseEvent * event)
+{
     // TODO: ask to save log
-    if (logger_) {
+    if (logger_)
+    {
         QMessageBox::warning(
             nullptr, tr("Close warning"),
             tr("Cannot close window while data logger is running"));
         event->ignore();
-    } else {
+    }
+    else
+    {
         event->accept();
     }
 }
 
 void DataLoggerWindow::saveLog() {}
 
-void DataLoggerWindow::simulate() {
+void DataLoggerWindow::simulate()
+{
     lt::Pid pid;
     pid.name = "Test";
     pid.code = 0;
@@ -138,30 +148,37 @@ void DataLoggerWindow::simulate() {
     timer.start();*/
 
     // Simulate coolant temp
-    for (int i = 0; i < 400; ++i) {
+    for (int i = 0; i < 400; ++i)
+    {
         log_->add(pid, lt::PidLogEntry{(i * 30.0 / 400) + 30,
                                        static_cast<std::size_t>(i * 50)});
     }
 }
 
-void DataLoggerWindow::toggleLogger() {
-    if (logger_) {
+void DataLoggerWindow::toggleLogger()
+{
+    if (logger_)
+    {
         logger_->disable();
         return;
     }
-    try {
+    try
+    {
         lt::PlatformLink link = LT()->platformLink();
-        const lt::Platform &platform = link.platform();
+        const lt::Platform & platform = link.platform();
 
         resetLog();
         logger_ = link.datalogger(*log_);
 
         // Add PIDs
-        for (QListWidgetItem *item : pidItems_) {
-            if (item->checkState() == Qt::Checked) {
-                const lt::Pid *pid =
+        for (QListWidgetItem * item : pidItems_)
+        {
+            if (item->checkState() == Qt::Checked)
+            {
+                const lt::Pid * pid =
                     platform.getPid(item->data(Qt::UserRole).toInt());
-                if (pid == nullptr) {
+                if (pid == nullptr)
+                {
                     // Should never happen...
                     Logger::warning(
                         "Invalid pid " +
@@ -183,23 +200,28 @@ void DataLoggerWindow::toggleLogger() {
 
         logger_.reset();
         buttonLog_->setText(tr("Start logging"));
-    } catch (const std::runtime_error &error) {
+    }
+    catch (const std::runtime_error & error)
+    {
         QMessageBox::critical(this, "Datalog error", error.what());
     }
 }
 
-void DataLoggerWindow::reset() {
+void DataLoggerWindow::reset()
+{
     pidList_->clear();
 
-    const lt::PlatformPtr &platform = LT()->platform();
+    const lt::PlatformPtr & platform = LT()->platform();
 
-    if (!platform) {
+    if (!platform)
+    {
         Logger::info("No platform selected");
         return;
     }
 
-    for (const lt::Pid &pid : platform->pids) {
-        auto *item = new QListWidgetItem;
+    for (const lt::Pid & pid : platform->pids)
+    {
+        auto * item = new QListWidgetItem;
         item->setText(QString::fromStdString(pid.name));
         item->setData(Qt::UserRole, QVariant::fromValue<uint32_t>(pid.code));
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
@@ -213,7 +235,8 @@ void DataLoggerWindow::reset() {
                               8 * pidList_->frameWidth());
 }
 
-void DataLoggerWindow::resetLog() {
+void DataLoggerWindow::resetLog()
+{
     log_ = std::make_shared<lt::DataLog>();
 
     dataLogView_->setDataLog(log_);

@@ -23,24 +23,26 @@
 #include <string>
 #include <vector>
 
-namespace lt {
+namespace lt
+{
 
 class Tune;
 
 /**
  * Describes regions of memory to be reprogrammed
  */
-class FlashMap {
+class FlashMap
+{
 public:
-    FlashMap(const std::vector<uint8_t> &data, std::size_t offset);
-    FlashMap(std::vector<uint8_t> &&data, std::size_t offset);
+    FlashMap(const std::vector<uint8_t> & data, std::size_t offset);
+    FlashMap(std::vector<uint8_t> && data, std::size_t offset);
 
-    static FlashMap fromTune(Tune &tune);
+    static FlashMap fromTune(Tune & tune);
 
     // The address offset the data should be flashed to
     size_t offset() const { return offset_; }
 
-    const std::vector<uint8_t> &data() const { return data_; }
+    const std::vector<uint8_t> & data() const { return data_; }
 
 private:
     std::vector<uint8_t> data_;

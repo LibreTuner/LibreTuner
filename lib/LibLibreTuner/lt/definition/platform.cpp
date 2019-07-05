@@ -1,15 +1,16 @@
 #include "platform.h"
 #include "../support/util.hpp"
 
-#include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <yaml-cpp/yaml.h>
 
 namespace fs = std::filesystem;
 
 namespace lt
 {
 
-const TableDefinition *Platform::getTable(const std::string & id) const noexcept
+const TableDefinition * Platform::getTable(const std::string & id) const
+    noexcept
 {
     if (auto it = tables.find(id); it != tables.end())
         return &it->second;
@@ -53,20 +54,22 @@ const Pid * Platform::getPid(uint32_t id) const noexcept
     return nullptr;
 }
 
-Platform load_main(const fs::path &path)
+Platform load_main(const fs::path & path)
 {
     std::ifstream file(path);
     if (!file.is_open())
     {
         throw std::runtime_error("file '" + path.string() +
-                                 "' does not exist or LibreTuner does not have permission to open it.");
+                                 "' does not exist or LibreTuner does not have "
+                                 "permission to open it.");
     }
     YAML::Node root = YAML::Load(file);
     return root.as<Platform>();
 }
 
-ChecksumPtr loadChecksum(const YAML::Node &checksum) {
-    const auto &mode = checksum["mode"].as<std::string>();
+ChecksumPtr loadChecksum(const YAML::Node & checksum)
+{
+    const auto & mode = checksum["mode"].as<std::string>();
     const auto offset = checksum["offset"].as<std::size_t>();
     const auto size = checksum["size"].as<std::size_t>();
     const auto target = checksum["target"].as<std::size_t>();
@@ -77,9 +80,11 @@ ChecksumPtr loadChecksum(const YAML::Node &checksum) {
     else
         throw std::runtime_error("invalid mode for checksum");
 
-    const auto &modify = checksum["modify"];
-    if (modify) {
-        for (const YAML::Node &node : modify) {
+    const auto & modify = checksum["modify"];
+    if (modify)
+    {
+        for (const YAML::Node & node : modify)
+        {
             sum->addModifiable(node["offset"].as<std::size_t>(),
                                node["size"].as<std::size_t>());
         }
@@ -88,15 +93,16 @@ ChecksumPtr loadChecksum(const YAML::Node &checksum) {
     return sum;
 }
 
-void decodeModel(const YAML::Node & node, lt::Model & model) // [[expects: model.platform]]
+void decodeModel(const YAML::Node & node,
+                 lt::Model & model) // [[expects: model.platform]]
 {
     model.name = node["name"].as<std::string>();
     model.id = node["id"].as<std::string>();
 
     // Axes
-    if (const auto &axes = node["axes"])
+    if (const auto & axes = node["axes"])
     {
-        for (const auto &axis : axes)
+        for (const auto & axis : axes)
         {
             const auto id = axis["id"].as<std::string>();
             const auto offset = axis["offset"].as<std::size_t>();
@@ -106,13 +112,15 @@ void decodeModel(const YAML::Node & node, lt::Model & model) // [[expects: model
     }
 
     // Table offsets
-    if (const auto &tables = node["tables"])
+    if (const auto & tables = node["tables"])
     {
         for (auto it = tables.begin(); it != tables.end(); ++it)
         {
             auto id = it->first.as<std::string>();
             // Get platform table
-            if (const TableDefinition * platformTable = model.platform.getTable(id); platformTable != nullptr)
+            if (const TableDefinition * platformTable =
+                    model.platform.getTable(id);
+                platformTable != nullptr)
             {
                 // Copy table and set offset
                 TableDefinition table(*platformTable);
@@ -127,19 +135,19 @@ void decodeModel(const YAML::Node & node, lt::Model & model) // [[expects: model
     }
 
     // Identifiers
-    if (const auto &identifiers = node["identifiers"])
+    if (const auto & identifiers = node["identifiers"])
     {
-        for (const auto &identifier : identifiers)
+        for (const auto & identifier : identifiers)
         {
             const auto offset = identifier["offset"].as<std::size_t>();
-            const auto &data = identifier["data"].as<std::string>();
+            const auto & data = identifier["data"].as<std::string>();
 
             model.identifiers.emplace_back(offset, data.begin(), data.end());
         }
     }
 
     // Checksums
-    if (const auto &checksums = node["checksums"])
+    if (const auto & checksums = node["checksums"])
     {
         for (const auto & node : checksums)
         {
@@ -156,8 +164,12 @@ Platform Platform::loadDirectory(const std::filesystem::path & path)
     // Load models
     for (auto & entry : fs::directory_iterator(path))
     {
-        const fs::path &path = entry.path();
-        if (path.extension() != "yaml" || path.filename() == "main.yaml" || !entry.is_regular_file()) { continue; }
+        const fs::path & path = entry.path();
+        if (path.extension() != "yaml" || path.filename() == "main.yaml" ||
+            !entry.is_regular_file())
+        {
+            continue;
+        }
         std::ifstream file(path);
 
         auto model = std::make_shared<Model>(platform);
@@ -186,7 +198,8 @@ void Platforms::loadDirectory(const std::filesystem::path & path)
         if (entry.is_directory())
         {
             // Convert to shared_ptr and store
-            platforms_.emplace_back(std::make_shared<Platform>(Platform::loadDirectory(entry.path())));
+            platforms_.emplace_back(std::make_shared<Platform>(
+                Platform::loadDirectory(entry.path())));
         }
     }
 }
@@ -209,9 +222,6 @@ ModelPtr Platforms::find(const std::string & platformId,
 }
 
 } // namespace lt
-
-
-
 
 // Declare YAML conversions outside lt namespace
 namespace YAML
@@ -236,34 +246,28 @@ template <> struct convert<lt::TableDefinition>
         table.name = node["name"].as<std::string>();
         table.description = node["description"].as<std::string>();
 
-        if (node["category"]) {
+        if (node["category"])
             table.category = node["category"].as<std::string>();
-        }
 
-        table.dataType = lt::datatype_from_string(node["datatype"].as<std::string>());
-        if (node["storeddatatype"]) {
-            table.storedDataType =
-                lt::datatype_from_string(node["storeddatatype"].as<std::string>());
-        } else {
+        table.dataType =
+            lt::datatype_from_string(node["datatype"].as<std::string>());
+        if (node["storeddatatype"])
+            table.storedDataType = lt::datatype_from_string(
+                node["storeddatatype"].as<std::string>());
+        else
             table.storedDataType = table.dataType;
-        }
 
-        if (const auto & n = node["width"]) {
+        if (const auto & n = node["width"])
             table.width = n.as<std::size_t>();
-        }
-        if (const auto & n = node["height"]) {
+        if (const auto & n = node["height"])
             table.height = n.as<std::size_t>();
-        }
 
-        if (const auto & n = node["axisx"]) {
+        if (const auto & n = node["axisx"])
             table.axisX = n.as<std::string>();
-        }
-        if (const auto & n = node["axisy"]) {
+        if (const auto & n = node["axisy"])
             table.axisY = n.as<std::string>();
-        }
-        if (const auto & n = node["scale"]) {
+        if (const auto & n = node["scale"])
             table.scale = n.as<double>();
-        }
 
         table.minimum =
             node["minimum"].as<double>(std::numeric_limits<double>::min());
@@ -278,7 +282,8 @@ template <> struct convert<lt::AxisDefinition>
     static bool decode(const Node & node, lt::AxisDefinition & axis)
     {
         axis.name = node["name"].as<std::string>();
-        axis.dataType = lt::datatype_from_string(node["datatype"].as<std::string>());
+        axis.dataType =
+            lt::datatype_from_string(node["datatype"].as<std::string>());
         std::string type = node["type"].as<std::string>();
         if (type == "memory")
         {
@@ -290,7 +295,8 @@ template <> struct convert<lt::AxisDefinition>
         {
             lt::LinearAxisDefinition linear;
             linear.start = node["minimum"].as<double>();
-            linear.increment = node["increment"].as<double>(); // TODO: rename to "step"
+            linear.increment =
+                node["increment"].as<double>(); // TODO: rename to "step"
             axis.def.emplace<lt::LinearAxisDefinition>(std::move(linear));
         }
         else
@@ -309,14 +315,14 @@ template <> struct convert<lt::Platform>
         platform.name = node["name"].as<std::string>();
         platform.romsize = node["romsize"].as<std::size_t>();
         platform.baudrate = node["baudrate"].as<std::size_t>();
-        if (const auto &n = node["logmode"])
+        if (const auto & n = node["logmode"])
         {
             platform.logMode = n.as<std::string>();
             lt::lowercase_string(platform.logMode);
         }
 
         // Transfer
-        if (const auto &transfer = node["transfer"])
+        if (const auto & transfer = node["transfer"])
         {
             if (const auto & n = transfer["flashmode"])
             {
@@ -332,40 +338,48 @@ template <> struct convert<lt::Platform>
         }
 
         // Authentication
-        if (const auto &auth = node["auth"]) {
+        if (const auto & auth = node["auth"])
+        {
             // Key should be the same for both
-            if (const auto & n = auth["key"]) {
+            if (const auto & n = auth["key"])
+            {
                 platform.downloadAuthOptions.key = n.as<std::string>();
-                platform.flashAuthOptions.key = platform.downloadAuthOptions.key;
+                platform.flashAuthOptions.key =
+                    platform.downloadAuthOptions.key;
             }
 
             // Session IDs
-            if (const auto & n = auth["sessionid"]) {
+            if (const auto & n = auth["sessionid"])
+            {
                 platform.downloadAuthOptions.session =
                     static_cast<uint8_t>(n.as<std::size_t>());
                 platform.flashAuthOptions.session =
                     platform.downloadAuthOptions.session;
             }
-            if (const auto & n = auth["download_sessionid"]) {
-                platform.downloadAuthOptions.session = static_cast<uint8_t>(
-                    n.as<std::size_t>());
+            if (const auto & n = auth["download_sessionid"])
+            {
+                platform.downloadAuthOptions.session =
+                    static_cast<uint8_t>(n.as<std::size_t>());
             }
-            if (const auto & n = auth["flash_sessionid"]) {
+            if (const auto & n = auth["flash_sessionid"])
+            {
                 platform.flashAuthOptions.session =
                     static_cast<uint8_t>(n.as<std::size_t>());
             }
         }
 
         // VIN patterns
-        for (const auto &vin : node["vins"]) {
+        for (const auto & vin : node["vins"])
+        {
             platform.vins.emplace_back(vin.as<std::string>());
         }
 
-        if (const auto &axes = node["axes"])
+        if (const auto & axes = node["axes"])
         {
             for (auto it = axes.begin(); it != axes.end(); ++it)
             {
-                platform.axes.emplace(it->first.as<std::string>(), it->second.as<lt::AxisDefinition>());
+                platform.axes.emplace(it->first.as<std::string>(),
+                                      it->second.as<lt::AxisDefinition>());
             }
         }
 
@@ -382,10 +396,8 @@ template <> struct convert<lt::Platform>
         }
 
         if (const auto & pids = node["pids"])
-        {
             platform.pids = pids.as<std::vector<lt::Pid>>();
-        }
         return true;
     }
 };
-}
+} // namespace YAML

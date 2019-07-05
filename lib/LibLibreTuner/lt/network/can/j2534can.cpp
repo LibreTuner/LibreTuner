@@ -21,11 +21,14 @@
 #include <algorithm>
 #include <sstream>
 
-namespace lt {
-namespace network {
+namespace lt
+{
+namespace network
+{
 
-J2534Can::J2534Can(const j2534::DevicePtr &device, uint32_t baudrate)
-    : channel_(device->connect(j2534::Protocol::CAN, CAN_ID_BOTH, baudrate)) {
+J2534Can::J2534Can(const j2534::DevicePtr & device, uint32_t baudrate)
+    : channel_(device->connect(j2534::Protocol::CAN, CAN_ID_BOTH, baudrate))
+{
     // Setup the filter
     j2534::PASSTHRU_MSG msgMask{};
     msgMask.ProtocolID = static_cast<uint32_t>(j2534::Protocol::CAN);
@@ -47,7 +50,8 @@ J2534Can::J2534Can(const j2534::DevicePtr &device, uint32_t baudrate)
 
 J2534Can::~J2534Can() {}
 
-void J2534Can::send(const CanMessage &message) {
+void J2534Can::send(const CanMessage & message)
+{
     j2534::PASSTHRU_MSG msg;
     msg.ProtocolID = static_cast<uint32_t>(j2534::Protocol::CAN);
     msg.TxFlags = 0;
@@ -66,25 +70,30 @@ void J2534Can::send(const CanMessage &message) {
     uint32_t numMsgs = 1;
     // TODO: Configurable timeout (100ms should be good for now, right?)
     channel_.writeMsgs(&msg, numMsgs, 100);
-    if (numMsgs != 1) {
+    if (numMsgs != 1)
+    {
         throw std::runtime_error("Message write timed out");
     }
 }
 
-bool J2534Can::recv(CanMessage &message, std::chrono::milliseconds timeout) {
+bool J2534Can::recv(CanMessage & message, std::chrono::milliseconds timeout)
+{
     auto start = std::chrono::system_clock::now();
 
-    while (true) {
+    while (true)
+    {
         j2534::PASSTHRU_MSG msg{};
         msg.ProtocolID = static_cast<uint32_t>(j2534::Protocol::CAN);
 
         uint32_t pNumMsgs = 1;
         channel_.readMsgs(&msg, pNumMsgs, timeout.count());
-        if ((std::chrono::system_clock::now() - start) >= timeout) {
+        if ((std::chrono::system_clock::now() - start) >= timeout)
+        {
             return false;
         }
 
-        if (msg.DataSize < 4) {
+        if (msg.DataSize < 4)
+        {
             // The message does not fit the CAN ID
             continue;
         }

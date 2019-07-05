@@ -25,24 +25,30 @@
 #include <utility>
 #include <vector>
 
-namespace lt {
-namespace download {
+namespace lt
+{
+namespace download
+{
 
-RMADownloader::RMADownloader(network::UdsPtr &&uds, Options &&options)
+RMADownloader::RMADownloader(network::UdsPtr && uds, Options && options)
     : uds_(std::move(uds)), authOptions_(std::move(options.auth)),
-      totalSize_(options.size) {
-    if (!uds_) {
+      totalSize_(options.size)
+{
+    if (!uds_)
+    {
         throw std::runtime_error(
             "UDS is unsupported with the selected datalink");
     }
 }
 
-bool RMADownloader::update_progress() {
+bool RMADownloader::update_progress()
+{
     notifyProgress((1.0f - (static_cast<float>(downloadSize_) / totalSize_)));
     return downloadSize_ > 0;
 }
 
-bool RMADownloader::download() {
+bool RMADownloader::download()
+{
     canceled_ = false;
     downloadOffset_ = 0;
     downloadSize_ = totalSize_;
@@ -51,14 +57,16 @@ bool RMADownloader::download() {
     auth::UdsAuthenticator auth(*uds_, authOptions_);
     auth.auth();
 
-    do {
+    do
+    {
         size_t to_download =
             std::min<std::size_t>(static_cast<size_t>(downloadSize_), 0xFFE);
         std::vector<uint8_t> data = uds_->requestReadMemoryAddress(
             static_cast<uint32_t>(downloadOffset_),
             static_cast<uint16_t>(to_download));
 
-        if (data.empty()) {
+        if (data.empty())
+        {
             throw std::runtime_error("received 0 bytes in download packet");
         }
 
@@ -71,7 +79,8 @@ bool RMADownloader::download() {
 
 void RMADownloader::cancel() { canceled_ = true; }
 
-std::pair<const uint8_t *, size_t> RMADownloader::data() {
+std::pair<const uint8_t *, size_t> RMADownloader::data()
+{
     return std::make_pair(downloadData_.data(), downloadData_.size());
 }
 

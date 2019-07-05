@@ -24,7 +24,8 @@
 
 #include <QAbstractItemModel>
 
-CanViewer::CanViewer(QWidget *parent) : QWidget(parent), ui(new Ui::CanViewer) {
+CanViewer::CanViewer(QWidget * parent) : QWidget(parent), ui(new Ui::CanViewer)
+{
     // QWidget *main = new QWidget;
     // mainLayout()->addWidget(main);
     ui->setupUi(this);
@@ -38,8 +39,10 @@ CanViewer::CanViewer(QWidget *parent) : QWidget(parent), ui(new Ui::CanViewer) {
 CanViewer::~CanViewer() { delete ui; }
 
 void CanViewer::rowsInserted(const QModelIndex & /*parent*/, int /*first*/,
-                             int /*last*/) {
-    if (ui->autoScroll->isChecked()) {
+                             int /*last*/)
+{
+    if (ui->autoScroll->isChecked())
+    {
         ui->logView->scrollToBottom();
     }
 }

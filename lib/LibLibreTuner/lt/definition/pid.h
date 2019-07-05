@@ -4,9 +4,11 @@
 #include <cstdint>
 #include <string>
 
-namespace lt {
+namespace lt
+{
 
-struct Pid {
+struct Pid
+{
     std::string name;
     std::string description;
     std::string formula;

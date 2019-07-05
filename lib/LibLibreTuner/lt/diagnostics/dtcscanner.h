@@ -22,9 +22,11 @@
 #include "codes.h"
 #include <memory>
 
-namespace lt {
+namespace lt
+{
 
-class DtcScanner {
+class DtcScanner
+{
 public:
     virtual ~DtcScanner() = default;
 

@@ -4,10 +4,13 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace lt {
-namespace network {
+namespace lt
+{
+namespace network
+{
 
-UdsPacket Uds::request(uint8_t sid, const uint8_t *data, size_t size) {
+UdsPacket Uds::request(uint8_t sid, const uint8_t * data, size_t size)
+{
     // Receive until we get a non-response-pending packet
 
     // Build request
@@ -15,10 +18,13 @@ UdsPacket Uds::request(uint8_t sid, const uint8_t *data, size_t size) {
 
     UdsPacket response = requestRaw(request);
 
-    do {
-        if (response.negative()) {
+    do
+    {
+        if (response.negative())
+        {
             uint8_t code = response.negativeCode();
-            if (code == UDS_NRES_RCRRP) {
+            if (code == UDS_NRES_RCRRP)
+            {
                 // Response pending
                 response = receiveRaw();
                 continue;
@@ -30,7 +36,8 @@ UdsPacket Uds::request(uint8_t sid, const uint8_t *data, size_t size) {
             throw std::runtime_error(ss.str());
         }
 
-        if (response.code != sid + 0x40) {
+        if (response.code != sid + 0x40)
+        {
             throw std::runtime_error("uds response id (" +
                                      std::to_string(response.code) +
                                      ") does not match expected id (" +
@@ -40,13 +47,16 @@ UdsPacket Uds::request(uint8_t sid, const uint8_t *data, size_t size) {
     } while (true);
 }
 
-std::vector<uint8_t> Uds::requestSession(uint8_t type) {
+std::vector<uint8_t> Uds::requestSession(uint8_t type)
+{
     UdsPacket res = request(UDS_REQ_SESSION, &type, 1);
-    if (res.data.empty()) {
+    if (res.data.empty())
+    {
         throw std::runtime_error("received empty session control response");
     }
 
-    if (res.data[0] != type) {
+    if (res.data[0] != type)
+    {
         throw std::runtime_error("diagnosticSessionType mismatch");
     }
 
@@ -54,14 +64,17 @@ std::vector<uint8_t> Uds::requestSession(uint8_t type) {
     return res.data;
 }
 
-std::vector<uint8_t> Uds::requestSecuritySeed() {
+std::vector<uint8_t> Uds::requestSecuritySeed()
+{
     uint8_t req[] = {1};
     UdsPacket res = request(UDS_REQ_SECURITY, req, 1);
-    if (res.data.empty()) {
+    if (res.data.empty())
+    {
         throw std::runtime_error("received empty security access packet");
     }
 
-    if (res.data[0] != req[0]) {
+    if (res.data[0] != req[0])
+    {
         throw std::runtime_error("securityAccessType mismatch");
     }
 
@@ -69,19 +82,22 @@ std::vector<uint8_t> Uds::requestSecuritySeed() {
     return res.data;
 }
 
-void Uds::requestSecurityKey(const uint8_t *key, size_t size) {
+void Uds::requestSecurityKey(const uint8_t * key, size_t size)
+{
     std::vector<uint8_t> req(size + 1);
     req[0] = 2;
     std::copy(key, key + size, req.data() + 1);
 
     UdsPacket res = request(UDS_REQ_SECURITY, req.data(), req.size());
-    if (res.data.empty()) {
+    if (res.data.empty())
+    {
         throw std::runtime_error("received empty security access response");
     }
 }
 
 std::vector<uint8_t> Uds::requestReadMemoryAddress(uint32_t address,
-                                                   uint16_t length) {
+                                                   uint16_t length)
+{
     std::array<uint8_t, 6> req;
     req[0] = (address & 0xFF000000) >> 24;
     req[1] = (address & 0xFF0000) >> 16;
@@ -96,7 +112,8 @@ std::vector<uint8_t> Uds::requestReadMemoryAddress(uint32_t address,
     return res.data;
 }
 
-std::vector<uint8_t> Uds::readDataByIdentifier(uint16_t id) {
+std::vector<uint8_t> Uds::readDataByIdentifier(uint16_t id)
+{
     std::array<uint8_t, 2> req;
     req[0] = id >> 8;
     req[1] = id & 0xFF;

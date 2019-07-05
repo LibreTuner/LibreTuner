@@ -10,14 +10,15 @@
 class QCustomPlot;
 
 // An interactive graph for analyzing datalogs
-class DataLogView : public QWidget {
+class DataLogView : public QWidget
+{
     Q_OBJECT
 public:
-    explicit DataLogView(QWidget *parent = nullptr);
+    explicit DataLogView(QWidget * parent = nullptr);
 
-    void setDatalog(DataLog *log);
+    void setDatalog(DataLog * log);
 
-    void append(const DataLog::Data &data, double value,
+    void append(const DataLog::Data & data, double value,
                 DataLog::TimePoint time);
 
 signals:
@@ -25,9 +26,9 @@ signals:
 public slots:
 
 private:
-    QCustomPlot *plot_;
+    QCustomPlot * plot_;
 
-    DataLog *log_{nullptr};
+    DataLog * log_{nullptr};
 
     // Map PIDs to graph ids
     std::unordered_map<std::size_t, > graphs_;

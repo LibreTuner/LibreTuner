@@ -9,10 +9,11 @@
 
 class QCheckBox;
 
-class DiagnosticsWidget : public QWidget {
+class DiagnosticsWidget : public QWidget
+{
     Q_OBJECT
 public:
-    explicit DiagnosticsWidget(QWidget *parent = nullptr);
+    explicit DiagnosticsWidget(QWidget * parent = nullptr);
 
 signals:
 
@@ -21,8 +22,8 @@ public slots:
     void clear();
 
 private:
-    QTableView *listCodes_;
-    QCheckBox *checkPending_;
+    QTableView * listCodes_;
+    QCheckBox * checkPending_;
 
     DtcModel dtcModel_;
     DtcModel pendingDtcModel_;

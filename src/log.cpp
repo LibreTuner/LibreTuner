@@ -22,7 +22,8 @@
 
 Log::Log() { connect(&Logger::get(), &Logger::appended, this, &Log::append); }
 
-void Log::appendEntry(LogEntry &&entry) {
+void Log::appendEntry(LogEntry && entry)
+{
     beginInsertRows(QModelIndex(), entries_.size(), entries_.size());
 
     entries_.emplace_back(std::move(entry));
@@ -30,37 +31,47 @@ void Log::appendEntry(LogEntry &&entry) {
     endInsertRows();
 }
 
-void Log::append(Logger::Mode mode, const QString &text) {
+void Log::append(Logger::Mode mode, const QString & text)
+{
     appendEntry({mode, text.toStdString()});
 }
 
-int Log::rowCount(const QModelIndex &parent) const {
-    if (parent.isValid()) {
+int Log::rowCount(const QModelIndex & parent) const
+{
+    if (parent.isValid())
+    {
         return 0;
     }
     return entries_.size();
 }
 
-QVariant Log::data(const QModelIndex &index, int role) const {
-    if (!index.isValid()) {
+QVariant Log::data(const QModelIndex & index, int role) const
+{
+    if (!index.isValid())
+    {
         return QVariant();
     }
 
-    if (index.column() != 0) {
+    if (index.column() != 0)
+    {
         return QVariant();
     }
 
     if (index.row() < 0 ||
-        static_cast<std::size_t>(index.row()) >= entries_.size()) {
+        static_cast<std::size_t>(index.row()) >= entries_.size())
+    {
         return QVariant();
     }
 
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::DisplayRole)
+    {
         return QString::fromStdString(entries_[index.row()].text);
     }
 
-    if (role == Qt::TextColorRole) {
-        switch (entries_[index.row()].mode) {
+    if (role == Qt::TextColorRole)
+    {
+        switch (entries_[index.row()].mode)
+        {
         case Logger::Mode::Critical:
             return QColor::fromRgb(170, 0, 0);
         case Logger::Mode::Info:

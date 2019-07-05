@@ -3,18 +3,21 @@
 
 #include <vector>
 
-namespace lt {
+namespace lt
+{
 
-template <class Vector> class VectorSink {
+template <class Vector> class VectorSink
+{
 public:
-    VectorSink(Vector &vector) : vector_(vector) {}
+    VectorSink(Vector & vector) : vector_(vector) {}
 
-    void write(const uint8_t *d, int length) {
+    void write(const uint8_t * d, int length)
+    {
         vector_.insert(vector_.end(), d, d + length);
     }
 
 private:
-    Vector &vector_;
+    Vector & vector_;
 };
 
 } // namespace lt

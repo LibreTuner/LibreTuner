@@ -12,7 +12,7 @@ class Model;
 using ModelPtr = std::shared_ptr<Model>;
 class Platform;
 using PlatformPtr = std::shared_ptr<Platform>;
-}
+} // namespace lt
 
 class PlatformsModel : public QAbstractItemModel
 {

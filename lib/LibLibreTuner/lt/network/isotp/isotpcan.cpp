@@ -3,16 +3,21 @@
 #include <string>
 #include <thread>
 
-namespace lt::network {
+namespace lt::network
+{
 
-namespace detail {
-uint8_t calculate_st(std::chrono::microseconds time) {
+namespace detail
+{
+uint8_t calculate_st(std::chrono::microseconds time)
+{
     assert(time.count() >= 0);
-    if (time.count() == 0) {
+    if (time.count() == 0)
+    {
         return 0;
     }
 
-    if (time >= std::chrono::milliseconds(1)) {
+    if (time >= std::chrono::milliseconds(1))
+    {
         return static_cast<uint8_t>(std::min<std::chrono::milliseconds::rep>(
             std::chrono::duration_cast<std::chrono::milliseconds>(time).count(),
             127));
@@ -22,18 +27,22 @@ uint8_t calculate_st(std::chrono::microseconds time) {
     return count + 0xF0;
 }
 
-std::chrono::microseconds calculate_time(uint8_t st) {
-    if (st <= 127) {
+std::chrono::microseconds calculate_time(uint8_t st)
+{
+    if (st <= 127)
+    {
         return std::chrono::milliseconds(st);
     }
-    if (st >= 0xF1 && st <= 0xF9) {
+    if (st >= 0xF1 && st <= 0xF9)
+    {
         return std::chrono::microseconds((st - 0xF0) * 100);
     }
     return std::chrono::microseconds(0);
 }
 } // namespace detail
 
-struct FlowControlFrame {
+struct FlowControlFrame
+{
     uint8_t fcFlag, blockSize, st;
 };
 
@@ -42,12 +51,15 @@ constexpr uint8_t typeFirst = 1;
 constexpr uint8_t typeConsec = 2;
 constexpr uint8_t typeFlow = 3;
 
-class MultiFrameReceiver {
+class MultiFrameReceiver
+{
 public:
-    MultiFrameReceiver(uint16_t size, IsoTpPacket &packet, Can &can,
-                       IsoTpOptions &options, IsoTpCan &protocol)
+    MultiFrameReceiver(uint16_t size, IsoTpPacket & packet, Can & can,
+                       IsoTpOptions & options, IsoTpCan & protocol)
         : packet_(packet), can_(can), options_(options), protocol_(protocol),
-          size_(size) {}
+          size_(size)
+    {
+    }
 
     void recv();
 
@@ -57,20 +69,23 @@ private:
     void sendFlowControl();
     void recvConsecutiveFrames();
 
-    IsoTpPacket &packet_;
-    Can &can_;
+    IsoTpPacket & packet_;
+    Can & can_;
     IsoTpOptions options_;
-    IsoTpCan &protocol_;
+    IsoTpCan & protocol_;
 
     uint8_t consecIndex_{1};
     uint16_t size_;
 };
 
-class MultiFrameSender {
+class MultiFrameSender
+{
 public:
-    MultiFrameSender(const IsoTpPacket &packet, Can &can, IsoTpOptions &options,
-                     IsoTpCan &protocol)
-        : reader_(packet), can_(can), options_(options), protocol_(protocol) {}
+    MultiFrameSender(const IsoTpPacket & packet, Can & can,
+                     IsoTpOptions & options, IsoTpCan & protocol)
+        : reader_(packet), can_(can), options_(options), protocol_(protocol)
+    {
+    }
 
     void send();
 
@@ -84,30 +99,35 @@ private:
     uint8_t nextConsec();
 
     IsoTpPacketReader reader_;
-    Can &can_;
+    Can & can_;
     IsoTpOptions options_;
-    IsoTpCan &protocol_;
+    IsoTpCan & protocol_;
 
     std::chrono::microseconds separationTime_{0};
     uint8_t blockSize_{0};
     uint8_t consecIndex_{1};
 };
 
-IsoTpCan::IsoTpCan(CanPtr &&can, IsoTpOptions options)
-    : can_(std::move(can)), options_(std::move(options)) {}
+IsoTpCan::IsoTpCan(CanPtr && can, IsoTpOptions options)
+    : can_(std::move(can)), options_(std::move(options))
+{
+}
 
 IsoTpCan::~IsoTpCan() = default;
 
-void IsoTpCan::recv(IsoTpPacket &result) {
+void IsoTpCan::recv(IsoTpPacket & result)
+{
     assert(can_);
     CanMessage message = recvNextFrame();
     uint8_t type = message[0] >> 4;
-    if (type == typeSingle) {
+    if (type == typeSingle)
+    {
         uint8_t length = message[0] & 0x0F;
         result.setData(message.message() + 1, length);
         return;
     }
-    if (type == typeFirst) {
+    if (type == typeFirst)
+    {
         uint16_t length = ((message[0] & 0x0F) << 8) | message[1];
         result.append(message.message() + 2, 6);
         MultiFrameReceiver receiver(length - 6, result, *can_, options_, *this);
@@ -119,24 +139,30 @@ void IsoTpCan::recv(IsoTpPacket &result) {
         " or " + std::to_string(typeFirst) + ", got " + std::to_string(type));
 }
 
-void IsoTpCan::request(const IsoTpPacket &req, IsoTpPacket &result) {
+void IsoTpCan::request(const IsoTpPacket & req, IsoTpPacket & result)
+{
     send(req);
     recv(result);
 }
 
-void IsoTpCan::send(const IsoTpPacket &packet) {
+void IsoTpCan::send(const IsoTpPacket & packet)
+{
     assert(can_);
     // Determine if packet will fit into a single frame
-    if (packet.size() <= 7) {
+    if (packet.size() <= 7)
+    {
         // Single frame
         sendSingleFrame(packet.data(), packet.size());
-    } else {
+    }
+    else
+    {
         MultiFrameSender sender(packet, *can_, options_, *this);
         sender.send();
     }
 }
 
-void IsoTpCan::sendSingleFrame(const uint8_t *data, std::size_t size) {
+void IsoTpCan::sendSingleFrame(const uint8_t * data, std::size_t size)
+{
     assert(can_);
     assert(size <= 7);
 
@@ -151,7 +177,8 @@ void IsoTpCan::sendSingleFrame(const uint8_t *data, std::size_t size) {
     can_->send(message);
 }
 
-std::vector<uint8_t> IsoTpPacketReader::next(std::size_t max) {
+std::vector<uint8_t> IsoTpPacketReader::next(std::size_t max)
+{
     std::size_t toRead = std::min(max, remaining());
 
     std::vector<uint8_t> rem(packet_.cbegin() + pointer_,
@@ -160,7 +187,8 @@ std::vector<uint8_t> IsoTpPacketReader::next(std::size_t max) {
     return rem;
 }
 
-std::size_t IsoTpPacketReader::next(uint8_t *dest, std::size_t max) {
+std::size_t IsoTpPacketReader::next(uint8_t * dest, std::size_t max)
+{
     std::size_t toRead = std::min(max, remaining());
     std::copy(packet_.cbegin() + pointer_, packet_.cbegin() + pointer_ + toRead,
               dest);
@@ -168,13 +196,15 @@ std::size_t IsoTpPacketReader::next(uint8_t *dest, std::size_t max) {
     return toRead;
 }
 
-std::vector<uint8_t> IsoTpPacketReader::readRemaining() {
+std::vector<uint8_t> IsoTpPacketReader::readRemaining()
+{
     std::vector<uint8_t> rem(packet_.cbegin() + pointer_, packet_.cend());
     pointer_ = packet_.size();
     return rem;
 }
 
-void MultiFrameSender::send() {
+void MultiFrameSender::send()
+{
     // Send first frame
     CanMessage message;
     message.setId(options_.sourceId);
@@ -191,10 +221,12 @@ void MultiFrameSender::send() {
     waitForFlowControl();
 }
 
-FlowControlFrame MultiFrameSender::recvFlowControl() {
+FlowControlFrame MultiFrameSender::recvFlowControl()
+{
     CanMessage message = protocol_.recvNextFrame(typeFlow);
 
-    if (message.length() < 3) {
+    if (message.length() < 3)
+    {
         throw std::runtime_error(
             "received invalid flow control response: too short");
     }
@@ -206,12 +238,16 @@ FlowControlFrame MultiFrameSender::recvFlowControl() {
     return frame;
 }
 
-void MultiFrameSender::waitForFlowControl() {
-    while (reader_.remaining() != 0) {
+void MultiFrameSender::waitForFlowControl()
+{
+    while (reader_.remaining() != 0)
+    {
         FlowControlFrame frame;
-        do {
+        do
+        {
             frame = recvFlowControl();
-            if (frame.fcFlag == 2) {
+            if (frame.fcFlag == 2)
+            {
                 throw std::runtime_error("remote requested to abort transfer");
             }
         } while (frame.fcFlag == 1);
@@ -223,8 +259,10 @@ void MultiFrameSender::waitForFlowControl() {
     }
 }
 
-void MultiFrameSender::sendConsecFrames() {
-    do {
+void MultiFrameSender::sendConsecFrames()
+{
+    do
+    {
         CanMessage message;
         message.setId(options_.sourceId);
         message[0] = (typeConsec << 4) | nextConsec();
@@ -237,13 +275,17 @@ void MultiFrameSender::sendConsecFrames() {
              (blockSize_ == 0 || --blockSize_ != 0));
 }
 
-CanMessage IsoTpCan::recvNextFrame() {
+CanMessage IsoTpCan::recvNextFrame()
+{
     auto start = std::chrono::steady_clock::now();
     CanMessage message;
     while (can_->recv(message, options_.timeout) &&
-           (std::chrono::steady_clock::now() - start) < options_.timeout) {
-        if (message.id() == options_.destId) {
-            if (message.length() == 0) {
+           (std::chrono::steady_clock::now() - start) < options_.timeout)
+    {
+        if (message.id() == options_.destId)
+        {
+            if (message.length() == 0)
+            {
                 throw std::runtime_error("received empty frame");
             }
             return message;
@@ -252,10 +294,12 @@ CanMessage IsoTpCan::recvNextFrame() {
     throw std::runtime_error("timed out");
 }
 
-CanMessage IsoTpCan::recvNextFrame(uint8_t expectedType) {
+CanMessage IsoTpCan::recvNextFrame(uint8_t expectedType)
+{
     CanMessage message = recvNextFrame();
     uint8_t id = message[0] >> 4;
-    if (id != expectedType) {
+    if (id != expectedType)
+    {
         throw std::runtime_error("received unexpected frame type. Got " +
                                  std::to_string(id) + ", expected " +
                                  std::to_string(expectedType));
@@ -263,28 +307,34 @@ CanMessage IsoTpCan::recvNextFrame(uint8_t expectedType) {
     return message;
 }
 
-uint8_t MultiFrameSender::nextConsec() {
+uint8_t MultiFrameSender::nextConsec()
+{
     uint8_t index = consecIndex_++;
-    if (consecIndex_ == 16) {
+    if (consecIndex_ == 16)
+    {
         consecIndex_ = 0;
     }
     return index;
 }
 
-void MultiFrameReceiver::recv() {
+void MultiFrameReceiver::recv()
+{
     sendFlowControl();
     recvConsecutiveFrames();
 }
 
-uint8_t MultiFrameReceiver::nextConsec() {
+uint8_t MultiFrameReceiver::nextConsec()
+{
     uint8_t index = consecIndex_++;
-    if (consecIndex_ == 16) {
+    if (consecIndex_ == 16)
+    {
         consecIndex_ = 0;
     }
     return index;
 }
 
-void MultiFrameReceiver::sendFlowControl() {
+void MultiFrameReceiver::sendFlowControl()
+{
     CanMessage message;
     message.setId(options_.sourceId);
     message.setLength(3);
@@ -295,11 +345,14 @@ void MultiFrameReceiver::sendFlowControl() {
     can_.send(message);
 }
 
-void MultiFrameReceiver::recvConsecutiveFrames() {
-    while (size_ != 0) {
+void MultiFrameReceiver::recvConsecutiveFrames()
+{
+    while (size_ != 0)
+    {
         CanMessage frame = protocol_.recvNextFrame(typeConsec);
         uint8_t index = frame[0] & 0x0F;
-        if (index != nextConsec()) {
+        if (index != nextConsec())
+        {
             throw std::runtime_error(
                 "received invalid consecutive frame index");
         }

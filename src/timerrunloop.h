@@ -27,13 +27,14 @@
 
 class Timer;
 
-class TimerRunLoop {
+class TimerRunLoop
+{
 public:
-    static TimerRunLoop &get();
+    static TimerRunLoop & get();
 
-    void addTimer(const std::shared_ptr<Timer> &timer);
+    void addTimer(const std::shared_ptr<Timer> & timer);
 
-    void removeTimer(const std::shared_ptr<Timer> &timer);
+    void removeTimer(const std::shared_ptr<Timer> & timer);
 
     void startWorker();
     void stopWorker();
@@ -45,13 +46,19 @@ private:
 
     void runLoop();
 
-    struct TCompare {
-        bool operator()(const std::weak_ptr<Timer> &first,
-                        const std::weak_ptr<Timer> &second) const {
-            if (auto pfirst = first.lock()) {
-                if (auto psecond = second.lock()) {
+    struct TCompare
+    {
+        bool operator()(const std::weak_ptr<Timer> & first,
+                        const std::weak_ptr<Timer> & second) const
+        {
+            if (auto pfirst = first.lock())
+            {
+                if (auto psecond = second.lock())
+                {
                     return pfirst->nextTrigger() < psecond->nextTrigger();
-                } else {
+                }
+                else
+                {
                     return false;
                 }
             }

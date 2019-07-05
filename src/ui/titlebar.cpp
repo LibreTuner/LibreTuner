@@ -29,13 +29,14 @@
 #include <Windows.h>
 #endif
 
-TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window) {
-    auto *layout = new QHBoxLayout;
+TitleBar::TitleBar(QWidget * window) : QWidget(window), window_(window)
+{
+    auto * layout = new QHBoxLayout;
     layout->setSpacing(0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     // setFixedHeight(30);
 
-    QLabel *icon = new QLabel();
+    QLabel * icon = new QLabel();
     icon->setObjectName("icon");
     layout->addWidget(icon);
     icon->setPixmap(QPixmap(":/icons/LibreTuner.png"));
@@ -84,7 +85,8 @@ TitleBar::TitleBar(QWidget *window) : QWidget(window), window_(window) {
     setAutoFillBackground(true);
 }
 
-void TitleBar::paintEvent(QPaintEvent *event) {
+void TitleBar::paintEvent(QPaintEvent * event)
+{
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
@@ -93,38 +95,47 @@ void TitleBar::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
 }
 
-void TitleBar::setMinimizable(bool minimizable) {
+void TitleBar::setMinimizable(bool minimizable)
+{
     minimize_->setVisible(minimizable);
 }
 
-void TitleBar::setMaximizable(bool maximizable) {
+void TitleBar::setMaximizable(bool maximizable)
+{
     maximize_->setVisible(maximizable);
     maximizable_ = maximizable;
 }
 
-void TitleBar::setTitle(const QString &title) { title_->setText(title); }
+void TitleBar::setTitle(const QString & title) { title_->setText(title); }
 
-void TitleBar::setMaximized(bool maximized) {
+void TitleBar::setMaximized(bool maximized)
+{
     if (restore_)
         restore_->setVisible(maximized);
     if (maximize_ && maximizable_)
         maximize_->setVisible(!maximized);
 
-    if (maximized) {
+    if (maximized)
+    {
         if (maximize_)
             maximize_->setAttribute(Qt::WA_UnderMouse, false);
-    } else {
+    }
+    else
+    {
         if (restore_)
             restore_->setAttribute(Qt::WA_UnderMouse, false);
     }
 }
 
-bool TitleBar::eventFilter(QObject *watched, QEvent *event) {
-    if (event->type() == QEvent::Resize) {
+bool TitleBar::eventFilter(QObject * watched, QEvent * event)
+{
+    if (event->type() == QEvent::Resize)
+    {
         // QResizeEvent *resizeEvent = static_cast<QResizeEvent*>(event);
         if (watched == restore_ || watched == maximize_ ||
-            watched == minimize_ || watched == close_) {
-            QPushButton *button = static_cast<QPushButton *>(watched);
+            watched == minimize_ || watched == close_)
+        {
+            QPushButton * button = static_cast<QPushButton *>(watched);
             button->setIconSize(
                 QSize(button->width() * 0.4f, button->height() * 0.4f));
         }

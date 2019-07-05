@@ -3,7 +3,8 @@
 
 #include <QAbstractListModel>
 
-class TunesModel : public QAbstractListModel {
+class TunesModel : public QAbstractListModel
+{
     Q_OBJECT
 public:
 };

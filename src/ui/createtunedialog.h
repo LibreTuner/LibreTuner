@@ -25,14 +25,16 @@
 
 #include <memory>
 
-namespace Ui {
+namespace Ui
+{
 class CreateTuneDialog;
 }
 
 /**
  * @todo write docs
  */
-class CreateTuneDialog : public QDialog {
+class CreateTuneDialog : public QDialog
+{
     Q_OBJECT
 public:
     explicit CreateTuneDialog(lt::RomPtr base = nullptr);
@@ -42,7 +44,7 @@ public:
     lt::TunePtr tune() const noexcept { return tune_; }
 
 private:
-    Ui::CreateTuneDialog *ui_;
+    Ui::CreateTuneDialog * ui_;
     lt::TunePtr tune_;
 
 private slots:

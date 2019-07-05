@@ -5,22 +5,25 @@
 
 #include "datalink.h"
 
-namespace lt {
-class SocketCanLink : public DataLink {
+namespace lt
+{
+class SocketCanLink : public DataLink
+{
 public:
-    SocketCanLink(const std::string &name, std::string device);
+    SocketCanLink(const std::string & name, std::string device);
 
     DataLinkType type() const override { return DataLinkType::SocketCan; }
 
     network::CanPtr can(uint32_t baudrate) override;
 
-    NetworkProtocol supportedProtocols() const override {
+    NetworkProtocol supportedProtocols() const override
+    {
         return NetworkProtocol::Can;
     }
 
     std::string port() const override { return device_; }
 
-    void setPort(const std::string &port) noexcept override { device_ = port; }
+    void setPort(const std::string & port) noexcept override { device_ = port; }
 
     // Supports port (network can)
     DataLinkFlags flags() const noexcept override;

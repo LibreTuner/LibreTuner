@@ -4,19 +4,21 @@
 #include "../network/uds/uds.h"
 #include "flasher.h"
 
-namespace lt {
+namespace lt
+{
 
-class MazdaT1Flasher : public Flasher {
+class MazdaT1Flasher : public Flasher
+{
 public:
-    MazdaT1Flasher(network::UdsPtr &&uds_, FlashOptions &&options);
+    MazdaT1Flasher(network::UdsPtr && uds_, FlashOptions && options);
 
-    bool flash(const FlashMap &flashmap) override;
+    bool flash(const FlashMap & flashmap) override;
     void cancel() override;
 
 private:
     network::UdsPtr uds_;
 
-    const FlashMap *flash_;
+    const FlashMap * flash_;
     std::atomic<bool> canceled_;
 
     size_t left_{}, sent_{};

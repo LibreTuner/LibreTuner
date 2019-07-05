@@ -14,29 +14,35 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
-class TableDelegate : public QStyledItemDelegate {
+class TableDelegate : public QStyledItemDelegate
+{
 public:
-    explicit TableDelegate(QObject *parent = nullptr)
-        : QStyledItemDelegate(parent) {}
+    explicit TableDelegate(QObject * parent = nullptr)
+        : QStyledItemDelegate(parent)
+    {
+    }
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
-               const QModelIndex &index) const override {
+    void paint(QPainter * painter, const QStyleOptionViewItem & option,
+               const QModelIndex & index) const override
+    {
         QVariant background = index.data(Qt::BackgroundColorRole);
-        if (background.isValid()) {
+        if (background.isValid())
+        {
             painter->fillRect(option.rect, background.value<QColor>());
         }
         QStyledItemDelegate::paint(painter, option, index);
     }
 };
 
-EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
-    QVBoxLayout *layout = new QVBoxLayout;
+EditorWidget::EditorWidget(QWidget * parent) : QWidget(parent)
+{
+    QVBoxLayout * layout = new QVBoxLayout;
 
     labelX_ = new QLabel("X-Axis");
     labelX_->setAlignment(Qt::AlignCenter);
     layout->addWidget(labelX_);
 
-    QHBoxLayout *hLayout = new QHBoxLayout;
+    QHBoxLayout * hLayout = new QHBoxLayout;
 
     view_ = new QTableView(this);
     view_->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
@@ -62,8 +68,10 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
     // setStyleSheet("QTableView::item { border: 0; }");
 }
 
-void EditorWidget::setModel(TableModel *model) {
-    if (model_ != nullptr) {
+void EditorWidget::setModel(TableModel * model)
+{
+    if (model_ != nullptr)
+    {
         disconnect(model_, &TableModel::modelReset, this,
                    &EditorWidget::axesChanged);
     }
@@ -74,29 +82,38 @@ void EditorWidget::setModel(TableModel *model) {
     axesChanged();
 }
 
-void EditorWidget::axesChanged() {
-    if (model_ == nullptr) {
+void EditorWidget::axesChanged()
+{
+    if (model_ == nullptr)
+    {
         return;
     }
-    lt::Table *table = model_->table();
-    if (table == nullptr) {
+    lt::Table * table = model_->table();
+    if (table == nullptr)
+    {
         return;
     }
 
-    if (table->xAxis()) {
+    if (table->xAxis())
+    {
         // labelX_->setText(QString::fromStdString(table->xAxis()->name()));
         labelX_->setVisible(true);
         view_->horizontalHeader()->setVisible(true);
-    } else {
+    }
+    else
+    {
         labelX_->setVisible(false);
         view_->horizontalHeader()->setVisible(false);
     }
 
-    if (table->yAxis()) {
+    if (table->yAxis())
+    {
         // labelY_->setText(QString::fromStdString(table->axisY()->name()));
         labelY_->setVisible(true);
         view_->verticalHeader()->setVisible(true);
-    } else {
+    }
+    else
+    {
         labelY_->setVisible(false);
         view_->verticalHeader()->setVisible(false);
     }

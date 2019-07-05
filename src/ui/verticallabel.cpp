@@ -22,12 +22,15 @@
 #include <QPainterPath>
 #include <QStyle>
 
-VerticalLabel::VerticalLabel(QWidget *parent) : QLabel(parent) {}
+VerticalLabel::VerticalLabel(QWidget * parent) : QLabel(parent) {}
 
-VerticalLabel::VerticalLabel(const QString &text, QWidget *parent)
-    : QLabel(text, parent) {}
+VerticalLabel::VerticalLabel(const QString & text, QWidget * parent)
+    : QLabel(text, parent)
+{
+}
 
-void VerticalLabel::paintEvent(QPaintEvent *) {
+void VerticalLabel::paintEvent(QPaintEvent *)
+{
     QPainter painter(this);
     painter.setPen(palette().color(QPalette::Foreground));
     painter.setBrush(Qt::Dense1Pattern);
@@ -40,12 +43,14 @@ void VerticalLabel::paintEvent(QPaintEvent *) {
     painter.drawText(0, 0, height(), width(), alignment(), text());
 }
 
-QSize VerticalLabel::minimumSizeHint() const {
+QSize VerticalLabel::minimumSizeHint() const
+{
     QSize s = QLabel::minimumSizeHint();
     return {s.height(), s.width()};
 }
 
-QSize VerticalLabel::sizeHint() const {
+QSize VerticalLabel::sizeHint() const
+{
     QSize s = QLabel::sizeHint();
     return {s.height(), s.width()};
 }

@@ -22,18 +22,19 @@
 #include <QAbstractItemModel>
 #include <QPlainTextEdit>
 
-class LogView : public QPlainTextEdit {
+class LogView : public QPlainTextEdit
+{
     Q_OBJECT
 public:
     LogView();
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel * model);
 
 private slots:
-    void rowsInserted(const QModelIndex &parent, int first, int last);
+    void rowsInserted(const QModelIndex & parent, int first, int last);
 
 private:
-    QAbstractItemModel *model_ = nullptr;
+    QAbstractItemModel * model_ = nullptr;
 };
 
 #endif // LOGVIEW_H

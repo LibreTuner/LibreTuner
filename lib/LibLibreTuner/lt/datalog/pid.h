@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <string>
 
-namespace lt {
-struct Pid {
+namespace lt
+{
+struct Pid
+{
     uint16_t code;
     std::string name;
     std::string description;

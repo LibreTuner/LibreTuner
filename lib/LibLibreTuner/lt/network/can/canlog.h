@@ -7,24 +7,29 @@
 #include <memory>
 #include <vector>
 
-namespace lt::network {
+namespace lt::network
+{
 
-enum class CanMessageDirection : bool {
+enum class CanMessageDirection : bool
+{
     Inbound,
     Outbound,
 };
 
-struct CanLogEntry {
+struct CanLogEntry
+{
     CanMessageDirection direction;
     CanMessage message;
 };
 
-struct CanLog {
+struct CanLog
+{
     std::vector<CanLogEntry> messages_;
 
     inline std::size_t size() const noexcept { return messages_.size(); }
 
-    template <typename T> inline void emplace_back(T &&t) {
+    template <typename T> inline void emplace_back(T && t)
+    {
         messages_.emplace_back(std::forward<T>(t));
         eventAdded(messages_.back());
     }
@@ -34,25 +39,32 @@ struct CanLog {
 using CanLogPtr = std::shared_ptr<CanLog>;
 
 // Proxies a CAN interface and logs all sent and received messages
-class CanLogProxy : public Can {
+class CanLogProxy : public Can
+{
 public:
-    CanLogProxy(CanPtr &&can, CanLogPtr log)
-        : can_(std::move(can)), log_(std::move(log)) {}
+    CanLogProxy(CanPtr && can, CanLogPtr log)
+        : can_(std::move(can)), log_(std::move(log))
+    {
+    }
 
     inline CanLogPtr log() const noexcept { return log_; }
     inline void setLog(CanLogPtr log) noexcept { log_ = std::move(log); }
 
-    void send(const CanMessage &message) override {
+    void send(const CanMessage & message) override
+    {
         can_->send(message);
-        if (log_) {
+        if (log_)
+        {
             log_->emplace_back(
                 CanLogEntry{CanMessageDirection::Outbound, message});
         }
     }
 
-    bool recv(CanMessage &message, std::chrono::milliseconds timeout) override {
+    bool recv(CanMessage & message, std::chrono::milliseconds timeout) override
+    {
         bool res = can_->recv(message, timeout);
-        if (res && log_) {
+        if (res && log_)
+        {
             log_->emplace_back(
                 CanLogEntry{CanMessageDirection::Inbound, message});
         }

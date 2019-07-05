@@ -32,16 +32,17 @@ class TimerRunLoop;
 /**
  * @todo write docs
  */
-class Timer : public std::enable_shared_from_this<Timer> {
+class Timer : public std::enable_shared_from_this<Timer>
+{
     friend TimerRunLoop;
 
 public:
     using Callback = std::function<void()>;
 
     static std::shared_ptr<Timer> create();
-    static std::shared_ptr<Timer> create(Callback &&cb);
+    static std::shared_ptr<Timer> create(Callback && cb);
 
-    void setCallback(Callback &&cb);
+    void setCallback(Callback && cb);
     void setTimeout(std::chrono::milliseconds timeout);
     std::chrono::milliseconds timeout() const { return timeout_; }
     /* Starts the timeout timer */
@@ -60,7 +61,7 @@ public:
     Timer(Timer &&) = delete;
 
     Timer() = default;
-    explicit Timer(Callback &&cb);
+    explicit Timer(Callback && cb);
 
 protected:
     bool tryTrigger();

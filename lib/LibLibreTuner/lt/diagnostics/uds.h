@@ -5,11 +5,13 @@
 
 #include "network/uds/uds.h"
 
-namespace lt {
+namespace lt
+{
 
-class UdsDtcScanner : public DtcScanner {
+class UdsDtcScanner : public DtcScanner
+{
 public:
-    explicit UdsDtcScanner(network::UdsPtr &&uds);
+    explicit UdsDtcScanner(network::UdsPtr && uds);
 
     virtual DiagnosticCodes scan() override;
     virtual DiagnosticCodes scanPending() override;

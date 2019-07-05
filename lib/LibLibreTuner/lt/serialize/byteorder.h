@@ -6,11 +6,15 @@
 
 #include "../support/types.h"
 
-namespace lt {
+namespace lt
+{
 
-template <Endianness e> class ByteOrder {};
+template <Endianness e> class ByteOrder
+{
+};
 
-template <> class ByteOrder<Endianness::Little> {
+template <> class ByteOrder<Endianness::Little>
+{
     template <typename T> T convert(T t) {}
 };
 

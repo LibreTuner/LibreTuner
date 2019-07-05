@@ -11,19 +11,20 @@
 class QTreeWidget;
 class QAbstractItemModel;
 
-class TablesWidget : public QWidget {
+class TablesWidget : public QWidget
+{
     Q_OBJECT
 public:
-    explicit TablesWidget(QWidget *parent = nullptr);
+    explicit TablesWidget(QWidget * parent = nullptr);
 
 signals:
-    void activated(const lt::TableDefinition *table);
+    void activated(const lt::TableDefinition * table);
 
 public slots:
-    void setModel(const lt::Model &model);
+    void setModel(const lt::Model & model);
 
 private:
-    QTreeWidget *view_;
+    QTreeWidget * view_;
 };
 
 Q_DECLARE_METATYPE(const lt::TableDefinition *)

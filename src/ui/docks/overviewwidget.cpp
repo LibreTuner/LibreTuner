@@ -6,7 +6,8 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 
-OverviewWidget::OverviewWidget(QWidget *parent) : QWidget(parent) {
+OverviewWidget::OverviewWidget(QWidget * parent) : QWidget(parent)
+{
     lineDefinitionCount_ = new QLineEdit;
     lineDefinitionCount_->setReadOnly(true);
 
@@ -16,7 +17,7 @@ OverviewWidget::OverviewWidget(QWidget *parent) : QWidget(parent) {
     lineDatalinkCount_ = new QLineEdit;
     lineDatalinkCount_->setReadOnly(true);
 
-    QFormLayout *form = new QFormLayout;
+    QFormLayout * form = new QFormLayout;
     form->addRow(tr("Definitions loaded:"), lineDefinitionCount_);
     form->addRow(tr("ROMs loaded:"), lineRomCount_);
     form->addRow(tr("Datalinks detected:"), lineDatalinkCount_);
@@ -24,7 +25,7 @@ OverviewWidget::OverviewWidget(QWidget *parent) : QWidget(parent) {
     lineDefinitionCount_->setText(QString::number(LT()->definitions().size()));
     lineDatalinkCount_->setText(QString::number(LT()->links().count()));
 
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->addLayout(form);
 
     setLayout(layout);

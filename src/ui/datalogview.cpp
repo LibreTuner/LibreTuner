@@ -4,7 +4,8 @@
 
 #include <QVBoxLayout>
 
-DataLogView::DataLogView(QWidget *parent) : QWidget(parent) {
+DataLogView::DataLogView(QWidget * parent) : QWidget(parent)
+{
     plot_ = new QCustomPlot;
     plot_->legend->setVisible(true);
     plot_->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom |
@@ -12,18 +13,20 @@ DataLogView::DataLogView(QWidget *parent) : QWidget(parent) {
 
     plot_->xAxis->setLabel("Elapsed time (seconds)");
 
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->addWidget(plot_);
 
     setLayout(layout);
 }
 
-void DataLogView::setDatalog(DataLog *log) {
+void DataLogView::setDatalog(DataLog * log)
+{
     connection_.reset();
     plot_->clearGraphs();
-    if (log != nullptr) {
+    if (log != nullptr)
+    {
         connection_ =
-            log->connectUpdate([this](const DataLog::Data &data, double value,
+            log->connectUpdate([this](const DataLog::Data & data, double value,
                                       DataLog::TimePoint time) {
                 QMetaObject::invokeMethod(this,
                                           [=]() { append(data, value, time); });
@@ -33,8 +36,9 @@ void DataLogView::setDatalog(DataLog *log) {
     log_ = log;
 }
 
-void DataLogView::append(const DataLog::Data &data, double value,
-                         DataLog::TimePoint time) {
+void DataLogView::append(const DataLog::Data & data, double value,
+                         DataLog::TimePoint time)
+{
     static QColor plotColors[] = {
         Qt::red,       Qt::green,    Qt::blue,        Qt::magenta,
         Qt::yellow,    Qt::gray,     Qt::cyan,        Qt::darkRed,
@@ -43,13 +47,17 @@ void DataLogView::append(const DataLog::Data &data, double value,
     };
 
     int graphId;
-    if (graphs_.size() <= data.id.id) {
+    if (graphs_.size() <= data.id.id)
+    {
         graphs_.resize(data.id.id + 1, -1);
     }
     auto it = graphs_[data.id.id];
-    if (it != -1) {
+    if (it != -1)
+    {
         graphId = it;
-    } else {
+    }
+    else
+    {
         graphId = plot_->graphCount();
         plot_->addGraph();
         plot_->graph(graphId)->setName(QString::fromStdString(data.id.name));

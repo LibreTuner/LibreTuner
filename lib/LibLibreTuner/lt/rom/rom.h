@@ -40,7 +40,10 @@ public:
     inline const std::string & name() const noexcept { return name_; }
     inline const ModelPtr & model() const noexcept { return model_; }
     inline const std::string & id() const noexcept { return id_; }
-    inline Endianness  endianness() const noexcept { return model_->platform.endianness; }
+    inline Endianness endianness() const noexcept
+    {
+        return model_->platform.endianness;
+    }
 
     void setId(const std::string & id) { id_ = id; }
     void setName(const std::string & name) { name_ = name; }
@@ -51,8 +54,14 @@ public:
 
     std::vector<uint8_t>::iterator begin() noexcept { return data_.begin(); }
     std::vector<uint8_t>::iterator end() noexcept { return data_.end(); }
-    std::vector<uint8_t>::const_iterator cbegin() const noexcept { return data_.cbegin(); }
-    std::vector<uint8_t>::const_iterator cend() const noexcept { return data_.cend(); }
+    std::vector<uint8_t>::const_iterator cbegin() const noexcept
+    {
+        return data_.cbegin();
+    }
+    std::vector<uint8_t>::const_iterator cend() const noexcept
+    {
+        return data_.cend();
+    }
 
     // Sets the ROM data
     void setData(std::vector<uint8_t> && data) { data_ = std::move(data); }
@@ -104,7 +113,10 @@ public:
     inline TableMap & tables() noexcept { return tables_; }
     inline const TableMap & tables() const noexcept { return tables_; }
 
-    inline Endianness endianness() const noexcept { return base_->endianness(); }
+    inline Endianness endianness() const noexcept
+    {
+        return base_->endianness();
+    }
 
     TablePtr deserializeTable(const TableDefinition & def, const uint8_t * data,
                               std::size_t length);
@@ -130,8 +142,7 @@ class FileRomDatabase
 {
 public:
     // Initializes base path for ROM storage.
-    FileRomDatabase(std::filesystem::path base,
-                    const Platforms & platforms)
+    FileRomDatabase(std::filesystem::path base, const Platforms & platforms)
         : base_(base), platforms_(std::move(platforms))
     {
     }
@@ -144,7 +155,7 @@ public:
 
     /* Saves ROM to file. Throws an exception if the ROM could not be saved
      * (i.e. invalid id or a ROM with the id already exists) */
-    void saveRom(const Rom &rom);
+    void saveRom(const Rom & rom);
 
     /* Loads tune from a path. Returns a null pointer if the path does not
      * exist. Throws an exception if it cannot be deserialized or the base
@@ -153,7 +164,7 @@ public:
 
     /* Saves a tune to a file. Throws an exception if serialization failed or
      * the file couldn't be opened. */
-    void saveTune(const Tune &tune, std::filesystem::path & path);
+    void saveTune(const Tune & tune, std::filesystem::path & path);
 
 private:
     std::filesystem::path base_;

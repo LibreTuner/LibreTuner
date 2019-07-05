@@ -4,12 +4,14 @@
 
 #include <atomic>
 
-namespace lt::download {
+namespace lt::download
+{
 
 // Downloads using ReadMemoryByAddress (UDS SID 23)
-class RMADownloader : public Downloader {
+class RMADownloader : public Downloader
+{
 public:
-    RMADownloader(network::UdsPtr &&uds, Options &&options);
+    RMADownloader(network::UdsPtr && uds, Options && options);
 
     bool download() override;
     void cancel() override;

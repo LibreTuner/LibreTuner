@@ -17,8 +17,9 @@
 #include <sys/socket.h>
 #endif
 
-DataLinkSettings::DataLinkSettings(lt::DataLinkFlags flags, QWidget *parent)
-    : QWidget(parent) {
+DataLinkSettings::DataLinkSettings(lt::DataLinkFlags flags, QWidget * parent)
+    : QWidget(parent)
+{
     // Name
     lineName_ = new QLineEdit;
 
@@ -47,7 +48,7 @@ DataLinkSettings::DataLinkSettings(lt::DataLinkFlags flags, QWidget *parent)
     baudrateLayout_->addWidget(checkBaudrate_);
 
     // Form
-    auto *form = new QFormLayout;
+    auto * form = new QFormLayout;
     form->setContentsMargins(0, 0, 0, 0);
 
     form->addRow(tr("Name"), lineName_);
@@ -75,7 +76,8 @@ DataLinkSettings::DataLinkSettings(lt::DataLinkFlags flags, QWidget *parent)
             [this](int /*state*/) { emit settingChanged(); });
 }
 
-void DataLinkSettings::setFlags(lt::DataLinkFlags flags) {
+void DataLinkSettings::setFlags(lt::DataLinkFlags flags)
+{
     bool baudrate =
         (flags & lt::DataLinkFlags::Baudrate) != lt::DataLinkFlags::None;
     bool port = (flags & lt::DataLinkFlags::Port) != lt::DataLinkFlags::None;
@@ -87,21 +89,27 @@ void DataLinkSettings::setFlags(lt::DataLinkFlags flags) {
     checkBaudrate_->setVisible(baudrate);
 }
 
-void DataLinkSettings::apply(lt::DataLink &link) {
+void DataLinkSettings::apply(lt::DataLink & link)
+{
     link.setName(lineName_->text().toStdString());
     link.setPort(comboPort_->value().toStdString());
     link.setBaudrate(checkBaudrate_->isChecked() ? 0 : spinBaudrate_->value());
 }
 
-void DataLinkSettings::fill(lt::DataLink *link) {
-    if (link == nullptr) {
+void DataLinkSettings::fill(lt::DataLink * link)
+{
+    if (link == nullptr)
+    {
         reset();
         return;
     }
 
-    if ((link->flags() & lt::DataLinkFlags::Port) != lt::DataLinkFlags::None) {
+    if ((link->flags() & lt::DataLinkFlags::Port) != lt::DataLinkFlags::None)
+    {
         setPortType(link->portType());
-    } else {
+    }
+    else
+    {
         portModel_->setPorts(std::vector<std::string>());
     }
 
@@ -111,7 +119,8 @@ void DataLinkSettings::fill(lt::DataLink *link) {
     checkBaudrate_->setChecked(link->baudrate() == 0);
 }
 
-void DataLinkSettings::reset() {
+void DataLinkSettings::reset()
+{
     lineName_->clear();
     comboPort_->setValue("");
     spinBaudrate_->setValue(0);
@@ -122,13 +131,16 @@ QString DataLinkSettings::name() const { return lineName_->text(); }
 
 QString DataLinkSettings::port() const { return comboPort_->value(); }
 
-int DataLinkSettings::baudrate() const {
+int DataLinkSettings::baudrate() const
+{
     return (checkBaudrate_->isChecked() ? 0 : spinBaudrate_->value());
 }
 
-void DataLinkSettings::setPortType(lt::DataLinkPortType type) {
+void DataLinkSettings::setPortType(lt::DataLinkPortType type)
+{
     std::vector<std::string> ports;
-    switch (type) {
+    switch (type)
+    {
     case lt::DataLinkPortType::Serial:
         ports = serial::enumeratePorts();
         break;
@@ -146,6 +158,7 @@ void DataLinkSettings::setPortType(lt::DataLinkPortType type) {
         tr("Error enumerating ports"));
 }
 
-void DataLinkSettings::setPort(const QString &port) {
+void DataLinkSettings::setPort(const QString & port)
+{
     comboPort_->setValue(port);
 }

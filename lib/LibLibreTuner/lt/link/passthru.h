@@ -7,14 +7,16 @@
 #include <memory>
 #include <vector>
 
-namespace lt {
-class PassThruLink : public DataLink {
+namespace lt
+{
+class PassThruLink : public DataLink
+{
 public:
-    explicit PassThruLink(j2534::Info &&info);
+    explicit PassThruLink(j2534::Info && info);
 
     DataLinkType type() const override { return DataLinkType::PassThru; };
 
-    void setPort(const std::string &port) noexcept override { port_ = port; }
+    void setPort(const std::string & port) noexcept override { port_ = port; }
 
     std::string port() const override { return port_; }
 

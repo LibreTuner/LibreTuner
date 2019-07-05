@@ -28,7 +28,8 @@
 #include <QVariant>
 
 CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
-    : ui_(new Ui::CreateTuneDialog) {
+    : ui_(new Ui::CreateTuneDialog)
+{
     ui_->setupUi(this);
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
@@ -46,7 +47,8 @@ CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
 
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
-void CreateTuneDialog::on_buttonCreate_clicked() {
+void CreateTuneDialog::on_buttonCreate_clicked()
+{
     std::string romId = ui_->comboBase->currentData().toString().toStdString();
     /*RomMeta *meta = LT()->roms().fromId(romId);
     if (meta == nullptr) {

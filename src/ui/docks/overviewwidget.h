@@ -8,15 +8,16 @@ class QLineEdit;
 /**
  * Shows an overview
  */
-class OverviewWidget : public QWidget {
+class OverviewWidget : public QWidget
+{
     Q_OBJECT
 public:
-    explicit OverviewWidget(QWidget *parent = nullptr);
+    explicit OverviewWidget(QWidget * parent = nullptr);
 
 private:
-    QLineEdit *lineDefinitionCount_;
-    QLineEdit *lineRomCount_;
-    QLineEdit *lineDatalinkCount_;
+    QLineEdit * lineDefinitionCount_;
+    QLineEdit * lineRomCount_;
+    QLineEdit * lineDatalinkCount_;
 };
 
 #endif // OVERVIEWWIDGET_H

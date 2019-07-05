@@ -28,13 +28,15 @@
 #include "../network/uds/uds.h"
 #include "datalog.h"
 
-namespace lt {
+namespace lt
+{
 
 class DataLogger;
 
-class DataLogger {
+class DataLogger
+{
 public:
-    explicit DataLogger(DataLog &log) : log_(log) {}
+    explicit DataLogger(DataLog & log) : log_(log) {}
 
     virtual ~DataLogger() = default;
 
@@ -48,17 +50,18 @@ public:
     virtual void addPid(Pid pid) = 0;
 
 protected:
-    DataLog &log_;
+    DataLog & log_;
 };
 using DataLoggerPtr = std::unique_ptr<DataLogger>;
 
-class UdsDataLogger : public DataLogger {
+class UdsDataLogger : public DataLogger
+{
 public:
-    UdsDataLogger(DataLog &log, network::UdsPtr &&uds);
+    UdsDataLogger(DataLog & log, network::UdsPtr && uds);
     UdsDataLogger(const UdsDataLogger &) = delete;
     UdsDataLogger(UdsDataLogger &&) = delete;
-    UdsDataLogger &operator=(UdsDataLogger &&) = delete;
-    UdsDataLogger &operator=(const UdsDataLogger &) = delete;
+    UdsDataLogger & operator=(UdsDataLogger &&) = delete;
+    UdsDataLogger & operator=(const UdsDataLogger &) = delete;
 
     ~UdsDataLogger() override = default;
 
@@ -70,7 +73,7 @@ public:
     void run() override;
 
 private:
-    Pid *nextPid();
+    Pid * nextPid();
     void processNext();
 
     std::chrono::steady_clock::time_point freeze_time_;

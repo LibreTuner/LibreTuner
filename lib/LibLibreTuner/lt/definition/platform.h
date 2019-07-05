@@ -66,7 +66,7 @@ struct Platform
      * if the table does not exist. NOTE: If the caller stores the result,
      * it must guarantee that the platform definition lives longer than
      * the table definition. */
-    const TableDefinition * getTable(const std::string &id) const noexcept;
+    const TableDefinition * getTable(const std::string & id) const noexcept;
 
     /* Gets the axis definition with id `id`. Returns nullptr
      * if the axis with the id does not exist. See note on `getTable` */
@@ -78,7 +78,7 @@ struct Platform
      *    model1.yaml  // Model definition
      *    model2.yaml
      */
-    static Platform loadDirectory(const std::filesystem::path &path);
+    static Platform loadDirectory(const std::filesystem::path & path);
 };
 using PlatformPtr = std::shared_ptr<Platform>;
 using WeakPlatformPtr = std::weak_ptr<Platform>;
@@ -95,7 +95,7 @@ public:
      *      model1.yaml  // Model definition
      *      model2.yaml
      */
-    void loadDirectory(const std::filesystem::path &path);
+    void loadDirectory(const std::filesystem::path & path);
 
     /* Searches for a platform with id `id`. Returns
      * a null pointer if the search fails. */
@@ -104,7 +104,8 @@ public:
     /* Searches for a model by first searching for the platform id `platformId`
      * and then searching for the model `modelId`. Returns a null ptr if the
      * search fails. */
-    ModelPtr find(const std::string & platformId, const std::string & modelId) const noexcept;
+    ModelPtr find(const std::string & platformId,
+                  const std::string & modelId) const noexcept;
 
     inline std::size_t size() const noexcept { return platforms_.size(); }
 
@@ -119,6 +120,7 @@ public:
     PlatformPtr at(int index) const { return platforms_[index]; }
 
     virtual ~Platforms() = default;
+
 private:
     std::vector<PlatformPtr> platforms_;
 };

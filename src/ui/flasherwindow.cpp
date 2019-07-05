@@ -38,13 +38,14 @@
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
 
-FlasherWindow::FlasherWindow(QWidget *parent)
-    : QDialog(parent), linksList_(LT()->links()) {
+FlasherWindow::FlasherWindow(QWidget * parent)
+    : QDialog(parent), linksList_(LT()->links())
+{
     setWindowTitle(tr("LibreTuner - Flash"));
     resize(600, 200);
 
     // Buttons
-    auto *buttonClose = new QPushButton(tr("Close"));
+    auto * buttonClose = new QPushButton(tr("Close"));
     buttonAdvanced_ = new QPushButton(tr("Advanced"));
     buttonAdvanced_->setCheckable(true);
     buttonAdvanced_->setVisible(false);
@@ -53,7 +54,7 @@ FlasherWindow::FlasherWindow(QWidget *parent)
     buttonFlash_->setEnabled(false);
 
     // Buttons layout
-    auto *buttonLayout = new QVBoxLayout;
+    auto * buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
     buttonLayout->addWidget(buttonFlash_);
     buttonLayout->addWidget(buttonClose);
@@ -64,7 +65,7 @@ FlasherWindow::FlasherWindow(QWidget *parent)
     buttonPrevious_ = new QPushButton(tr("Previous"));
     buttonPrevious_->setEnabled(false);
 
-    auto *controlLayout = new QHBoxLayout;
+    auto * controlLayout = new QHBoxLayout;
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->addWidget(buttonPrevious_);
     controlLayout->addWidget(buttonNext_);
@@ -76,13 +77,13 @@ FlasherWindow::FlasherWindow(QWidget *parent)
     stack_->setContentsMargins(0, 0, 0, 0);
 
     // Top layout
-    auto *topLayout = new QHBoxLayout;
+    auto * topLayout = new QHBoxLayout;
     topLayout->setContentsMargins(0, 0, 0, 0);
     topLayout->addWidget(stack_);
     topLayout->addLayout(buttonLayout);
 
     // Main layout
-    QVBoxLayout *layout = new QVBoxLayout;
+    QVBoxLayout * layout = new QVBoxLayout;
     // layout->setSizeConstraint(QLayout::SetFixedSize);
 
     layout->addLayout(topLayout);
@@ -101,18 +102,21 @@ FlasherWindow::FlasherWindow(QWidget *parent)
             &FlasherWindow::buttonFlashClicked);
 }
 
-void FlasherWindow::buttonFlashClicked() {
+void FlasherWindow::buttonFlashClicked()
+{
     catchCritical(
         [this]() {
             auto link =
                 comboLink_->currentData(Qt::UserRole).value<lt::DataLink *>();
-            if (link == nullptr) {
+            if (link == nullptr)
+            {
                 Logger::debug("Invalid link when pressing button - "
                               "verification failed somewhere");
                 return;
             }
 
-            if (!selectedTune_) {
+            if (!selectedTune_)
+            {
                 Logger::debug("Invalid tune when pressing button - "
                               "verification failed somewhere");
                 return;
@@ -123,7 +127,8 @@ void FlasherWindow::buttonFlashClicked() {
                 std::make_unique<lt::PlatformLink>(*link, platform);
             lt::FlasherPtr flasher = platformLink->flasher();
 
-            if (!flasher) {
+            if (!flasher)
+            {
                 Logger::critical("Failed to create flasher");
                 QMessageBox(QMessageBox::Critical, tr("Flash failure"),
                             tr("Failed to create flasher for the selected "
@@ -163,7 +168,8 @@ void FlasherWindow::buttonFlashClicked() {
                 msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
                 msgBox.setDefaultButton(QMessageBox::No);
 
-                if (msgBox.exec() == QMessageBox::Yes) {
+                if (msgBox.exec() == QMessageBox::Yes)
+                {
                     flasher->cancel();
                     canceled = true;
                 }
@@ -171,10 +177,14 @@ void FlasherWindow::buttonFlashClicked() {
 
             task();
 
-            if (!canceled) {
-                if (!task.future().get()) {
+            if (!canceled)
+            {
+                if (!task.future().get())
+                {
                     throw std::runtime_error("Unknown error");
-                } else {
+                }
+                else
+                {
                     QMessageBox(QMessageBox::Information, "Flash Finished",
                                 "Successfully reprogrammed ECU")
                         .exec();
@@ -184,9 +194,11 @@ void FlasherWindow::buttonFlashClicked() {
         tr("Error while flashing"));
 }
 
-void FlasherWindow::setTune(const lt::TunePtr &tune) {
+void FlasherWindow::setTune(const lt::TunePtr & tune)
+{
     selectedTune_ = tune;
-    if (selectedTune_) {
+    if (selectedTune_)
+    {
         stack_->setCurrentIndex(1);
         buttonPrevious_->setEnabled(false);
         buttonNext_->setEnabled(false);
@@ -195,11 +207,13 @@ void FlasherWindow::setTune(const lt::TunePtr &tune) {
     verify();
 }
 
-void FlasherWindow::nextClicked() {
+void FlasherWindow::nextClicked()
+{
     // Try to open tune
     catchCritical(
         [this]() {
-            selectedTune_ = LT()->roms().loadTune(fileSelect_->path().toStdString());
+            selectedTune_ =
+                LT()->roms().loadTune(fileSelect_->path().toStdString());
 
             stack_->setCurrentIndex(1);
             buttonNext_->setEnabled(false);
@@ -211,15 +225,18 @@ void FlasherWindow::nextClicked() {
         "Error opening tune");
 }
 
-void FlasherWindow::previousClicked() {
+void FlasherWindow::previousClicked()
+{
     stack_->setCurrentIndex(0);
     buttonPrevious_->setEnabled(false);
     buttonNext_->setEnabled(true);
     buttonAdvanced_->setVisible(false);
 }
 
-void FlasherWindow::verify() {
-    if (selectedTune_ != nullptr) {
+void FlasherWindow::verify()
+{
+    if (selectedTune_ != nullptr)
+    {
         authOptions_->setDefaultOptions(
             selectedTune_->base()->model()->platform.flashAuthOptions);
     }
@@ -227,21 +244,23 @@ void FlasherWindow::verify() {
                              comboLink_->currentData(Qt::UserRole).isValid());
 }
 
-QWidget *FlasherWindow::createSelectPage() {
+QWidget * FlasherWindow::createSelectPage()
+{
     fileSelect_ = new FileSelectWidget("Open tune", "Tune (*.ltt)");
 
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
     layout->addWidget(fileSelect_);
 
-    auto *page = new QWidget;
+    auto * page = new QWidget;
     page->setLayout(layout);
     page->setContentsMargins(0, 0, 0, 0);
     return page;
 }
 
-QWidget *FlasherWindow::createOptionPage() {
+QWidget * FlasherWindow::createOptionPage()
+{
     // Form entries
     comboLink_ = new QComboBox;
     comboLink_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -251,19 +270,19 @@ QWidget *FlasherWindow::createOptionPage() {
             [this](int) { verify(); });
 
     // Form
-    QFormLayout *form = new QFormLayout;
+    QFormLayout * form = new QFormLayout;
     form->addRow(tr("Link"), comboLink_);
 
     authOptions_ = new AuthOptionsView;
     authOptions_->hide();
 
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
     layout->addLayout(form);
     layout->addWidget(authOptions_);
 
-    auto *page = new QWidget;
+    auto * page = new QWidget;
     page->setLayout(layout);
     page->setContentsMargins(0, 0, 0, 0);
     return page;

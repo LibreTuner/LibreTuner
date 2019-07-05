@@ -22,18 +22,22 @@
 
 Logger::Logger() { qRegisterMetaType<Logger::Mode>("Mode"); }
 
-Logger &Logger::get() {
+Logger & Logger::get()
+{
     static Logger logger;
     return logger;
 }
 
-void Logger::log(Logger::Mode mode, const std::string &message) {
+void Logger::log(Logger::Mode mode, const std::string & message)
+{
     emit appended(mode, QString::fromStdString(message));
     std::cout << "[" << modeString(mode) << "] " << message << std::endl;
 }
 
-std::string Logger::modeString(Logger::Mode mode) {
-    switch (mode) {
+std::string Logger::modeString(Logger::Mode mode)
+{
+    switch (mode)
+    {
     case Mode::Debug:
         return "DEBUG";
     case Mode::Info:

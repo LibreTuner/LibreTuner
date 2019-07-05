@@ -8,21 +8,25 @@
 #include "../support/types.h"
 #include "../support/util.hpp"
 
-namespace lt {
+namespace lt
+{
 
-enum class DataLinkFlags : unsigned {
+enum class DataLinkFlags : unsigned
+{
     None = 0,
     Port = 1 << 1,
     Baudrate = 1 << 2,
 };
 ENABLE_BITMASK(DataLinkFlags)
 
-enum class DataLinkPortType {
+enum class DataLinkPortType
+{
     Serial,
     NetworkCan,
 };
 
-class DataLink {
+class DataLink
+{
 public:
     explicit DataLink(std::string name);
     virtual ~DataLink() = default;
@@ -33,9 +37,9 @@ public:
     virtual NetworkProtocol supportedProtocols() const = 0;
 
     // Returns the pretty name of the link for displaying to the user
-    inline const std::string &name() const noexcept { return name_; }
+    inline const std::string & name() const noexcept { return name_; }
 
-    inline void setName(const std::string &name) noexcept { name_ = name; }
+    inline void setName(const std::string & name) noexcept { name_ = name; }
 
     // Creates a CAN interface with the specified baudrate. The baudrate
     // may not be supported by the link. Returns nullptr if the interface is
@@ -43,18 +47,22 @@ public:
     virtual network::CanPtr can(uint32_t baudrate);
 
     // Tries to create a device wrapped around can()
-    virtual network::IsoTpPtr isotp(const network::IsoTpOptions &options);
+    virtual network::IsoTpPtr isotp(const network::IsoTpOptions & options);
 
     // Returns the port or an empty string if no port is used by the datalink
     // type
     virtual std::string port() const = 0;
-    virtual void setPort(const std::string &port) = 0;
+    virtual void setPort(const std::string & port) = 0;
 
     // Returns datalink port type (defaults to serial)
-    virtual DataLinkPortType portType() const { return DataLinkPortType::Serial; }
+    virtual DataLinkPortType portType() const
+    {
+        return DataLinkPortType::Serial;
+    }
 
     // Returns a list of available ports
-    virtual std::vector<std::string> ports() {
+    virtual std::vector<std::string> ports()
+    {
         return std::vector<std::string>();
     }
 
@@ -70,6 +78,5 @@ protected:
 };
 using DataLinkPtr = std::unique_ptr<DataLink>;
 } // namespace lt
-
 
 #endif // LT_DATALINK_H

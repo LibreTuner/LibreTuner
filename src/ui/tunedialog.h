@@ -6,14 +6,15 @@
 class RomsView;
 class Tune;
 
-class TuneDialog : public QDialog {
+class TuneDialog : public QDialog
+{
 public:
-    explicit TuneDialog(QWidget *parent = nullptr);
+    explicit TuneDialog(QWidget * parent = nullptr);
 
-    Tune *selectedTune();
+    Tune * selectedTune();
 
 private:
-    RomsView *roms_;
+    RomsView * roms_;
 };
 
 #endif // TUNEDIALOG_H

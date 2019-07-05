@@ -6,9 +6,11 @@
 
 #include "endianness.h"
 
-namespace lt {
+namespace lt
+{
 
-template <typename T, Endianness endianness> class numeric_type {
+template <typename T, Endianness endianness> class numeric_type
+{
     static_assert(std::is_arithmetic_v<T>, "Type must be arithmetic");
 
 public:

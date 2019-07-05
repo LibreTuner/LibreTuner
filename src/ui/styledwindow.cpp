@@ -30,12 +30,13 @@
 #include <windowsx.h>
 #endif
 
-template <class T> StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent) {
+template <class T> StyledWidget<T>::StyledWidget(QWidget * parent) : T(parent)
+{
     T::setWindowFlag(Qt::Window);
     T::setObjectName("mainWindow");
     bgLayout_ = new QVBoxLayout;
     bgLayout_->setMargin(1);
-    QWidget *bg = new QWidget;
+    QWidget * bg = new QWidget;
     bg->setContentsMargins(0, 0, 0, 0);
     bg->setAutoFillBackground(true);
     bgLayout_->addWidget(bg);
@@ -62,9 +63,11 @@ template <class T> StyledWidget<T>::StyledWidget(QWidget *parent) : T(parent) {
     setResizable(true);
 }
 
-template <class T> void StyledWidget<T>::setResizable(bool resizable) {
+template <class T> void StyledWidget<T>::setResizable(bool resizable)
+{
     resizable_ = resizable;
-    if (resizable) {
+    if (resizable)
+    {
         T::setWindowFlags(T::windowFlags() | Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
@@ -73,7 +76,9 @@ template <class T> void StyledWidget<T>::setResizable(bool resizable) {
         SetWindowLong(hwnd, GWL_STYLE,
                       style | WS_MAXIMIZEBOX | WS_THICKFRAME | WS_CAPTION);
 #endif
-    } else {
+    }
+    else
+    {
         T::setWindowFlags(T::windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
 #ifdef _WIN32
@@ -85,24 +90,28 @@ template <class T> void StyledWidget<T>::setResizable(bool resizable) {
 }
 
 #ifdef _WIN32
-namespace {
-void fix_maximized_window(HWND window, int maxWidth, int maxHeight,
-                          RECT &rect) {
+namespace
+{
+void fix_maximized_window(HWND window, int maxWidth, int maxHeight, RECT & rect)
+{
     auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONULL);
-    if (!monitor) {
+    if (!monitor)
+    {
         return;
     }
 
     MONITORINFO monitor_info{};
     monitor_info.cbSize = sizeof(monitor_info);
-    if (!GetMonitorInfoW(monitor, &monitor_info)) {
+    if (!GetMonitorInfoW(monitor, &monitor_info))
+    {
         return;
     }
 
     RECT r = monitor_info.rcWork;
     auto width = r.right - r.left;
     auto height = r.bottom - r.top;
-    if (width > maxWidth || height > maxHeight) {
+    if (width > maxWidth || height > maxHeight)
+    {
         return;
     }
     rect = r;
@@ -112,21 +121,26 @@ void fix_maximized_window(HWND window, int maxWidth, int maxHeight,
 
 #ifdef _WIN32
 template <class T>
-bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
-                                  long *result) {
+bool StyledWidget<T>::nativeEvent(const QByteArray & eventType, void * message,
+                                  long * result)
+{
     Q_UNUSED(eventType);
 #if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
-    MSG *msg = *reinterpret_cast<MSG **>(message);
+    MSG * msg = *reinterpret_cast<MSG **>(message);
 #else
-    MSG *msg = reinterpret_cast<MSG *>(message);
+    MSG * msg = reinterpret_cast<MSG *>(message);
 #endif
 
-    switch (msg->message) {
-    case WM_NCCALCSIZE: {
-        if (msg->wParam == TRUE) {
-            auto &params = *reinterpret_cast<NCCALCSIZE_PARAMS *>(msg->lParam);
+    switch (msg->message)
+    {
+    case WM_NCCALCSIZE:
+    {
+        if (msg->wParam == TRUE)
+        {
+            auto & params = *reinterpret_cast<NCCALCSIZE_PARAMS *>(msg->lParam);
 
-            if (IsZoomed(msg->hwnd)) {
+            if (IsZoomed(msg->hwnd))
+            {
                 // Maximized
                 fix_maximized_window(msg->hwnd, T::maximumWidth(),
                                      T::maximumHeight(), params.rgrc[0]);
@@ -135,7 +149,8 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
         *result = 0;
         return true;
     }
-    case WM_NCHITTEST: {
+    case WM_NCHITTEST:
+    {
         static const QMargins margins(5, 5, 5, 5);
         RECT winrect;
         GetWindowRect(reinterpret_cast<HWND>(T::winId()), &winrect);
@@ -160,62 +175,75 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
         bool resizeHeight = T::minimumHeight() != T::maximumHeight();
 
         *result = 0;
-        if (resizeWidth) {
-            if (resizeHeight) {
+        if (resizeWidth)
+        {
+            if (resizeHeight)
+            {
                 // bottom left corner
-                if (leftBorder.contains(x, y) && bottomBorder.contains(x, y)) {
+                if (leftBorder.contains(x, y) && bottomBorder.contains(x, y))
+                {
                     *result = HTBOTTOMLEFT;
                     return true;
                 }
                 // bottom right corner
-                if (bottomBorder.contains(x, y) && rightBorder.contains(x, y)) {
+                if (bottomBorder.contains(x, y) && rightBorder.contains(x, y))
+                {
                     *result = HTBOTTOMRIGHT;
                     return true;
                 }
                 // top left corner
-                if (leftBorder.contains(x, y) && topBorder.contains(x, y)) {
+                if (leftBorder.contains(x, y) && topBorder.contains(x, y))
+                {
                     *result = HTTOPLEFT;
                     return true;
                 }
                 // top right corner
-                if (rightBorder.contains(x, y) && topBorder.contains(x, y)) {
+                if (rightBorder.contains(x, y) && topBorder.contains(x, y))
+                {
                     *result = HTTOPRIGHT;
                     return true;
                 }
             }
-            if (leftBorder.contains(x, y)) {
+            if (leftBorder.contains(x, y))
+            {
                 // Left border
                 *result = HTLEFT;
                 return true;
             }
-            if (rightBorder.contains(x, y)) {
+            if (rightBorder.contains(x, y))
+            {
                 // Right border
                 *result = HTRIGHT;
                 return true;
             }
         }
-        if (resizeHeight) {
-            if (bottomBorder.contains(x, y)) {
+        if (resizeHeight)
+        {
+            if (bottomBorder.contains(x, y))
+            {
                 // Bottom border
                 *result = HTBOTTOM;
                 return true;
             }
-            if (topBorder.contains(x, y)) {
+            if (topBorder.contains(x, y))
+            {
                 // Top border
                 *result = HTTOP;
                 return true;
             }
         }
 
-        if (QApplication::widgetAt(QCursor::pos()) == titleBar_->title_) {
+        if (QApplication::widgetAt(QCursor::pos()) == titleBar_->title_)
+        {
             *result = HTCAPTION;
             return true;
         }
         // Otherwise, let QWidget handle it.
         break;
     }
-    case WM_GETMINMAXINFO: {
-        MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO *>(msg->lParam);
+    case WM_GETMINMAXINFO:
+    {
+        MINMAXINFO * mmi = reinterpret_cast<MINMAXINFO *>(msg->lParam);
 
         mmi->ptMinTrackSize.x = T::minimumWidth();
         mmi->ptMinTrackSize.y = T::minimumHeight();
@@ -227,14 +255,16 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
         break;
     }
 
-    case WM_SIZE: {
+    case WM_SIZE:
+    {
         RECT winrect;
         GetClientRect(msg->hwnd, &winrect);
 
         WINDOWPLACEMENT wp;
         wp.length = sizeof(WINDOWPLACEMENT);
         GetWindowPlacement(msg->hwnd, &wp);
-        if (wp.showCmd == SW_MAXIMIZE) {
+        if (wp.showCmd == SW_MAXIMIZE)
+        {
 
             // SetWindowPos(reinterpret_cast<HWND>(winId()), nullptr, 0, 0, 0,
             // 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
@@ -245,10 +275,14 @@ bool StyledWidget<T>::nativeEvent(const QByteArray &eventType, void *message,
     return QWidget::nativeEvent(eventType, message, result);
 }
 
-template <class T> void StyledWidget<T>::changeEvent(QEvent *e) {
-    if (e->type() == QEvent::WindowStateChange) {
-        QWindowStateChangeEvent *ev = static_cast<QWindowStateChangeEvent *>(e);
-        if ((T::windowState() && Qt::WindowMaximized) && !resizable_) {
+template <class T> void StyledWidget<T>::changeEvent(QEvent * e)
+{
+    if (e->type() == QEvent::WindowStateChange)
+    {
+        QWindowStateChangeEvent * ev =
+            static_cast<QWindowStateChangeEvent *>(e);
+        if ((T::windowState() && Qt::WindowMaximized) && !resizable_)
+        {
             T::setWindowState(Qt::WindowNoState);
         }
         bool maximized = !(ev->oldState() & Qt::WindowMaximized) &&
@@ -261,38 +295,46 @@ template <class T> void StyledWidget<T>::changeEvent(QEvent *e) {
 }
 #endif
 
-StyledWindow::StyledWindow(QWidget *parent) : StyledWidget<QWidget>(parent) {}
+StyledWindow::StyledWindow(QWidget * parent) : StyledWidget<QWidget>(parent) {}
 
-StyledDialog::StyledDialog(QWidget *parent) : StyledWidget<QDialog>(parent) {
+StyledDialog::StyledDialog(QWidget * parent) : StyledWidget<QDialog>(parent)
+{
     // titleBar_->setMaximizable(false);
     // titleBar_->setMinimizable(false);
     // setResizable(false);
 }
 
 template <class T>
-IntermediateWidget<T>::IntermediateWidget(QWidget *parent)
-    : parent_(new StyledWidget<QWidget>(parent)) {
+IntermediateWidget<T>::IntermediateWidget(QWidget * parent)
+    : parent_(new StyledWidget<QWidget>(parent))
+{
     parent_->mainLayout()->addWidget(this);
     T::installEventFilter(parent_);
     parent_->show();
 }
 
-template <class T> void IntermediateWidget<T>::showEvent(QShowEvent *event) {
+template <class T> void IntermediateWidget<T>::showEvent(QShowEvent * event)
+{
     Logger::debug("show event");
 }
 
-template <class T> IntermediateWidget<T>::~IntermediateWidget() {
+template <class T> IntermediateWidget<T>::~IntermediateWidget()
+{
     // delete parent_;
 }
 
 template <class T>
-bool StyledWidget<T>::eventFilter(QObject *object, QEvent *event) {
+bool StyledWidget<T>::eventFilter(QObject * object, QEvent * event)
+{
     Logger::debug(std::to_string(static_cast<int>(event->type())));
-    if (event->type() == QEvent::Show) {
+    if (event->type() == QEvent::Show)
+    {
         T::show();
     }
     return false;
 }
 
-StyledMainWindow::StyledMainWindow(QWidget *parent)
-    : StyledWidget<QMainWindow>(parent) {}
+StyledMainWindow::StyledMainWindow(QWidget * parent)
+    : StyledWidget<QMainWindow>(parent)
+{
+}

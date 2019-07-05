@@ -40,7 +40,8 @@ static LibreTuner * _global;
 namespace fs = std::filesystem;
 
 LibreTuner::LibreTuner(int & argc, char * argv[])
-    : QApplication(argc, argv), rootPath_(fs::current_path()), roms_(rootPath_ / "roms", platforms_)
+    : QApplication(argc, argv), rootPath_(fs::current_path()),
+      roms_(rootPath_ / "roms", platforms_)
 {
     _global = this;
 
@@ -61,9 +62,9 @@ LibreTuner::LibreTuner(int & argc, char * argv[])
     // Setup main path
     rootPath_ = fs::current_path();
 
-    catchCritical([&]() {
-        platforms_.loadDirectory(rootPath_ / "definitions");
-    }, "Error loading definitions");
+    catchCritical(
+        [&]() { platforms_.loadDirectory(rootPath_ / "definitions"); },
+        "Error loading definitions");
 
     links_.setPath(rootPath_ / "links.lts");
 

@@ -24,10 +24,11 @@
 /**
  * @todo write docs
  */
-class CanLogView : public QTableView {
+class CanLogView : public QTableView
+{
     Q_OBJECT
 public:
-    explicit CanLogView(QWidget *parent = 0);
+    explicit CanLogView(QWidget * parent = 0);
 };
 
 #endif // CANLOGVIEW_H

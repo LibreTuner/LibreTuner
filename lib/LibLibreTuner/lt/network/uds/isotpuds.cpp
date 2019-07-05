@@ -1,8 +1,10 @@
 #include "isotpuds.h"
 
-namespace lt::network {
+namespace lt::network
+{
 
-UdsPacket IsoTpUds::requestRaw(const UdsPacket &packet) {
+UdsPacket IsoTpUds::requestRaw(const UdsPacket & packet)
+{
     IsoTpPacket isotpPacket;
     isotpPacket.append(&packet.code, 1);
     isotpPacket.append(packet.data.data(), packet.data.size());
@@ -11,7 +13,8 @@ UdsPacket IsoTpUds::requestRaw(const UdsPacket &packet) {
     return receiveRaw();
 }
 
-UdsPacket IsoTpUds::receiveRaw() {
+UdsPacket IsoTpUds::receiveRaw()
+{
     IsoTpPacket res;
     isotp_->recv(res);
 

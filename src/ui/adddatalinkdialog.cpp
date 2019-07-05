@@ -21,7 +21,8 @@
 #endif
 #include "lt/link/elm.h"
 
-AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
+AddDatalinkDialog::AddDatalinkDialog(QWidget * parent) : QDialog(parent)
+{
     setWindowTitle(tr("LibreTuner - Add Datalink"));
 
     // Type combo
@@ -33,23 +34,23 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     settings_ = new DataLinkSettings;
 
     // Buttons
-    auto *buttonAdd = new QPushButton(tr("Add"));
-    auto *buttonCancel = new QPushButton(tr("Cancel"));
+    auto * buttonAdd = new QPushButton(tr("Add"));
+    auto * buttonCancel = new QPushButton(tr("Cancel"));
 
     // Form layout
-    auto *form = new QVBoxLayout;
+    auto * form = new QVBoxLayout;
     form->setContentsMargins(0, 0, 0, 0);
     form->addWidget(comboType_);
     form->addWidget(settings_);
 
     // Button layout
-    auto *buttonLayout = new QVBoxLayout;
+    auto * buttonLayout = new QVBoxLayout;
     buttonLayout->addWidget(buttonAdd);
     buttonLayout->addWidget(buttonCancel);
     buttonLayout->setAlignment(Qt::AlignTop);
 
     // Main layout
-    auto *layout = new QHBoxLayout;
+    auto * layout = new QHBoxLayout;
     layout->addLayout(form);
     layout->addLayout(buttonLayout);
 
@@ -64,15 +65,18 @@ AddDatalinkDialog::AddDatalinkDialog(QWidget *parent) : QDialog(parent) {
     typeIndexChanged(0);
 }
 
-void AddDatalinkDialog::addClicked() {
+void AddDatalinkDialog::addClicked()
+{
     std::string name = settings_->name().trimmed().toStdString();
-    if (name.empty()) {
+    if (name.empty())
+    {
         QMessageBox::warning(this, tr("Invalid name"),
                              tr("Datalink name must not be empty"));
         return;
     }
 
-    switch (comboType_->currentIndex()) {
+    switch (comboType_->currentIndex())
+    {
     case 0:
         // SocketCAN
 #ifdef WITH_SOCKETCAN
@@ -97,8 +101,10 @@ void AddDatalinkDialog::addClicked() {
     }
 }
 
-void AddDatalinkDialog::typeIndexChanged(int index) {
-    switch (index) {
+void AddDatalinkDialog::typeIndexChanged(int index)
+{
+    switch (index)
+    {
     case 0: // SocketCAN
         settings_->setFlags(lt::DataLinkFlags::Port |
                             lt::DataLinkFlags::Baudrate);

@@ -18,41 +18,50 @@
 
 #include "logview.h"
 
-LogView::LogView() {
+LogView::LogView()
+{
     setReadOnly(true);
     setWordWrapMode(QTextOption::NoWrap);
 }
 
-void LogView::setModel(QAbstractItemModel *model) {
-    if (model_) {
+void LogView::setModel(QAbstractItemModel * model)
+{
+    if (model_)
+    {
         disconnect(model_, &QAbstractItemModel::rowsInserted, this,
                    &LogView::rowsInserted);
     }
     document()->clear();
     model_ = model;
-    if (model) {
+    if (model)
+    {
         connect(model_, &QAbstractItemModel::rowsInserted, this,
                 &LogView::rowsInserted);
         rowsInserted(QModelIndex(), 0, model->rowCount() - 1);
     }
 }
 
-void LogView::rowsInserted(const QModelIndex &parent, int first, int last) {
-    if (parent.isValid()) {
+void LogView::rowsInserted(const QModelIndex & parent, int first, int last)
+{
+    if (parent.isValid())
+    {
         return;
     }
-    for (int i = first; i <= last; ++i) {
+    for (int i = first; i <= last; ++i)
+    {
         QModelIndex index = model_->index(i, 0, parent);
 
         QTextCharFormat format;
 
         QVariant foregroundColor = model_->data(index, Qt::TextColorRole);
-        if (foregroundColor.isValid()) {
+        if (foregroundColor.isValid())
+        {
             format.setForeground(foregroundColor.value<QColor>());
         }
 
         QVariant backgroundColor = model_->data(index, Qt::BackgroundColorRole);
-        if (backgroundColor.isValid()) {
+        if (backgroundColor.isValid())
+        {
             format.setBackground(backgroundColor.value<QColor>());
         }
 
@@ -62,7 +71,8 @@ void LogView::rowsInserted(const QModelIndex &parent, int first, int last) {
 
         QTextCursor cursor = textCursor();
         cursor.movePosition(QTextCursor::End);
-        if (i != 0) {
+        if (i != 0)
+        {
             cursor.insertBlock();
         }
 

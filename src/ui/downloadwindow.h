@@ -33,10 +33,11 @@ class AuthOptionsView;
 /**
  * Window for downloading firmware from the ECU
  */
-class DownloadWindow : public QDialog {
+class DownloadWindow : public QDialog
+{
     Q_OBJECT
 public:
-    explicit DownloadWindow(QWidget *parent = nullptr);
+    explicit DownloadWindow(QWidget * parent = nullptr);
     ~DownloadWindow() override;
 
 public slots:
@@ -45,13 +46,13 @@ public slots:
 
     // QWidget interface
 protected:
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent * event) override;
 
 private:
-    QComboBox *comboPlatform_;
-    QLineEdit *lineName_;
-    QLineEdit *lineId_;
-    AuthOptionsView *authOptions_;
+    QComboBox * comboPlatform_;
+    QLineEdit * lineName_;
+    QLineEdit * lineId_;
+    AuthOptionsView * authOptions_;
 
     lt::PlatformLink getPlatformLink();
 };

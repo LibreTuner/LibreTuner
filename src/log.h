@@ -23,29 +23,31 @@
 
 #include <QAbstractItemModel>
 
-struct LogEntry {
+struct LogEntry
+{
     Logger::Mode mode;
     std::string text;
 };
 
-class Log : public QAbstractListModel {
+class Log : public QAbstractListModel
+{
     Q_OBJECT
 public:
     Log();
     Log(const Log &) = delete;
     Log(Log &&) = delete;
-    Log &operator=(const Log &) = delete;
+    Log & operator=(const Log &) = delete;
 
     /* Adds to the end of log */
-    void appendEntry(LogEntry &&entry);
+    void appendEntry(LogEntry && entry);
 
 public slots:
-    void append(Logger::Mode mode, const QString &text);
+    void append(Logger::Mode mode, const QString & text);
 
     // QAbstractItemModel interface
 public:
-    virtual int rowCount(const QModelIndex &parent) const override;
-    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual int rowCount(const QModelIndex & parent) const override;
+    virtual QVariant data(const QModelIndex & index, int role) const override;
 
 private:
     std::vector<LogEntry> entries_;

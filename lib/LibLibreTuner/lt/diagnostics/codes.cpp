@@ -19,20 +19,26 @@
 #include "codes.h"
 #include <cassert>
 
-namespace lt {
+namespace lt
+{
 
 static char firstDtc[4] = {'P', 'C', 'B', 'U'};
 
-static char numericChar(uint8_t c) {
-    if (c <= 9) {
+static char numericChar(uint8_t c)
+{
+    if (c <= 9)
+    {
         return static_cast<char>(c) + '0';
-    } else if (c <= 15) {
+    }
+    else if (c <= 15)
+    {
         return static_cast<char>(c) - 10 + 'A';
     }
     return '?';
 }
 
-std::string DiagnosticCode::codeString() const {
+std::string DiagnosticCode::codeString() const
+{
     std::string res;
     res += firstDtc[(code & 0xC000) >> 14];
     res += numericChar((code & 0x3000) >> 12);

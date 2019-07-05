@@ -49,47 +49,41 @@ enum class DataType
     Int32,
 };
 
-template<DataType T>
-struct DataTypeTraits {};
+template <DataType T> struct DataTypeTraits
+{
+};
 
-template<>
-struct DataTypeTraits<DataType::Uint8>
+template <> struct DataTypeTraits<DataType::Uint8>
 {
     using Type = uint8_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Uint16>
+template <> struct DataTypeTraits<DataType::Uint16>
 {
     using Type = uint16_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Uint32>
+template <> struct DataTypeTraits<DataType::Uint32>
 {
     using Type = uint32_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Int8>
+template <> struct DataTypeTraits<DataType::Int8>
 {
     using Type = int8_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Int16>
+template <> struct DataTypeTraits<DataType::Int16>
 {
     using Type = int16_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Int32>
+template <> struct DataTypeTraits<DataType::Int32>
 {
     using Type = int32_t;
 };
 
-template<>
-struct DataTypeTraits<DataType::Float>
+template <> struct DataTypeTraits<DataType::Float>
 {
     using Type = float;
 };
@@ -144,8 +138,7 @@ inline void datatypeToType(DataType type, Func && func, Args &&... args)
     }
 }
 
-template<DataType Selected, DataType ...Args>
-struct DataTypeExecutor_
+template <DataType Selected, DataType... Args> struct DataTypeExecutor_
 {
     static int size(DataType dt)
     {
@@ -158,7 +151,10 @@ struct DataTypeExecutor_
     }
 };
 
-using DataTypeExecutor = DataTypeExecutor_<DataType::Float, DataType::Uint8, DataType::Uint16, DataType::Uint32, DataType::Int8, DataType::Int16, DataType::Int32>;
+using DataTypeExecutor =
+    DataTypeExecutor_<DataType::Float, DataType::Uint8, DataType::Uint16,
+                      DataType::Uint32, DataType::Int8, DataType::Int16,
+                      DataType::Int32>;
 
 inline std::size_t dataTypeSize(DataType type)
 {

@@ -23,10 +23,12 @@
 #include <string>
 
 /* Static logger */
-class Logger : public QObject {
+class Logger : public QObject
+{
     Q_OBJECT
 public:
-    enum class Mode {
+    enum class Mode
+    {
         Debug,
         Info,
         Warning,
@@ -34,23 +36,27 @@ public:
     };
 
     // Returns the logger singleton
-    static Logger &get();
+    static Logger & get();
 
-    void log(Mode mode, const std::string &message);
+    void log(Mode mode, const std::string & message);
 
-    static void debug(const std::string &message) {
+    static void debug(const std::string & message)
+    {
         Logger::get().log(Mode::Debug, message);
     }
 
-    static void info(const std::string &message) {
+    static void info(const std::string & message)
+    {
         Logger::get().log(Mode::Info, message);
     }
 
-    static void warning(const std::string &message) {
+    static void warning(const std::string & message)
+    {
         Logger::get().log(Mode::Warning, message);
     }
 
-    static void critical(const std::string &message) {
+    static void critical(const std::string & message)
+    {
         Logger::get().log(Mode::Critical, message);
     }
 
@@ -58,11 +64,11 @@ public:
 
     Logger(Logger &&) = delete;
     Logger(const Logger &) = delete;
-    Logger &operator=(Logger &&) = delete;
-    Logger &operator=(const Logger &) = delete;
+    Logger & operator=(Logger &&) = delete;
+    Logger & operator=(const Logger &) = delete;
 
 signals:
-    void appended(Mode mode, const QString &message);
+    void appended(Mode mode, const QString & message);
 
 private:
     static std::string modeString(Mode mode);

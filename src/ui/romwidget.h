@@ -31,17 +31,18 @@ struct RomMeta;
 /**
  * Widget for the ROM list
  */
-class RomWidget : public QWidget {
+class RomWidget : public QWidget
+{
     Q_OBJECT
 public:
-    explicit RomWidget(const RomMeta &rom, QWidget *parent = 0);
+    explicit RomWidget(const RomMeta & rom, QWidget * parent = 0);
 
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent * event) override;
 
 private:
-    QLabel *label_;
-    QPushButton *deleteButton_;
-    QPushButton *tuneButton_;
+    QLabel * label_;
+    QPushButton * deleteButton_;
+    QPushButton * tuneButton_;
 
     int romId_;
 

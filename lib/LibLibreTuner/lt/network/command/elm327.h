@@ -5,9 +5,11 @@
 #include <serial/bufferedreader.h>
 #include <serial/device.h>
 
-namespace lt::network {
+namespace lt::network
+{
 
-enum class ElmProtocol : uint8_t {
+enum class ElmProtocol : uint8_t
+{
     Automatic = 0,
     SAE_J1850_PWM = 1,
     SAE_J1850_VPW = 2,
@@ -23,9 +25,11 @@ enum class ElmProtocol : uint8_t {
     USER2_CAN = 0xC,
 };
 
-class Elm327 {
+class Elm327
+{
 public:
-    Elm327(std::string port = "", serial::Settings serialSettings = serial::Settings{});
+    Elm327(std::string port = "",
+           serial::Settings serialSettings = serial::Settings{});
 
     // Opens serial device
     void open();
@@ -34,7 +38,7 @@ public:
 
     void setProtocol(ElmProtocol protocol);
 
-    inline serial::Device &device() noexcept { return device_; }
+    inline serial::Device & device() noexcept { return device_; }
 
     // If `echo` is true, enables echo. Else, disables echo.
     void setEcho(bool echo);
@@ -62,11 +66,11 @@ public:
 
     // Sends a command and waits for a response. Returns response separated into
     // lines.
-    std::vector<std::string> sendCommand(const std::string &command);
+    std::vector<std::string> sendCommand(const std::string & command);
 
     // Same as `sendCommand()` but throws an exception if the response is not
     // "OK"
-    void sendBasicCommand(const std::string &command);
+    void sendBasicCommand(const std::string & command);
 
 private:
     serial::Device device_;

@@ -13,26 +13,29 @@ class QLabel;
 class QHBoxLayout;
 class SerialPortModel;
 
-namespace lt {
+namespace lt
+{
 class DataLink;
 }
 
-class DataLinkSettings : public QWidget {
+class DataLinkSettings : public QWidget
+{
     Q_OBJECT
 public:
-    explicit DataLinkSettings(lt::DataLinkFlags flags = lt::DataLinkFlags::None, QWidget *parent = nullptr);
+    explicit DataLinkSettings(lt::DataLinkFlags flags = lt::DataLinkFlags::None,
+                              QWidget * parent = nullptr);
 
     void setFlags(lt::DataLinkFlags flags);
     void setPortType(lt::DataLinkPortType type);
-    void apply(lt::DataLink &link);
+    void apply(lt::DataLink & link);
 
     void reset();
     // Fill form from datalink. Resets if nullptr.
-    void fill(lt::DataLink *link);
+    void fill(lt::DataLink * link);
 
     QString name() const;
 
-    void setPort(const QString &port);
+    void setPort(const QString & port);
     QString port() const;
     int baudrate() const;
 
@@ -40,19 +43,16 @@ signals:
     void settingChanged();
 
 private:
+    QLineEdit * lineName_;
+    CustomCombo * comboPort_{nullptr};
+    QSpinBox * spinBaudrate_{nullptr};
+    QCheckBox * checkBaudrate_{nullptr};
 
-    QLineEdit *lineName_;
-    CustomCombo *comboPort_{nullptr};
-    QSpinBox *spinBaudrate_{nullptr};
-    QCheckBox *checkBaudrate_{nullptr};
+    QLabel * labelPort_;
+    QLabel * labelBaudrate_;
+    QHBoxLayout * baudrateLayout_;
 
-    QLabel *labelPort_;
-    QLabel *labelBaudrate_;
-    QHBoxLayout *baudrateLayout_;
-
-    SerialPortModel *portModel_;
+    SerialPortModel * portModel_;
 };
 
-
-
-#endif //LIBRETUNER_DATALINKSETTINGS_H
+#endif // LIBRETUNER_DATALINKSETTINGS_H

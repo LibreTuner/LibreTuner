@@ -42,7 +42,8 @@
 #include <thread>
 #include <utility>
 
-DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
+DownloadWindow::DownloadWindow(QWidget * parent) : QDialog(parent)
+{
     setWindowTitle(tr("LibreTuner - Download"));
 
     comboPlatform_ = new QComboBox;
@@ -52,39 +53,39 @@ DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
     lineId_ = new QLineEdit;
 
     // Main options
-    auto *form = new QFormLayout;
+    auto * form = new QFormLayout;
     form->addRow(tr("Platform"), comboPlatform_);
     form->addRow(tr("Name"), lineName_);
     form->addRow(tr("Id"), lineId_);
 
-    auto *groupDetails = new QGroupBox(tr("ROM Details"));
+    auto * groupDetails = new QGroupBox(tr("ROM Details"));
     groupDetails->setLayout(form);
 
     // Buttons
-    auto *buttonDownload = new QPushButton(tr("Download"));
+    auto * buttonDownload = new QPushButton(tr("Download"));
     buttonDownload->setDefault(true);
     buttonDownload->setAutoDefault(true);
-    auto *buttonClose = new QPushButton(tr("Close"));
-    auto *buttonAdvanced = new QPushButton(tr("Advanced"));
+    auto * buttonClose = new QPushButton(tr("Close"));
+    auto * buttonAdvanced = new QPushButton(tr("Advanced"));
     buttonAdvanced->setCheckable(true);
 
     // Extension
     authOptions_ = new AuthOptionsView;
     authOptions_->hide();
 
-    auto *buttonLayout = new QVBoxLayout;
+    auto * buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
     buttonLayout->addWidget(buttonDownload);
     buttonLayout->addWidget(buttonClose);
     buttonLayout->addWidget(buttonAdvanced);
 
     // Top layout
-    auto *topLayout = new QHBoxLayout;
+    auto * topLayout = new QHBoxLayout;
     topLayout->addWidget(groupDetails);
     topLayout->addLayout(buttonLayout);
 
     // Main layout
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->addLayout(topLayout);
     layout->addWidget(authOptions_);
@@ -102,21 +103,25 @@ DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
     platformChanged(comboPlatform_->currentIndex());
 }
 
-void DownloadWindow::platformChanged(int /*index*/) {
+void DownloadWindow::platformChanged(int /*index*/)
+{
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<lt::PlatformPtr>()) {
+    if (!var.canConvert<lt::PlatformPtr>())
+    {
         return;
     }
 
-    const auto &platform = var.value<lt::PlatformPtr>();
-    if (!platform) {
+    const auto & platform = var.value<lt::PlatformPtr>();
+    if (!platform)
+    {
         return;
     }
 
     authOptions_->setDefaultOptions(platform->downloadAuthOptions);
 }
 
-void DownloadWindow::download() {
+void DownloadWindow::download()
+{
     catchCritical(
         [this]() {
             lt::PlatformLink pLink = getPlatformLink();
@@ -149,19 +154,25 @@ void DownloadWindow::download() {
 
             task();
 
-            if (!canceled) {
+            if (!canceled)
+            {
                 bool success = task.future().get();
-                if (!success) {
+                if (!success)
+                {
                     throw std::runtime_error("Unknown error");
                 }
                 auto data = downloader->data();
-                try {
-                    lt::ModelPtr model = pLink.platform().identify(data.first, data.second);
+                try
+                {
+                    lt::ModelPtr model =
+                        pLink.platform().identify(data.first, data.second);
                     if (!model)
-                        throw std::runtime_error("Could not identify calibration");
+                        throw std::runtime_error(
+                            "Could not identify calibration");
 
                     lt::Rom rom(model);
-                    rom.setData(std::vector<uint8_t>(data.first, data.first + data.second));
+                    rom.setData(std::vector<uint8_t>(data.first,
+                                                     data.first + data.second));
                     rom.setName(lineName_->text().toStdString());
                     rom.setId(lineId_->text().toStdString());
                     LT()->roms().saveRom(rom);
@@ -169,7 +180,9 @@ void DownloadWindow::download() {
                     QMessageBox(QMessageBox::Information, "Download Finished",
                                 "ROM downloaded successfully")
                         .exec();
-                } catch (const std::runtime_error &err) {
+                }
+                catch (const std::runtime_error & err)
+                {
                     QMessageBox msgBox;
                     msgBox.setWindowTitle("Download Error");
                     msgBox.setText(
@@ -181,16 +194,19 @@ void DownloadWindow::download() {
                     msgBox.setDefaultButton(QMessageBox::Yes);
 
                     int ret = msgBox.exec();
-                    if (ret == QMessageBox::Yes) {
+                    if (ret == QMessageBox::Yes)
+                    {
                         QString fileName = QFileDialog::getSaveFileName(
                             this, tr("Save ROM"), "",
                             tr("Binary (*.bin);;All Files (*)"));
-                        if (fileName.isEmpty()) {
+                        if (fileName.isEmpty())
+                        {
                             return;
                         }
 
                         QFile file(fileName);
-                        if (!file.open(QIODevice::WriteOnly)) {
+                        if (!file.open(QIODevice::WriteOnly))
+                        {
                             QMessageBox::information(this,
                                                      tr("Unable to open file"),
                                                      file.errorString());
@@ -208,19 +224,23 @@ void DownloadWindow::download() {
 
 void DownloadWindow::closeEvent(QCloseEvent * /*event*/) {}
 
-lt::PlatformLink DownloadWindow::getPlatformLink() {
-    lt::DataLink *link = LT()->datalink();
-    if (link == nullptr) {
+lt::PlatformLink DownloadWindow::getPlatformLink()
+{
+    lt::DataLink * link = LT()->datalink();
+    if (link == nullptr)
+    {
         throw std::runtime_error("no datalink selected");
     }
 
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<const lt::PlatformPtr &>()) {
+    if (!var.canConvert<const lt::PlatformPtr &>())
+    {
         throw std::runtime_error("no platform selected");
     }
 
-    const auto &platform = var.value<lt::PlatformPtr>();
-    if (!platform) {
+    const auto & platform = var.value<lt::PlatformPtr>();
+    if (!platform)
+    {
         throw std::runtime_error("no platform selected");
     }
 

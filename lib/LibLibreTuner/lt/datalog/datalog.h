@@ -28,21 +28,25 @@
 #include "../support/event.h"
 #include "pid.h"
 
-namespace lt {
+namespace lt
+{
 using DataLogTimePoint = std::chrono::steady_clock::time_point;
 
-struct PidLogEntry {
+struct PidLogEntry
+{
     double value;
     // Miliseconds since log start
     std::size_t time;
 };
 
-struct PidLog {
+struct PidLog
+{
     Pid pid;
     std::vector<PidLogEntry> entries;
 };
 
-class DataLog {
+class DataLog
+{
 public:
     using AddEvent = Event<const PidLog &, const PidLogEntry &>;
     using AddConnectionPtr = AddEvent::ConnectionPtr;
@@ -52,27 +56,28 @@ public:
 
     // adds a point to a dataset. Returns false if the dataset
     // with the specified id does not exist.
-    bool add(const Pid &pid, PidLogEntry value);
+    bool add(const Pid & pid, PidLogEntry value);
 
     // Adds a value at the current time
-    bool add(const Pid &pid, double value);
+    bool add(const Pid & pid, double value);
 
     // Returns the PID log or nullptr if it does not exist. Add with
     // addPid()
-    PidLog *pidLog(const Pid &pid) noexcept;
+    PidLog * pidLog(const Pid & pid) noexcept;
 
     // Adds a PID to the log. Overwrites any previous logs with the same
     // pid.
-    PidLog &addPid(const Pid &pid) noexcept;
+    PidLog & addPid(const Pid & pid) noexcept;
 
     inline std::string name() const noexcept { return name_; }
-    inline void setName(const std::string &name) noexcept { name_ = name; }
+    inline void setName(const std::string & name) noexcept { name_ = name; }
 
     // Returns true if the log is empty
     inline bool empty() const noexcept { return empty_; }
 
     template <typename Func>
-    inline AddConnectionPtr onAdd(Func &&func) noexcept {
+    inline AddConnectionPtr onAdd(Func && func) noexcept
+    {
         return addEvent_.connect(std::forward<Func>(func));
     }
 

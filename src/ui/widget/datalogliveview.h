@@ -9,9 +9,10 @@
 
 #include "lt/datalog/datalog.h"
 
-class DataLogLiveView : public QTreeWidget {
+class DataLogLiveView : public QTreeWidget
+{
 public:
-    explicit DataLogLiveView(QWidget *parent = nullptr);
+    explicit DataLogLiveView(QWidget * parent = nullptr);
 
     void setDataLog(lt::DataLogPtr dataLog) noexcept;
 
@@ -22,7 +23,8 @@ private:
 
     std::unordered_map<std::size_t, QTreeWidgetItem *> pids_;
 
-    void onAdded(const lt::PidLog &log, const lt::PidLogEntry &entry) noexcept;
+    void onAdded(const lt::PidLog & log,
+                 const lt::PidLogEntry & entry) noexcept;
 };
 
 #endif // DATALOGLIVEVIEW_H

@@ -29,21 +29,24 @@
 
 class PlatformLink;
 
-namespace lt {
+namespace lt
+{
 
-struct FlashOptions {
+struct FlashOptions
+{
     auth::Options auth;
 };
 
 /**
  * An interface for flashing ROMs
  */
-class Flasher : public AsyncRoutine {
+class Flasher : public AsyncRoutine
+{
 public:
     virtual ~Flasher() = default;
 
     /* Flash map. Returns false if canceled. */
-    virtual bool flash(const FlashMap &flashable) = 0;
+    virtual bool flash(const FlashMap & flashable) = 0;
 
     /* Cancels the active flash */
     virtual void cancel() = 0;

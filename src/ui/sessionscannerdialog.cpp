@@ -19,7 +19,8 @@
 
 #include "uiutil.h"
 
-SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent) {
+SessionScannerDialog::SessionScannerDialog(QWidget * parent) : QDialog(parent)
+{
     setWindowTitle(tr("LibreTuner - Session Scanner"));
 
     sessionIds_ = new QListWidget;
@@ -38,9 +39,9 @@ SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent) {
 
     connect(buttonStart_, &QPushButton::clicked, [this]() { scan(); });
 
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
 
-    auto *spinLayout = new QHBoxLayout;
+    auto * spinLayout = new QHBoxLayout;
     spinLayout->addWidget(new QLabel(tr("Minimum:")));
     spinLayout->addWidget(spinMinimum_);
     spinLayout->addWidget(new QLabel(tr("Maximum:")));
@@ -53,7 +54,8 @@ SessionScannerDialog::SessionScannerDialog(QWidget *parent) : QDialog(parent) {
     setLayout(layout);
 }
 
-void SessionScannerDialog::scan() {
+void SessionScannerDialog::scan()
+{
     catchCritical(
         [this]() {
             lt::PlatformLink link = LT()->platformLink();

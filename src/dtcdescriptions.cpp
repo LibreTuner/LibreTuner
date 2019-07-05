@@ -22,9 +22,11 @@
 #include <QFile>
 #include <QXmlStreamReader>
 
-void DtcDescriptions::load() {
+void DtcDescriptions::load()
+{
     QFile file(":/codes.xml");
-    if (!file.open(QFile::ReadOnly)) {
+    if (!file.open(QFile::ReadOnly))
+    {
         Logger::warning("Could not open :/codes.xml. DTC descriptions will not "
                         "be available");
         return;
@@ -32,13 +34,15 @@ void DtcDescriptions::load() {
 
     QXmlStreamReader xml(&file);
 
-    if (!xml.readNextStartElement()) {
+    if (!xml.readNextStartElement())
+    {
         Logger::warning(
             "Could not load DTC descriptions: no xml start element");
         return;
     }
 
-    if (xml.name() != "codes") {
+    if (xml.name() != "codes")
+    {
         Logger::warning(
             ("Could not load DTC descriptions: xml start element name was '" +
              xml.name() + "', expected 'codes'")
@@ -46,14 +50,17 @@ void DtcDescriptions::load() {
         return;
     }
 
-    while (xml.readNextStartElement()) {
-        if (xml.name() != "code") {
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() != "code")
+        {
             xml.raiseError("unexpected element. Expected 'code' tag");
             continue;
         }
 
         QXmlStreamAttributes attrs = xml.attributes();
-        if (!attrs.hasAttribute("code")) {
+        if (!attrs.hasAttribute("code"))
+        {
             xml.raiseError("no code attribute");
             continue;
         }
@@ -62,7 +69,8 @@ void DtcDescriptions::load() {
                               xml.readElementText().toStdString());
     }
 
-    if (xml.hasError()) {
+    if (xml.hasError())
+    {
         Logger::warning(QObject::tr("Failed to load DTC descriptions due to an "
                                     "xml error: %1\nLine %2, column %3")
                             .arg(xml.errorString())
@@ -76,9 +84,11 @@ void DtcDescriptions::load() {
 }
 
 std::pair<bool, std::string>
-DtcDescriptions::get(const std::string &code) const {
+DtcDescriptions::get(const std::string & code) const
+{
     auto it = descriptions_.find(code);
-    if (it == descriptions_.end()) {
+    if (it == descriptions_.end())
+    {
         return std::make_pair(false, std::string());
     }
 

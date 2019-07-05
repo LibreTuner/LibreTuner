@@ -11,26 +11,29 @@ class QCustomPlot;
 class QListWidget;
 class QCheckBox;
 
-namespace lt {
+namespace lt
+{
 struct Pid;
 }
 
 /**
  * @todo write docs
  */
-class DataLogView : public QWidget {
+class DataLogView : public QWidget
+{
 public:
-    explicit DataLogView(QWidget *parent = nullptr);
+    explicit DataLogView(QWidget * parent = nullptr);
 
     void setDataLog(lt::DataLogPtr dataLog);
 
 private:
-    void onAdded(const lt::PidLog &log, const lt::PidLogEntry &entry) noexcept;
+    void onAdded(const lt::PidLog & log,
+                 const lt::PidLogEntry & entry) noexcept;
 
-    QCPGraph *getOrCreateGraph(const lt::Pid &pid) noexcept;
+    QCPGraph * getOrCreateGraph(const lt::Pid & pid) noexcept;
 
-    QCustomPlot *plot_;
-    QCheckBox *checkLive_;
+    QCustomPlot * plot_;
+    QCheckBox * checkLive_;
 
     lt::DataLogPtr dataLog_;
     lt::DataLog::AddConnectionPtr connection_;

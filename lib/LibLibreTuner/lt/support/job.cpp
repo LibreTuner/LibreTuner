@@ -4,9 +4,11 @@
 
 #include "job.h"
 
-namespace lt {
+namespace lt
+{
 
-void JobControl::setProgress(double progress) noexcept {
+void JobControl::setProgress(double progress) noexcept
+{
     job_->progress_ = progress;
     job_->eventProgress_(progress);
 }

@@ -11,12 +11,13 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
+SidebarWidget::SidebarWidget(QWidget * parent) : QWidget(parent)
+{
     tableDescription_ = new QLabel;
     tableDescription_->setWordWrap(true);
     tableDescription_->setAlignment(Qt::AlignCenter);
 
-    auto *tableInfoTitleLayout = new QHBoxLayout;
+    auto * tableInfoTitleLayout = new QHBoxLayout;
     tableInfoButton_ = new QToolButton;
     tableInfoButton_->setArrowType(Qt::DownArrow);
     tableInfoButton_->setAutoRaise(true);
@@ -31,7 +32,7 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     // Table info tree widget
     tableInfo_ = new QWidget;
     tableInfo_->setContentsMargins(0, 0, 0, 0);
-    auto *tableForm = new QFormLayout;
+    auto * tableForm = new QFormLayout;
     tableForm->setSizeConstraint(QFormLayout::SetMaximumSize);
 
     // Build tree widget
@@ -61,23 +62,23 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     tableInfo_->setLayout(tableForm);
 
     // Scroll area
-    auto *scrollLayout = new QVBoxLayout;
+    auto * scrollLayout = new QVBoxLayout;
     scrollLayout->setContentsMargins(5, 0, 5, 0);
     scrollLayout->setAlignment(Qt::AlignTop);
     scrollLayout->addWidget(tableDescription_);
     scrollLayout->addLayout(tableInfoTitleLayout);
     scrollLayout->addWidget(tableInfo_);
 
-    auto *scrollWidget = new QWidget;
+    auto * scrollWidget = new QWidget;
     scrollWidget->setContentsMargins(0, 0, 0, 0);
     scrollWidget->setLayout(scrollLayout);
 
-    auto *scrollArea = new QScrollArea;
+    auto * scrollArea = new QScrollArea;
     scrollArea->setWidget(scrollWidget);
     scrollArea->setWidgetResizable(true);
 
     // Main layout
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     setLayout(layout);
     layout->addWidget(scrollArea);
     // layout->setAlignment(Qt::AlignTop);
@@ -86,8 +87,10 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     fillTableInfo(nullptr);
 }
 
-void SidebarWidget::fillTableInfo(const lt::TableDefinition *table) {
-    if (table == nullptr) {
+void SidebarWidget::fillTableInfo(const lt::TableDefinition * table)
+{
+    if (table == nullptr)
+    {
         tableName_->setText("N/A");
         tableOffset_->setText("N/A");
         tableWidth_->setText("N/A");
@@ -100,7 +103,8 @@ void SidebarWidget::fillTableInfo(const lt::TableDefinition *table) {
     }
 
     tableName_->setText(QString::fromStdString(table->name));
-    tableOffset_->setText(QString("0x") + QString::number(table->offset.value(), 16));
+    tableOffset_->setText(QString("0x") +
+                          QString::number(table->offset.value(), 16));
     tableWidth_->setText(QString::number(table->width));
     tableHeight_->setText(QString::number(table->height));
     tableRange_->setText(
@@ -108,11 +112,15 @@ void SidebarWidget::fillTableInfo(const lt::TableDefinition *table) {
     tableDescription_->setText(QString::fromStdString(table->description));
 }
 
-void SidebarWidget::on_treeToolButton_clicked(bool checked) {
-    if (checked) {
+void SidebarWidget::on_treeToolButton_clicked(bool checked)
+{
+    if (checked)
+    {
         tableInfoButton_->setArrowType(Qt::RightArrow);
         tableInfo_->hide();
-    } else {
+    }
+    else
+    {
         tableInfoButton_->setArrowType(Qt::DownArrow);
         tableInfo_->show();
     }

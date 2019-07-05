@@ -8,12 +8,13 @@
 class QLineEdit;
 class QSpinBox;
 
-class AuthOptionsView : public QWidget {
+class AuthOptionsView : public QWidget
+{
     Q_OBJECT
 public:
-    explicit AuthOptionsView(QWidget *parent = nullptr);
+    explicit AuthOptionsView(QWidget * parent = nullptr);
 
-    void setDefaultOptions(const lt::auth::Options &options);
+    void setDefaultOptions(const lt::auth::Options & options);
 
 signals:
 
@@ -21,8 +22,8 @@ public slots:
     void resetOptions();
 
 private:
-    QLineEdit *lineKey_;
-    QSpinBox *spinSessionId_;
+    QLineEdit * lineKey_;
+    QSpinBox * spinSessionId_;
 
     lt::auth::Options defaultOptions_;
 };

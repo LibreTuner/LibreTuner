@@ -32,24 +32,25 @@
 /**
  * @todo write docs
  */
-class GraphWidget : public QWidget {
+class GraphWidget : public QWidget
+{
 public:
-    explicit GraphWidget(QWidget *parent = nullptr);
+    explicit GraphWidget(QWidget * parent = nullptr);
     ~GraphWidget() override;
 
-    void setModel(TableModel *model);
+    void setModel(TableModel * model);
 
 public slots:
     void refresh();
 
 private:
-    TableModel *model_{nullptr};
-    QtDataVisualization::Q3DSurface *surface_;
-    QWidget *container_;
-    QtCharts::QChart *chart_;
-    QtCharts::QChartView *chartView_;
+    TableModel * model_{nullptr};
+    QtDataVisualization::Q3DSurface * surface_;
+    QWidget * container_;
+    QtCharts::QChart * chart_;
+    QtCharts::QChartView * chartView_;
 
-    QtDataVisualization::QSurface3DSeries *series3d_;
+    QtDataVisualization::QSurface3DSeries * series3d_;
 };
 
 #endif // GRAPHWIDGET_H

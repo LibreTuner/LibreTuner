@@ -7,7 +7,8 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-AuthOptionsView::AuthOptionsView(QWidget *parent) : QWidget(parent) {
+AuthOptionsView::AuthOptionsView(QWidget * parent) : QWidget(parent)
+{
 
     // Options
     lineKey_ = new QLineEdit;
@@ -18,7 +19,7 @@ AuthOptionsView::AuthOptionsView(QWidget *parent) : QWidget(parent) {
     spinSessionId_->setPrefix("0x");
 
     // Form
-    auto *form = new QFormLayout;
+    auto * form = new QFormLayout;
     form->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     form->setLabelAlignment(Qt::AlignTop);
     form->setContentsMargins(0, 0, 0, 0);
@@ -26,10 +27,10 @@ AuthOptionsView::AuthOptionsView(QWidget *parent) : QWidget(parent) {
     form->addRow(tr("Session ID"), spinSessionId_);
 
     // Buttons
-    auto *buttonReset = new QPushButton(tr("Reset to Default"));
+    auto * buttonReset = new QPushButton(tr("Reset to Default"));
 
     // Main layout
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addLayout(form);
     layout->addWidget(buttonReset);
@@ -40,12 +41,14 @@ AuthOptionsView::AuthOptionsView(QWidget *parent) : QWidget(parent) {
             &AuthOptionsView::resetOptions);
 }
 
-void AuthOptionsView::setDefaultOptions(const lt::auth::Options &options) {
+void AuthOptionsView::setDefaultOptions(const lt::auth::Options & options)
+{
     defaultOptions_ = options;
     resetOptions();
 }
 
-void AuthOptionsView::resetOptions() {
+void AuthOptionsView::resetOptions()
+{
     lineKey_->setText(QString::fromStdString(defaultOptions_.key));
     spinSessionId_->setValue(defaultOptions_.session);
 }

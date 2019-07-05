@@ -24,14 +24,18 @@
 
 extern void cparse_startup();
 
-namespace lt {
+namespace lt
+{
 
-class PidEvaluator {
+class PidEvaluator
+{
 public:
-    explicit PidEvaluator(const Pid &pid)
-        : pid_(pid), expression_(pid.formula.c_str()) {}
+    explicit PidEvaluator(const Pid & pid)
+        : pid_(pid), expression_(pid.formula.c_str())
+    {
+    }
     PidEvaluator(PidEvaluator &&) = default;
-    PidEvaluator &operator=(const PidEvaluator &) = delete;
+    PidEvaluator & operator=(const PidEvaluator &) = delete;
     PidEvaluator(const PidEvaluator &) = delete;
 
     void setX(uint8_t x) { vars_["a"] = x; }
@@ -40,51 +44,60 @@ public:
 
     double evaluate() const { return expression_.eval(vars_).asDouble(); }
 
-    inline const Pid &pid() const noexcept { return pid_; }
+    inline const Pid & pid() const noexcept { return pid_; }
     inline uint16_t code() const { return pid_.code; }
 
 private:
-    const Pid &pid_;
+    const Pid & pid_;
 
     TokenMap vars_;
     calculator expression_;
 };
 
-class CParseInit {
+class CParseInit
+{
 public:
     CParseInit() { cparse_startup(); }
 };
 
-UdsDataLogger::UdsDataLogger(DataLog &log, network::UdsPtr &&uds)
-    : DataLogger(log), uds_(std::move(uds)), iter_(pids_.begin()) {
+UdsDataLogger::UdsDataLogger(DataLog & log, network::UdsPtr && uds)
+    : DataLogger(log), uds_(std::move(uds)), iter_(pids_.begin())
+{
     static CParseInit cparseInit;
 }
 
 void UdsDataLogger::addPid(Pid pid) { pids_.emplace_front(std::move(pid)); }
 
-Pid *UdsDataLogger::nextPid() {
-    if (pids_.empty()) {
+Pid * UdsDataLogger::nextPid()
+{
+    if (pids_.empty())
+    {
         return nullptr;
     }
 
-    if (iter_ == pids_.end()) {
+    if (iter_ == pids_.end())
+    {
         iter_ = pids_.begin();
     }
 
     return &*iter_++;
 }
 
-void UdsDataLogger::processNext() {
-    if (!uds_) {
+void UdsDataLogger::processNext()
+{
+    if (!uds_)
+    {
         disable();
     }
-    Pid *pid = nextPid();
-    if (pid == nullptr) {
+    Pid * pid = nextPid();
+    if (pid == nullptr)
+    {
         // PID list is empty. Disable to avoid infinite loop
         disable();
         return;
     }
-    if (current_pid_ == 0) {
+    if (current_pid_ == 0)
+    {
         // Freeze current frame
         // freeze();
         // return;
@@ -95,7 +108,8 @@ void UdsDataLogger::processNext() {
 
     PidEvaluator evaluator(*pid);
 
-    switch (response.size()) {
+    switch (response.size())
+    {
     case 0:
         break;
     default:
@@ -114,12 +128,16 @@ void UdsDataLogger::processNext() {
     log_.add(*pid, result);
 }
 
-void UdsDataLogger::run() {
+void UdsDataLogger::run()
+{
     running_ = true;
-    try {
+    try
+    {
         while (running_)
             processNext();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception & e)
+    {
         disable();
     }
 }

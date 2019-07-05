@@ -25,7 +25,8 @@
 #include <csignal>
 #include <iostream>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char * argv[])
+{
     LibreTuner app(argc, argv);
 
     return LibreTuner::exec();

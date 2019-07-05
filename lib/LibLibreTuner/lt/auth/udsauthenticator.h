@@ -27,19 +27,22 @@
 /**
  * Handles UDS authentication for flashing & downloading
  */
-namespace lt {
-namespace auth {
+namespace lt
+{
+namespace auth
+{
 
-class UdsAuthenticator {
+class UdsAuthenticator
+{
 public:
-    UdsAuthenticator(network::Uds &uds, Options options);
+    UdsAuthenticator(network::Uds & uds, Options options);
     /* Start authentication */
     void auth();
 
-    uint32_t generateKey(uint32_t parameter, const uint8_t *seed, size_t size);
+    uint32_t generateKey(uint32_t parameter, const uint8_t * seed, size_t size);
 
 private:
-    network::Uds &uds_;
+    network::Uds & uds_;
     Options options_;
 
     void do_session();

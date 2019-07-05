@@ -3,7 +3,8 @@
 #include <QStringList>
 #include <QVBoxLayout>
 
-DataLogLiveView::DataLogLiveView(QWidget *parent) : QTreeWidget(parent) {
+DataLogLiveView::DataLogLiveView(QWidget * parent) : QTreeWidget(parent)
+{
     setColumnCount(2);
 
     QStringList headerLabels;
@@ -11,33 +12,39 @@ DataLogLiveView::DataLogLiveView(QWidget *parent) : QTreeWidget(parent) {
     setHeaderLabels(headerLabels);
 }
 
-void DataLogLiveView::setDataLog(lt::DataLogPtr dataLog) noexcept {
+void DataLogLiveView::setDataLog(lt::DataLogPtr dataLog) noexcept
+{
     dataLog_ = std::move(dataLog);
     clear();
     pids_.clear();
 
-    if (!dataLog_) {
+    if (!dataLog_)
+    {
         connection_.reset();
         return;
     }
 
     connection_ = dataLog_->onAdd(
-        [this](const lt::PidLog &log, const lt::PidLogEntry &entry) {
+        [this](const lt::PidLog & log, const lt::PidLogEntry & entry) {
             onAdded(log, entry);
         });
 }
 
-void DataLogLiveView::onAdded(const lt::PidLog &log,
-                              const lt::PidLogEntry &entry) noexcept {
+void DataLogLiveView::onAdded(const lt::PidLog & log,
+                              const lt::PidLogEntry & entry) noexcept
+{
     auto it = pids_.find(log.pid.code);
 
-    QTreeWidgetItem *item;
-    if (it == pids_.end()) {
+    QTreeWidgetItem * item;
+    if (it == pids_.end())
+    {
         item = new QTreeWidgetItem;
         item->setText(0, QString::fromStdString(log.pid.name));
         addTopLevelItem(item);
         pids_.emplace(log.pid.code, item);
-    } else {
+    }
+    else
+    {
         item = it->second;
     }
 

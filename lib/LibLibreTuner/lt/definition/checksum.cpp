@@ -21,18 +21,23 @@
 #include "checksum.h"
 #include "support/util.hpp"
 
-namespace lt {
+namespace lt
+{
 
-void Checksum::addModifiable(int offset, int size) {
+void Checksum::addModifiable(int offset, int size)
+{
     modifiable_.emplace_back(offset, size);
 }
 
 Checksum::~Checksum() = default;
 
-uint32_t ChecksumBasic::compute(const uint8_t *data, int size, bool *ok) const {
+uint32_t ChecksumBasic::compute(const uint8_t * data, int size, bool * ok) const
+{
     assert(size >= 0);
-    if (size < offset_ + size_) {
-        if (ok != nullptr) {
+    if (size < offset_ + size_)
+    {
+        if (ok != nullptr)
+        {
             *ok = false;
         }
         return 0;
@@ -43,19 +48,23 @@ uint32_t ChecksumBasic::compute(const uint8_t *data, int size, bool *ok) const {
 
     uint32_t sum = 0;
     // Add up the big endian int32s
-    for (int i = 0; i < size_ / 4; ++i, data += 4) {
+    for (int i = 0; i < size_ / 4; ++i, data += 4)
+    {
         sum += readBE<int32_t>(data, data + size);
     }
 
-    if (ok != nullptr) {
+    if (ok != nullptr)
+    {
         *ok = true;
     }
     return sum;
 }
 
-void ChecksumBasic::correct(uint8_t *data, int size) const {
+void ChecksumBasic::correct(uint8_t * data, int size) const
+{
     assert(size >= 0);
-    if (size < offset_ + size_) {
+    if (size < offset_ + size_)
+    {
         throw std::runtime_error("checksum region exceeds the rom size.");
     }
 
@@ -63,14 +72,17 @@ void ChecksumBasic::correct(uint8_t *data, int size) const {
     int modifiableOffset{0};
 
     // Find a usable modifiable region
-    for (const auto &it : modifiable_) {
-        if (it.second >= 4) {
+    for (const auto & it : modifiable_)
+    {
+        if (it.second >= 4)
+        {
             modifiableOffset = it.first;
             foundMod = true;
             break;
         }
     }
-    if (!foundMod) {
+    if (!foundMod)
+    {
         throw std::runtime_error("failed to find a usable modifiable region "
                                  "for checksum correction.");
     }
@@ -85,14 +97,17 @@ void ChecksumBasic::correct(uint8_t *data, int size) const {
     writeBE<int32_t>(val, &data[offset_ + modifiableOffset], data + size);
 
     // Check if the correction was successful
-    if (compute(data, size, nullptr) != target_) {
+    if (compute(data, size, nullptr) != target_)
+    {
         throw std::runtime_error(
             "checksum does not equal target after correction");
     }
 }
 
-void Checksums::correct(uint8_t *data, size_t size) {
-    for (const ChecksumPtr &checksum : checksums_) {
+void Checksums::correct(uint8_t * data, size_t size)
+{
+    for (const ChecksumPtr & checksum : checksums_)
+    {
         checksum->correct(data, size);
     }
 }

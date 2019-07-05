@@ -30,10 +30,11 @@
 /**
  * Widget displaying a tune for the tunes tab.
  */
-class TuneWidget : public QFrame {
+class TuneWidget : public QFrame
+{
     Q_OBJECT
 public:
-    TuneWidget(const TuneMeta &tune, QWidget *parent = 0);
+    TuneWidget(const TuneMeta & tune, QWidget * parent = 0);
 
 private:
     TuneMeta tune_;

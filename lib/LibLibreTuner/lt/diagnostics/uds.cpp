@@ -20,9 +20,11 @@
 
 #include <cassert>
 
-namespace lt {
+namespace lt
+{
 
-UdsDtcScanner::UdsDtcScanner(network::UdsPtr &&uds) : uds_(std::move(uds)) {
+UdsDtcScanner::UdsDtcScanner(network::UdsPtr && uds) : uds_(std::move(uds))
+{
     assert(uds_);
 }
 
@@ -30,7 +32,8 @@ DiagnosticCodes UdsDtcScanner::scan() { return scanPid(0x3); }
 
 DiagnosticCodes UdsDtcScanner::scanPending() { return scanPid(0x7); }
 
-DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
+DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid)
+{
     // Scan with OBD-II Service 03
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03
     network::UdsPacket response = uds_->request(pid, nullptr, 0);
@@ -38,7 +41,8 @@ DiagnosticCodes UdsDtcScanner::scanPid(uint8_t pid) {
     DiagnosticCodes result;
     // Decode results as per
     // https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_03_(no_PID_required)
-    for (size_t i = 1; i + 1 < response.data.size(); i += 2) {
+    for (size_t i = 1; i + 1 < response.data.size(); i += 2)
+    {
         DiagnosticCode code;
         code.code = (response.data[i] << 8) | response.data[i + 1];
 

@@ -1,5 +1,6 @@
 #include "datalinkswidget.h"
 
+#include <QCheckBox>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -8,7 +9,6 @@
 #include <QSpinBox>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <QCheckBox>
 
 #include "serial/device.h"
 
@@ -20,12 +20,13 @@
 #include "widget/customcombo.h"
 #include "widget/datalinksettings.h"
 
-DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
+DatalinksWidget::DatalinksWidget(QWidget * parent) : QWidget(parent)
+{
     setWindowTitle(tr("LibreTuner - Datalinks"));
     resize(600, 400);
 
-    auto *buttonAdd = new QPushButton(tr("Add"));
-    auto *buttonRemove = new QPushButton(tr("Remove"));
+    auto * buttonAdd = new QPushButton(tr("Add"));
+    auto * buttonRemove = new QPushButton(tr("Remove"));
 
     buttonUpdate_ = new QPushButton(tr("Save"));
     buttonUpdate_->setEnabled(false);
@@ -40,25 +41,25 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     settings_->setEnabled(false);
 
     // Layouts
-    auto *buttonLayout = new QVBoxLayout;
+    auto * buttonLayout = new QVBoxLayout;
     buttonLayout->setAlignment(Qt::AlignTop);
     buttonLayout->addWidget(buttonAdd);
     buttonLayout->addWidget(buttonRemove);
 
-    auto *layoutOptButtons = new QVBoxLayout;
+    auto * layoutOptButtons = new QVBoxLayout;
     layoutOptButtons->setAlignment(Qt::AlignTop);
     layoutOptButtons->addWidget(buttonUpdate_);
     layoutOptButtons->addWidget(buttonReset_);
 
-    auto *layoutOpt = new QHBoxLayout;
+    auto * layoutOpt = new QHBoxLayout;
     layoutOpt->addWidget(settings_);
     layoutOpt->addLayout(layoutOptButtons);
 
-    auto *linksLayout = new QVBoxLayout;
+    auto * linksLayout = new QVBoxLayout;
     linksLayout->addWidget(linksView_);
     linksLayout->addLayout(layoutOpt);
 
-    auto *layout = new QHBoxLayout;
+    auto * layout = new QHBoxLayout;
     layout->addLayout(linksLayout);
     layout->addLayout(buttonLayout);
     setLayout(layout);
@@ -69,8 +70,9 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
     });
 
     connect(buttonRemove, &QPushButton::clicked, [this]() {
-        auto *link = currentLink();
-        if (link == nullptr) {
+        auto * link = currentLink();
+        if (link == nullptr)
+        {
             return;
         }
         LT()->links().remove(link);
@@ -82,8 +84,9 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         [this](const QModelIndex & /*index*/) { linkChanged(currentLink()); });
 
     connect(buttonUpdate_, &QPushButton::clicked, [this]() {
-        lt::DataLink *link = currentLink();
-        if (link == nullptr) {
+        lt::DataLink * link = currentLink();
+        if (link == nullptr)
+        {
             return;
         }
 
@@ -97,13 +100,14 @@ DatalinksWidget::DatalinksWidget(QWidget *parent) : QWidget(parent) {
         setButtonsEnabled(false);
     });
 
-    connect(settings_, &DataLinkSettings::settingChanged, [this]() {
-        setButtonsEnabled(true);
-    });
+    connect(settings_, &DataLinkSettings::settingChanged,
+            [this]() { setButtonsEnabled(true); });
 }
 
-void DatalinksWidget::linkChanged(lt::DataLink *link) {
-    if (link == nullptr) {
+void DatalinksWidget::linkChanged(lt::DataLink * link)
+{
+    if (link == nullptr)
+    {
         settings_->setEnabled(false);
         setButtonsEnabled(false);
         return;
@@ -116,17 +120,20 @@ void DatalinksWidget::linkChanged(lt::DataLink *link) {
     setButtonsEnabled(false);
 }
 
-lt::DataLink *DatalinksWidget::currentLink() const {
+lt::DataLink * DatalinksWidget::currentLink() const
+{
     QVariant data =
         LT()->links().data(linksView_->currentIndex(), Qt::UserRole);
-    if (!data.canConvert<lt::DataLink *>()) {
+    if (!data.canConvert<lt::DataLink *>())
+    {
         return nullptr;
     }
 
     return data.value<lt::DataLink *>();
 }
 
-void DatalinksWidget::setButtonsEnabled(bool enabled) {
+void DatalinksWidget::setButtonsEnabled(bool enabled)
+{
     buttonUpdate_->setEnabled(enabled);
     buttonReset_->setEnabled(enabled);
 }

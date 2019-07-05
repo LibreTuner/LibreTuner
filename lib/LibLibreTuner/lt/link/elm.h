@@ -4,11 +4,13 @@
 #include "../network/command/elm327.h"
 #include "datalink.h"
 
-namespace lt {
+namespace lt
+{
 
-class ElmDataLink : public DataLink {
+class ElmDataLink : public DataLink
+{
 public:
-    explicit ElmDataLink(const std::string &name, std::string port = "",
+    explicit ElmDataLink(const std::string & name, std::string port = "",
                          int baudrate = 115200);
 
     DataLinkType type() const override;
@@ -18,13 +20,13 @@ public:
     // Stub. Returns nullptr
     network::CanPtr can(uint32_t baudrate) override;
 
-    network::IsoTpPtr isotp(const network::IsoTpOptions &options) override;
+    network::IsoTpPtr isotp(const network::IsoTpOptions & options) override;
 
     std::string port() const override { return port_; }
 
     std::vector<std::string> ports() override;
 
-    void setPort(const std::string &port) override;
+    void setPort(const std::string & port) override;
 
     // If the device has not been initialized, initializes it
     void createDevice();

@@ -124,7 +124,10 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
             if constexpr (std::is_same_v<T, LinearAxisDefinition>)
             {
                 // Linear axis
-                builder.setLinear(typeDefinition.start, typeDefinition.increment, typeDefinition.size).build();
+                builder
+                    .setLinear(typeDefinition.start, typeDefinition.increment,
+                               typeDefinition.size)
+                    .build();
             }
             else if constexpr (std::is_same_v<T, MemoryAxisDefinition>)
             {
@@ -148,25 +151,32 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
                 switch (def->dataType)
                 {
                 case DataType::Float:
-                    builder.setEntries(fromBytes<float>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<float>(start, end, endianness()));
                     break;
                 case DataType::Uint8:
-                    builder.setEntries(fromBytes<uint8_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<uint8_t>(start, end, endianness()));
                     break;
                 case DataType::Uint16:
-                    builder.setEntries(fromBytes<uint16_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<uint16_t>(start, end, endianness()));
                     break;
                 case DataType::Uint32:
-                    builder.setEntries(fromBytes<uint32_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<uint32_t>(start, end, endianness()));
                     break;
                 case DataType::Int8:
-                    builder.setEntries(fromBytes<int8_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<int8_t>(start, end, endianness()));
                     break;
                 case DataType::Int16:
-                    builder.setEntries(fromBytes<int16_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<int16_t>(start, end, endianness()));
                     break;
                 case DataType::Int32:
-                    builder.setEntries(fromBytes<int32_t>(start, end, endianness()));
+                    builder.setEntries(
+                        fromBytes<int32_t>(start, end, endianness()));
                     break;
                 default:
                     break;
@@ -175,7 +185,8 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
         },
         def->def);
 
-    return axes_.emplace(id, std::make_shared<Axis>(builder.build())).first->second;
+    return axes_.emplace(id, std::make_shared<Axis>(builder.build()))
+        .first->second;
 }
 
 // Define constructs in global scope
@@ -202,8 +213,7 @@ struct TableConstruct
     std::string id;
     std::vector<uint8_t> data;
 
-    template <class Archive>
-    void serialize(Archive & archive)
+    template <class Archive> void serialize(Archive & archive)
     {
         archive(id, data);
     }
@@ -302,7 +312,8 @@ void FileRomDatabase::saveRom(const Rom & rom)
     std::filesystem::path path = base_ / construct.id;
     std::ofstream file(path, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open ROM file '" + path.string() + "' for writing");
+        throw std::runtime_error("failed to open ROM file '" + path.string() +
+                                 "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
     archive(construct);
@@ -314,7 +325,7 @@ void FileRomDatabase::saveTune(const Tune & tune, std::filesystem::path & path)
     construct.id = tune.id();
     construct.name = tune.name();
     construct.baseId = tune.base()->id();
-    for (auto &[id, table] : tune.tables())
+    for (auto & [id, table] : tune.tables())
     {
         TableConstruct tc;
         tc.id = id;
@@ -324,7 +335,8 @@ void FileRomDatabase::saveTune(const Tune & tune, std::filesystem::path & path)
 
     std::ofstream file(path, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open tune file '" + path.string() + "' for writing");
+        throw std::runtime_error("failed to open tune file '" + path.string() +
+                                 "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
     archive(construct);

@@ -1,6 +1,7 @@
 #include "model.h"
 
-namespace lt {
+namespace lt
+{
 
 const TableDefinition * Model::getTable(const std::string & id) const
 {
@@ -11,29 +12,36 @@ const TableDefinition * Model::getTable(const std::string & id) const
     return nullptr;
 }
 
-std::size_t Model::getAxisOffset(const std::string &id) const noexcept {
+std::size_t Model::getAxisOffset(const std::string & id) const noexcept
+{
     auto it = axisOffsets.find(id);
-    if (it == axisOffsets.end()) {
+    if (it == axisOffsets.end())
+    {
         return 0;
     }
     return it->second;
 }
 
-bool Model::isModel(const uint8_t *data, std::size_t size) const noexcept {
-    if (identifiers.empty()) {
+bool Model::isModel(const uint8_t * data, std::size_t size) const noexcept
+{
+    if (identifiers.empty())
+    {
         // This model is unidentifiable
         return false;
     }
 
-    for (const Identifier &identifier : identifiers) {
+    for (const Identifier & identifier : identifiers)
+    {
         // Verify size
-        if (identifier.offset() + identifier.size() > size) {
+        if (identifier.offset() + identifier.size() > size)
+        {
             return false;
         }
 
         if (!std::equal(data + identifier.offset(),
                         data + identifier.offset() + identifier.size(),
-                        identifier.data())) {
+                        identifier.data()))
+        {
             return false;
         }
     }

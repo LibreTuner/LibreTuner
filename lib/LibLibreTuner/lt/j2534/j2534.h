@@ -75,10 +75,13 @@
 #define BLOCK_FILTER 0x00000002
 #define FLOW_CONTROL_FILTER 0x00000003
 
-namespace lt {
-namespace j2534 {
+namespace lt
+{
+namespace j2534
+{
 
-enum class Protocol {
+enum class Protocol
+{
     None = 0,
     J1850VPW = 1,
     J1850PWM = 2,
@@ -92,24 +95,28 @@ enum class Protocol {
     SCI_B_Trans = 10,
 };
 
-inline Protocol operator|(Protocol lhs, Protocol rhs) {
+inline Protocol operator|(Protocol lhs, Protocol rhs)
+{
     using DType = std::underlying_type<Protocol>::type;
     return static_cast<Protocol>(static_cast<DType>(lhs) |
                                  static_cast<DType>(rhs));
 }
 
-inline Protocol operator&(Protocol lhs, Protocol rhs) {
+inline Protocol operator&(Protocol lhs, Protocol rhs)
+{
     using DType = std::underlying_type<Protocol>::type;
     return static_cast<Protocol>(static_cast<DType>(lhs) &
                                  static_cast<DType>(rhs));
 }
 
-class Error : public std::runtime_error {
+class Error : public std::runtime_error
+{
 public:
-    Error(const std::string &message) : std::runtime_error(message) {}
+    Error(const std::string & message) : std::runtime_error(message) {}
 };
 
-struct Info {
+struct Info
+{
     std::string name;
     // Supported protocols
     Protocol protocols{Protocol::None};
@@ -119,7 +126,8 @@ struct Info {
 
 // J2534 API
 
-struct PASSTHRU_MSG {
+struct PASSTHRU_MSG
+{
     uint32_t ProtocolID; /* vehicle network protocol */
     uint32_t RxStatus;   /* receive message status */
     uint32_t TxFlags;    /* transmit message flags */
@@ -162,7 +170,8 @@ using PassThruIoctl_t = long(PTAPI *)(uint32_t, uint32_t, void *, void *);
 class J2534;
 using J2534Ptr = std::shared_ptr<J2534>;
 
-enum class Ioctl {
+enum class Ioctl
+{
     GetConfig = 0x01,
     SetConfig = 0x02,
     ReadVbatt = 0x03,
@@ -186,7 +195,8 @@ enum class Ioctl {
 class Device;
 using DevicePtr = std::shared_ptr<Device>;
 
-class Channel {
+class Channel
+{
 public:
     // Creates an invalid device
     Channel() = default;
@@ -194,23 +204,24 @@ public:
     ~Channel();
 
     Channel(const Channel &) = delete;
-    Channel(Channel &&chann) noexcept;
+    Channel(Channel && chann) noexcept;
 
     /* Reads `pNumMsgs` messages or until the timeout expires. If timeout is 0,
      * reads the buffer and returns immediately. Sets pNumMsgs to the amount of
      messages actually read. Refer to the j2534 spec for more information. */
-    void readMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+    void readMsgs(PASSTHRU_MSG * pMsg, uint32_t & pNumMsgs, uint32_t timeout);
 
     /* Writes the array of `pMsg` (size `pNumMsgs`) until timeout expires. Is
      timeout is 0,
      * queues as many transmit messages as possible and returns immediately.
      Sets pNumMsgs to the amount of messages sent. Refer to the j2534 spec for
      more information. */
-    void writeMsgs(PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs, uint32_t timeout);
+    void writeMsgs(PASSTHRU_MSG * pMsg, uint32_t & pNumMsgs, uint32_t timeout);
 
-    void startMsgFilter(uint32_t type, const PASSTHRU_MSG *pMaskMsg,
-                        const PASSTHRU_MSG *pPatternMsg,
-                        const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
+    void startMsgFilter(uint32_t type, const PASSTHRU_MSG * pMaskMsg,
+                        const PASSTHRU_MSG * pPatternMsg,
+                        const PASSTHRU_MSG * pFlowControlMsg,
+                        uint32_t & pMsgID);
 
     /* Disconnects the channel from the j2534 device. The object
      * is in an invalid state after calling this method */
@@ -220,9 +231,11 @@ public:
 
     // This should only be constructed internally.
     // Use J2534Device::connect
-    Channel(const J2534Ptr &j2534, const DevicePtr &device,
+    Channel(const J2534Ptr & j2534, const DevicePtr & device,
             uint32_t channel) noexcept
-        : j2534_(j2534), device_(device), channel_(channel) {}
+        : j2534_(j2534), device_(device), channel_(channel)
+    {
+    }
 
 private:
     J2534Ptr j2534_;
@@ -230,11 +243,12 @@ private:
     uint32_t channel_;
 };
 
-class Device : public std::enable_shared_from_this<Device> {
+class Device : public std::enable_shared_from_this<Device>
+{
 public:
     // This object should never be contructed by the client. Use
     // J2534::open instaed
-    Device(const J2534Ptr &j2534, uint32_t device) noexcept;
+    Device(const J2534Ptr & j2534, uint32_t device) noexcept;
     // Creates an invalid device
     Device() noexcept = default;
 
@@ -250,7 +264,7 @@ public:
                     uint32_t baudrate = 500000);
 
     Device(const Device &) = delete;
-    Device(Device &&dev) noexcept;
+    Device(Device && dev) noexcept;
 
     bool valid() const noexcept { return !!j2534_; }
 
@@ -262,7 +276,8 @@ private:
 };
 
 // TODO: Synchronize this all into one thread! (IMPORTANT!!!)
-class J2534 : public std::enable_shared_from_this<J2534> {
+class J2534 : public std::enable_shared_from_this<J2534>
+{
 public:
     // Initializes the interface by loading the DLL. May throw an exception
     void init();
@@ -271,7 +286,7 @@ public:
     bool initialized() const noexcept { return loaded_; }
 
     // Opens a J2534 device. If no device is connected, returns nullptr
-    DevicePtr open(const char *port = nullptr);
+    DevicePtr open(const char * port = nullptr);
 
     // Closes a  J2534 device
     void close(uint32_t device);
@@ -280,14 +295,15 @@ public:
     uint32_t connect(uint32_t device, Protocol protocol, uint32_t flags,
                      uint32_t baudrate);
 
-    void readMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+    void readMsgs(uint32_t channel, PASSTHRU_MSG * pMsg, uint32_t & pNumMsgs,
                   uint32_t timeout);
-    void writeMsgs(uint32_t channel, PASSTHRU_MSG *pMsg, uint32_t &pNumMsgs,
+    void writeMsgs(uint32_t channel, PASSTHRU_MSG * pMsg, uint32_t & pNumMsgs,
                    uint32_t timeout);
     void startMsgFilter(uint32_t channel, uint32_t type,
-                        const PASSTHRU_MSG *pMaskMsg,
-                        const PASSTHRU_MSG *pPatternMsg,
-                        const PASSTHRU_MSG *pFlowControlMsg, uint32_t &pMsgID);
+                        const PASSTHRU_MSG * pMaskMsg,
+                        const PASSTHRU_MSG * pPatternMsg,
+                        const PASSTHRU_MSG * pFlowControlMsg,
+                        uint32_t & pMsgID);
 
     // Disconnects a logical communication channel
     void disconnect(uint32_t channel);
@@ -300,23 +316,23 @@ public:
     Protocol protocols() const noexcept { return info_.protocols; }
 
     // Creates a J2534 interface. Must be initialized with init() before use.
-    static J2534Ptr create(Info &&info) noexcept;
+    static J2534Ptr create(Info && info) noexcept;
 
-    J2534(Info &&info) noexcept : info_(std::move(info)) {}
+    J2534(Info && info) noexcept : info_(std::move(info)) {}
 
     ~J2534() noexcept;
 
 private:
     Info info_;
 
-    void *hDll_{nullptr};
+    void * hDll_{nullptr};
 
     bool loaded_{false};
 
     // Loads the dll
     void load();
 
-    void *getProc(const char *proc);
+    void * getProc(const char * proc);
 
     PassThruOpen_t PassThruOpen{};
     PassThruClose_t PassThruClose{};

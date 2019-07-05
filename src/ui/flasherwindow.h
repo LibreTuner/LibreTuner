@@ -27,7 +27,8 @@
 
 #include "database/links.h"
 
-namespace lt {
+namespace lt
+{
 class Tune;
 using TunePtr = std::shared_ptr<Tune>;
 } // namespace lt
@@ -41,14 +42,15 @@ class QStackedWidget;
 /**
  * @todo write docs
  */
-class FlasherWindow : public QDialog {
+class FlasherWindow : public QDialog
+{
     Q_OBJECT
 public:
-    explicit FlasherWindow(QWidget *parent = nullptr);
+    explicit FlasherWindow(QWidget * parent = nullptr);
 
     virtual ~FlasherWindow() override;
 
-    void setTune(const lt::TunePtr &tune);
+    void setTune(const lt::TunePtr & tune);
 
 private slots:
     void nextClicked();
@@ -60,23 +62,23 @@ private:
     // Verifies form entries and enables or disables buttonFlash
     void verify();
 
-    QWidget *createSelectPage();
-    QWidget *createOptionPage();
+    QWidget * createSelectPage();
+    QWidget * createOptionPage();
 
     lt::TunePtr selectedTune_;
 
-    QPushButton *buttonFlash_;
-    QPushButton *buttonNext_;
-    QPushButton *buttonPrevious_;
-    QPushButton *buttonAdvanced_;
+    QPushButton * buttonFlash_;
+    QPushButton * buttonNext_;
+    QPushButton * buttonPrevious_;
+    QPushButton * buttonAdvanced_;
 
-    QComboBox *comboLink_;
-    AuthOptionsView *authOptions_;
-    QStackedWidget *stack_;
+    QComboBox * comboLink_;
+    AuthOptionsView * authOptions_;
+    QStackedWidget * stack_;
 
     LinksListModel linksList_;
 
-    FileSelectWidget *fileSelect_;
+    FileSelectWidget * fileSelect_;
 };
 
 #endif // FLASHWINDOW_H

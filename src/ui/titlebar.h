@@ -24,36 +24,37 @@
 
 class QPushButton;
 
-class TitleBar : public QWidget {
+class TitleBar : public QWidget
+{
     Q_OBJECT
 public:
-    explicit TitleBar(QWidget *window);
+    explicit TitleBar(QWidget * window);
 
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent * event) override;
 
-    QLabel *title_;
+    QLabel * title_;
 
     void setMinimizable(bool minimizable);
     void setMaximizable(bool maximizable);
 signals:
 
 public slots:
-    void setTitle(const QString &title);
+    void setTitle(const QString & title);
     void setMaximized(bool maximized);
 
 private:
-    QWidget *window_;
+    QWidget * window_;
 
-    QPushButton *restore_;
-    QPushButton *maximize_;
-    QPushButton *close_;
-    QPushButton *minimize_;
+    QPushButton * restore_;
+    QPushButton * maximize_;
+    QPushButton * close_;
+    QPushButton * minimize_;
 
     bool maximizable_ = true;
 
     // QObject interface
 public:
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+    virtual bool eventFilter(QObject * watched, QEvent * event) override;
 };
 
 #endif // TITLEBAR_H

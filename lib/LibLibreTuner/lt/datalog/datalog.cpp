@@ -18,26 +18,34 @@
 
 #include "datalog.h"
 
-namespace lt {
+namespace lt
+{
 
-bool DataLog::add(const Pid &pid, PidLogEntry entry) {
-    PidLog *log = pidLog(pid);
-    if (log == nullptr) {
+bool DataLog::add(const Pid & pid, PidLogEntry entry)
+{
+    PidLog * log = pidLog(pid);
+    if (log == nullptr)
+    {
         log = &addPid(pid);
     }
 
-    if (empty_) {
+    if (empty_)
+    {
         empty_ = false;
         beginTime_ = std::chrono::steady_clock::now();
     }
 
     log->entries.emplace_back(entry);
-    if (entry.time > maxTime_) {
+    if (entry.time > maxTime_)
+    {
         maxTime_ = entry.time;
     }
-    if (entry.value > maxValue_) {
+    if (entry.value > maxValue_)
+    {
         maxValue_ = entry.value;
-    } else if (entry.value < minValue_) {
+    }
+    else if (entry.value < minValue_)
+    {
         minValue_ = entry.value;
     }
 
@@ -45,22 +53,27 @@ bool DataLog::add(const Pid &pid, PidLogEntry entry) {
     return true;
 }
 
-PidLog *DataLog::pidLog(const Pid &pid) noexcept {
+PidLog * DataLog::pidLog(const Pid & pid) noexcept
+{
     auto it = logs_.find(pid.code);
-    if (it == logs_.end()) {
+    if (it == logs_.end())
+    {
         return nullptr;
     }
     return &it->second;
 }
 
-PidLog &DataLog::addPid(const Pid &pid) noexcept {
+PidLog & DataLog::addPid(const Pid & pid) noexcept
+{
     PidLog log{pid, {}};
     logs_.emplace(pid.code, std::move(log));
     return logs_.find(pid.code)->second;
 }
 
-bool DataLog::add(const Pid &pid, double value) {
-    if (empty_) {
+bool DataLog::add(const Pid & pid, double value)
+{
+    if (empty_)
+    {
         empty_ = false;
         beginTime_ = std::chrono::steady_clock::now();
     }

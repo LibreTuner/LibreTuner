@@ -23,9 +23,11 @@
 #include <string>
 #include <vector>
 
-namespace lt {
+namespace lt
+{
 
-struct DiagnosticCode {
+struct DiagnosticCode
+{
     uint16_t code;
 
     std::string codeString() const;

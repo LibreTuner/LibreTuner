@@ -24,23 +24,27 @@
 #include <string>
 #include <vector>
 
-namespace lt {
+namespace lt
+{
 
-class Checksum {
+class Checksum
+{
 public:
     Checksum(int offset, int size, uint32_t target)
-        : offset_(offset), size_(size), target_(target) {}
+        : offset_(offset), size_(size), target_(target)
+    {
+    }
 
     /* Adds a region modifiable for checksum computation */
     void addModifiable(int offset, int size);
 
     /* Corrects the checksum for the data using modifiable sections. */
-    virtual void correct(uint8_t *data, int size) const = 0;
+    virtual void correct(uint8_t * data, int size) const = 0;
 
     /* Returns the computed checksum. If length is too small,
      * returns 0 and sets ok to false.*/
-    virtual uint32_t compute(const uint8_t *data, int size,
-                             bool *ok = nullptr) const = 0;
+    virtual uint32_t compute(const uint8_t * data, int size,
+                             bool * ok = nullptr) const = 0;
 
     virtual ~Checksum();
 
@@ -54,29 +58,34 @@ protected:
 using ChecksumPtr = std::unique_ptr<Checksum>;
 
 /* Basic type checksum */
-class ChecksumBasic : public Checksum {
+class ChecksumBasic : public Checksum
+{
 public:
     ChecksumBasic(uint32_t offset, uint32_t size, uint32_t target)
-        : Checksum(offset, size, target) {}
+        : Checksum(offset, size, target)
+    {
+    }
 
-    uint32_t compute(const uint8_t *data, int size, bool *ok) const override;
+    uint32_t compute(const uint8_t * data, int size, bool * ok) const override;
 
-    void correct(uint8_t *data, int size) const override;
+    void correct(uint8_t * data, int size) const override;
 };
 
 /**
  * Manages ECU checksums
  */
-class Checksums {
+class Checksums
+{
 public:
     /* Adds a basic type checksum */
-    inline void add(ChecksumPtr &&checksum) {
+    inline void add(ChecksumPtr && checksum)
+    {
         checksums_.emplace_back(std::move(checksum));
     }
 
     /* Corrects the checksums for the data using modifiable sections.
      * Returns (false, errmsg) on failure and (true, "") on success. */
-    void correct(uint8_t *data, size_t size);
+    void correct(uint8_t * data, size_t size);
 
 private:
     std::vector<ChecksumPtr> checksums_;

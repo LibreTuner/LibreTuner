@@ -11,13 +11,17 @@
  * Runs a task in the background while updating Qt
  */
 template <typename T> class BackgroundTask;
-template <class R, class... Args> class BackgroundTask<R(Args...)> {
+template <class R, class... Args> class BackgroundTask<R(Args...)>
+{
 public:
     template <class F>
-    explicit BackgroundTask(F &&f) : task_(std::forward<F>(f)) {}
+    explicit BackgroundTask(F && f) : task_(std::forward<F>(f))
+    {
+    }
 
     // Executes the function
-    void operator()(Args &&... args) {
+    void operator()(Args &&... args)
+    {
         std::atomic<bool> complete{false};
         std::thread worker(
             [this, &complete](Args &&... args) {
@@ -26,7 +30,8 @@ public:
             },
             std::forward<Args>(args)...);
 
-        while (!complete) {
+        while (!complete)
+        {
             QApplication::processEvents(QEventLoop::WaitForMoreEvents);
         }
         worker.join();

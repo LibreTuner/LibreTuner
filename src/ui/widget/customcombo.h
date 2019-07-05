@@ -9,23 +9,24 @@ class QAbstractItemModel;
 
 class CustomComboProxy;
 
-class CustomCombo : public QWidget {
+class CustomCombo : public QWidget
+{
     Q_OBJECT
 public:
-    explicit CustomCombo(QWidget *parent = nullptr);
+    explicit CustomCombo(QWidget * parent = nullptr);
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(QAbstractItemModel * model);
 
-    void setValue(const QString &value);
+    void setValue(const QString & value);
     QString value();
 
 signals:
     void valueChanged();
 
 private:
-    QComboBox *combo_;
-    QLineEdit *line_;
-    CustomComboProxy *model_;
+    QComboBox * combo_;
+    QLineEdit * line_;
+    CustomComboProxy * model_;
 };
 
 #endif // LIBRETUNER_CUSTOMCOMBO_H

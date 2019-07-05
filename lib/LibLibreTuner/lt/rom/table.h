@@ -13,15 +13,14 @@ namespace lt
 
 // Provides a way to interface with the underlying data of many tables/axes
 // by using a common datatype.
-template<typename PresentedType>
-struct Entries
+template <typename PresentedType> struct Entries
 {
     virtual PresentedType get(int index) const noexcept = 0;
     virtual void set(int index, PresentedType value) noexcept = 0;
 
     // Serializes the entries into a byte array
     virtual std::vector<uint8_t> intoBytes(Endianness endianness) const
-    noexcept = 0;
+        noexcept = 0;
     virtual ~Entries() = default;
 };
 
@@ -49,13 +48,16 @@ private:
 public:
     EntriesImpl(std::vector<T> && entries) : entries_(std::move(entries)) {}
 
-    PresentedType get(int index) const noexcept override { return static_cast<PresentedType>(entries_[index]); }
+    PresentedType get(int index) const noexcept override
+    {
+        return static_cast<PresentedType>(entries_[index]);
+    }
     void set(int index, PresentedType value) noexcept
     {
         entries_[index] = static_cast<T>(value);
     }
     std::vector<uint8_t> intoBytes(Endianness endianness) const
-    noexcept override
+        noexcept override
     {
         switch (endianness)
         {
@@ -74,7 +76,9 @@ public:
 template <typename PresentedType> class BasicAxis
 {
 private:
-    explicit BasicAxis(std::unique_ptr<Entries<PresentedType>> entries, int size) : entries_(std::move(entries)), size_(size)
+    explicit BasicAxis(std::unique_ptr<Entries<PresentedType>> entries,
+                       int size)
+        : entries_(std::move(entries)), size_(size)
     {
     }
 
@@ -82,19 +86,18 @@ public:
     class Builder
     {
     public:
-        template<typename T>
-        Builder & setEntries(std::vector<T> && entries)
+        template <typename T> Builder & setEntries(std::vector<T> && entries)
         {
             size_ = entries.size();
-            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(std::move(entries));
+            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
+                std::move(entries));
             return *this;
         }
 
         /* Creates a set of linear entries. A linear axis
          * uses the form y = mx + b where m is the step, b
          * is the start, and x is the index. */
-        template<typename T>
-        Builder & setLinear(T start, T step, int size)
+        template <typename T> Builder & setLinear(T start, T step, int size)
         {
             std::vector<T> entries;
             for (int i = 0; i < size; ++i, start += step)
@@ -106,9 +109,11 @@ public:
         BasicAxis<PresentedType> build()
         {
             if (!entries_)
-                throw std::runtime_error("attempt to build axis without setting entries");
+                throw std::runtime_error(
+                    "attempt to build axis without setting entries");
             return BasicAxis<PresentedType>(std::move(entries_), size_);
         }
+
     private:
         std::unique_ptr<Entries<PresentedType>> entries_;
         int size_;
@@ -204,9 +209,7 @@ public:
 
     /* Returns true if the table contains a single row
      * (height = 1) */
-    inline bool isOneDimensional() const noexcept{
-        return height_ == 1;
-    }
+    inline bool isOneDimensional() const noexcept { return height_ == 1; }
 
     // Serializes entries into bytes
     std::vector<uint8_t> intoBytes(Endianness endianness) const noexcept
@@ -224,8 +227,9 @@ private:
     bool dirty_{false};
 
     BasicTable(std::string name, Bounds<PresentedType> bounds,
-               std::unique_ptr<Entries<PresentedType>> && entries, int width, int height,
-               AxisTypePtr && xAxis, AxisTypePtr && yAxis, double scale)
+               std::unique_ptr<Entries<PresentedType>> && entries, int width,
+               int height, AxisTypePtr && xAxis, AxisTypePtr && yAxis,
+               double scale)
         : name_(std::move(name)), bounds_(std::move(bounds)),
           entries_(std::move(entries)), width_(width), height_(height),
           xAxis_(std::move(xAxis)), yAxis_(std::move(yAxis)), scale_(scale)
@@ -268,7 +272,8 @@ public:
         template <typename T>
         Builder & setEntries(std::vector<T> && entries) noexcept
         {
-            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(std::move(entries));
+            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
+                std::move(entries));
             return *this;
         }
 
@@ -276,8 +281,8 @@ public:
         template <typename T, typename It>
         inline Builder & operator()(It begin, It end, Endianness endianness)
         {
-            return setEntries(fromBytes<T>(std::forward<It>(begin), std::forward<It>(end),
-                      endianness));
+            return setEntries(fromBytes<T>(std::forward<It>(begin),
+                                           std::forward<It>(end), endianness));
         }
 
         inline Builder & setXAxis(AxisTypePtr xAxis) noexcept

@@ -13,18 +13,21 @@
 
 #ifdef WITH_SOCKETCAN
 
-namespace lt {
-namespace network {
+namespace lt
+{
+namespace network
+{
 
-class SocketCanReceiver {
+class SocketCanReceiver
+{
 public:
-    SocketCanReceiver(os::Socket &socket) : socket_(socket) {}
+    SocketCanReceiver(os::Socket & socket) : socket_(socket) {}
 
     ~SocketCanReceiver();
 
     // Returns the first message in the buffer and waits if empty.
     // If the worker thread has thrown an exception, passes it here.
-    bool recv(CanMessage &message, std::chrono::milliseconds timeout);
+    bool recv(CanMessage & message, std::chrono::milliseconds timeout);
 
     void start();
     void stop();
@@ -32,7 +35,7 @@ public:
     void clearBuffer();
 
 private:
-    os::Socket &socket_;
+    os::Socket & socket_;
 
     void work();
 
@@ -46,7 +49,8 @@ private:
     CanMessageBuffer buffer_;
 };
 
-class SocketCan : public Can {
+class SocketCan : public Can
+{
 public:
     SocketCan(SocketCan &) = delete;
     SocketCan(const SocketCan &) = delete;
@@ -54,14 +58,14 @@ public:
 
     ~SocketCan() override;
 
-    SocketCan(const std::string &ifname);
+    SocketCan(const std::string & ifname);
 
     // Can interface
 public:
-    virtual void send(const CanMessage &message) override;
+    virtual void send(const CanMessage & message) override;
 
     /* Returns false if the timeout expired and no message was read. */
-    virtual bool recv(CanMessage &message,
+    virtual bool recv(CanMessage & message,
                       std::chrono::milliseconds timeout) override;
 
     virtual void clearBuffer() noexcept override;

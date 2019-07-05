@@ -2,7 +2,8 @@
 
 #include "logger.h"
 
-PluginState::PluginState() {
+PluginState::PluginState()
+{
     // Open libraries
     lua_.open_libraries(sol::lib::base, sol::lib::package, sol::lib::coroutine,
                         sol::lib::string, sol::lib::os, sol::lib::math,
@@ -10,10 +11,14 @@ PluginState::PluginState() {
                         sol::lib::io);
 }
 
-void PluginState::loadFile(const std::string &filename) {
-    try {
+void PluginState::loadFile(const std::string & filename)
+{
+    try
+    {
         lua_.safe_script_file(filename);
-    } catch (const sol::error &err) {
+    }
+    catch (const sol::error & err)
+    {
         Logger::warning("Error loading " + filename + ": " + err.what());
     }
 }

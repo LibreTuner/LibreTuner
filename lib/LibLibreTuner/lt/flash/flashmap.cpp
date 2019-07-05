@@ -22,19 +22,25 @@
 
 #include <cassert>
 
-namespace lt {
+namespace lt
+{
 
-FlashMap::FlashMap(const std::vector<uint8_t> &data, std::size_t offset)
-    : data_(data), offset_(offset) {}
+FlashMap::FlashMap(const std::vector<uint8_t> & data, std::size_t offset)
+    : data_(data), offset_(offset)
+{
+}
 
-FlashMap::FlashMap(std::vector<uint8_t> &&data, std::size_t offset)
-    : data_(std::move(data)), offset_(offset) {}
+FlashMap::FlashMap(std::vector<uint8_t> && data, std::size_t offset)
+    : data_(std::move(data)), offset_(offset)
+{
+}
 
-FlashMap FlashMap::fromTune(Tune &tune) {
-    const lt::RomPtr &rom = tune.base();
+FlashMap FlashMap::fromTune(Tune & tune)
+{
+    const lt::RomPtr & rom = tune.base();
 
-    const lt::ModelPtr &model = rom->model();
-    const lt::Platform &platform = model->platform;
+    const lt::ModelPtr & model = rom->model();
+    const lt::Platform & platform = model->platform;
 
     std::size_t offset = platform.flashOffset;
 
@@ -42,9 +48,11 @@ FlashMap FlashMap::fromTune(Tune &tune) {
                               rom->data() + rom->size() - offset);
 
     // Try each table
-    for (const auto &[id, definition] : model->tables) {
-        Table *table = tune.getTable(id, false);
-        if (table == nullptr) {
+    for (const auto & [id, definition] : model->tables)
+    {
+        Table * table = tune.getTable(id, false);
+        if (table == nullptr)
+        {
             continue;
         }
 

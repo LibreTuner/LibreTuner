@@ -6,7 +6,8 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 
-DataLogView::DataLogView(QWidget *parent) : QWidget(parent) {
+DataLogView::DataLogView(QWidget * parent) : QWidget(parent)
+{
     plot_ = new QCustomPlot;
 
     plot_->legend->setVisible(true);
@@ -16,16 +17,18 @@ DataLogView::DataLogView(QWidget *parent) : QWidget(parent) {
 
     // Set maximum range
     connect(plot_->xAxis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged),
-            this, [this](const QCPRange &newRange) {
-                if (dataLog_) {
+            this, [this](const QCPRange & newRange) {
+                if (dataLog_)
+                {
                     plot_->xAxis->setRange(
                         newRange.bounded(0, dataLog_->maxTime() / 1000.0));
                 }
             });
 
     connect(plot_->yAxis, qOverload<const QCPRange &>(&QCPAxis::rangeChanged),
-            this, [this](const QCPRange &newRange) {
-                if (dataLog_) {
+            this, [this](const QCPRange & newRange) {
+                if (dataLog_)
+                {
                     plot_->yAxis->setRange(
                         newRange.bounded(dataLog_->minValue() - 5.0,
                                          dataLog_->maxValue() + 5.0));
@@ -41,7 +44,8 @@ DataLogView::DataLogView(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-QCPGraph *DataLogView::getOrCreateGraph(const lt::Pid &pid) noexcept {
+QCPGraph * DataLogView::getOrCreateGraph(const lt::Pid & pid) noexcept
+{
     static const QColor plotColors[] = {
         Qt::red,       Qt::green,    Qt::blue,        Qt::magenta,
         Qt::yellow,    Qt::gray,     Qt::cyan,        Qt::darkRed,
@@ -50,8 +54,9 @@ QCPGraph *DataLogView::getOrCreateGraph(const lt::Pid &pid) noexcept {
     };
 
     auto it = graphs_.find(pid.code);
-    if (it == graphs_.end()) {
-        QCPGraph *graph = plot_->addGraph();
+    if (it == graphs_.end())
+    {
+        QCPGraph * graph = plot_->addGraph();
         graph->setName(QString::fromStdString(pid.name));
         graph->setPen(QPen(plotColors[graphs_.size() % sizeof(plotColors)]));
         graphs_.emplace(pid.code, graph);
@@ -60,16 +65,18 @@ QCPGraph *DataLogView::getOrCreateGraph(const lt::Pid &pid) noexcept {
     return it->second;
 }
 
-void DataLogView::onAdded(const lt::PidLog &log,
-                          const lt::PidLogEntry &entry) noexcept {
+void DataLogView::onAdded(const lt::PidLog & log,
+                          const lt::PidLogEntry & entry) noexcept
+{
     QMetaObject::invokeMethod(
         this,
         [this, log, entry] {
-            QCPGraph *graph = getOrCreateGraph(log.pid);
+            QCPGraph * graph = getOrCreateGraph(log.pid);
             graph->addData(static_cast<double>(entry.time) / 1000.0,
                            entry.value);
 
-            if (checkLive_->isChecked()) {
+            if (checkLive_->isChecked())
+            {
                 plot_->xAxis->setRange(dataLog_->maxTime() / 1000.0, 8,
                                        Qt::AlignRight);
             }
@@ -79,18 +86,20 @@ void DataLogView::onAdded(const lt::PidLog &log,
         Qt::QueuedConnection);
 }
 
-void DataLogView::setDataLog(lt::DataLogPtr dataLog) {
+void DataLogView::setDataLog(lt::DataLogPtr dataLog)
+{
     dataLog_ = std::move(dataLog);
     graphs_.clear();
     plot_->clearGraphs();
 
-    if (!dataLog_) {
+    if (!dataLog_)
+    {
         connection_.reset();
         return;
     }
 
     connection_ = dataLog_->onAdd(
-        [this](const lt::PidLog &log, const lt::PidLogEntry &entry) {
+        [this](const lt::PidLog & log, const lt::PidLogEntry & entry) {
             onAdded(log, entry);
         });
 }

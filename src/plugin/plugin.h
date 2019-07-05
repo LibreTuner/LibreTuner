@@ -10,22 +10,23 @@ class PluginState;
 /**
  * @todo write docs
  */
-class Plugin {
+class Plugin
+{
 public:
     // Loads a plugin. Throws an exception on failure
-    Plugin(PluginState &state, const std::string &path);
+    Plugin(PluginState & state, const std::string & path);
 
-    static void loadLibrary(sol::state &state);
+    static void loadLibrary(sol::state & state);
 
     // API
-    static void l_register(const std::string &name);
+    static void l_register(const std::string & name);
 
     // Prevent copies
     Plugin(const Plugin &) = delete;
-    Plugin &operator=(const Plugin &) = delete;
+    Plugin & operator=(const Plugin &) = delete;
 
 private:
-    PluginState *state_;
+    PluginState * state_;
     std::string name_;
 };
 

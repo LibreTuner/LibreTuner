@@ -5,15 +5,20 @@
 #include <stdexcept>
 #include <vector>
 
-namespace lt {
+namespace lt
+{
 
-template <class Vector> class VectorSource {
+template <class Vector> class VectorSource
+{
 public:
-    VectorSource(const Vector &vector)
-        : vector_(vector), it_(vector_.begin()) {}
+    VectorSource(const Vector & vector) : vector_(vector), it_(vector_.begin())
+    {
+    }
 
-    void read(uint8_t *d, int length) {
-        if (std::distance(it_, vector_.end()) < length) {
+    void read(uint8_t * d, int length)
+    {
+        if (std::distance(it_, vector_.end()) < length)
+        {
             throw std::runtime_error("Cannot deserialize " +
                                      std::to_string(length) +
                                      " bytes from vector; reaches EOF");
@@ -23,7 +28,7 @@ public:
     }
 
 private:
-    const Vector &vector_;
+    const Vector & vector_;
     typename Vector::const_iterator it_;
 };
 

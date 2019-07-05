@@ -1,5 +1,5 @@
 
-namespace lt {
-
+namespace lt
+{
 
 } // namespace lt

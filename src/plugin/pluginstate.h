@@ -9,12 +9,13 @@
 /**
  * @todo write docs
  */
-class PluginState {
+class PluginState
+{
 public:
     PluginState();
 
     // Loads a script from a file
-    void loadFile(const std::string &filename);
+    void loadFile(const std::string & filename);
 
 private:
     std::vector<Plugin> plugins_;

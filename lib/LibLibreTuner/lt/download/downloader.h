@@ -25,15 +25,19 @@
 #include <memory>
 #include <vector>
 
-namespace lt {
-namespace download {
+namespace lt
+{
+namespace download
+{
 
-struct Options {
+struct Options
+{
     auth::Options auth;
     std::size_t size;
 };
 
-class Downloader : public AsyncRoutine {
+class Downloader : public AsyncRoutine
+{
 public:
     virtual ~Downloader() = default;
 

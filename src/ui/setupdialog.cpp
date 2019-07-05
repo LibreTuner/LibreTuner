@@ -12,11 +12,12 @@
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
 
-SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
+SetupDialog::SetupDialog(QWidget * parent) : QDialog(parent)
+{
     setWindowTitle(tr("LibreTuner - Initial Setup"));
-    auto *layout = new QVBoxLayout;
+    auto * layout = new QVBoxLayout;
 
-    auto *formLayout = new QFormLayout;
+    auto * formLayout = new QFormLayout;
     comboPlatforms_ = new QComboBox;
     comboPlatforms_->setItemDelegate(new QStyledItemDelegate());
     comboPlatforms_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -29,7 +30,7 @@ SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
 
     layout->addLayout(formLayout);
 
-    auto *buttonFinish = new QPushButton(tr("Finish"));
+    auto * buttonFinish = new QPushButton(tr("Finish"));
     connect(buttonFinish, &QPushButton::clicked, [this]() { close(); });
 
     layout->addWidget(buttonFinish);
@@ -37,30 +38,36 @@ SetupDialog::SetupDialog(QWidget *parent) : QDialog(parent) {
     setLayout(layout);
 }
 
-void SetupDialog::setDefinitionModel(QAbstractItemModel *model) {
+void SetupDialog::setDefinitionModel(QAbstractItemModel * model)
+{
     comboPlatforms_->setModel(model);
 }
 
 Q_DECLARE_METATYPE(definition::MainPtr);
 
-definition::MainPtr SetupDialog::platform() {
+definition::MainPtr SetupDialog::platform()
+{
     QVariant var = comboPlatforms_->currentData(Qt::UserRole);
-    if (!var.canConvert<definition::MainPtr>()) {
+    if (!var.canConvert<definition::MainPtr>())
+    {
         return nullptr;
     }
 
     return var.value<definition::MainPtr>();
 }
 
-void SetupDialog::setDatalinksModel(QAbstractItemModel *model) {
+void SetupDialog::setDatalinksModel(QAbstractItemModel * model)
+{
     comboDatalinks_->setModel(model);
 }
 
 Q_DECLARE_METATYPE(datalink::Link *);
 
-datalink::Link *SetupDialog::datalink() {
+datalink::Link * SetupDialog::datalink()
+{
     QVariant var = comboDatalinks_->currentData(Qt::UserRole);
-    if (!var.canConvert<datalink::Link *>()) {
+    if (!var.canConvert<datalink::Link *>())
+    {
         return nullptr;
     }
 

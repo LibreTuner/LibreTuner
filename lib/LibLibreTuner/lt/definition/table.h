@@ -3,27 +3,32 @@
 
 #include "../support/types.h"
 #include <string>
-#include <variant>
 #include <utility>
+#include <variant>
 
-namespace lt {
+namespace lt
+{
 
-enum class AxisType {
+enum class AxisType
+{
     Linear,
     Memory,
 };
 
-struct LinearAxisDefinition {
+struct LinearAxisDefinition
+{
     double start;
     double increment;
     int size;
 };
 
-struct MemoryAxisDefinition {
+struct MemoryAxisDefinition
+{
     int size;
 };
 
-struct AxisDefinition {
+struct AxisDefinition
+{
     std::string name;
     std::string id;
     DataType dataType;
@@ -36,7 +41,8 @@ struct AxisDefinition {
  * e.g. Mazdaspeed3/6/CX-7 would inherit from a base
  * MZR-DISI definition. This would symplify the current system by
  * eliminating the distinction in models and platforms. */
-struct TableDefinition {
+struct TableDefinition
+{
     std::string id;
     std::string name;
     std::string description;
@@ -54,7 +60,8 @@ struct TableDefinition {
     // Offsets only show up in models
     std::optional<int> offset;
 
-    inline int byteSize() const noexcept {
+    inline int byteSize() const noexcept
+    {
         return dataTypeSize(storedDataType) * width * height;
     }
 };

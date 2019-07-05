@@ -28,16 +28,17 @@
 #include <QStyleOption>
 #include <QVBoxLayout>
 
-RomWidget::RomWidget(const Rom &rom, QWidget *parent)
-    : QWidget(parent), romId_(rom) {
-    auto *vlayout = new QVBoxLayout(this);
-    auto *hlayout = new QHBoxLayout();
-    auto *buttonLayout = new QVBoxLayout();
+RomWidget::RomWidget(const Rom & rom, QWidget * parent)
+    : QWidget(parent), romId_(rom)
+{
+    auto * vlayout = new QVBoxLayout(this);
+    auto * hlayout = new QHBoxLayout();
+    auto * buttonLayout = new QVBoxLayout();
 
     label_ = new QLabel(QString::fromStdString(rom.name), this);
     label_->setAlignment(Qt::AlignCenter);
 
-    QLabel *icon = new QLabel();
+    QLabel * icon = new QLabel();
     icon->setPixmap(QPixmap(":/icons/rom-file.png"));
     vlayout->addWidget(label_);
     vlayout->addLayout(hlayout);
@@ -59,7 +60,8 @@ RomWidget::RomWidget(const Rom &rom, QWidget *parent)
     setAutoFillBackground(true);
 }
 
-void RomWidget::paintEvent(QPaintEvent *event) {
+void RomWidget::paintEvent(QPaintEvent * event)
+{
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
@@ -68,9 +70,11 @@ void RomWidget::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
 }
 
-void RomWidget::createTuneClicked() {
-    const RomMeta *rom = RomStore::get()->fromId(romId_);
-    if (rom == nullptr) {
+void RomWidget::createTuneClicked()
+{
+    const RomMeta * rom = RomStore::get()->fromId(romId_);
+    if (rom == nullptr)
+    {
         Logger::warning("ROM no longer exists");
         // We need not return here because CreateTuneDialog can take a nullptr
         // in its constructor
