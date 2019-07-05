@@ -23,6 +23,8 @@
 #include "logger.h"
 #include "uiutil.h"
 
+#include "../database/definitions.h"
+
 #include "authoptionsview.h"
 
 #include <QComboBox>
@@ -44,7 +46,7 @@ DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("LibreTuner - Download"));
 
     comboPlatform_ = new QComboBox;
-    comboPlatform_->setModel(&LT()->definitions());
+    comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
 
     lineName_ = new QLineEdit;
     lineId_ = new QLineEdit;
@@ -102,7 +104,7 @@ DownloadWindow::DownloadWindow(QWidget *parent) : QDialog(parent) {
 
 void DownloadWindow::platformChanged(int /*index*/) {
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
-    if (!var.canConvert<const lt::PlatformPtr &>()) {
+    if (!var.canConvert<lt::PlatformPtr>()) {
         return;
     }
 
@@ -154,10 +156,16 @@ void DownloadWindow::download() {
                 }
                 auto data = downloader->data();
                 try {
-                    LT()->roms().addRom(pLink.platform(),
-                                        lineId_->text().toStdString(),
-                                        lineName_->text().toStdString(),
-                                        data.first, data.second);
+                    lt::ModelPtr model = pLink.platform().identify(data.first, data.second);
+                    if (!model)
+                        throw std::runtime_error("Could not identify calibration");
+
+                    lt::Rom rom(model);
+                    rom.setData(std::vector<uint8_t>(data.first, data.first + data.second));
+                    rom.setName(lineName_->text().toStdString());
+                    rom.setId(lineId_->text().toStdString());
+                    LT()->roms().saveRom(rom);
+
                     QMessageBox(QMessageBox::Information, "Download Finished",
                                 "ROM downloaded successfully")
                         .exec();

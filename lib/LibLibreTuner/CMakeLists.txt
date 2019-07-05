@@ -10,6 +10,7 @@ find_package(Threads REQUIRED)
 
 add_subdirectory(lib/cparse)
 add_subdirectory(lib/serial)
+add_subdirectory(lib/yaml)
 
 # Options
 option(BUILD_TESTS "Build tests" OFF)
@@ -64,7 +65,6 @@ file(GLOB_RECURSE SESSION_SOURCES ${SOURCE_DIR}/session/*.cpp)
 file(GLOB_RECURSE DATALOG_SOURCES ${SOURCE_DIR}/datalog/*.cpp)
 file(GLOB_RECURSE SERIALIZE_SOURCES ${SOURCE_DIR}/serialize/*.cpp)
 
-
 set(NETWORK_HEADERS
     ${NETWORK_CAN_HEADERS}
     ${NETWORK_ISOTP_HEADERS}
@@ -76,8 +76,6 @@ set(NETWORK_SOURCES
     ${NETWORK_ISOTP_SOURCES}
     ${NETWORK_UDS_SOURCES}
 	${NETWORK_COMMAND_SOURCES})
-
-
 
 set(HEADERS
     ${ROOT_HEADERS}
@@ -93,9 +91,8 @@ set(HEADERS
 	${ROM_HEADERS}
 	${LINK_HEADERS}
 	${SESSION_HEADERS}
-	${DATALOG_HEADERS}
-	${SERIALIZE_HEADERS})
-    
+	${DATALOG_HEADERS})
+
 set(SOURCES
     ${ROOT_SOURCES}
     ${NETWORK_SOURCES}
@@ -110,13 +107,12 @@ set(SOURCES
 	${ROM_SOURCES}
 	${LINK_SOURCES}
 	${SESSION_SOURCES}
-	${DATALOG_SOURCES}
-	${SERIALIZE_SOURCES})
+	${DATALOG_SOURCES})
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial)
-target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial yaml-cpp)
+target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set warnings

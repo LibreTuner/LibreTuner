@@ -19,42 +19,43 @@
 #ifndef ROM_H
 #define ROM_H
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "../definition/model.h"
+#include "../definition/platform.h"
 #include "table.h"
 
-namespace lt {
+namespace lt
+{
 
-/* ROM Metadata */
-class Rom {
+class Rom
+{
 public:
     explicit Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
 
-    const std::string &name() const { return name_; }
-    const ModelPtr &model() const { return model_; }
-    const std::string &id() const { return id_; }
+    inline const std::string & name() const noexcept { return name_; }
+    inline const ModelPtr & model() const noexcept { return model_; }
+    inline const std::string & id() const noexcept { return id_; }
+    inline Endianness  endianness() const noexcept { return model_->platform.endianness; }
 
-    void setId(const std::string &id) { id_ = id; }
-    void setName(const std::string &name) { name_ = name; }
-    void setModel(const ModelPtr &model) { model_ = model; }
+    void setId(const std::string & id) { id_ = id; }
+    void setName(const std::string & name) { name_ = name; }
+    void setModel(const ModelPtr & model) { model_ = model; }
 
-    inline const uint8_t *data() const noexcept { return data_.data(); }
+    inline const uint8_t * data() const noexcept { return data_.data(); }
     inline int size() const noexcept { return static_cast<int>(data_.size()); }
 
+    std::vector<uint8_t>::iterator begin() noexcept { return data_.begin(); }
+    std::vector<uint8_t>::iterator end() noexcept { return data_.end(); }
+    std::vector<uint8_t>::const_iterator cbegin() const noexcept { return data_.cbegin(); }
+    std::vector<uint8_t>::const_iterator cend() const noexcept { return data_.cend(); }
+
     // Sets the ROM data
-    void setData(std::vector<uint8_t> &&data) { data_ = std::move(data); }
-
-    std::vector<uint8_t> getRawTableData(std::size_t id) const;
-    std::vector<uint8_t> getRawTableData(const ModelTable *modTable) const;
-
-    TablePtr baseTable(std::size_t tableId) const;
-
-    TablePtr deserializeTable(std::size_t tableId, const uint8_t *data,
-                              std::size_t length) const;
+    void setData(std::vector<uint8_t> && data) { data_ = std::move(data); }
 
 private:
     std::string name_;
@@ -67,16 +68,18 @@ private:
     std::vector<uint8_t> data_;
 };
 using RomPtr = std::shared_ptr<Rom>;
+using WeakRomPtr = std::weak_ptr<Rom>;
 
-using TableVector = std::vector<std::unique_ptr<Table>>;
+using TableMap = std::unordered_map<std::string, std::unique_ptr<Table>>;
 
-class Tune {
+class Tune
+{
 public:
     explicit Tune(RomPtr rom) : base_(std::move(rom)) { assert(base_); }
 
-    inline const std::string &name() const noexcept { return name_; }
-    inline const std::string &id() const noexcept { return id_; }
-    inline const RomPtr &base() const noexcept { return base_; }
+    inline const std::string & name() const noexcept { return name_; }
+    inline const std::string & id() const noexcept { return id_; }
+    inline const RomPtr & base() const noexcept { return base_; }
 
     // Returns true if any table is dirty
     bool dirty() const noexcept;
@@ -84,33 +87,79 @@ public:
     // Clears dirty bit of all tables
     void clearDirty() noexcept;
 
-    void setId(const std::string &id) { id_ = id; }
-    void setName(const std::string &name) { name_ = name; }
-    void setBase(const RomPtr &rom) { base_ = rom; }
+    void setId(const std::string & id) { id_ = id; }
+    void setName(const std::string & name) { name_ = name; }
+    void setBase(const RomPtr & rom) { base_ = rom; }
 
     // Gets table by id. Returns nullptr if the table does not exist
     // If `create` is true and the table has not been initialized, creates
     // the table from the ROM data and definitions.
-    Table *getTable(std::size_t id, bool create = true);
+    Table * getTable(const std::string & id, bool create = true);
 
-    Table *setTable(std::size_t id, const uint8_t *data, std::size_t length);
+    Table * setTable(const std::string & id, const uint8_t * data,
+                     std::size_t length);
 
-    TableAxisPtr getAxis(const std::string &id, bool create = true);
+    AxisPtr getAxis(const std::string & id, bool create = true);
 
-    inline TableVector &tables() noexcept { return tables_; }
-    inline const TableVector &tables() const noexcept { return tables_; }
+    inline TableMap & tables() noexcept { return tables_; }
+    inline const TableMap & tables() const noexcept { return tables_; }
+
+    inline Endianness endianness() const noexcept { return base_->endianness(); }
+
+    TablePtr deserializeTable(const TableDefinition & def, const uint8_t * data,
+                              std::size_t length);
 
 private:
     std::string name_;
 
     RomPtr base_;
-    TableVector tables_;
+    TableMap tables_;
 
-    std::unordered_map<std::string, TableAxisPtr> axes_;
+    std::unordered_map<std::string, AxisPtr> axes_;
 
     std::string id_;
 };
 using TunePtr = std::shared_ptr<Tune>;
+
+class Platforms;
+
+/* Manages saving and loading of ROMs and tunes from files.
+ * `FileRomDatabase` loads and stores ROMs in a specified
+ * directory. */
+class FileRomDatabase
+{
+public:
+    // Initializes base path for ROM storage.
+    FileRomDatabase(std::filesystem::path base,
+                    const Platforms & platforms)
+        : base_(base), platforms_(std::move(platforms))
+    {
+    }
+
+    /* Loads a ROM by id. If the ROM is cached, it will be returned.
+     * Otherwise, the directory is searched and if the ROM cannot
+     * be found, RomPtr() is returned. If the ROM was found but deserialization
+     * fails, throws an exception. */
+    RomPtr getRom(const std::string & id);
+
+    /* Saves ROM to file. Throws an exception if the ROM could not be saved
+     * (i.e. invalid id or a ROM with the id already exists) */
+    void saveRom(const Rom &rom);
+
+    /* Loads tune from a path. Returns a null pointer if the path does not
+     * exist. Throws an exception if it cannot be deserialized or the base
+     * cannot be found. */
+    TunePtr loadTune(const std::filesystem::path & path);
+
+    /* Saves a tune to a file. Throws an exception if serialization failed or
+     * the file couldn't be opened. */
+    void saveTune(const Tune &tune, std::filesystem::path & path);
+
+private:
+    std::filesystem::path base_;
+    std::unordered_map<std::string, WeakRomPtr> cache_;
+    const Platforms & platforms_;
+};
 
 } // namespace lt
 

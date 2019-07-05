@@ -28,10 +28,7 @@
 
 #include <memory>
 
-// intolib rewrite stuff
-#include "database/definitions.h"
 #include "database/links.h"
-#include "database/roms.h"
 
 #include "lt/link/platformlink.h"
 
@@ -42,55 +39,54 @@
 class Tune;
 class TuneData;
 
-class LibreTuner : public QApplication {
+class LibreTuner : public QApplication
+{
     Q_OBJECT
 
     // intolib rewrite stuff
 public:
-    LibreTuner(int &argc, char *argv[]);
+    LibreTuner(int & argc, char * argv[]);
 
     ~LibreTuner() override;
 
-    /* Returns the global LibreTune object */
-    static LibreTuner *get();
+    /* Returns the global LibreTuner object */
+    static LibreTuner * get();
 
-    inline const std::filesystem::path &rootPath() const noexcept {
+    inline const std::filesystem::path & rootPath() const noexcept
+    {
         return rootPath_;
     }
 
-    inline const Definitions &definitions() const noexcept {
-        return definitions_;
+    inline const lt::Platforms & definitions() const noexcept
+    {
+        return platforms_;
     }
-    inline Definitions &definitions() noexcept { return definitions_; }
+    inline lt::Platforms & definitions() noexcept { return platforms_; }
 
-    inline const Roms &roms() const noexcept { return roms_; }
-    inline Roms &roms() noexcept { return roms_; }
+    inline const lt::FileRomDatabase & roms() const noexcept { return roms_; }
+    inline lt::FileRomDatabase & roms() noexcept { return roms_; }
 
-    inline const Links &links() const noexcept { return links_; }
-    inline Links &links() noexcept { return links_; }
+    inline const Links & links() const noexcept { return links_; }
+    inline Links & links() noexcept { return links_; }
 
-    /* Returns the current platform or nullptr if one is not selected */
-    const lt::PlatformPtr &platform() const { return currentPlatform_; }
-    void setPlatform(const lt::PlatformPtr &platform);
+    /* Returns the current platform or nullptr if none is selected */
+    lt::PlatformPtr platform() const { return currentPlatform_; }
+    void setPlatform(lt::PlatformPtr platform);
 
     /* Returns the selected datalink or nullptr if not is not selected */
-    lt::DataLink *datalink() const { return currentDatalink_; }
-    void setDatalink(lt::DataLink *link);
+    lt::DataLink * datalink() const { return currentDatalink_; }
+    void setDatalink(lt::DataLink * link);
 
     lt::PlatformLink platformLink() const;
 
-    lt::TunePtr openTune(const std::filesystem::path &path) const;
-    void saveTune(const lt::Tune &tune,
-                  const std::filesystem::path &path) const;
-
 private:
-    Definitions definitions_;
     std::filesystem::path rootPath_;
+    lt::Platforms platforms_;
 
-    Roms roms_;
+    lt::FileRomDatabase roms_;
     Links links_;
 
-    lt::DataLink *currentDatalink_{nullptr};
+    lt::DataLink * currentDatalink_{nullptr};
     lt::PlatformPtr currentPlatform_;
 
     // Legacy stuff
@@ -110,12 +106,13 @@ public:
     /* Attempts to open a tune. Shows an error dialog on failure and returns
      * nullptr. */
     static std::shared_ptr<TuneData>
-    openTune(const std::shared_ptr<Tune> &tune);
+    openTune(const std::shared_ptr<Tune> & tune);
 
     /* Open tune flasher */
-    void flashTune(const std::shared_ptr<TuneData> &tune);
+    void flashTune(const std::shared_ptr<TuneData> & tune);
 
-    inline const DtcDescriptions &dtcDescriptions() const noexcept {
+    inline const DtcDescriptions & dtcDescriptions() const noexcept
+    {
         return dtcDescriptions_;
     }
 
@@ -123,7 +120,7 @@ public:
     void load_datalinks();
 
     /* Returns the log */
-    Log &log() { return log_; }
+    Log & log() { return log_; }
 
     /* Runs the setup dialog */
     void setup();
@@ -131,7 +128,7 @@ public:
     void saveLinks();
 
 private:
-    MainWindow *mainWindow_;
+    MainWindow * mainWindow_;
     Log log_;
     DtcDescriptions dtcDescriptions_;
 

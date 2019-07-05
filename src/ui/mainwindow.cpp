@@ -53,11 +53,13 @@
 #include <QStatusBar>
 #include <QWindowStateChangeEvent>
 
+#include <database/definitions.h>
 #include <future>
 #include <lt/link/datalink.h>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), linksList_(LT()->links()) {
+MainWindow::MainWindow(QWidget * parent)
+    : QMainWindow(parent), linksList_(LT()->links())
+{
     resize(QSize(1100, 630));
 
     setWindowTitle("LibreTuner");
@@ -86,37 +88,45 @@ MainWindow::MainWindow(QWidget *parent)
     loadSettings();
 }
 
-void MainWindow::saveTune(bool newPath) {
-    if (!tune_) {
+void MainWindow::saveTune(bool newPath)
+{
+    if (!tune_)
         return;
-    }
 
-    if (tunePath_.empty() || newPath) {
+    if (tunePath_.empty() || newPath)
+    {
         QString qPath = QFileDialog::getSaveFileName(
             this, tr("Save tune"), QString(), tr("Tune file (*.ltt)"));
-        if (qPath.isNull()) {
+        if (qPath.isNull())
+        {
             return;
         }
 
         tunePath_ = qPath.toStdString();
-    } else if (!tune_->dirty()) {
+    }
+    else if (!tune_->dirty())
+    {
         // If the tune is not dirty and we're not saving to a new location,
         // don't save.
         return;
     }
 
-    LT()->saveTune(*tune_, tunePath_);
+    LT()->roms().saveTune(*tune_, tunePath_);
     tune_->clearDirty();
 }
 
-void MainWindow::hideAllDocks() {
-    for (auto dock : docks_) {
+void MainWindow::hideAllDocks()
+{
+    for (auto dock : docks_)
+    {
         removeDockWidget(dock);
     }
 }
 
-void MainWindow::restoreDocks() {
-    for (auto dock : docks_) {
+void MainWindow::restoreDocks()
+{
+    for (auto dock : docks_)
+    {
         dock->show();
     }
     // Place docks
@@ -137,7 +147,8 @@ void MainWindow::restoreDocks() {
     tabifyDockWidget(overviewDock_, graphDock_);
 }
 
-void MainWindow::loadSettings() {
+void MainWindow::loadSettings()
+{
     QSettings settings;
     QByteArray geo =
         settings.value("mainwindow/geometry", QByteArray()).toByteArray();
@@ -151,11 +162,14 @@ void MainWindow::loadSettings() {
     move(pos);
 }
 
-bool MainWindow::checkSave() {
-    if (!tune_) {
+bool MainWindow::checkSave()
+{
+    if (!tune_)
+    {
         return true;
     }
-    if (!tune_->dirty()) {
+    if (!tune_->dirty())
+    {
         return true;
     }
 
@@ -167,7 +181,8 @@ bool MainWindow::checkSave() {
     mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard |
                           QMessageBox::Save);
     mb.setDefaultButton(QMessageBox::Save);
-    switch (mb.exec()) {
+    switch (mb.exec())
+    {
     case QMessageBox::Save:
         // Save then accept
         catchCritical(
@@ -185,10 +200,12 @@ bool MainWindow::checkSave() {
     }
 }
 
-void MainWindow::setTune(const lt::TunePtr &tune,
-                         const std::filesystem::path &path) {
+void MainWindow::setTune(const lt::TunePtr & tune,
+                         const std::filesystem::path & path)
+{
     // Save any previous tunes
-    if (!checkSave()) {
+    if (!checkSave())
+    {
         return;
     }
 
@@ -202,15 +219,19 @@ void MainWindow::setTune(const lt::TunePtr &tune,
     flashCurrentAction_->setEnabled(!!tune);
     saveCurrentAction_->setEnabled(!!tune);
 
-    if (tune) {
+    if (tune)
+    {
         setWindowTitle(tr("LibreTuner") + " - " +
                        QString::fromStdString(tune->name()));
-    } else {
+    }
+    else
+    {
         setWindowTitle(tr("LibreTuner"));
     }
 }
 
-void MainWindow::saveSettings() {
+void MainWindow::saveSettings()
+{
     QSettings settings;
     settings.setValue("mainwindow/geometry", saveGeometry());
     settings.setValue("mainwindow/size", size());
@@ -218,16 +239,17 @@ void MainWindow::saveSettings() {
     settings.setValue("mainwindow/state", saveState());
 }
 
-QDockWidget *MainWindow::createLoggingDock() {
-    QDockWidget *dock = new QDockWidget("Logging", this);
+QDockWidget * MainWindow::createLoggingDock()
+{
+    QDockWidget * dock = new QDockWidget("Logging", this);
     dock->setObjectName("logging");
-    auto *widget = new QWidget;
-    auto *layout = new QVBoxLayout();
+    auto * widget = new QWidget;
+    auto * layout = new QVBoxLayout();
 
-    auto *hlayout = new QHBoxLayout();
+    auto * hlayout = new QHBoxLayout();
     layout->addLayout(hlayout);
 
-    QPushButton *buttonNewLog = new QPushButton(tr("New Log"));
+    QPushButton * buttonNewLog = new QPushButton(tr("New Log"));
     hlayout->addWidget(buttonNewLog);
     connect(buttonNewLog, &QPushButton::clicked, this,
             &MainWindow::newLogClicked);
@@ -247,19 +269,21 @@ QDockWidget *MainWindow::createLoggingDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createDiagnosticsDock() {
-    QDockWidget *dock = new QDockWidget("Diagnostics", this);
+QDockWidget * MainWindow::createDiagnosticsDock()
+{
+    QDockWidget * dock = new QDockWidget("Diagnostics", this);
     dock->setObjectName("diagnostics");
     dock->setWidget(new DiagnosticsWidget);
     docks_.emplace_back(dock);
     return dock;
 }
 
-QDockWidget *MainWindow::createLogDock() {
-    LogView *log = new LogView;
+QDockWidget * MainWindow::createLogDock()
+{
+    LogView * log = new LogView;
     log->setModel(&LT()->log());
 
-    QDockWidget *dock = new QDockWidget("Log", this);
+    QDockWidget * dock = new QDockWidget("Log", this);
     dock->setObjectName("log");
     dock->setWidget(log);
     dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -267,8 +291,9 @@ QDockWidget *MainWindow::createLogDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createSidebarDock() {
-    QDockWidget *dock = new QDockWidget("Sidebar", this);
+QDockWidget * MainWindow::createSidebarDock()
+{
+    QDockWidget * dock = new QDockWidget("Sidebar", this);
     dock->setObjectName("dock");
     dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
@@ -280,34 +305,36 @@ QDockWidget *MainWindow::createSidebarDock() {
     return dock;
 }
 
-void MainWindow::setTable(const lt::ModelTable *modTable) {
-    if (modTable == nullptr) {
+void MainWindow::setTable(const lt::TableDefinition * table)
+{
+    if (table == nullptr)
+    {
         // Don't change
         return;
     }
 
-    sidebar_->fillTableInfo(modTable);
-
-    const lt::TableDefinition *tabDef = modTable->table;
+    sidebar_->fillTableInfo(table);
 
     catchWarning(
-        [this, tabDef]() {
-            lt::Table *tab = tune_->getTable(tabDef->id, true);
+        [&]() {
+            lt::Table * tab = tune_->getTable(table->id, true);
             tableModel_.setTable(tab);
             emit tableChanged(tab);
         },
         tr("Error creating table"));
 }
 
-QDockWidget *MainWindow::createTablesDock() {
-    QDockWidget *dock = new QDockWidget("Tables", this);
+QDockWidget * MainWindow::createTablesDock()
+{
+    QDockWidget * dock = new QDockWidget("Tables", this);
     dock->setObjectName("tables");
     tables_ = new TablesWidget(dock);
     dock->setWidget(tables_);
 
     connect(tables_, &TablesWidget::activated, this, &MainWindow::setTable);
-    connect(this, &MainWindow::tuneChanged, [this](const lt::Tune *tune) {
-        if (tune == nullptr) {
+    connect(this, &MainWindow::tuneChanged, [this](const lt::Tune * tune) {
+        if (tune == nullptr)
+        {
             return;
         }
         tables_->setModel(*tune->base()->model());
@@ -316,8 +343,9 @@ QDockWidget *MainWindow::createTablesDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createEditorDock() {
-    QDockWidget *dock = new QDockWidget("Editor", this);
+QDockWidget * MainWindow::createEditorDock()
+{
+    QDockWidget * dock = new QDockWidget("Editor", this);
     dock->setObjectName("editor");
     editor_ = new EditorWidget(dock);
     editor_->setModel(&tableModel_);
@@ -326,8 +354,9 @@ QDockWidget *MainWindow::createEditorDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createOverviewDock() {
-    QDockWidget *dock = new QDockWidget("Overview", this);
+QDockWidget * MainWindow::createOverviewDock()
+{
+    QDockWidget * dock = new QDockWidget("Overview", this);
     dock->setObjectName("overview");
 
     dock->setWidget(new OverviewWidget);
@@ -336,8 +365,9 @@ QDockWidget *MainWindow::createOverviewDock() {
     return dock;
 }
 
-QDockWidget *MainWindow::createGraphDock() {
-    QDockWidget *dock = new QDockWidget("Graph", this);
+QDockWidget * MainWindow::createGraphDock()
+{
+    QDockWidget * dock = new QDockWidget("Graph", this);
 
     graph_ = new GraphWidget(dock);
     dock->setWidget(graph_);
@@ -348,22 +378,23 @@ QDockWidget *MainWindow::createGraphDock() {
     return dock;
 }
 
-void MainWindow::setupMenu() {
-    auto *menuBar = new QMenuBar;
-    QMenu *fileMenu = menuBar->addMenu(tr("&File"));
-    QMenu *editMenu = menuBar->addMenu(tr("&Edit"));
-    QMenu *helpMenu = menuBar->addMenu(tr("&Help"));
-    QMenu *viewMenu = menuBar->addMenu(tr("&View"));
-    QMenu *toolsMenu = menuBar->addMenu(tr("&Tools"));
+void MainWindow::setupMenu()
+{
+    auto * menuBar = new QMenuBar;
+    QMenu * fileMenu = menuBar->addMenu(tr("&File"));
+    QMenu * editMenu = menuBar->addMenu(tr("&Edit"));
+    QMenu * helpMenu = menuBar->addMenu(tr("&Help"));
+    QMenu * viewMenu = menuBar->addMenu(tr("&View"));
+    QMenu * toolsMenu = menuBar->addMenu(tr("&Tools"));
 
     // File menu
-    auto *flashAction = fileMenu->addAction(tr("Flash Tune"));
-    auto *openTuneAction = fileMenu->addAction(tr("&Open Tune"));
+    auto * flashAction = fileMenu->addAction(tr("Flash Tune"));
+    auto * openTuneAction = fileMenu->addAction(tr("&Open Tune"));
     openTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
-    auto *createTuneAction = fileMenu->addAction(tr("&New Tune"));
+    auto * createTuneAction = fileMenu->addAction(tr("&New Tune"));
 
     createTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
-    auto *downloadAction = fileMenu->addAction(tr("&Download ROM"));
+    auto * downloadAction = fileMenu->addAction(tr("&Download ROM"));
 
     saveCurrentAction_ = fileMenu->addAction(tr("&Save Tune"));
     saveCurrentAction_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -374,24 +405,25 @@ void MainWindow::setupMenu() {
     flashCurrentAction_->setEnabled(false);
 
     // View menu
-    auto *openPlatformsAction = viewMenu->addAction(tr("Platforms"));
+    auto * openPlatformsAction = viewMenu->addAction(tr("Platforms"));
     connect(openPlatformsAction, &QAction::triggered, [this]() {
-        if (!definitionsWindow_) {
+        if (!definitionsWindow_)
+        {
             definitionsWindow_ = new DefinitionsWindow;
             definitionsWindow_->setDefinitions(&LT()->definitions());
         }
         definitionsWindow_->show();
     });
 
-    QMenu *themeMenu = viewMenu->addMenu(tr("Theme"));
+    QMenu * themeMenu = viewMenu->addMenu(tr("Theme"));
 
-    auto *resetLayoutAction = viewMenu->addAction(tr("Reset Layout"));
+    auto * resetLayoutAction = viewMenu->addAction(tr("Reset Layout"));
     connect(resetLayoutAction, &QAction::triggered, [this]() {
         hideAllDocks();
         restoreDocks();
     });
 
-    auto *nativeThemeAction = themeMenu->addAction(tr("Native"));
+    auto * nativeThemeAction = themeMenu->addAction(tr("Native"));
 
     connect(nativeThemeAction, &QAction::triggered,
             []() { LT()->setStyleSheet(""); });
@@ -402,7 +434,8 @@ void MainWindow::setupMenu() {
     });
 
     connect(flashCurrentAction_, &QAction::triggered, [this]() {
-        if (tune_) {
+        if (tune_)
+        {
             FlasherWindow flasher;
             flasher.setTune(tune_);
             flasher.exec();
@@ -411,13 +444,15 @@ void MainWindow::setupMenu() {
 
     connect(createTuneAction, &QAction::triggered, [this]() {
         // Check if an unsaved tune is in the workspace first
-        if (!checkSave()) {
+        if (!checkSave())
+        {
             return;
         }
         CreateTuneDialog dlg;
         dlg.exec();
         lt::TunePtr tune = dlg.tune();
-        if (!tune) {
+        if (!tune)
+        {
             return;
         }
 
@@ -433,31 +468,33 @@ void MainWindow::setupMenu() {
 
     connect(openTuneAction, &QAction::triggered, [this]() {
         // Check if we have an unsaved tune in the workspace
-        if (!checkSave()) {
+        if (!checkSave())
+        {
             return;
         }
         QString fileName = QFileDialog::getOpenFileName(
             nullptr, tr("Open Tune"), QString(), tr("Tune Files (*.ltt)"));
-        if (fileName.isNull()) {
+        if (fileName.isNull())
+        {
             return;
         }
 
         catchCritical(
             [this, &fileName]() {
                 std::filesystem::path path(fileName.toStdString());
-                setTune(LT()->openTune(path), path);
+                setTune(LT()->roms().loadTune(path), path);
             },
             tr("Error opening tune"));
     });
 
-    QAction *logAction = toolsMenu->addAction(tr("&CAN Log"));
+    QAction * logAction = toolsMenu->addAction(tr("&CAN Log"));
     // connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
 
-    QAction *datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
+    QAction * datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
     connect(datalinksAction, &QAction::triggered,
             [this]() { datalinksWindow_.show(); });
 
-    auto *sessionScanAct = toolsMenu->addAction("Session Scanner");
+    auto * sessionScanAct = toolsMenu->addAction("Session Scanner");
     connect(sessionScanAct, &QAction::triggered, [this]() {
         SessionScannerDialog scanner;
         scanner.exec();
@@ -466,13 +503,15 @@ void MainWindow::setupMenu() {
     setMenuBar(menuBar);
 }
 
-void MainWindow::setupStatusBar() {
-    auto *comboPlatform = new QComboBox;
-    comboPlatform->setModel(&LT()->definitions());
+void MainWindow::setupStatusBar()
+{
+    auto * comboPlatform = new QComboBox;
+    comboPlatform->setModel(new PlatformsModel(&LT()->definitions(), this));
     connect(comboPlatform, QOverload<int>::of(&QComboBox::currentIndexChanged),
             [comboPlatform](int) {
                 QVariant var = comboPlatform->currentData(Qt::UserRole);
-                if (!var.canConvert<lt::PlatformPtr>()) {
+                if (!var.canConvert<lt::PlatformPtr>())
+                {
                     return;
                 }
                 LT()->setPlatform(var.value<lt::PlatformPtr>());
@@ -484,18 +523,21 @@ void MainWindow::setupStatusBar() {
     connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
             [this](int) {
                 QVariant var = comboDatalink_->currentData(Qt::UserRole);
-                if (!var.canConvert<lt::DataLink *>()) {
+                if (!var.canConvert<lt::DataLink *>())
+                {
                     return;
                 }
 
                 LT()->setDatalink(var.value<lt::DataLink *>());
             });
 
-    if (LT()->platform()) {
+    if (LT()->platform())
+    {
         comboPlatform->setCurrentText(
             QString::fromStdString(LT()->platform()->name));
     }
-    if (LT()->datalink()) {
+    if (LT()->datalink())
+    {
         comboDatalink_->setCurrentText(
             QString::fromStdString(LT()->datalink()->name()));
     }
@@ -504,7 +546,8 @@ void MainWindow::setupStatusBar() {
     statusBar()->addPermanentWidget(comboDatalink_);
 }
 
-void MainWindow::on_buttonDownloadRom_clicked() {
+void MainWindow::on_buttonDownloadRom_clicked()
+{
     /*if (downloadWindow_) {
         delete downloadWindow_;
         downloadWindow_ = nullptr;
@@ -514,15 +557,18 @@ void MainWindow::on_buttonDownloadRom_clicked() {
     downloadWindow.exec();
 }
 
-void MainWindow::newLogClicked() {
-    auto *window = new DataLoggerWindow;
+void MainWindow::newLogClicked()
+{
+    auto * window = new DataLoggerWindow;
     window->setAttribute(Qt::WA_DeleteOnClose);
     window->setWindowModality(Qt::WindowModal);
     window->show();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
-    if (!checkSave()) {
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    if (!checkSave())
+    {
         event->ignore();
         return;
     }

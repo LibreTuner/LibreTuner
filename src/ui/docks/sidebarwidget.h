@@ -4,7 +4,7 @@
 #include <QWidget>
 
 namespace lt {
-struct ModelTable;
+struct TableDefinition;
 }
 
 class QLabel;
@@ -17,7 +17,7 @@ public:
     explicit SidebarWidget(QWidget *parent = nullptr);
 
 public slots:
-    void fillTableInfo(const lt::ModelTable *table);
+    void fillTableInfo(const lt::TableDefinition *table);
 
 private slots:
     void on_treeToolButton_clicked(bool checked);

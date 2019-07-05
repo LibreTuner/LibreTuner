@@ -30,11 +30,6 @@ private:
     std::vector<uint8_t> data_;
 };
 
-struct ModelTable {
-    const TableDefinition *table{nullptr};
-    std::size_t offset;
-};
-
 /* Model definition. Includes the table locations */
 struct Model {
 public:
@@ -45,16 +40,23 @@ public:
     std::string name;
     Checksums checksums;
 
-    /* Table offsets */
-    std::vector<ModelTable> tables;
+    /* Tables */
+    std::unordered_map<std::string, TableDefinition> tables;
 
+    // TODO: inheritance-based system like tables.
     std::unordered_map<std::string, std::size_t> axisOffsets;
+
+    // Identifiers are unique to each model in a platform.
     std::vector<Identifier> identifiers;
 
-    const ModelTable *getTable(std::size_t index) const noexcept;
+    /* Gets the table definition with id `id`. Returns
+     * nullptr if the table does not exist. */
+    const TableDefinition * getTable(const std::string & id) const;
 
     std::size_t getAxisOffset(const std::string &id) const noexcept;
 
+    /* Returns true if the provided data is the correct
+     * size and matches all identifiers. */
     bool isModel(const uint8_t *data, std::size_t size) const noexcept;
 };
 using ModelPtr = std::shared_ptr<Model>;

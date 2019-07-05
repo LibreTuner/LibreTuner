@@ -27,26 +27,28 @@
 #include <QStyledItemDelegate>
 #include <QVariant>
 
-CreateTuneDialog::CreateTuneDialog(const RomMeta *base)
+CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
     : ui_(new Ui::CreateTuneDialog) {
     ui_->setupUi(this);
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
 
+    /*
     for (const RomMeta &meta : LT()->roms()) {
         ui_->comboBase->addItem(QString::fromStdString(meta.name),
                                 QString::fromStdString(meta.id));
         if (base != nullptr && &meta == base) {
             ui_->comboBase->setCurrentIndex(ui_->comboBase->count() - 1);
         }
-    }
+    }*/
+    // TODO: Search ROM directory
 }
 
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
 void CreateTuneDialog::on_buttonCreate_clicked() {
     std::string romId = ui_->comboBase->currentData().toString().toStdString();
-    RomMeta *meta = LT()->roms().fromId(romId);
+    /*RomMeta *meta = LT()->roms().fromId(romId);
     if (meta == nullptr) {
         Logger::warning("Rom with ID '" + romId + "' no longer exists");
         return;
@@ -61,5 +63,5 @@ void CreateTuneDialog::on_buttonCreate_clicked() {
         },
         tr("Error creating tune"));
 
-    close();
+    close();*/
 }

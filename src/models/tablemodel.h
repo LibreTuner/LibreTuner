@@ -2,7 +2,6 @@
 #define TABLEMODEL_H
 
 #include <QAbstractTableModel>
-
 #include "lt/rom/table.h"
 
 class TableModel : public QAbstractTableModel {

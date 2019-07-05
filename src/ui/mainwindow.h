@@ -40,53 +40,54 @@ class SidebarWidget;
 class GraphWidget;
 class DefinitionsWindow;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget * parent = 0);
 
     // If newPath is true OR the current tune was not loaded from a file, asks
     // the user for a path.
     void saveTune(bool newPath = false);
 
 public slots:
-    void setTable(const lt::ModelTable *modTable);
+    void setTable(const lt::TableDefinition * modTable);
 
 private slots:
     void on_buttonDownloadRom_clicked();
     void newLogClicked();
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent * event) override;
 
 signals:
-    void tableChanged(lt::Table *table);
+    void tableChanged(lt::Table * table);
 
-    void tuneChanged(const lt::Tune *tune);
+    void tuneChanged(const lt::Tune * tune);
 
 private:
     bool checkSave();
 
-    QComboBox *comboLogVehicles_;
-    QComboBox *comboDatalink_;
-    QListView *listLogs_;
-    SidebarWidget *sidebar_;
+    QComboBox * comboLogVehicles_;
+    QComboBox * comboDatalink_;
+    QListView * listLogs_;
+    SidebarWidget * sidebar_;
 
-    TablesWidget *tables_;
-    EditorWidget *editor_;
-    GraphWidget *graph_;
+    TablesWidget * tables_;
+    EditorWidget * editor_;
+    GraphWidget * graph_;
 
-    QAction *flashCurrentAction_;
-    QAction *saveCurrentAction_;
+    QAction * flashCurrentAction_;
+    QAction * saveCurrentAction_;
 
     // Docks
-    QDockWidget *logDock_;
-    QDockWidget *overviewDock_;
-    QDockWidget *loggingDock_;
-    QDockWidget *diagnosticsDock_;
-    QDockWidget *sidebarDock_;
-    QDockWidget *tablesDock_;
-    QDockWidget *editorDock_;
-    QDockWidget *graphDock_;
+    QDockWidget * logDock_;
+    QDockWidget * overviewDock_;
+    QDockWidget * loggingDock_;
+    QDockWidget * diagnosticsDock_;
+    QDockWidget * sidebarDock_;
+    QDockWidget * tablesDock_;
+    QDockWidget * editorDock_;
+    QDockWidget * graphDock_;
 
     void setupMenu();
     void setupStatusBar();
@@ -97,17 +98,17 @@ private:
     void saveSettings();
     void loadSettings();
 
-    void setTune(const lt::TunePtr &tune,
-                 const std::filesystem::path &path = std::filesystem::path());
+    void setTune(const lt::TunePtr & tune,
+                 const std::filesystem::path & path = std::filesystem::path());
 
-    QDockWidget *createOverviewDock();
-    QDockWidget *createLoggingDock();
-    QDockWidget *createDiagnosticsDock();
-    QDockWidget *createLogDock();
-    QDockWidget *createSidebarDock();
-    QDockWidget *createTablesDock();
-    QDockWidget *createEditorDock();
-    QDockWidget *createGraphDock();
+    QDockWidget * createOverviewDock();
+    QDockWidget * createLoggingDock();
+    QDockWidget * createDiagnosticsDock();
+    QDockWidget * createLogDock();
+    QDockWidget * createSidebarDock();
+    QDockWidget * createTablesDock();
+    QDockWidget * createEditorDock();
+    QDockWidget * createGraphDock();
 
     std::vector<QDockWidget *> docks_;
 

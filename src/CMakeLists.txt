@@ -102,8 +102,6 @@ set(libretuner_SRC
 
     database/definitions.cpp
     database/definitions.h
-    database/roms.cpp
-    database/roms.h
     database/links.cpp
     database/links.h
 
@@ -138,7 +136,7 @@ qt5_add_resources(libretuner_SRC
 
 add_executable(LibreTuner ${libretuner_SRC})
 
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} yaml-cpp sol2 Lua LibLibreTuner)
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} sol2 Lua LibLibreTuner)
 
 target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView)
 

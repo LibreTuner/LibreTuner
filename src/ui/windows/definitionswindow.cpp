@@ -12,7 +12,7 @@ DefinitionsWindow::DefinitionsWindow(QWidget *parent) : QWidget(parent) {
     setLayout(layout);
 }
 
-void DefinitionsWindow::setDefinitions(Definitions *definitions) noexcept {
+void DefinitionsWindow::setDefinitions(lt::Platforms *definitions) noexcept {
     definitions_ = definitions;
-    platformsView_->setModel(definitions);
+    platformsView_->setModel(new PlatformsModel(definitions, this));
 }

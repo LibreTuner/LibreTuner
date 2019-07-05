@@ -17,187 +17,320 @@
  */
 
 #include "rom.h"
-#include "tableext.h"
+#include "table.h"
 
 #include "definition/platform.h"
 
 #include <cassert>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <fstream>
 
-namespace lt {
+namespace lt
+{
 
-std::vector<uint8_t> Rom::getRawTableData(const ModelTable *modTable) const {
-    std::size_t offset = modTable->offset;
-    const TableDefinition *def = modTable->table;
-
-    auto regionBegin = data_.begin() + offset;
-    auto regionEnd = regionBegin + def->byteSize();
-
-    return std::vector(regionBegin, regionEnd);
-}
-
-std::vector<uint8_t> Rom::getRawTableData(std::size_t id) const {
-    const ModelTable *modTable = model_->getTable(id);
-    if (modTable == nullptr) {
-        throw std::runtime_error("invalid table id " + std::to_string(id));
-    }
-
-    return getRawTableData(modTable);
-}
-
-TablePtr Rom::baseTable(std::size_t tableId) const {
-    const ModelTable *modTable = model_->getTable(tableId);
-    if (modTable == nullptr) {
-        throw std::runtime_error(
-            "table does not have matching offset in model definition (" +
-            std::to_string(tableId) + ")");
-    }
-
-    TablePtr table = std::make_unique<Table>();
-    initializeTable(*table, *modTable->table);
-
-    std::vector<uint8_t> raw = getRawTableData(modTable);
-    table->deserialize(raw.begin(), raw.end(), model_->platform.endianness);
-
-    return table;
-}
-
-bool Tune::dirty() const noexcept {
-    for (const TablePtr &table : tables_) {
-        if (table && table->dirty()) {
+bool Tune::dirty() const noexcept
+{
+    for (const auto & [id, table] : tables_)
+    {
+        if (table->dirty())
             return true;
-        }
     }
     return false;
 }
 
-void Tune::clearDirty() noexcept {
-    for (const TablePtr &table : tables_) {
-        if (table && table->dirty()) {
+void Tune::clearDirty() noexcept
+{
+    for (const auto & [id, table] : tables_)
+    {
+        if (table->dirty())
             table->clearDirty();
-        }
     }
 }
 
-Table *Tune::getTable(std::size_t id, bool create) {
-    if (id < tables_.size()) {
-        if (tables_[id]) {
-            return tables_[id].get();
-        }
-    }
+Table * Tune::getTable(const std::string & id, bool create)
+{
+    if (auto it = tables_.find(id); it != tables_.end())
+        return it->second.get();
 
-    if (create) {
-        TablePtr table = base_->baseTable(id);
+    // Else, try to create a new table from base calibration
+    if (create)
+    {
+        const TableDefinition * def = base_->model()->getTable(id);
+        if (def == nullptr)
+            return nullptr;
 
-        const TableDefinition *def = base_->model()->platform.getTable(id);
-
-        if (!def->axisX.empty()) {
-            table->setAxisX(getAxis(def->axisX, true));
+        if (base_->size() < def->offset.value() + def->byteSize())
+        {
+            throw std::runtime_error("table '" + id +
+                                     "' could not be created because it "
+                                     "exceeds the size of the ROM");
         }
-        if (!def->axisY.empty()) {
-            table->setAxisY(getAxis(def->axisY, true));
-        }
-
-        if (id >= tables_.size()) {
-            tables_.resize(id + 1);
-        }
-        tables_[id] = std::move(table);
-        return tables_[id].get();
+        auto data = base_->cbegin();
+        std::advance(data, def->offset.value());
+        return setTable(id, &*data, def->byteSize());
     }
     return nullptr;
 }
 
-Table *Tune::setTable(std::size_t id, const uint8_t *data, std::size_t length) {
-    TablePtr table = std::make_unique<Table>();
-
-    const TableDefinition *def = base_->model()->platform.getTable(id);
-    if (def == nullptr) {
+Table * Tune::setTable(const std::string & id, const uint8_t * data,
+                       std::size_t length)
+{
+    const TableDefinition * def = base_->model()->getTable(id);
+    if (def == nullptr)
         return nullptr;
-    }
 
-    initializeTable(*table, *def);
-    table->deserialize(data, data + length,
-                       base_->model()->platform.endianness);
+    Table::Builder builder;
+    builder.setBounds(def->minimum, def->maximum)
+        .setName(def->name)
+        .setScale(def->scale)
+        .setSize(def->width, def->height);
 
-    if (!def->axisX.empty()) {
-        table->setAxisX(getAxis(def->axisX, true));
-    }
-    if (!def->axisY.empty()) {
-        table->setAxisY(getAxis(def->axisY, true));
-    }
+    if (!def->axisX.empty())
+        builder.setXAxis(getAxis(def->axisX, true));
+    if (!def->axisY.empty())
+        builder.setYAxis(getAxis(def->axisY, true));
 
-    if (id >= tables_.size()) {
-        tables_.resize(id + 1);
-    }
-    tables_[id] = std::move(table);
-    return tables_[id].get();
+    // Deserialize
+    auto begin = data;
+    auto end = &data[length];
+    datatypeToType(def->dataType, builder, begin, end, endianness());
+
+    // Emplace table and use returned iterator to get the inserted table
+    return tables_.emplace(id, std::make_unique<Table>(builder.build()))
+        .first->second.get();
 }
 
-struct ADS {
-    template <typename T> void operator()() {
-        std::vector<T> des(size);
-        readBE<T>(data, data + size * sizeof(T), des.begin());
-        auto memoryAxis =
-            std::make_shared<lt::MemoryAxis<T>>(name, des.begin(), des.end());
-
-        axis = std::static_pointer_cast<lt::TableAxis>(memoryAxis);
-    }
-
-    std::string name;
-    const uint8_t *data;
-    std::size_t size;
-    lt::TableAxisPtr axis;
-};
-
-template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template <class... Ts> overloaded(Ts...)->overloaded<Ts...>;
-
-TableAxisPtr Tune::getAxis(const std::string &id, bool create) {
+AxisPtr Tune::getAxis(const std::string & id, bool create)
+{
+    // Check axes cache
     auto it = axes_.find(id);
-    if (it != axes_.end()) {
+    if (it != axes_.end())
         return it->second;
-    }
 
-    if (!create) {
-        return TableAxisPtr();
-    }
+    if (!create)
+        return AxisPtr();
 
-    const lt::AxisDefinition *def = base_->model()->platform.getAxis(id);
-    if (def == nullptr) {
-        return TableAxisPtr();
-    }
+    const lt::AxisDefinition * def = base_->model()->platform.getAxis(id);
+    if (def == nullptr)
+        return AxisPtr();
 
-    auto axis = std::visit(
-        overloaded{[this, def](LinearAxisDefinition linear) {
-                       return std::static_pointer_cast<TableAxis>(
-                           std::make_shared<LinearAxis<double>>(
-                               def->name, linear.start, linear.increment));
-                   },
-                   [this, def](MemoryAxisDefinition memory) {
-                       int offset = base_->model()->getAxisOffset(def->id);
-                       int size = memory.size;
+    Axis::Builder builder;
 
-                       if (offset + size * static_cast<int>(
-                                               dataTypeSize(def->dataType)) >
-                           base_->size()) {
-                           throw std::runtime_error(
-                               "axis exceeds rom size (rom size: " +
-                               std::to_string(base_->size()) +
-                               ", axis ends at " +
-                               std::to_string(offset + size) + ")");
-                       }
+    std::visit(
+        [&](auto && typeDefinition) {
+            using T = std::decay_t<decltype(typeDefinition)>;
+            if constexpr (std::is_same_v<T, LinearAxisDefinition>)
+            {
+                // Linear axis
+                builder.setLinear(typeDefinition.start, typeDefinition.increment, typeDefinition.size).build();
+            }
+            else if constexpr (std::is_same_v<T, MemoryAxisDefinition>)
+            {
+                // Memory axis
+                // TODO: offsets should work the same as tables.
+                int offset = base_->model()->getAxisOffset(def->id);
+                int size = typeDefinition.size;
+                if (offset +
+                        size * static_cast<int>(dataTypeSize(def->dataType)) >
+                    base_->size())
+                {
+                    throw std::runtime_error(
+                        "axis exceeds rom size (rom size: " +
+                        std::to_string(base_->size()) + ", axis ends at " +
+                        std::to_string(offset + size) + ")");
+                }
 
-                       ADS ads;
-                       ads.data = base_->data() + offset;
-                       ads.size = size;
-                       ads.name = def->name;
+                auto start = std::next(base_->data(), offset);
+                auto end = start + size;
 
-                       datatypeToType(def->dataType, ads);
-                       return std::static_pointer_cast<TableAxis>(ads.axis);
-                   }},
+                switch (def->dataType)
+                {
+                case DataType::Float:
+                    builder.setEntries(fromBytes<float>(start, end, endianness()));
+                    break;
+                case DataType::Uint8:
+                    builder.setEntries(fromBytes<uint8_t>(start, end, endianness()));
+                    break;
+                case DataType::Uint16:
+                    builder.setEntries(fromBytes<uint16_t>(start, end, endianness()));
+                    break;
+                case DataType::Uint32:
+                    builder.setEntries(fromBytes<uint32_t>(start, end, endianness()));
+                    break;
+                case DataType::Int8:
+                    builder.setEntries(fromBytes<int8_t>(start, end, endianness()));
+                    break;
+                case DataType::Int16:
+                    builder.setEntries(fromBytes<int16_t>(start, end, endianness()));
+                    break;
+                case DataType::Int32:
+                    builder.setEntries(fromBytes<int32_t>(start, end, endianness()));
+                    break;
+                default:
+                    break;
+                }
+            }
+        },
         def->def);
 
-    axes_.emplace(id, axis);
-    return axis;
+    return axes_.emplace(id, std::make_shared<Axis>(builder.build())).first->second;
+}
+
+// Define constructs in global scope
+struct RomConstruct
+{
+    std::string id;
+    std::string name;
+    std::string platformId;
+    std::string modelId;
+    std::vector<uint8_t> data;
+
+    template <class Archive>
+    void serialize(Archive & archive, std::uint32_t const version)
+    {
+        if (version != 1)
+            throw std::runtime_error("invalid ROM version, expected 1");
+
+        archive(id, name, platformId, modelId, data);
+    }
+};
+
+struct TableConstruct
+{
+    std::string id;
+    std::vector<uint8_t> data;
+
+    template <class Archive>
+    void serialize(Archive & archive)
+    {
+        archive(id, data);
+    }
+};
+
+struct TuneConstruct
+{
+    std::string id;
+    std::string name;
+    std::string baseId;
+    std::vector<TableConstruct> tables;
+
+    template <class Archive>
+    void serialize(Archive & archive, std::uint32_t const version)
+    {
+        if (version != 1)
+            throw std::runtime_error("invalid tune version, expected 1");
+
+        archive(id, name, baseId, tables);
+    }
+};
+
+RomPtr FileRomDatabase::getRom(const std::string & id)
+{
+    // Search the cache
+    if (auto it = cache_.find(id); it != cache_.end())
+    {
+        // Check if the pointer has expired
+        if (auto rom = it->second.lock())
+            return rom;
+    }
+
+    std::ifstream file(base_ / id, std::ios::binary | std::ios::in);
+    if (!file.is_open())
+        return RomPtr();
+
+    // Deserialize ROM with cereal
+    cereal::BinaryInputArchive archive(file);
+    RomConstruct construct;
+    archive(construct);
+
+    // Find the model
+    ModelPtr model = platforms_.find(construct.platformId, construct.modelId);
+    if (!model)
+        throw std::runtime_error("Unknown platform and rom combination '" +
+                                 construct.platformId + "' and '" +
+                                 construct.modelId + "'");
+    auto rom = std::make_shared<Rom>(model);
+    rom->setId(construct.id);
+    rom->setName(construct.name);
+    rom->setData(std::move(construct.data));
+    // Insert into cache
+    cache_.emplace(construct.id, rom);
+    return rom;
+}
+
+TunePtr FileRomDatabase::loadTune(const std::filesystem::path & path)
+{
+    std::ifstream file(path, std::ios::binary | std::ios::in);
+    if (!file.is_open())
+        return TunePtr();
+
+    cereal::BinaryInputArchive archive(file);
+    TuneConstruct construct;
+    archive(construct);
+
+    RomPtr rom = getRom(construct.baseId);
+    if (!rom)
+        throw std::runtime_error("unable to find ROM with id '" +
+                                 construct.baseId + "'");
+
+    auto tune = std::make_shared<Tune>(rom);
+    tune->setId(construct.id);
+    tune->setName(construct.name);
+
+    for (const TableConstruct & table : construct.tables)
+    {
+        tune->setTable(table.id, table.data.data(), table.data.size());
+    }
+    return tune;
+}
+
+void FileRomDatabase::saveRom(const Rom & rom)
+{
+    RomConstruct construct;
+    construct.name = rom.name();
+    construct.id = rom.id();
+    construct.modelId = rom.model()->id;
+    construct.platformId = rom.model()->platform.id;
+    construct.data = std::vector<uint8_t>(rom.data(), rom.data() + rom.size());
+
+    trim(construct.id);
+    if (construct.id.empty())
+        throw std::runtime_error("attempt to save ROM with empty id");
+
+    std::filesystem::path path = base_ / construct.id;
+    std::ofstream file(path, std::ios::binary | std::ios::out);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open ROM file '" + path.string() + "' for writing");
+
+    cereal::BinaryOutputArchive archive(file);
+    archive(construct);
+}
+
+void FileRomDatabase::saveTune(const Tune & tune, std::filesystem::path & path)
+{
+    TuneConstruct construct;
+    construct.id = tune.id();
+    construct.name = tune.name();
+    construct.baseId = tune.base()->id();
+    for (auto &[id, table] : tune.tables())
+    {
+        TableConstruct tc;
+        tc.id = id;
+        tc.data = table->intoBytes(tune.endianness());
+        construct.tables.emplace_back(std::move(tc));
+    }
+
+    std::ofstream file(path, std::ios::binary | std::ios::out);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open tune file '" + path.string() + "' for writing");
+
+    cereal::BinaryOutputArchive archive(file);
+    archive(construct);
 }
 
 } // namespace lt
+
+// Declare cereal version out of scope
+CEREAL_CLASS_VERSION(lt::Rom, 1)

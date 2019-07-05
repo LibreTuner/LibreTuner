@@ -19,3 +19,12 @@
 [submodule "lib/LibLibreTuner/lib/serial"]
 	path = lib/LibLibreTuner/lib/serial
 	url = https://github.com/Altenius/SerialPP.git
+[submodule "lib/LibLibreTuner/cereal"]
+	path = lib/LibrLibreTuner/cereal
+	url = https://github.com/USCiLab/cereal.git
+[submodule "lib/LibLibreTuner/lib/cereal"]
+	path = lib/LibLibreTuner/lib/cereal
+	url = https://github.com/USCiLab/cereal.git
+[submodule "lib/LibLibreTuner/lib/yaml"]
+	path = lib/LibLibreTuner/lib/yaml
+	url = https://github.com/jbeder/yaml-cpp.git

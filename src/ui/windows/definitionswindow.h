@@ -4,16 +4,19 @@
 #include <QTreeView>
 #include <QWidget>
 
-class Definitions;
+namespace lt
+{
+class Platforms;
+}
 
 class DefinitionsWindow : public QWidget {
 public:
     explicit DefinitionsWindow(QWidget *parent = nullptr);
 
-    void setDefinitions(Definitions *definitions) noexcept;
+    void setDefinitions(lt::Platforms *definitions) noexcept;
 
 private:
-    Definitions *definitions_{nullptr};
+    lt::Platforms *definitions_{nullptr};
     QTreeView *platformsView_;
 };
 

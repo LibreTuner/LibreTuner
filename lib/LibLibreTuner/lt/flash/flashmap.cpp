@@ -19,7 +19,6 @@
 #include "flashmap.h"
 #include "../definition/platform.h"
 #include "../rom/rom.h"
-#include "../rom/tableext.h"
 
 #include <cassert>
 
@@ -43,23 +42,16 @@ FlashMap FlashMap::fromTune(Tune &tune) {
                               rom->data() + rom->size() - offset);
 
     // Try each table
-    for (const lt::ModelTable &modTable : model->tables) {
-        if (modTable.table == nullptr) {
-            continue;
-        }
-
-        const TableDefinition *tableDef = modTable.table;
-        std::size_t tableOffset = modTable.offset;
-
-        Table *table = tune.getTable(tableDef->id, false);
+    for (const auto &[id, definition] : model->tables) {
+        Table *table = tune.getTable(id, false);
         if (table == nullptr) {
             continue;
         }
 
-        std::vector<uint8_t> serialized = table->serialize(platform.endianness);
+        std::vector<uint8_t> serialized = table->intoBytes(platform.endianness);
 
         std::copy(serialized.begin(), serialized.end(),
-                  data.begin() + tableOffset - offset);
+                  data.begin() + definition.offset.value() - offset);
     }
 
     return FlashMap(std::move(data), offset);

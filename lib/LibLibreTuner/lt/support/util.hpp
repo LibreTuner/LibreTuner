@@ -26,6 +26,8 @@
 #include <string>
 #include <utility>
 
+#include "endianness.h"
+
 namespace lt {
 template <typename T, int Size> class SConverter {};
 
@@ -236,11 +238,63 @@ static void writeLE(InputIt values, InputIt end, OutputIt out) {
 
 inline void remove_whitespace(std::string &string) {
     string.erase(std::remove_if(string.begin(), string.end(),
-                                [](char ch) {
+                                [](unsigned char ch) {
                                     return std::isspace(
                                         static_cast<unsigned char>(ch));
                                 }),
                  string.end());
+}
+
+inline void trim(std::string &string)
+{
+    // Trim beginning
+    string.erase(string.begin(), std::find_if_not(string.begin(), string.end(), [](unsigned char c) { return std::isspace(c); }));
+    // Trim end
+    string.erase(std::find_if_not(string.rbegin(), string.rend(), [](unsigned char c) { return std::isspace(c); }).base(), string.end());
+}
+
+inline void lowercase_string(std::string &string) {
+    std::transform(string.begin(), string.end(), string.begin(), [](unsigned char c){ return std::tolower(c); });
+}
+
+template<typename T, typename It, Endianness endianness>
+std::vector<T> fromBytes_(It && begin, It && end)
+{
+    static_assert(sizeof(*std::declval<It>()) == 1, "Iterator type must be one byte long");
+    std::vector<T> entries;
+    for (;;)
+    {
+        if (begin == end)
+            break;
+        T val;
+        uint8_t *repr = reinterpret_cast<uint8_t*>(&val);
+        // Unroll this loop, compiler!
+        for (std::size_t i = 0; i < sizeof(T); ++i)
+        {
+            if (std::next(begin, 1) == end)
+                break;
+            repr[i] = *begin;
+        }
+        // Convert endianness and emplace
+        entries.emplace_back(endian::convert<T, endianness, endian::current>(val));
+    }
+    return entries;
+}
+
+/* Converts the representation of an array in bytes into an array of the
+ * type. */
+template<typename T, typename It>
+std::vector<T> fromBytes(It && begin, It && end, Endianness endianness)
+{
+    switch(endianness)
+    {
+    case Endianness::Big:
+        return fromBytes_<T, It, Endianness::Big>(std::forward<It>(begin), std::forward<It>(end));
+    case Endianness::Little:
+        return fromBytes_<T, It, Endianness::Little>(std::forward<It>(begin), std::forward<It>(end));
+    default:
+        return std::vector<T>();
+    }
 }
 
 } // namespace lt

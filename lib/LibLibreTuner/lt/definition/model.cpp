@@ -2,9 +2,11 @@
 
 namespace lt {
 
-const ModelTable *Model::getTable(std::size_t index) const noexcept {
-    if (index < tables.size()) {
-        return &tables[index];
+const TableDefinition * Model::getTable(const std::string & id) const
+{
+    if (auto it = tables.find(id); it != tables.end())
+    {
+        return &it->second;
     }
     return nullptr;
 }
@@ -19,10 +21,12 @@ std::size_t Model::getAxisOffset(const std::string &id) const noexcept {
 
 bool Model::isModel(const uint8_t *data, std::size_t size) const noexcept {
     if (identifiers.empty()) {
+        // This model is unidentifiable
         return false;
     }
 
     for (const Identifier &identifier : identifiers) {
+        // Verify size
         if (identifier.offset() + identifier.size() > size) {
             return false;
         }

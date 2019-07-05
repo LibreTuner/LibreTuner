@@ -17,7 +17,7 @@ public:
     explicit TablesWidget(QWidget *parent = nullptr);
 
 signals:
-    void activated(const lt::ModelTable *table);
+    void activated(const lt::TableDefinition *table);
 
 public slots:
     void setModel(const lt::Model &model);
@@ -26,6 +26,6 @@ private:
     QTreeWidget *view_;
 };
 
-Q_DECLARE_METATYPE(const lt::ModelTable *)
+Q_DECLARE_METATYPE(const lt::TableDefinition *)
 
 #endif // TABLESWIDGET_H

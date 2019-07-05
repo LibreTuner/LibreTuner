@@ -21,7 +21,6 @@
 
 #include <QDialog>
 
-#include "database/roms.h"
 #include "lt/rom/rom.h"
 
 #include <memory>
@@ -36,7 +35,7 @@ class CreateTuneDialog;
 class CreateTuneDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit CreateTuneDialog(const RomMeta *base = nullptr);
+    explicit CreateTuneDialog(lt::RomPtr base = nullptr);
 
     ~CreateTuneDialog() override;
 

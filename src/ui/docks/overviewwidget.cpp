@@ -21,8 +21,7 @@ OverviewWidget::OverviewWidget(QWidget *parent) : QWidget(parent) {
     form->addRow(tr("ROMs loaded:"), lineRomCount_);
     form->addRow(tr("Datalinks detected:"), lineDatalinkCount_);
 
-    lineRomCount_->setText(QString::number(LT()->roms().count()));
-    lineDefinitionCount_->setText(QString::number(LT()->definitions().count()));
+    lineDefinitionCount_->setText(QString::number(LT()->definitions().size()));
     lineDatalinkCount_->setText(QString::number(LT()->links().count()));
 
     auto *layout = new QVBoxLayout;

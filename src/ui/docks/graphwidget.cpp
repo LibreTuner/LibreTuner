@@ -89,7 +89,7 @@ void GraphWidget::refresh() {
             QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
         series3d_->setDataProxy(modelProxy);
-
+/*
         if (table->axisX()) {
             surface_->axisX()->setTitle(
                 QString::fromStdString(table->axisX()->name()));
@@ -104,13 +104,13 @@ void GraphWidget::refresh() {
             surface_->axisZ()->setTitleVisible(true);
         } else {
             surface_->axisZ()->setTitleVisible(true);
-        }
+        }*/
 
         chartView_->setVisible(false);
         container_->setVisible(true);
     } else if (table->height() == 1 && table->width() > 1) {
         auto *series = new QLineSeries;
-        if (table->axisX()) {
+        /*if (table->axisX()) {
             for (int x = 0; x < table->width(); ++x) {
                 series->append(table->axisX()->label(x),
                                table->get(x, 0)); // Should always be a float
@@ -131,7 +131,7 @@ void GraphWidget::refresh() {
         }
 
         chartView_->setVisible(true);
-        container_->setVisible(false);
+        container_->setVisible(false);*/
     } else {
         chartView_->setVisible(false);
         container_->setVisible(false);

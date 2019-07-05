@@ -99,8 +99,7 @@ public:
     InputBufferAdapter(Buffer &buffer)
         : pointer_(std::begin(buffer)), end_(std::end(buffer)) {}
 
-    void read(TValue *data, int size) {
-        assert(size >= 0);
+    void read(TValue *data, std::size_t size) {
         assert(end_ > pointer_);
         if (size <= std::distance(pointer_, end_)) {
             std::copy(pointer_, pointer_ + size, data);

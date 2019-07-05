@@ -83,8 +83,8 @@ void EditorWidget::axesChanged() {
         return;
     }
 
-    if (table->axisX()) {
-        labelX_->setText(QString::fromStdString(table->axisX()->name()));
+    if (table->xAxis()) {
+        // labelX_->setText(QString::fromStdString(table->xAxis()->name()));
         labelX_->setVisible(true);
         view_->horizontalHeader()->setVisible(true);
     } else {
@@ -92,8 +92,8 @@ void EditorWidget::axesChanged() {
         view_->horizontalHeader()->setVisible(false);
     }
 
-    if (table->axisY()) {
-        labelY_->setText(QString::fromStdString(table->axisY()->name()));
+    if (table->yAxis()) {
+        // labelY_->setText(QString::fromStdString(table->axisY()->name()));
         labelY_->setVisible(true);
         view_->verticalHeader()->setVisible(true);
     } else {

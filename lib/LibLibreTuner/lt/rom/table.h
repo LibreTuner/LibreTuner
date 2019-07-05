@@ -1,282 +1,323 @@
-#include <utility>
+#ifndef LIBRETUNER_TABLE_H
+#define LIBRETUNER_TABLE_H
 
-#ifndef LT_ROM_TABLE_H
-#define LT_ROM_TABLE_H
-
-#include <limits>
+#include <cassert>
 #include <memory>
-#include <string>
-#include <variant>
 #include <vector>
 
 #include "../support/types.h"
 #include "../support/util.hpp"
 
-namespace lt {
+namespace lt
+{
 
-class TableAxis {
-public:
-    virtual double label(int index) const = 0;
-    virtual const std::string &name() const = 0;
-    virtual ~TableAxis();
+// Provides a way to interface with the underlying data of many tables/axes
+// by using a common datatype.
+template<typename PresentedType>
+struct Entries
+{
+    virtual PresentedType get(int index) const noexcept = 0;
+    virtual void set(int index, PresentedType value) noexcept = 0;
+
+    // Serializes the entries into a byte array
+    virtual std::vector<uint8_t> intoBytes(Endianness endianness) const
+    noexcept = 0;
+    virtual ~Entries() = default;
 };
-using TableAxisPtr = std::shared_ptr<TableAxis>;
 
-template <typename DataType> class MemoryAxis : public TableAxis {
-public:
-    template <typename InputIt>
-    MemoryAxis(std::string name, InputIt begin, InputIt end);
-
-    virtual double label(int index) const override;
-    virtual const std::string &name() const override;
-
+// Type-defined implementation of Entries
+template <typename PresentedType, typename T>
+struct EntriesImpl : public Entries<PresentedType>
+{
 private:
-    std::vector<DataType> data_;
-    std::string name_;
-};
-
-template <typename DataType>
-template <typename InputIt>
-MemoryAxis<DataType>::MemoryAxis(std::string name, InputIt begin, InputIt end)
-    : data_(begin, end), name_(std::move(name)) {}
-
-template <typename DataType>
-double MemoryAxis<DataType>::label(int index) const {
-    if (index < 0 || static_cast<std::size_t>(index) >= data_.size()) {
-        return 0;
-    }
-
-    return data_[index];
-}
-
-template <typename DataType>
-const std::string &MemoryAxis<DataType>::name() const {
-    return name_;
-}
-
-template <typename T> class LinearAxis : public TableAxis {
-public:
-    LinearAxis(std::string name, T start, T increment);
-
-    virtual double label(int index) const override;
-    virtual const std::string &name() const override;
-
-private:
-    T start_, increment_;
-    std::string name_;
-};
-
-template <typename T>
-LinearAxis<T>::LinearAxis(std::string name, T start, T increment)
-    : start_(start), increment_(increment), name_(std::move(name)) {}
-
-template <typename T> double LinearAxis<T>::label(int index) const {
-    return (start_) + index * increment_;
-}
-
-template <typename T> const std::string &LinearAxis<T>::name() const {
-    return name_;
-}
-
-template <typename T> struct TableBounds {
-    T minimum_{std::numeric_limits<T>::min()};
-    T maximum_{std::numeric_limits<T>::max()};
-
-    inline bool withinBounds(T value) const noexcept {
-        return value >= minimum_ && value <= maximum_;
-    }
-};
-
-using StorageVariant = std::variant<std::vector<uint8_t>, std::vector<int8_t>,
-                                    std::vector<uint16_t>, std::vector<int16_t>,
-                                    std::vector<uint32_t>, std::vector<int32_t>,
-                                    std::vector<float>>;
-
-class TableStorage {
-public:
-    template <typename T> void set(std::size_t index, T value) noexcept {
-        std::visit(
-            [index, value](auto &&vec) {
-                if (index >= vec.size()) {
-                    throw std::runtime_error("out of bounds");
-                }
-                vec[index] = value;
-            },
-            store_);
-    }
-
-    template <typename T> T get(std::size_t index) const noexcept {
-        return std::visit(
-            [index](auto &&vec) -> T {
-                if (index >= vec.size()) {
-                    throw std::runtime_error("out of bounds");
-                }
-                return static_cast<T>(vec[index]);
-            },
-            store_);
-    }
-
-    std::size_t size() const noexcept {
-        return std::visit([](auto &&vec) -> std::size_t { return vec.size(); },
-                          store_);
-    }
-
-    std::vector<uint8_t> serialize(Endianness endianness) const {
-        std::vector<uint8_t> serialized;
-        std::visit(
-            [&serialized, endianness](auto &&vec) {
-                using EntryType =
-                    typename std::decay_t<decltype(vec)>::value_type;
-                serialized.resize(vec.size() * sizeof(EntryType));
-                if (endianness == Endianness::Big) {
-                    writeBE<EntryType>(vec.begin(), vec.end(),
-                                       serialized.begin());
-                } else if (endianness == Endianness::Little) {
-                    writeLE<EntryType>(vec.begin(), vec.end(),
-                                       serialized.begin());
-                }
-            },
-            store_);
-        return serialized;
-    }
-
-    // Returns an iterator pointing to the value after the last entry
-    template <typename Iter>
-    void deserialize(Iter begin, Iter end, Endianness endianness) {
-        static_assert(sizeof(*std::declval<Iter>()) == 1,
-                      "Iterator must be byte iterator");
-
-        std::visit(
-            [&begin, &end, endianness](auto &&vec) {
-                using EntryType =
-                    typename std::decay_t<decltype(vec)>::value_type;
-
-                if (std::distance(begin, end) / sizeof(EntryType) !=
-                    vec.size()) {
-                    throw std::runtime_error(
-                        "byte buffer is not equal to the table size");
-                }
-
-                if (endianness == Endianness::Big) {
-                    readBE<EntryType>(begin, end, vec.begin());
-                } else if (endianness == Endianness::Little) {
-                    readLE<EntryType>(begin, end, vec.begin());
-                }
-            },
-            store_);
-    }
-
-    template <typename T> static TableStorage create(std::size_t size) {
-        static_assert(std::is_arithmetic_v<T>, "Type must be arithmetic");
-        TableStorage store;
-        store.store_ = std::vector<T>(size);
-        return store;
-    }
-
-private:
-    StorageVariant store_;
-};
-
-template <typename EntryType,
-          typename = std::enable_if_t<std::is_arithmetic<EntryType>::value>>
-class BasicTable {
-public:
-    template <typename T> void initialize(int width, int height) {
-        assert(width >= 0);
-        assert(height > 0);
-        entries_ = TableStorage::create<T>(width * height);
-        width_ = width;
-    }
-
-    inline EntryType get(std::size_t x, std::size_t y) const noexcept {
-        return entries_.get<EntryType>(y * width() + x);
-    }
-
-    void set(std::size_t x, std::size_t y, EntryType value) {
-        if (!bounds_.withinBounds(value)) {
-            throw std::runtime_error("value out of bounds");
+    template <Endianness endianness>
+    inline std::vector<uint8_t> intoBytes_() const noexcept
+    {
+        // Endianness-aware byte serialization
+        std::vector<uint8_t> out;
+        out.reserve(entries_.size() * sizeof(T));
+        for (T entry : entries_)
+        {
+            entry = endian::convert<T, endian::current, endianness>(entry);
+            // Get byte representation and append to buffer
+            uint8_t * repr = reinterpret_cast<uint8_t *>(&entry);
+            out.insert(out.end(), repr, &repr[sizeof(T)]);
         }
-        if (get(x, y) != value) {
-            setDirty();
-            entries_.set<EntryType>(y * width() + x, value);
+        return out;
+    }
+
+public:
+    EntriesImpl(std::vector<T> && entries) : entries_(std::move(entries)) {}
+
+    PresentedType get(int index) const noexcept override { return static_cast<PresentedType>(entries_[index]); }
+    void set(int index, PresentedType value) noexcept
+    {
+        entries_[index] = static_cast<T>(value);
+    }
+    std::vector<uint8_t> intoBytes(Endianness endianness) const
+    noexcept override
+    {
+        switch (endianness)
+        {
+        case Endianness::Big:
+            return intoBytes_<Endianness::Big>();
+        case Endianness::Little:
+            return intoBytes_<Endianness::Little>();
+        default:
+            return std::vector<uint8_t>();
         }
     }
+    std::vector<T> entries_;
+};
 
+/* A memory axis uses a defined set of values as indicies. */
+template <typename PresentedType> class BasicAxis
+{
+private:
+    explicit BasicAxis(std::unique_ptr<Entries<PresentedType>> entries, int size) : entries_(std::move(entries)), size_(size)
+    {
+    }
+
+public:
+    class Builder
+    {
+    public:
+        template<typename T>
+        Builder & setEntries(std::vector<T> && entries)
+        {
+            size_ = entries.size();
+            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(std::move(entries));
+            return *this;
+        }
+
+        /* Creates a set of linear entries. A linear axis
+         * uses the form y = mx + b where m is the step, b
+         * is the start, and x is the index. */
+        template<typename T>
+        Builder & setLinear(T start, T step, int size)
+        {
+            std::vector<T> entries;
+            for (int i = 0; i < size; ++i, start += step)
+                entries.emplace_back(start);
+            size_ = size;
+            return setEntries(std::move(entries));
+        }
+
+        BasicAxis<PresentedType> build()
+        {
+            if (!entries_)
+                throw std::runtime_error("attempt to build axis without setting entries");
+            return BasicAxis<PresentedType>(std::move(entries_), size_);
+        }
+    private:
+        std::unique_ptr<Entries<PresentedType>> entries_;
+        int size_;
+    };
+
+    PresentedType index(int index) const noexcept
+    {
+        if (index < 0 || index >= size_)
+            return PresentedType{};
+        return entries_->get(index);
+    }
+
+    int size() const noexcept { return size_; }
+
+private:
+    std::unique_ptr<Entries<PresentedType>> entries_;
+    int size_;
+};
+
+// Defines the minimum and maximum bounds of table entries
+template <typename T> struct Bounds
+{
+    T minimum, maximum;
+
+    bool within(T t) const noexcept { return t >= minimum && t <= maximum; }
+};
+
+template <typename PresentedType> class BasicTable
+{
+public:
+    using AxisType = BasicAxis<PresentedType>;
+    using AxisTypePtr = std::shared_ptr<AxisType>;
+
+    /* Creates a one-dimensional index from a two-dimensional point.
+     * Calculated by multiplying the row and height and adding the
+     * column. Checks if the point is in bounds and throws an exception
+     * if the check fails. */
+    inline int index(int row, int column) const
+    {
+        assert(row > 0 && column > 0);
+        if (row >= width_ || column >= height_)
+            throw std::runtime_error("point (" + std::to_string(row) + ", " +
+                                     std::to_string(column) +
+                                     ") out of bounds.");
+        return row * height_ + column;
+    }
+
+    /* Returns the entry at position (`row`, `column`). Throws an
+     * exception if the point is out-of-bounds. */
+    PresentedType get(int row, int column) const
+    {
+        return static_cast<PresentedType>(entries_->get(index(row, column)) *
+                                          scale_);
+    }
+
+    /* Sets the entry at position (`row`, `column`) to `value`. Throws
+     * an exception if the point is out-of-bounds. */
+    void set(int row, int column, PresentedType value) noexcept
+    {
+        entries_->set(index(row, column),
+                      static_cast<PresentedType>(value / scale_));
+        dirty_ = true;
+    }
+
+    // Getters
+    inline const std::string & name() const noexcept { return name_; }
     inline int width() const noexcept { return width_; }
-    inline int height() const noexcept { return entries_.size() / width_; }
-    inline int size() const noexcept {
-        return static_cast<int>(entries_.size());
-    }
+    inline int height() const noexcept { return height_; }
+    inline AxisTypePtr xAxis() const noexcept { return xAxis_; }
+    inline AxisTypePtr yAxis() const noexcept { return yAxis_; }
+    inline PresentedType minimum() const noexcept { return bounds_.minimum; }
+    inline PresentedType maximum() const noexcept { return bounds_.maximum; }
 
-    template <typename T = EntryType, typename Iter>
-    Iter serialize(Iter begin, Iter end) const {
-        return entries_.serialize(std::move(begin), std::move(end));
-    }
-
-    inline std::vector<uint8_t> serialize(Endianness endianness) const {
-        return entries_.serialize(endianness);
-    }
-
-    template <typename Iter>
-    inline void deserialize(Iter begin, Iter end, Endianness endianness) {
-        entries_.deserialize(std::forward<Iter>(begin), std::forward<Iter>(end),
-                             endianness);
-    }
-
-    inline std::string name() const noexcept { return name_; }
-    inline std::string description() const noexcept { return description_; }
-
-    void setName(const std::string &name) noexcept { name_ = name; }
-    void setDescription(const std::string &description) noexcept {
-        description_ = description;
-    }
-
-    inline const TableBounds<EntryType> &bounds() const noexcept {
-        return bounds_;
-    }
-    inline void setBounds(const TableBounds<EntryType> &bounds) noexcept {
-        bounds_ = bounds;
-    }
-
-    inline EntryType minimum() const noexcept { return bounds_.minimum_; }
-    inline EntryType maximum() const noexcept { return bounds_.maximum_; }
-
-    inline bool isOneDimensional() const noexcept { return height() == 1; }
-    inline bool isTwoDimensional() const noexcept { return height() > 1; }
-    inline bool isSingle() const noexcept {
-        return height() == 1 && width() == 1;
-    }
-
-    inline void setAxisX(const TableAxisPtr &axis) noexcept { axisX_ = axis; }
-    inline const TableAxisPtr &axisX() const noexcept { return axisX_; }
-
-    inline void setAxisY(const TableAxisPtr &axis) noexcept { axisY_ = axis; }
-    inline const TableAxisPtr &axisY() const noexcept { return axisY_; }
-
-    inline double scale() const noexcept { return scale_; }
-    inline void setScale(double scale) noexcept { scale_ = scale; }
-
-    inline void setDirty() noexcept { dirty_ = true; }
-    inline void clearDirty() noexcept { dirty_ = false; }
+    /* Returns true if the dirty bit is set. Thit bit is set
+     * every time set() is called. */
     inline bool dirty() const noexcept { return dirty_; }
 
+    // Clears the dirty bit
+    inline void clearDirty() noexcept { dirty_ = false; }
+
+    // Returns true if the value is within the entry bounds
+    inline bool inBounds(PresentedType value) const noexcept
+    {
+        return bounds_.within(value);
+    }
+
+    /* Returns true if the table holds a single value
+     * (width = height = 1) */
+    inline bool isSingle() const noexcept
+    {
+        return width_ == 1 && height_ == 1;
+    }
+
+    /* Returns true if the table contains a single row
+     * (height = 1) */
+    inline bool isOneDimensional() const noexcept{
+        return height_ == 1;
+    }
+
+    // Serializes entries into bytes
+    std::vector<uint8_t> intoBytes(Endianness endianness) const noexcept
+    {
+        return entries_->intoBytes(endianness);
+    }
+
 private:
-    TableStorage entries_;
-    int width_{0}; // row width
-    double scale_{1.0};
-
-    TableBounds<EntryType> bounds_;
     std::string name_;
-    std::string description_;
-
-    TableAxisPtr axisX_;
-    TableAxisPtr axisY_;
+    Bounds<PresentedType> bounds_;
+    std::unique_ptr<Entries<PresentedType>> entries_;
+    int width_, height_;
+    AxisTypePtr xAxis_, yAxis_;
+    double scale_;
     bool dirty_{false};
+
+    BasicTable(std::string name, Bounds<PresentedType> bounds,
+               std::unique_ptr<Entries<PresentedType>> && entries, int width, int height,
+               AxisTypePtr && xAxis, AxisTypePtr && yAxis, double scale)
+        : name_(std::move(name)), bounds_(std::move(bounds)),
+          entries_(std::move(entries)), width_(width), height_(height),
+          xAxis_(std::move(xAxis)), yAxis_(std::move(yAxis)), scale_(scale)
+    {
+        assert(entries_);
+    }
+
+public:
+    // Builder pattern for cleaner code
+    class Builder
+    {
+    public:
+        inline Builder & setSize(int width, int height) noexcept
+        {
+            width_ = width;
+            height_ = height;
+            return *this;
+        }
+
+        inline Builder & setName(std::string name) noexcept
+        {
+            name_ = std::move(name);
+            return *this;
+        }
+
+        inline Builder & setBounds(PresentedType minimum,
+                                   PresentedType maximum) noexcept
+        {
+            bounds_.minimum = minimum;
+            bounds_.maximum = maximum;
+            return *this;
+        }
+
+        inline Builder & setScale(double scale) noexcept
+        {
+            scale_ = scale;
+            return *this;
+        }
+
+        template <typename T>
+        Builder & setEntries(std::vector<T> && entries) noexcept
+        {
+            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(std::move(entries));
+            return *this;
+        }
+
+        // Deserializes entries from bytes
+        template <typename T, typename It>
+        inline Builder & operator()(It begin, It end, Endianness endianness)
+        {
+            return setEntries(fromBytes<T>(std::forward<It>(begin), std::forward<It>(end),
+                      endianness));
+        }
+
+        inline Builder & setXAxis(AxisTypePtr xAxis) noexcept
+        {
+            xAxis_ = std::move(xAxis);
+            return *this;
+        }
+
+        inline Builder & setYAxis(AxisTypePtr yAxis) noexcept
+        {
+            yAxis_ = std::move(yAxis);
+            return *this;
+        }
+
+        BasicTable<PresentedType> build() noexcept
+        {
+            return BasicTable<PresentedType>(
+                std::move(name_), std::move(bounds_), std::move(entries_),
+                width_, height_, std::move(xAxis_), std::move(yAxis_), scale_);
+        }
+
+    private:
+        int width_, height_;
+        double scale_{1.0};
+        AxisTypePtr xAxis_;
+        AxisTypePtr yAxis_;
+        std::string name_;
+        Bounds<PresentedType> bounds_;
+        std::unique_ptr<Entries<PresentedType>> entries_;
+    };
+    friend class Builder;
 };
 
+// Alias for a double-presented table
 using Table = BasicTable<double>;
-using TablePtr = std::unique_ptr<Table>;
+using TablePtr = std::shared_ptr<Table>;
+
+using Axis = BasicAxis<double>;
+using AxisPtr = std::shared_ptr<Axis>;
 
 } // namespace lt
 
-#endif
+#endif // LIBRETUNER_TABLE_H

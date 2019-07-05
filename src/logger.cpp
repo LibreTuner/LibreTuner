@@ -17,7 +17,6 @@
  */
 
 #include "logger.h"
-#include "libretuner.h"
 #include <QMetaObject>
 #include <iostream>
 

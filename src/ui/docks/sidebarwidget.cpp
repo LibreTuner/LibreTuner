@@ -86,8 +86,8 @@ SidebarWidget::SidebarWidget(QWidget *parent) : QWidget(parent) {
     fillTableInfo(nullptr);
 }
 
-void SidebarWidget::fillTableInfo(const lt::ModelTable *mod) {
-    if (mod == nullptr) {
+void SidebarWidget::fillTableInfo(const lt::TableDefinition *table) {
+    if (table == nullptr) {
         tableName_->setText("N/A");
         tableOffset_->setText("N/A");
         tableWidth_->setText("N/A");
@@ -99,10 +99,8 @@ void SidebarWidget::fillTableInfo(const lt::ModelTable *mod) {
         return;
     }
 
-    const lt::TableDefinition *table = mod->table;
-
     tableName_->setText(QString::fromStdString(table->name));
-    tableOffset_->setText(QString("0x") + QString::number(mod->offset, 16));
+    tableOffset_->setText(QString("0x") + QString::number(table->offset.value(), 16));
     tableWidth_->setText(QString::number(table->width));
     tableHeight_->setText(QString::number(table->height));
     tableRange_->setText(
