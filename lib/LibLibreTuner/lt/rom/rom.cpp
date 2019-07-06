@@ -21,11 +21,14 @@
 
 #include "definition/platform.h"
 
-#include <cassert>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+
+#include <cassert>
 #include <fstream>
+
+namespace fs = std::filesystem;
 
 namespace lt
 {
@@ -189,153 +192,63 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
         .first->second;
 }
 
-// Define constructs in global scope
-struct RomConstruct
+Tune::MetaData Tune::metadata() const noexcept
 {
-    std::string id;
-    std::string name;
-    std::string platformId;
-    std::string modelId;
-    std::vector<uint8_t> data;
-
-    template <class Archive>
-    void serialize(Archive & archive, std::uint32_t const version)
-    {
-        if (version != 1)
-            throw std::runtime_error("invalid ROM version, expected 1");
-
-        archive(id, name, platformId, modelId, data);
-    }
-};
-
-struct TableConstruct
-{
-    std::string id;
-    std::vector<uint8_t> data;
-
-    template <class Archive> void serialize(Archive & archive)
-    {
-        archive(id, data);
-    }
-};
-
-struct TuneConstruct
-{
-    std::string id;
-    std::string name;
-    std::string baseId;
-    std::vector<TableConstruct> tables;
-
-    template <class Archive>
-    void serialize(Archive & archive, std::uint32_t const version)
-    {
-        if (version != 1)
-            throw std::runtime_error("invalid tune version, expected 1");
-
-        archive(id, name, baseId, tables);
-    }
-};
-
-RomPtr FileRomDatabase::getRom(const std::string & id)
-{
-    // Search the cache
-    if (auto it = cache_.find(id); it != cache_.end())
-    {
-        // Check if the pointer has expired
-        if (auto rom = it->second.lock())
-            return rom;
-    }
-
-    std::ifstream file(base_ / id, std::ios::binary | std::ios::in);
-    if (!file.is_open())
-        return RomPtr();
-
-    // Deserialize ROM with cereal
-    cereal::BinaryInputArchive archive(file);
-    RomConstruct construct;
-    archive(construct);
-
-    // Find the model
-    ModelPtr model = platforms_.find(construct.platformId, construct.modelId);
-    if (!model)
-        throw std::runtime_error("Unknown platform and rom combination '" +
-                                 construct.platformId + "' and '" +
-                                 construct.modelId + "'");
-    auto rom = std::make_shared<Rom>(model);
-    rom->setId(construct.id);
-    rom->setName(construct.name);
-    rom->setData(std::move(construct.data));
-    // Insert into cache
-    cache_.emplace(construct.id, rom);
-    return rom;
+    MetaData md;
+    md.name = name_;
+    if (base_)
+        md.base = base_->path().filename();
+    return md;
 }
 
-TunePtr FileRomDatabase::loadTune(const std::filesystem::path & path)
+void Tune::save() const
 {
-    std::ifstream file(path, std::ios::binary | std::ios::in);
-    if (!file.is_open())
-        return TunePtr();
+    if (path_.empty())
+        throw std::runtime_error("attempt to save ROM without a path");
 
-    cereal::BinaryInputArchive archive(file);
     TuneConstruct construct;
-    archive(construct);
+    construct.meta = metadata();
 
-    RomPtr rom = getRom(construct.baseId);
-    if (!rom)
-        throw std::runtime_error("unable to find ROM with id '" +
-                                 construct.baseId + "'");
-
-    auto tune = std::make_shared<Tune>(rom);
-    tune->setId(construct.id);
-    tune->setName(construct.name);
-
-    for (const TableConstruct & table : construct.tables)
+    for (auto & [id, table] : tables_)
     {
-        tune->setTable(table.id, table.data.data(), table.data.size());
+        TableConstruct tc;
+        tc.id = id;
+        tc.data = table->intoBytes(endianness());
+        construct.tables.emplace_back(std::move(tc));
     }
-    return tune;
-}
 
-void FileRomDatabase::saveRom(const Rom & rom)
-{
-    RomConstruct construct;
-    construct.name = rom.name();
-    construct.id = rom.id();
-    construct.modelId = rom.model()->id;
-    construct.platformId = rom.model()->platform.id;
-    construct.data = std::vector<uint8_t>(rom.data(), rom.data() + rom.size());
-
-    trim(construct.id);
-    if (construct.id.empty())
-        throw std::runtime_error("attempt to save ROM with empty id");
-
-    std::filesystem::path path = base_ / construct.id;
-    std::ofstream file(path, std::ios::binary | std::ios::out);
+    std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open ROM file '" + path.string() +
+        throw std::runtime_error("failed to open tune file '" + path_.string() +
                                  "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
     archive(construct);
 }
 
-void FileRomDatabase::saveTune(const Tune & tune, std::filesystem::path & path)
+Rom::MetaData Rom::metadata() const noexcept
 {
-    TuneConstruct construct;
-    construct.id = tune.id();
-    construct.name = tune.name();
-    construct.baseId = tune.base()->id();
-    for (auto & [id, table] : tune.tables())
+    MetaData md;
+    md.name = name_;
+    if (model_)
     {
-        TableConstruct tc;
-        tc.id = id;
-        tc.data = table->intoBytes(tune.endianness());
-        construct.tables.emplace_back(std::move(tc));
+        md.model = model_->id;
+        md.platform = model_->platform.id;
     }
+    return md;
+}
 
-    std::ofstream file(path, std::ios::binary | std::ios::out);
+void Rom::save() const
+{
+    if (path_.empty())
+        throw std::runtime_error("attempt to save ROM without a path");
+    RomConstruct construct;
+    construct.meta = metadata();
+    construct.data = std::vector<uint8_t>(data_);
+
+    std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open tune file '" + path.string() +
+        throw std::runtime_error("failed to open ROM file '" + path_.string() +
                                  "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
@@ -343,6 +256,3 @@ void FileRomDatabase::saveTune(const Tune & tune, std::filesystem::path & path)
 }
 
 } // namespace lt
-
-// Declare cereal version out of scope
-CEREAL_CLASS_VERSION(lt::Rom, 1)

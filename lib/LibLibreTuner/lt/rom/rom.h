@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cereal/cereal.hpp>
+
 #include "../definition/model.h"
 #include "../definition/platform.h"
 #include "table.h"
@@ -35,19 +37,21 @@ namespace lt
 class Rom
 {
 public:
+    static constexpr auto extension = ".ltr";
+
     explicit Rom(ModelPtr model = ModelPtr()) : model_(std::move(model)) {}
 
     inline const std::string & name() const noexcept { return name_; }
     inline const ModelPtr & model() const noexcept { return model_; }
-    inline const std::string & id() const noexcept { return id_; }
     inline Endianness endianness() const noexcept
     {
         return model_->platform.endianness;
     }
+    inline const std::filesystem::path & path() const noexcept { return path_; }
 
-    void setId(const std::string & id) { id_ = id; }
     void setName(const std::string & name) { name_ = name; }
     void setModel(const ModelPtr & model) { model_ = model; }
+    void setPath(std::filesystem::path path) { path_ = std::move(path); }
 
     inline const uint8_t * data() const noexcept { return data_.data(); }
     inline int size() const noexcept { return static_cast<int>(data_.size()); }
@@ -66,10 +70,30 @@ public:
     // Sets the ROM data
     void setData(std::vector<uint8_t> && data) { data_ = std::move(data); }
 
+    struct MetaData
+    {
+        std::string name;
+        std::string platform;
+        std::string model;
+
+        template <class Archive>
+        void serialize(Archive & archive, std::uint32_t const version)
+        {
+            archive(name, platform, model);
+        }
+    };
+
+    // Constructs ROM metadata
+    MetaData metadata() const noexcept;
+
+    // Saves rom to `path_`
+    void save() const;
+
 private:
     std::string name_;
     ModelPtr model_;
-    std::string id_;
+
+    std::filesystem::path path_;
 
     // Tunes SHOULD NOT be tied to ROMs but instead to platforms
     // std::vector<std::unique_ptr<Tune>> tunes_;
@@ -84,11 +108,13 @@ using TableMap = std::unordered_map<std::string, std::unique_ptr<Table>>;
 class Tune
 {
 public:
+    static constexpr auto extension = ".ltr";
+
     explicit Tune(RomPtr rom) : base_(std::move(rom)) { assert(base_); }
 
     inline const std::string & name() const noexcept { return name_; }
-    inline const std::string & id() const noexcept { return id_; }
     inline const RomPtr & base() const noexcept { return base_; }
+    inline const std::filesystem::path & path() const noexcept { return path_; }
 
     // Returns true if any table is dirty
     bool dirty() const noexcept;
@@ -96,9 +122,9 @@ public:
     // Clears dirty bit of all tables
     void clearDirty() noexcept;
 
-    void setId(const std::string & id) { id_ = id; }
     void setName(const std::string & name) { name_ = name; }
     void setBase(const RomPtr & rom) { base_ = rom; }
+    void setPath(std::filesystem::path path) { path_ = std::move(path); }
 
     // Gets table by id. Returns nullptr if the table does not exist
     // If `create` is true and the table has not been initialized, creates
@@ -118,8 +144,24 @@ public:
         return base_->endianness();
     }
 
-    TablePtr deserializeTable(const TableDefinition & def, const uint8_t * data,
-                              std::size_t length);
+    struct MetaData
+    {
+        std::string name;
+        // Base ROM id
+        std::string base;
+
+        template <class Archive>
+        void serialize(Archive & archive, std::uint32_t const version)
+        {
+            archive(name, base);
+        }
+    };
+
+    /* Constructs tune metadata */
+    MetaData metadata() const noexcept;
+
+    // Saves tune to `path_`
+    void save() const;
 
 private:
     std::string name_;
@@ -129,49 +171,47 @@ private:
 
     std::unordered_map<std::string, AxisPtr> axes_;
 
-    std::string id_;
+    std::filesystem::path path_;
 };
 using TunePtr = std::shared_ptr<Tune>;
 
-class Platforms;
-
-/* Manages saving and loading of ROMs and tunes from files.
- * `FileRomDatabase` loads and stores ROMs in a specified
- * directory. */
-class FileRomDatabase
+// Serialization
+struct RomConstruct
 {
-public:
-    // Initializes base path for ROM storage.
-    FileRomDatabase(std::filesystem::path base, const Platforms & platforms)
-        : base_(base), platforms_(std::move(platforms))
+    Rom::MetaData meta;
+    std::vector<uint8_t> data;
+
+    template <class Archive> void serialize(Archive & archive)
     {
+        archive(meta, data);
     }
-
-    /* Loads a ROM by id. If the ROM is cached, it will be returned.
-     * Otherwise, the directory is searched and if the ROM cannot
-     * be found, RomPtr() is returned. If the ROM was found but deserialization
-     * fails, throws an exception. */
-    RomPtr getRom(const std::string & id);
-
-    /* Saves ROM to file. Throws an exception if the ROM could not be saved
-     * (i.e. invalid id or a ROM with the id already exists) */
-    void saveRom(const Rom & rom);
-
-    /* Loads tune from a path. Returns a null pointer if the path does not
-     * exist. Throws an exception if it cannot be deserialized or the base
-     * cannot be found. */
-    TunePtr loadTune(const std::filesystem::path & path);
-
-    /* Saves a tune to a file. Throws an exception if serialization failed or
-     * the file couldn't be opened. */
-    void saveTune(const Tune & tune, std::filesystem::path & path);
-
-private:
-    std::filesystem::path base_;
-    std::unordered_map<std::string, WeakRomPtr> cache_;
-    const Platforms & platforms_;
 };
 
+struct TableConstruct
+{
+    std::string id;
+    std::vector<uint8_t> data;
+
+    template <class Archive> void serialize(Archive & archive)
+    {
+        archive(id, data);
+    }
+};
+
+struct TuneConstruct
+{
+    Tune::MetaData meta;
+    std::vector<TableConstruct> tables;
+
+    template <class Archive> void serialize(Archive & archive)
+    {
+        archive(meta, tables);
+    }
+};
 } // namespace lt
+
+// Declare cereal versions out of scope
+CEREAL_CLASS_VERSION(lt::Rom::MetaData, 1)
+CEREAL_CLASS_VERSION(lt::Tune::MetaData, 1)
 
 #endif // ROM_H
