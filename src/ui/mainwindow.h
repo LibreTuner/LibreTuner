@@ -39,6 +39,7 @@ class TuneData;
 class SidebarWidget;
 class GraphWidget;
 class DefinitionsWindow;
+class ExplorerWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -75,6 +76,7 @@ private:
     TablesWidget * tables_;
     EditorWidget * editor_;
     GraphWidget * graph_;
+    ExplorerWidget * explorer_;
 
     QAction * flashCurrentAction_;
     QAction * saveCurrentAction_;
@@ -88,6 +90,7 @@ private:
     QDockWidget * tablesDock_;
     QDockWidget * editorDock_;
     QDockWidget * graphDock_;
+    QDockWidget * explorerDock_;
 
     void setupMenu();
     void setupStatusBar();
@@ -109,6 +112,7 @@ private:
     QDockWidget * createTablesDock();
     QDockWidget * createEditorDock();
     QDockWidget * createGraphDock();
+    QDockWidget * createExplorerDock();
 
     std::vector<QDockWidget *> docks_;
 

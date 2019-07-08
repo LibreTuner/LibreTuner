@@ -28,6 +28,7 @@
 #include "docks/overviewwidget.h"
 #include "docks/sidebarwidget.h"
 #include "docks/tableswidget.h"
+#include "docks/explorerwidget.h"
 
 #include "windows/definitionswindow.h"
 
@@ -56,6 +57,7 @@
 #include <database/definitions.h>
 #include <future>
 #include <lt/link/datalink.h>
+#include <ui/windows/newprojectdialog.h>
 
 MainWindow::MainWindow(QWidget * parent)
     : QMainWindow(parent), linksList_(LT()->links())
@@ -82,6 +84,7 @@ MainWindow::MainWindow(QWidget * parent)
     tablesDock_ = createTablesDock();
     editorDock_ = createEditorDock();
     graphDock_ = createGraphDock();
+    explorerDock_ = createExplorerDock();
 
     restoreDocks();
 
@@ -111,7 +114,7 @@ void MainWindow::saveTune(bool newPath)
         return;
     }
 
-    LT()->roms().saveTune(*tune_, tunePath_);
+    //LT()->roms().saveTune(*tune_, tunePath_);
     tune_->clearDirty();
 }
 
@@ -132,7 +135,8 @@ void MainWindow::restoreDocks()
     // Place docks
 
     // Roms | Central | Sidebar
-    addDockWidget(Qt::TopDockWidgetArea, overviewDock_);
+    addDockWidget(Qt::TopDockWidgetArea, explorerDock_);
+    splitDockWidget(explorerDock_, overviewDock_, Qt::Horizontal);
     splitDockWidget(overviewDock_, tablesDock_, Qt::Horizontal);
     splitDockWidget(tablesDock_, sidebarDock_, Qt::Vertical);
 
@@ -378,6 +382,19 @@ QDockWidget * MainWindow::createGraphDock()
     return dock;
 }
 
+QDockWidget * MainWindow::createExplorerDock()
+{
+    QDockWidget * dock = new QDockWidget("Explorer", this);
+
+    explorer_ = new ExplorerWidget(dock);
+    explorer_->setModel(&LT()->projects());
+    dock->setWidget(explorer_);
+    dock->setObjectName("explorer");
+
+    docks_.emplace_back(dock);
+    return dock;
+}
+
 void MainWindow::setupMenu()
 {
     auto * menuBar = new QMenuBar;
@@ -392,6 +409,7 @@ void MainWindow::setupMenu()
     auto * openTuneAction = fileMenu->addAction(tr("&Open Tune"));
     openTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     auto * createTuneAction = fileMenu->addAction(tr("&New Tune"));
+    auto * newProjectAction = fileMenu->addAction(tr("New Project"));
 
     createTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     auto * downloadAction = fileMenu->addAction(tr("&Download ROM"));
@@ -463,6 +481,14 @@ void MainWindow::setupMenu()
         catchCritical([this]() { saveTune(); }, tr("Error saving tune"));
     });
 
+    connect(newProjectAction, &QAction::triggered, [this]() {
+        NewProjectDialog dlg;
+        if (dlg.exec() == QDialog::Accepted)
+        {
+            std::filesystem::path path = dlg.path().toStdString();
+        }
+    });
+
     connect(downloadAction, &QAction::triggered, this,
             &MainWindow::on_buttonDownloadRom_clicked);
 
@@ -482,7 +508,7 @@ void MainWindow::setupMenu()
         catchCritical(
             [this, &fileName]() {
                 std::filesystem::path path(fileName.toStdString());
-                setTune(LT()->roms().loadTune(path), path);
+                //setTune(LT()->roms().loadTune(path), path);
             },
             tr("Error opening tune"));
     });

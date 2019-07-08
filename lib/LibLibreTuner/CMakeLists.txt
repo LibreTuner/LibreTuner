@@ -116,7 +116,8 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial yaml-cpp)
-target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set warnings

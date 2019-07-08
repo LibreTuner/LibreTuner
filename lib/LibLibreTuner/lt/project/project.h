@@ -53,8 +53,13 @@ public:
     // Getters
     inline const std::string & name() const noexcept { return name_; }
 
+    inline void setName(std::string name) noexcept { name_ = std::move(name); }
+
     // Saves project configuration. Does NOT save tunes or ROMs.
-    void save();
+    void save() const;
+
+    // Loads project configuration
+    void load();
 
     // Creates all project directories
     void makeDirectories();
@@ -84,6 +89,7 @@ private:
     std::string generateRomId(std::string name);
     std::string generateTuneId(std::string name);
 };
+using ProjectPtr = std::shared_ptr<Project>;
 
 } // namespace lt
 

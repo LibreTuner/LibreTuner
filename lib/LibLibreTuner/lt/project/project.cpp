@@ -178,4 +178,40 @@ std::string Project::generateTuneId(std::string name)
     return generateId(tunesDir_, std::move(name), Tune::extension);
 }
 
+template <class Archive>
+void save(Archive & archive, const lt::Project & project, std::uint32_t const version)
+{
+    archive(project.name());
+}
+
+template <class Archive>
+void load(Archive & archive, lt::Project & project, std::uint32_t const version)
+{
+    std::string name;
+    archive(name);
+    project.setName(std::move(name));
+}
+
+void Project::save() const
+{
+    std::ofstream file(path_, std::ios::binary | std::ios::out);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open project file '" + path_.string() + "' for writing.");
+
+    cereal::BinaryOutputArchive ar(file);
+    ar(*this);
+}
+
+void Project::load()
+{
+    std::ifstream file(path_, std::ios::binary | std::ios::in);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open project file '" + path_.string() + "' for reading.");
+
+    cereal::BinaryInputArchive ar(file);
+    ar(*this);
+}
+
 } // namespace lt
+
+CEREAL_CLASS_VERSION(lt::Project, 1)

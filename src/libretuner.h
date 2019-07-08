@@ -29,8 +29,10 @@
 #include <memory>
 
 #include "database/links.h"
+#include "database/projects.h"
 
-#include "lt/link/platformlink.h"
+#include <lt/link/platformlink.h>
+#include <lt/project/project.h>
 
 #include <filesystem>
 
@@ -63,11 +65,10 @@ public:
     }
     inline lt::Platforms & definitions() noexcept { return platforms_; }
 
-    inline const lt::FileRomDatabase & roms() const noexcept { return roms_; }
-    inline lt::FileRomDatabase & roms() noexcept { return roms_; }
-
     inline const Links & links() const noexcept { return links_; }
     inline Links & links() noexcept { return links_; }
+
+    inline Projects & projects() noexcept { return projects_; }
 
     /* Returns the current platform or nullptr if none is selected */
     lt::PlatformPtr platform() const { return currentPlatform_; }
@@ -82,8 +83,8 @@ public:
 private:
     std::filesystem::path rootPath_;
     lt::Platforms platforms_;
+    Projects projects_;
 
-    lt::FileRomDatabase roms_;
     Links links_;
 
     lt::DataLink * currentDatalink_{nullptr};

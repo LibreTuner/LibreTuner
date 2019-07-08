@@ -212,8 +212,8 @@ void FlasherWindow::nextClicked()
     // Try to open tune
     catchCritical(
         [this]() {
-            selectedTune_ =
-                LT()->roms().loadTune(fileSelect_->path().toStdString());
+            //selectedTune_ =
+               // LT()->roms().loadTune(fileSelect_->path().toStdString());
 
             stack_->setCurrentIndex(1);
             buttonNext_->setEnabled(false);

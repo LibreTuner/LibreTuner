@@ -40,8 +40,7 @@ static LibreTuner * _global;
 namespace fs = std::filesystem;
 
 LibreTuner::LibreTuner(int & argc, char * argv[])
-    : QApplication(argc, argv), rootPath_(fs::current_path()),
-      roms_(rootPath_ / "roms", platforms_)
+    : QApplication(argc, argv), rootPath_(fs::current_path())
 {
     _global = this;
 

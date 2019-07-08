@@ -174,8 +174,8 @@ void DownloadWindow::download()
                     rom.setData(std::vector<uint8_t>(data.first,
                                                      data.first + data.second));
                     rom.setName(lineName_->text().toStdString());
-                    rom.setId(lineId_->text().toStdString());
-                    LT()->roms().saveRom(rom);
+                    //rom.setId(lineId_->text().toStdString());
+                    //LT()->roms().saveRom(rom);
 
                     QMessageBox(QMessageBox::Information, "Download Finished",
                                 "ROM downloaded successfully")

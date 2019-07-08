@@ -80,9 +80,13 @@ set(libretuner_SRC
     ui/docks/graphwidget.h
     ui/docks/hexeditwidget.cpp
     ui/docks/hexeditwidget.h
+        ui/docks/explorerwidget.cpp
+        ui/docks/explorerwidget.h
 
     ui/windows/definitionswindow.cpp
     ui/windows/definitionswindow.h
+        ui/windows/newprojectdialog.cpp
+        ui/windows/newprojectdialog.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
@@ -104,6 +108,8 @@ set(libretuner_SRC
     database/definitions.h
     database/links.cpp
     database/links.h
+        database/projects.cpp
+        database/projects.h
 
 
     ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
