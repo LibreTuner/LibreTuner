@@ -197,7 +197,7 @@ Tune::MetaData Tune::metadata() const noexcept
     MetaData md;
     md.name = name_;
     if (base_)
-        md.base = base_->path().filename();
+        md.base = base_->path().filename().string();
     return md;
 }
 

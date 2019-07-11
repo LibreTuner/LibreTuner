@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <variant>
+#include <optional>
 
 namespace lt
 {
