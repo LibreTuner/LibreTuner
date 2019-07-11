@@ -39,8 +39,8 @@ struct TreeItem
 class DirectoryItem : public TreeItem
 {
 public:
-    explicit DirectoryItem(QString name, TreeItem * parent = nullptr)
-        : TreeItem(parent), name_(std::move(name))
+    explicit DirectoryItem(QString name, lt::Project * project, TreeItem * parent = nullptr)
+        : TreeItem(parent), name_(std::move(name)), project_(project)
     {
     }
 
@@ -58,11 +58,17 @@ public:
             return provider.icon(QFileIconProvider::Folder);
         }
 
+        if (role == Qt::UserRole)
+        {
+            return QVariant::fromValue(project_);
+        }
+
         return QVariant();
     }
 
 private:
     QString name_;
+    lt::Project * project_;
 };
 
 class ProjectItem : public TreeItem
@@ -72,9 +78,9 @@ public:
                          TreeItem * parent = nullptr)
         : TreeItem(parent), project_(std::move(project))
     {
-        roms_ = new DirectoryItem("ROMs", this);
-        tunes_ = new DirectoryItem("Tunes", this);
-        logs_ = new DirectoryItem("Logs", this);
+        roms_ = new DirectoryItem("ROMs", project_.get(), this);
+        tunes_ = new DirectoryItem("Tunes", project_.get(), this);
+        logs_ = new DirectoryItem("Logs", project_.get(), this);
     }
 
     QVariant data(int column, int role) const override
@@ -89,6 +95,11 @@ public:
         {
             QFileIconProvider provider;
             return provider.icon(QFileIconProvider::Drive);
+        }
+
+        if (role == Qt::UserRole)
+        {
+            return QVariant::fromValue(project_.get());
         }
 
         return QVariant();
@@ -165,7 +176,9 @@ QVariant Projects::data(const QModelIndex & index, int role) const
 
 void Projects::addProject(lt::ProjectPtr project)
 {
+    beginInsertRows(QModelIndex(), root_->children.size(), root_->children.size());
     new ProjectItem(std::move(project), root_);
+    endInsertRows();
 }
 
 QVariant Projects::headerData(int section, Qt::Orientation orientation,

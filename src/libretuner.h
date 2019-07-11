@@ -70,6 +70,9 @@ public:
 
     inline Projects & projects() noexcept { return projects_; }
 
+    // Creates a new project with path `path`.
+    lt::ProjectPtr createProject(const std::filesystem::path & path);
+
     /* Returns the current platform or nullptr if none is selected */
     lt::PlatformPtr platform() const { return currentPlatform_; }
     void setPlatform(lt::PlatformPtr platform);

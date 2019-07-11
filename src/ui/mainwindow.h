@@ -59,6 +59,7 @@ private slots:
     void on_buttonDownloadRom_clicked();
     void newLogClicked();
     void closeEvent(QCloseEvent * event) override;
+    void newProject();
 
 signals:
     void tableChanged(lt::Table * table);

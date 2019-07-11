@@ -170,3 +170,10 @@ lt::PlatformLink LibreTuner::platformLink() const
 
     return lt::PlatformLink(*currentDatalink_, *currentPlatform_);
 }
+
+lt::ProjectPtr LibreTuner::createProject(const std::filesystem::path & path)
+{
+    auto project = std::make_shared<lt::Project>(path, platforms_);
+    projects_.addProject(project);
+    return project;
+}

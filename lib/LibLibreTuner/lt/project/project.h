@@ -20,9 +20,8 @@ public:
      * fails, throws an exception. */
     RomPtr getRom(const std::string & filename);
 
-    /* Saves ROM to file. Throws an exception if the ROM could not be saved
-     * (i.e. invalid id or a ROM with the id already exists) */
-    void saveRom(const Rom & rom);
+    /* Creates a new blank ROM from `name`. Sets path. */
+    RomPtr createRom(const std::string & name, lt::ModelPtr model = lt::ModelPtr());
 
     /* Loads tune by id. Returns a null pointer if the path does not
      * exist. Throws an exception if it cannot be deserialized or the base

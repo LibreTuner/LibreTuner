@@ -388,6 +388,7 @@ QDockWidget * MainWindow::createExplorerDock()
 
     explorer_ = new ExplorerWidget(dock);
     explorer_->setModel(&LT()->projects());
+    connect(explorer_->menu().actionNewProject(), &QAction::triggered, this, &MainWindow::newProject);
     dock->setWidget(explorer_);
     dock->setObjectName("explorer");
 
@@ -482,11 +483,7 @@ void MainWindow::setupMenu()
     });
 
     connect(newProjectAction, &QAction::triggered, [this]() {
-        NewProjectDialog dlg;
-        if (dlg.exec() == QDialog::Accepted)
-        {
-            std::filesystem::path path = dlg.path().toStdString();
-        }
+        newProject();
     });
 
     connect(downloadAction, &QAction::triggered, this,
@@ -602,4 +599,15 @@ void MainWindow::closeEvent(QCloseEvent * event)
     datalinksWindow_.close();*/
 
     saveSettings();
+}
+
+void MainWindow::newProject()
+{
+    NewProjectDialog dlg;
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        std::filesystem::path path = dlg.path().toStdString();
+        lt::ProjectPtr project = LT()->createProject(path);
+        project->setName(path.stem().string());
+    }
 }

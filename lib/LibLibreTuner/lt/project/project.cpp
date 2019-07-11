@@ -212,6 +212,15 @@ void Project::load()
     ar(*this);
 }
 
+RomPtr Project::createRom(const std::string & name, lt::ModelPtr model) {
+    auto rom = std::make_shared<lt::Rom>(model);
+    rom->setName(name);
+    rom->setPath(romsDir_ / generateRomId(name));
+
+    cache_.emplace(rom->path().string(), rom);
+    return rom;
+}
+
 } // namespace lt
 
 CEREAL_CLASS_VERSION(lt::Project, 1)

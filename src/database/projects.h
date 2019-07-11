@@ -5,7 +5,7 @@
 
 #include <lt/project/project.h>
 
-class TreeItem;
+struct TreeItem;
 
 class Projects : public QAbstractItemModel
 {
@@ -14,7 +14,6 @@ public:
     ~Projects() override;
 
     void addProject(lt::ProjectPtr project);
-
 
     QModelIndex index(int row, int column,
                       const QModelIndex & parent) const override;
@@ -28,5 +27,7 @@ public:
 private:
     TreeItem * root_;
 };
+
+Q_DECLARE_METATYPE(lt::Project*)
 
 #endif // LIBRETUNER_PROJECTS_H
