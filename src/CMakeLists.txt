@@ -53,8 +53,6 @@ set(libretuner_SRC
     ui/flasherwindow.h
     ui/authoptionsview.cpp
     ui/authoptionsview.h
-    ui/downloadwindow.cpp
-    ui/downloadwindow.h
     ui/datalinkswidget.cpp
     ui/datalinkswidget.h
     ui/adddatalinkdialog.cpp
@@ -80,13 +78,15 @@ set(libretuner_SRC
     ui/docks/graphwidget.h
     ui/docks/hexeditwidget.cpp
     ui/docks/hexeditwidget.h
-        ui/docks/explorerwidget.cpp
-        ui/docks/explorerwidget.h
+    ui/docks/explorerwidget.cpp
+    ui/docks/explorerwidget.h
 
     ui/windows/definitionswindow.cpp
     ui/windows/definitionswindow.h
-        ui/windows/newprojectdialog.cpp
-        ui/windows/newprojectdialog.h
+    ui/windows/newprojectdialog.cpp
+    ui/windows/newprojectdialog.h
+    ui/windows/downloadwindow.cpp
+    ui/windows/downloadwindow.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h

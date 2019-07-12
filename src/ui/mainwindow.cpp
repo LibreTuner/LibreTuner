@@ -19,7 +19,7 @@
 #include "mainwindow.h"
 #include "libretuner.h"
 
-#include "downloadwindow.h"
+#include "ui/windows/downloadwindow.h"
 
 #include "docks/diagnosticswidget.h"
 #include "docks/editorwidget.h"

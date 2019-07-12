@@ -18,16 +18,16 @@
 
 #include "downloadwindow.h"
 
-#include "backgroundtask.h"
 #include "libretuner.h"
 #include "logger.h"
+#include "ui/backgroundtask.h"
 #include "uiutil.h"
 
-#include "../database/definitions.h"
+#include "database/definitions.h"
 
 #include <lt/project/project.h>
 
-#include "authoptionsview.h"
+#include "ui/authoptionsview.h"
 
 #include <QComboBox>
 #include <QFileDialog>
