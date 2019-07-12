@@ -79,7 +79,6 @@ MainWindow::MainWindow(QWidget * parent)
     logDock_ = createLogDock();
     overviewDock_ = createOverviewDock();
     loggingDock_ = createLoggingDock();
-    diagnosticsDock_ = createDiagnosticsDock();
     sidebarDock_ = createSidebarDock();
     tablesDock_ = createTablesDock();
     editorDock_ = createEditorDock();
@@ -146,7 +145,6 @@ void MainWindow::restoreDocks()
     // Top (central)
 
     tabifyDockWidget(overviewDock_, loggingDock_);
-    tabifyDockWidget(overviewDock_, diagnosticsDock_);
     tabifyDockWidget(overviewDock_, editorDock_);
     tabifyDockWidget(overviewDock_, graphDock_);
 }
@@ -269,15 +267,6 @@ QDockWidget * MainWindow::createLoggingDock()
 
     widget->setLayout(layout);
     dock->setWidget(widget);
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-QDockWidget * MainWindow::createDiagnosticsDock()
-{
-    QDockWidget * dock = new QDockWidget("Diagnostics", this);
-    dock->setObjectName("diagnostics");
-    dock->setWidget(new DiagnosticsWidget);
     docks_.emplace_back(dock);
     return dock;
 }
@@ -510,6 +499,8 @@ void MainWindow::setupMenu()
             tr("Error opening tune"));
     });
 
+    // Tools menu
+
     QAction * logAction = toolsMenu->addAction(tr("&CAN Log"));
     // connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
 
@@ -517,10 +508,16 @@ void MainWindow::setupMenu()
     connect(datalinksAction, &QAction::triggered,
             [this]() { datalinksWindow_.show(); });
 
-    auto * sessionScanAct = toolsMenu->addAction("Session Scanner");
+    auto * sessionScanAct = toolsMenu->addAction(tr("Session Scanner"));
     connect(sessionScanAct, &QAction::triggered, [this]() {
         SessionScannerDialog scanner;
         scanner.exec();
+    });
+
+    QAction * diagnosticsAction = toolsMenu->addAction(tr("Trouble Code Scanner"));
+    connect(diagnosticsAction, &QAction::triggered, [this]()
+    {
+        diagnosticsWindow_.show();
     });
 
     setMenuBar(menuBar);

@@ -42,8 +42,8 @@ public:
      * be called often. */
     std::vector<Tune::MetaData> queryTunes();
 
-    std::filesystem::path tunesDirectory() const noexcept;
-    std::filesystem::path romsDirectory() const noexcept;
+    const std::filesystem::path & tunesDirectory() const noexcept;
+    const std::filesystem::path & romsDirectory() const noexcept;
 
     /* Creates a tune from the base calibration. Generates an
      * id based on the name. */
@@ -62,6 +62,9 @@ public:
 
     // Creates all project directories
     void makeDirectories();
+
+    // Returns the project's path
+    const std::filesystem::path & path() const noexcept { return path_; }
 
     std::filesystem::path logsDirectory() const noexcept;
 

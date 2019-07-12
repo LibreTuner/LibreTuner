@@ -1,13 +1,14 @@
 #include "explorerwidget.h"
 
-#include <QVBoxLayout>
-#include <QTreeView>
-#include <QVector>
 #include <QAbstractItemModel>
 #include <QFileIconProvider>
+#include <QTreeView>
+#include <QVBoxLayout>
+#include <QVector>
 
-#include <lt/project/project.h>
 #include "../../database/projects.h"
+#include "../downloadwindow.h"
+#include <lt/project/project.h>
 
 #include <memory>
 
@@ -22,35 +23,45 @@ ExplorerWidget::ExplorerWidget(QWidget * parent) : QWidget(parent)
     setLayout(layout);
 
     tree_->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(tree_, &QTreeView::customContextMenuRequested, [this](const QPoint & point)
-    {
-        QModelIndex index = tree_->indexAt(point);
+    connect(tree_, &QTreeView::customContextMenuRequested,
+            [this](const QPoint & point) {
+                QModelIndex index = tree_->indexAt(point);
 
-        QVariant data = index.data(Qt::UserRole);
-        if (data.canConvert<lt::Project*>())
-            menu_.setProject(data.value<lt::Project*>());
-        else
-            menu_.setProject(nullptr);
+                QVariant data = index.data(Qt::UserRole);
+                if (data.canConvert<lt::ProjectPtr>())
+                    menu_.setProject(data.value<lt::ProjectPtr>());
+                else
+                    menu_.setProject(nullptr);
 
-        menu_.exec(tree_->viewport()->mapToGlobal(point));
-    });
+                menu_.exec(tree_->viewport()->mapToGlobal(point));
+            });
 }
 
-void ExplorerWidget::setModel(QAbstractItemModel * model) {
+void ExplorerWidget::setModel(QAbstractItemModel * model)
+{
     tree_->setModel(model);
 }
 
-ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent) {
-    actionNewProject_ = new QAction(tr("New Project"), this);
-    actionDownloadRom_ = new QAction(style()->standardIcon(QStyle::SP_DriveNetIcon),
-                                     tr("Download ROM"), this);
+ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent)
+{
+    actionNewProject_ = new QAction(QIcon(":/icons/new_file.svg"), tr("New Project"), this);
+    actionDownloadRom_ =
+        new QAction(QIcon(":/icons/download.svg"),
+                    tr("Download ROM"), this);
 
     addAction(actionNewProject_);
     addAction(actionDownloadRom_);
+
+    connect(actionDownloadRom_, &QAction::triggered, [this]()
+    {
+        DownloadWindow dlg(project_);
+        dlg.setModal(true);
+        dlg.exec();
+    });
 }
 
-void ExplorerMenu::setProject(lt::Project * project)
+void ExplorerMenu::setProject(lt::ProjectPtr project)
 {
-    project_ = project;
-    actionDownloadRom_->setEnabled(project_ != nullptr);
+    project_ = std::move(project);
+    actionDownloadRom_->setEnabled(!!project_);
 }

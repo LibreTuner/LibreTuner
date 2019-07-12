@@ -75,9 +75,9 @@ TunePtr Project::loadTune(const std::string & filename)
     return tune;
 }
 
-fs::path Project::tunesDirectory() const noexcept { return tunesDir_; }
+const fs::path & Project::tunesDirectory() const noexcept { return tunesDir_; }
 
-fs::path Project::romsDirectory() const noexcept { return romsDir_; }
+const fs::path & Project::romsDirectory() const noexcept { return romsDir_; }
 
 Project::Project(fs::path base, const Platforms & platforms)
     : path_(base), tunesDir_(base / "tunes"), romsDir_(base / "roms"),

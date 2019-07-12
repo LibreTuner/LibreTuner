@@ -13,6 +13,8 @@
 
 DiagnosticsWidget::DiagnosticsWidget(QWidget * parent) : QWidget(parent)
 {
+    setWindowTitle(tr("Diagnostic Trouble Code Scanner - LibreTuner"));
+    resize(700, 400);
     auto * layout = new QVBoxLayout;
     auto * menuLayout = new QHBoxLayout;
 

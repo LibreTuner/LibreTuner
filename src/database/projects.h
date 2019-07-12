@@ -2,6 +2,7 @@
 #define LIBRETUNER_PROJECTS_H
 
 #include <QAbstractItemModel>
+#include <QFileSystemWatcher>
 
 #include <lt/project/project.h>
 
@@ -13,6 +14,8 @@ public:
     explicit Projects(QObject * parent = nullptr);
     ~Projects() override;
 
+    /* Adds a project. The project directory must exist in order
+     * for the file watcher to work. */
     void addProject(lt::ProjectPtr project);
 
     QModelIndex index(int row, int column,
@@ -24,10 +27,24 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role) const override;
 
+    void refreshRoms(const lt::Project &project);
+
+    QModelIndex projectIndex(const lt::Project & project);
+
+    // Returns the index of the ROM directory with path `romsPath`
+    QModelIndex romsIndex(const QString & romsPath);
+
 private:
     TreeItem * root_;
+    QFileSystemWatcher romsWatcher_;
+
+    void refreshRoms(const QModelIndex & index);
+
+private slots:
+    void romsDirectoryChanged(const QString & path);
 };
 
-Q_DECLARE_METATYPE(lt::Project*)
+Q_DECLARE_METATYPE(lt::ProjectPtr)
+Q_DECLARE_METATYPE(lt::Rom::MetaData)
 
 #endif // LIBRETUNER_PROJECTS_H

@@ -30,6 +30,11 @@ class QLineEdit;
 class QComboBox;
 class AuthOptionsView;
 
+namespace lt {
+class Project;
+using ProjectPtr = std::shared_ptr<Project>;
+}
+
 /**
  * Window for downloading firmware from the ECU
  */
@@ -37,7 +42,7 @@ class DownloadWindow : public QDialog
 {
     Q_OBJECT
 public:
-    explicit DownloadWindow(QWidget * parent = nullptr);
+    explicit DownloadWindow(lt::ProjectPtr project = lt::ProjectPtr(), QWidget * parent = nullptr);
     ~DownloadWindow() override;
 
 public slots:
@@ -51,8 +56,8 @@ protected:
 private:
     QComboBox * comboPlatform_;
     QLineEdit * lineName_;
-    QLineEdit * lineId_;
     AuthOptionsView * authOptions_;
+    lt::ProjectPtr project_;
 
     lt::PlatformLink getPlatformLink();
 };

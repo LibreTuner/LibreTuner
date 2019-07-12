@@ -30,6 +30,7 @@
 #include "datalinkswidget.h"
 #include "lt/rom/rom.h"
 #include "models/tablemodel.h"
+#include "docks/diagnosticswidget.h"
 
 class QListView;
 
@@ -86,7 +87,6 @@ private:
     QDockWidget * logDock_;
     QDockWidget * overviewDock_;
     QDockWidget * loggingDock_;
-    QDockWidget * diagnosticsDock_;
     QDockWidget * sidebarDock_;
     QDockWidget * tablesDock_;
     QDockWidget * editorDock_;
@@ -107,7 +107,6 @@ private:
 
     QDockWidget * createOverviewDock();
     QDockWidget * createLoggingDock();
-    QDockWidget * createDiagnosticsDock();
     QDockWidget * createLogDock();
     QDockWidget * createSidebarDock();
     QDockWidget * createTablesDock();
@@ -125,6 +124,7 @@ private:
     TableModel tableModel_;
 
     DatalinksWidget datalinksWindow_;
+    DiagnosticsWidget diagnosticsWindow_;
 
     QPointer<DefinitionsWindow> definitionsWindow_;
 };

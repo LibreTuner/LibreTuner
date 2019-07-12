@@ -25,6 +25,8 @@
 
 #include "../database/definitions.h"
 
+#include <lt/project/project.h>
+
 #include "authoptionsview.h"
 
 #include <QComboBox>
@@ -42,7 +44,8 @@
 #include <thread>
 #include <utility>
 
-DownloadWindow::DownloadWindow(QWidget * parent) : QDialog(parent)
+DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent)
+    : QDialog(parent), project_(project)
 {
     setWindowTitle(tr("LibreTuner - Download"));
 
@@ -50,13 +53,11 @@ DownloadWindow::DownloadWindow(QWidget * parent) : QDialog(parent)
     comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
 
     lineName_ = new QLineEdit;
-    lineId_ = new QLineEdit;
 
     // Main options
     auto * form = new QFormLayout;
     form->addRow(tr("Platform"), comboPlatform_);
     form->addRow(tr("Name"), lineName_);
-    form->addRow(tr("Id"), lineId_);
 
     auto * groupDetails = new QGroupBox(tr("ROM Details"));
     groupDetails->setLayout(form);
@@ -122,6 +123,12 @@ void DownloadWindow::platformChanged(int /*index*/)
 
 void DownloadWindow::download()
 {
+    if (!project_)
+    {
+        QMessageBox::critical(nullptr, tr("Invalid project"),
+                              tr("A project has not been selected."));
+        return;
+    }
     catchCritical(
         [this]() {
             lt::PlatformLink pLink = getPlatformLink();
@@ -158,9 +165,7 @@ void DownloadWindow::download()
             {
                 bool success = task.future().get();
                 if (!success)
-                {
                     throw std::runtime_error("Unknown error");
-                }
                 auto data = downloader->data();
                 try
                 {
@@ -170,12 +175,11 @@ void DownloadWindow::download()
                         throw std::runtime_error(
                             "Could not identify calibration");
 
-                    lt::Rom rom(model);
-                    rom.setData(std::vector<uint8_t>(data.first,
-                                                     data.first + data.second));
-                    rom.setName(lineName_->text().toStdString());
-                    //rom.setId(lineId_->text().toStdString());
-                    //LT()->roms().saveRom(rom);
+                    lt::RomPtr rom = project_->createRom(
+                        lineName_->text().toStdString(), model);
+                    rom->setData(std::vector<uint8_t>(
+                        data.first, data.first + data.second));
+                    rom->save();
 
                     QMessageBox(QMessageBox::Information, "Download Finished",
                                 "ROM downloaded successfully")
@@ -187,7 +191,9 @@ void DownloadWindow::download()
                     msgBox.setWindowTitle("Download Error");
                     msgBox.setText(
                         "The ROM was downloaded, but an error occurred while "
-                        "saving. Would you like to save the binary data?");
+                        "saving. Would you like to save the binary data? "
+                        "Please send this to the LibreTuner developers. In the "
+                        "future, this will be automatic.");
                     msgBox.setInformativeText(err.what());
                     msgBox.setStandardButtons(QMessageBox::Yes |
                                               QMessageBox::No);
@@ -200,9 +206,7 @@ void DownloadWindow::download()
                             this, tr("Save ROM"), "",
                             tr("Binary (*.bin);;All Files (*)"));
                         if (fileName.isEmpty())
-                        {
                             return;
-                        }
 
                         QFile file(fileName);
                         if (!file.open(QIODevice::WriteOnly))

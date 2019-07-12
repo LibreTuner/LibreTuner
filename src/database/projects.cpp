@@ -1,6 +1,7 @@
 #include "projects.h"
 
 #include <QFileIconProvider>
+#include <logger.h>
 
 struct TreeItem
 {
@@ -39,8 +40,8 @@ struct TreeItem
 class DirectoryItem : public TreeItem
 {
 public:
-    explicit DirectoryItem(QString name, lt::Project * project, TreeItem * parent = nullptr)
-        : TreeItem(parent), name_(std::move(name)), project_(project)
+    explicit DirectoryItem(QString name, TreeItem * parent = nullptr)
+        : TreeItem(parent), name_(std::move(name))
     {
     }
 
@@ -58,29 +59,78 @@ public:
             return provider.icon(QFileIconProvider::Folder);
         }
 
+        return QVariant();
+    }
+
+private:
+    QString name_;
+};
+
+class RomItem : public TreeItem
+{
+public:
+    explicit RomItem(lt::Rom::MetaData md, TreeItem * parent = nullptr)
+        : TreeItem(parent), md_(std::move(md))
+    {
+    }
+
+    QVariant data(int column, int role) const override
+    {
+        if (column != 0)
+            return QVariant();
+
+        if (role == Qt::DisplayRole)
+            return QString::fromStdString(md_.name);
+
+        if (role == Qt::DecorationRole)
+        {
+            QFileIconProvider provider;
+            return provider.icon(QFileIconProvider::File);
+        }
+
         if (role == Qt::UserRole)
         {
-            return QVariant::fromValue(project_);
+            return QVariant::fromValue(md_);
         }
 
         return QVariant();
     }
 
 private:
-    QString name_;
-    lt::Project * project_;
+    lt::Rom::MetaData md_;
+};
+
+class RomsItem : public DirectoryItem
+{
+public:
+    explicit RomsItem(lt::ProjectPtr project, TreeItem * parent = nullptr)
+        : DirectoryItem("ROMs", parent), project_(std::move(project))
+    {
+    }
+
+    QVariant data(int column, int role) const override
+    {
+        if (column != 0)
+            return QVariant();
+
+        if (role == Qt::UserRole)
+            return QVariant::fromValue(project_);
+
+        return DirectoryItem::data(column, role);
+    }
+
+    lt::ProjectPtr project_;
 };
 
 class ProjectItem : public TreeItem
 {
 public:
-    explicit ProjectItem(std::shared_ptr<lt::Project> project,
-                         TreeItem * parent = nullptr)
+    explicit ProjectItem(lt::ProjectPtr project, TreeItem * parent = nullptr)
         : TreeItem(parent), project_(std::move(project))
     {
-        roms_ = new DirectoryItem("ROMs", project_.get(), this);
-        tunes_ = new DirectoryItem("Tunes", project_.get(), this);
-        logs_ = new DirectoryItem("Logs", project_.get(), this);
+        roms_ = new RomsItem(project_, this);
+        tunes_ = new DirectoryItem("Tunes", this);
+        logs_ = new DirectoryItem("Logs", this);
     }
 
     QVariant data(int column, int role) const override
@@ -98,9 +148,7 @@ public:
         }
 
         if (role == Qt::UserRole)
-        {
-            return QVariant::fromValue(project_.get());
-        }
+            return QVariant::fromValue(project_);
 
         return QVariant();
     }
@@ -108,7 +156,7 @@ public:
 private:
     lt::ProjectPtr project_;
 
-    TreeItem * roms_;
+    RomsItem * roms_;
     TreeItem * tunes_;
     TreeItem * logs_;
 };
@@ -116,6 +164,9 @@ private:
 Projects::Projects(QObject * parent) : QAbstractItemModel(parent)
 {
     root_ = new TreeItem;
+
+    connect(&romsWatcher_, &QFileSystemWatcher::directoryChanged, this,
+            &Projects::romsDirectoryChanged);
 }
 
 QModelIndex Projects::index(int row, int column,
@@ -176,7 +227,15 @@ QVariant Projects::data(const QModelIndex & index, int role) const
 
 void Projects::addProject(lt::ProjectPtr project)
 {
-    beginInsertRows(QModelIndex(), root_->children.size(), root_->children.size());
+    Logger::debug("Adding project '" + project->name() + "'");
+    if (!romsWatcher_.addPath(
+            QString::fromStdString(project->romsDirectory().string())))
+        Logger::warning("Failed to add roms path '" +
+                        project->romsDirectory().string() +
+                        "' to file watcher.");
+
+    beginInsertRows(QModelIndex(), root_->children.size(),
+                    root_->children.size());
     new ProjectItem(std::move(project), root_);
     endInsertRows();
 }
@@ -187,7 +246,50 @@ QVariant Projects::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-Projects::~Projects()
+Projects::~Projects() { delete root_; }
+
+QModelIndex Projects::romsIndex(const QString & romsPath)
 {
-    delete root_;
+    std::filesystem::path dir(romsPath.toStdString());
+    for (int row = 0; row < root_->children.size(); ++row)
+    {
+        QVariant data = root_->child(row)->data(0, Qt::UserRole);
+        if (data.canConvert<lt::ProjectPtr>())
+        {
+            auto project = data.value<lt::ProjectPtr>();
+            if (project->romsDirectory() == dir)
+                return index(0, 0, index(row, 0, QModelIndex()));
+        }
+    }
+    return QModelIndex();
+}
+
+void Projects::romsDirectoryChanged(const QString & path)
+{
+    QModelIndex index = romsIndex(path);
+    if (!index.isValid())
+        return;
+
+    refreshRoms(index);
+}
+
+void Projects::refreshRoms(const QModelIndex & index)
+{
+    auto project = index.data(Qt::UserRole).value<lt::ProjectPtr>();
+    auto romsItem = reinterpret_cast<RomItem *>(index.internalPointer());
+
+    // Found the correct project, reset roms
+    beginRemoveRows(index, 0, romsItem->children.size());
+    qDeleteAll(romsItem->children);
+    romsItem->children.clear();
+    endRemoveRows();
+
+    // Get all ROM metadata
+    auto roms = project->queryRoms();
+    beginInsertRows(index, 0, roms.size());
+    for (const auto & rom : roms)
+    {
+        new RomItem(rom, romsItem);
+    }
+    endInsertRows();
 }

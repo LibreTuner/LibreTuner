@@ -174,6 +174,7 @@ lt::PlatformLink LibreTuner::platformLink() const
 lt::ProjectPtr LibreTuner::createProject(const std::filesystem::path & path)
 {
     auto project = std::make_shared<lt::Project>(path, platforms_);
+    project->makeDirectories();
     projects_.addProject(project);
     return project;
 }
