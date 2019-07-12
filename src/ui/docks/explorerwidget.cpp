@@ -8,6 +8,7 @@
 
 #include "../../database/projects.h"
 #include "ui/windows/downloadwindow.h"
+#include "ui/windows/importromdialog.h"
 #include <lt/project/project.h>
 
 #include <memory>
@@ -63,7 +64,9 @@ ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent)
 
     connect(actionImportRom_, &QAction::triggered, [this]()
     {
-
+        ImportRomDialog dlg(project_);
+        dlg.setModal(true);
+        dlg.exec();
     });
 }
 
