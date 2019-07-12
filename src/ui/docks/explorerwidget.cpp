@@ -7,7 +7,7 @@
 #include <QVector>
 
 #include "../../database/projects.h"
-#include "../downloadwindow.h"
+#include "ui/windows/downloadwindow.h"
 #include <lt/project/project.h>
 
 #include <memory>
@@ -48,9 +48,11 @@ ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent)
     actionDownloadRom_ =
         new QAction(QIcon(":/icons/download.svg"),
                     tr("Download ROM"), this);
+    actionImportRom_ = new QAction(tr("Import ROM"), this);
 
     addAction(actionNewProject_);
     addAction(actionDownloadRom_);
+    addAction(actionImportRom_);
 
     connect(actionDownloadRom_, &QAction::triggered, [this]()
     {
@@ -58,10 +60,16 @@ ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent)
         dlg.setModal(true);
         dlg.exec();
     });
+
+    connect(actionImportRom_, &QAction::triggered, [this]()
+    {
+
+    });
 }
 
 void ExplorerMenu::setProject(lt::ProjectPtr project)
 {
     project_ = std::move(project);
     actionDownloadRom_->setEnabled(!!project_);
+    actionImportRom_->setEnabled(!!project_);
 }

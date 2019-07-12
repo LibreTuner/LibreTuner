@@ -87,6 +87,8 @@ set(libretuner_SRC
     ui/windows/newprojectdialog.h
     ui/windows/downloadwindow.cpp
     ui/windows/downloadwindow.h
+    ui/windows/importromdialog.cpp
+    ui/windows/importromdialog.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h

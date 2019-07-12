@@ -24,6 +24,7 @@ public:
 private:
     QAction * actionNewProject_;
     QAction * actionDownloadRom_;
+    QAction * actionImportRom_;
 
     lt::ProjectPtr project_;
 };
