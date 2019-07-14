@@ -68,7 +68,7 @@ QVariant Log::data(const QModelIndex & index, int role) const
         return QString::fromStdString(entries_[index.row()].text);
     }
 
-    if (role == Qt::TextColorRole)
+    if (role == Qt::ForegroundRole)
     {
         switch (entries_[index.row()].mode)
         {

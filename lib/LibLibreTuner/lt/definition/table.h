@@ -2,10 +2,10 @@
 #define LT_TABLEDEF_H
 
 #include "../support/types.h"
+#include <optional>
 #include <string>
 #include <utility>
 #include <variant>
-#include <optional>
 
 namespace lt
 {
@@ -63,7 +63,7 @@ struct TableDefinition
 
     inline int byteSize() const noexcept
     {
-        return dataTypeSize(storedDataType) * width * height;
+        return static_cast<int>(dataTypeSize(storedDataType)) * width * height;
     }
 };
 

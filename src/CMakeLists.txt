@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.1)
 project(LibreTuner)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -72,8 +72,8 @@ set(libretuner_SRC
     ui/docks/logview.cpp
     ui/docks/editorwidget.cpp
     ui/docks/editorwidget.h
-    ui/docks/diagnosticswidget.cpp
-    ui/docks/diagnosticswidget.h
+        ui/windows/diagnosticswidget.cpp
+        ui/windows/diagnosticswidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
     ui/docks/hexeditwidget.cpp
@@ -144,7 +144,7 @@ qt5_add_resources(libretuner_SRC
 
 add_executable(LibreTuner ${libretuner_SRC})
 
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} sol2 Lua LibLibreTuner)
+target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} Lua LibLibreTuner)
 
 target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView)
 

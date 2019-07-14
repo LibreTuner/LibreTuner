@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "plugin.h"
-#include <sol.hpp>
 
 /**
  * @todo write docs
@@ -20,7 +19,7 @@ public:
 private:
     std::vector<Plugin> plugins_;
 
-    sol::state lua_;
+    //sol::state lua_;
 };
 
 #endif // PLUGINLOADER_H

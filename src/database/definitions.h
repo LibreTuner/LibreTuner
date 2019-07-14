@@ -8,9 +8,9 @@
 namespace lt
 {
 class Platforms;
-class Model;
+struct Model;
 using ModelPtr = std::shared_ptr<Model>;
-class Platform;
+struct Platform;
 using PlatformPtr = std::shared_ptr<Platform>;
 } // namespace lt
 

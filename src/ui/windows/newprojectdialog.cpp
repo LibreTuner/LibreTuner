@@ -21,6 +21,8 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
     linePath_->setClearButtonEnabled(true);
 
     auto * buttonCreate = new QPushButton(tr("Create"));
+    buttonCreate->setDefault(true);
+    buttonCreate->setAutoDefault(true);
     auto * buttonCancel = new QPushButton(tr("Cancel"));
 
     auto * buttonLayout = new QHBoxLayout;
@@ -65,8 +67,8 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
         QDir dir = QDir(path());
         if (dir.exists())
         {
-            QMessageBox::warning(nullptr, tr("Project Exists"), tr("A project with that path already exists."));
-            return;
+            if (QMessageBox::question(nullptr, tr("Project Exists"), tr("A project with that path already exists, would you like to overwrite it?")) != QMessageBox::Yes)
+                return;
         }
 
         accept();

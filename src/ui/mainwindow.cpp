@@ -21,14 +21,14 @@
 
 #include "ui/windows/downloadwindow.h"
 
-#include "docks/diagnosticswidget.h"
 #include "docks/editorwidget.h"
+#include "docks/explorerwidget.h"
 #include "docks/graphwidget.h"
 #include "docks/logview.h"
 #include "docks/overviewwidget.h"
 #include "docks/sidebarwidget.h"
 #include "docks/tableswidget.h"
-#include "docks/explorerwidget.h"
+#include "ui/windows/diagnosticswidget.h"
 
 #include "windows/definitionswindow.h"
 

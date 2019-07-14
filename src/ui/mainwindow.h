@@ -30,7 +30,7 @@
 #include "datalinkswidget.h"
 #include "lt/rom/rom.h"
 #include "models/tablemodel.h"
-#include "docks/diagnosticswidget.h"
+#include "ui/windows/diagnosticswidget.h"
 
 class QListView;
 

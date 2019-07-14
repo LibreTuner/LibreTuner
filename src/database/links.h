@@ -38,10 +38,10 @@ public:
     lt::DataLink * get(int index) const;
 
     // Returns total amount of detected links
-    inline int detectedCount() const { return detectedLinks_.size(); }
+    inline int detectedCount() const { return static_cast<int>(detectedLinks_.size()); }
 
     // Returns total amount of manual links
-    inline int manualCount() const { return manualLinks_.size(); }
+    inline int manualCount() const { return static_cast<int>(manualLinks_.size()); }
 
     // Returns the total amount of links
     inline int count() const { return detectedCount() + manualCount(); }

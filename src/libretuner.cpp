@@ -44,6 +44,8 @@ LibreTuner::LibreTuner(int & argc, char * argv[])
 {
     _global = this;
 
+    Logger::debug("Initializing resources");
+
     Q_INIT_RESOURCE(icons);
     Q_INIT_RESOURCE(definitions);
     Q_INIT_RESOURCE(style);
@@ -60,6 +62,8 @@ LibreTuner::LibreTuner(int & argc, char * argv[])
 
     // Setup main path
     rootPath_ = fs::current_path();
+
+    Logger::debug("Loading platforms");
 
     catchCritical(
         [&]() { platforms_.loadDirectory(rootPath_ / "definitions"); },
@@ -100,6 +104,7 @@ LibreTuner * LibreTuner::get() { return _global; }
 
 void LibreTuner::load_datalinks()
 {
+    Logger::debug("Loading datalinks");
     links_.detect();
 
     try

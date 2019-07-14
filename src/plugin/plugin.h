@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include <sol.hpp>
-
 class PluginState;
 
 /**
@@ -16,7 +14,7 @@ public:
     // Loads a plugin. Throws an exception on failure
     Plugin(PluginState & state, const std::string & path);
 
-    static void loadLibrary(sol::state & state);
+    //static void loadLibrary(sol::state & state);
 
     // API
     static void l_register(const std::string & name);
