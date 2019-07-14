@@ -43,9 +43,13 @@ public:
 
     inline const std::string & name() const noexcept { return name_; }
     inline const ModelPtr & model() const noexcept { return model_; }
+
+    // Returns the endianness of the platform.
     inline Endianness endianness() const noexcept
     {
-        return model_->platform.endianness;
+        if (auto platform = model_->platform())
+            return platform->endianness;
+        return Endianness::Big;
     }
     inline const std::filesystem::path & path() const noexcept { return path_; }
 

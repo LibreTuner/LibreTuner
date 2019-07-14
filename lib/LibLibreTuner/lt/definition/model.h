@@ -12,6 +12,8 @@ namespace lt
 {
 
 struct Platform;
+using PlatformPtr = std::shared_ptr<Platform>;
+using WeakPlatformPtr = std::weak_ptr<Platform>;
 
 /* Used to identify models */
 class Identifier
@@ -38,9 +40,12 @@ private:
 struct Model
 {
 public:
-    explicit Model(const Platform & _platform) : platform(_platform) {}
+    explicit Model(const PlatformPtr & platform) : platformRef_(platform) {}
 
-    const Platform & platform;
+    /* Returns the platform or PlatformPtr() if the reference
+     * has expired. */
+    PlatformPtr platform() const noexcept { return platformRef_.lock(); }
+
     std::string id;
     std::string name;
     Checksums checksums;
@@ -63,6 +68,8 @@ public:
     /* Returns true if the provided data is the correct
      * size and matches all identifiers. */
     bool isModel(const uint8_t * data, std::size_t size) const noexcept;
+
+    WeakPlatformPtr platformRef_;
 };
 using ModelPtr = std::shared_ptr<Model>;
 

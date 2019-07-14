@@ -40,9 +40,12 @@ FlashMap FlashMap::fromTune(Tune & tune)
     const lt::RomPtr & rom = tune.base();
 
     const lt::ModelPtr & model = rom->model();
-    const lt::Platform & platform = model->platform;
+    lt::PlatformPtr platform = model->platform();
+    if (!platform)
+        throw std::runtime_error("model does not have a valid platform. (did "
+                                 "the reference expire?)");
 
-    std::size_t offset = platform.flashOffset;
+    std::size_t offset = platform->flashOffset;
 
     std::vector<uint8_t> data(rom->data() + offset,
                               rom->data() + rom->size() - offset);
@@ -56,7 +59,8 @@ FlashMap FlashMap::fromTune(Tune & tune)
             continue;
         }
 
-        std::vector<uint8_t> serialized = table->intoBytes(platform.endianness);
+        std::vector<uint8_t> serialized =
+            table->intoBytes(platform->endianness);
 
         std::copy(serialized.begin(), serialized.end(),
                   data.begin() + definition.offset.value() - offset);

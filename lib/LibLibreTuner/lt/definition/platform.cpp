@@ -54,7 +54,7 @@ const Pid * Platform::getPid(uint32_t id) const noexcept
     return nullptr;
 }
 
-Platform load_main(const fs::path & path)
+PlatformPtr load_main(const fs::path & path)
 {
     std::ifstream file(path);
     if (!file.is_open())
@@ -63,8 +63,9 @@ Platform load_main(const fs::path & path)
                                  "' does not exist or LibreTuner does not have "
                                  "permission to open it.");
     }
+
     YAML::Node root = YAML::Load(file);
-    return root.as<Platform>();
+    return std::make_shared<Platform>(root.as<Platform>());
 }
 
 ChecksumPtr loadChecksum(const YAML::Node & checksum)
@@ -111,6 +112,9 @@ void decodeModel(const YAML::Node & node,
         }
     }
 
+    auto platform = model.platform();
+    // Platform will always be valid
+
     // Table offsets
     if (const auto & tables = node["tables"])
     {
@@ -118,8 +122,7 @@ void decodeModel(const YAML::Node & node,
         {
             auto id = it->first.as<std::string>();
             // Get platform table
-            if (const TableDefinition * platformTable =
-                    model.platform.getTable(id);
+            if (const TableDefinition * platformTable = platform->getTable(id);
                 platformTable != nullptr)
             {
                 // Copy table and set offset
@@ -156,10 +159,10 @@ void decodeModel(const YAML::Node & node,
     }
 }
 
-Platform Platform::loadDirectory(const std::filesystem::path & base_path)
+PlatformPtr Platform::loadDirectory(const std::filesystem::path & base_path)
 {
     // Load main.yaml
-    Platform platform = load_main(base_path / "main.yaml");
+    PlatformPtr platform = load_main(base_path / "main.yaml");
 
     // Load models
     for (auto & entry : fs::directory_iterator(base_path))
@@ -174,7 +177,7 @@ Platform Platform::loadDirectory(const std::filesystem::path & base_path)
 
         auto model = std::make_shared<Model>(platform);
         decodeModel(YAML::Load(file), *model);
-        platform.models.emplace_back(std::move(model));
+        platform->models.emplace_back(std::move(model));
     }
     return platform;
 }
@@ -198,8 +201,7 @@ void Platforms::loadDirectory(const std::filesystem::path & path)
         if (entry.is_directory())
         {
             // Convert to shared_ptr and store
-            platforms_.emplace_back(std::make_shared<Platform>(
-                Platform::loadDirectory(entry.path())));
+            platforms_.emplace_back(Platform::loadDirectory(entry.path()));
         }
     }
 }

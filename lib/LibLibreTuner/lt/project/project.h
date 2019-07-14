@@ -21,7 +21,15 @@ public:
     RomPtr getRom(const std::string & filename);
 
     /* Creates a new blank ROM from `name`. Sets path. */
-    RomPtr createRom(const std::string & name, lt::ModelPtr model = lt::ModelPtr());
+    RomPtr createRom(const std::string & name,
+                     lt::ModelPtr model = lt::ModelPtr());
+
+    /* Creates a new ROM from a file containing the raw ROM from an ECU.
+     * Throws an exception if the file cannot be opened or the model
+     * cannot be determined. */
+    RomPtr importRom(const std::string & name,
+                     const std::filesystem::path & path,
+                     lt::PlatformPtr platform);
 
     /* Loads tune by id. Returns a null pointer if the path does not
      * exist. Throws an exception if it cannot be deserialized or the base
@@ -88,8 +96,8 @@ private:
     // Logs
 
     // Generates the next available id based on the name
-    std::string generateRomId(std::string name);
-    std::string generateTuneId(std::string name);
+    std::filesystem::path generateRomPath(std::string name);
+    std::filesystem::path generateTunePath(std::string name);
 };
 using ProjectPtr = std::shared_ptr<Project>;
 

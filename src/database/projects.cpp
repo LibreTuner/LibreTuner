@@ -228,8 +228,8 @@ QVariant Projects::data(const QModelIndex & index, int role) const
 void Projects::addProject(lt::ProjectPtr project)
 {
     Logger::debug("Adding project '" + project->name() + "'");
-    if (!romsWatcher_.addPath(
-            QString::fromStdString(project->romsDirectory().string())))
+    QString romsDir = QString::fromStdString(project->romsDirectory().string());
+    if (!romsWatcher_.addPath(romsDir))
         Logger::warning("Failed to add roms path '" +
                         project->romsDirectory().string() +
                         "' to file watcher.");
@@ -238,6 +238,9 @@ void Projects::addProject(lt::ProjectPtr project)
                     root_->children.size());
     new ProjectItem(std::move(project), root_);
     endInsertRows();
+
+    // Force update
+    romsDirectoryChanged(romsDir);
 }
 
 QVariant Projects::headerData(int section, Qt::Orientation orientation,
@@ -279,17 +282,23 @@ void Projects::refreshRoms(const QModelIndex & index)
     auto romsItem = reinterpret_cast<RomItem *>(index.internalPointer());
 
     // Found the correct project, reset roms
-    beginRemoveRows(index, 0, romsItem->children.size());
-    qDeleteAll(romsItem->children);
-    romsItem->children.clear();
-    endRemoveRows();
+    if (!romsItem->children.empty())
+    {
+        beginRemoveRows(index, 0, romsItem->children.size() - 1);
+        qDeleteAll(romsItem->children);
+        romsItem->children.clear();
+        endRemoveRows();
+    }
 
     // Get all ROM metadata
     auto roms = project->queryRoms();
-    beginInsertRows(index, 0, roms.size());
-    for (const auto & rom : roms)
+    if (!roms.empty())
     {
-        new RomItem(rom, romsItem);
+        beginInsertRows(index, 0, roms.size() - 1);
+        for (const auto & rom : roms)
+        {
+            new RomItem(rom, romsItem);
+        }
+        endInsertRows();
     }
-    endInsertRows();
 }

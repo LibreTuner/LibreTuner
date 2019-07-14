@@ -115,7 +115,11 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
     if (!create)
         return AxisPtr();
 
-    const lt::AxisDefinition * def = base_->model()->platform.getAxis(id);
+    auto platform = base_->model()->platform();
+    if (!platform)
+        return AxisPtr();
+
+    const lt::AxisDefinition * def = platform->getAxis(id);
     if (def == nullptr)
         return AxisPtr();
 
@@ -233,7 +237,8 @@ Rom::MetaData Rom::metadata() const noexcept
     if (model_)
     {
         md.model = model_->id;
-        md.platform = model_->platform.id;
+        if (auto platform = model_->platform())
+            md.platform = platform->id;
     }
     return md;
 }

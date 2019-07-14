@@ -122,9 +122,9 @@ void FlasherWindow::buttonFlashClicked()
                 return;
             }
 
-            auto platform = selectedTune_->base()->model()->platform;
+            auto platform = selectedTune_->base()->model()->platform();
             auto platformLink =
-                std::make_unique<lt::PlatformLink>(*link, platform);
+                std::make_unique<lt::PlatformLink>(*link, *platform);
             lt::FlasherPtr flasher = platformLink->flasher();
 
             if (!flasher)
@@ -212,8 +212,8 @@ void FlasherWindow::nextClicked()
     // Try to open tune
     catchCritical(
         [this]() {
-            //selectedTune_ =
-               // LT()->roms().loadTune(fileSelect_->path().toStdString());
+            // selectedTune_ =
+            // LT()->roms().loadTune(fileSelect_->path().toStdString());
 
             stack_->setCurrentIndex(1);
             buttonNext_->setEnabled(false);
@@ -237,8 +237,8 @@ void FlasherWindow::verify()
 {
     if (selectedTune_ != nullptr)
     {
-        authOptions_->setDefaultOptions(
-            selectedTune_->base()->model()->platform.flashAuthOptions);
+        if (auto platform = selectedTune_->base()->model()->platform())
+            authOptions_->setDefaultOptions(platform->flashAuthOptions);
     }
     buttonFlash_->setEnabled(selectedTune_ &&
                              comboLink_->currentData(Qt::UserRole).isValid());

@@ -16,6 +16,10 @@
 namespace lt
 {
 
+struct Platform;
+using PlatformPtr = std::shared_ptr<Platform>;
+using WeakPlatformPtr = std::weak_ptr<Platform>;
+
 struct Platform
 {
     std::string name;
@@ -78,10 +82,8 @@ struct Platform
      *    model1.yaml  // Model definition
      *    model2.yaml
      */
-    static Platform loadDirectory(const std::filesystem::path & path);
+    static PlatformPtr loadDirectory(const std::filesystem::path & path);
 };
-using PlatformPtr = std::shared_ptr<Platform>;
-using WeakPlatformPtr = std::weak_ptr<Platform>;
 
 // Loads and stores platforms
 class Platforms

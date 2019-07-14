@@ -133,7 +133,7 @@ TunePtr Project::createTune(RomPtr base, const std::string & name)
 
     auto tune = std::make_shared<Tune>(std::move(base));
     tune->setName(name);
-    tune->setPath(tunesDir_ / generateTuneId(name));
+    tune->setPath(generateTunePath(name));
     // tunes_.emplace_back(tune);
     return tune;
 }
@@ -150,36 +150,37 @@ std::filesystem::path Project::logsDirectory() const noexcept
     return path_ / "logs";
 }
 
-inline std::string generateId(const fs::path & dir, std::string && id,
-                              const std::string & extension)
+inline fs::path generatePath(const fs::path & dir, std::string && id,
+                             const std::string & extension)
 {
     // Remove whitespace and convert to lowercase
     lt::remove_whitespace(id);
     lt::lowercase_string(id);
 
     if (!fs::exists(dir / (id + extension)))
-        return id;
+        return dir / (id + extension);
 
     for (int i = 0;; ++i)
     {
         std::string newId = id + "_" + std::to_string(i) + extension;
         if (!fs::exists(dir / newId))
-            return id;
+            return dir / newId;
     }
 }
 
-std::string Project::generateRomId(std::string name)
+fs::path Project::generateRomPath(std::string name)
 {
-    return generateId(romsDir_, std::move(name), Rom::extension);
+    return generatePath(romsDir_, std::move(name), Rom::extension);
 }
 
-std::string Project::generateTuneId(std::string name)
+fs::path Project::generateTunePath(std::string name)
 {
-    return generateId(tunesDir_, std::move(name), Tune::extension);
+    return generatePath(tunesDir_, std::move(name), Tune::extension);
 }
 
 template <class Archive>
-void save(Archive & archive, const lt::Project & project, std::uint32_t const version)
+void save(Archive & archive, const lt::Project & project,
+          std::uint32_t const version)
 {
     archive(project.name());
 }
@@ -196,7 +197,8 @@ void Project::save() const
 {
     std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open project file '" + path_.string() + "' for writing.");
+        throw std::runtime_error("failed to open project file '" +
+                                 path_.string() + "' for writing.");
 
     cereal::BinaryOutputArchive ar(file);
     ar(*this);
@@ -206,18 +208,51 @@ void Project::load()
 {
     std::ifstream file(path_, std::ios::binary | std::ios::in);
     if (!file.is_open())
-        throw std::runtime_error("failed to open project file '" + path_.string() + "' for reading.");
+        throw std::runtime_error("failed to open project file '" +
+                                 path_.string() + "' for reading.");
 
     cereal::BinaryInputArchive ar(file);
     ar(*this);
 }
 
-RomPtr Project::createRom(const std::string & name, lt::ModelPtr model) {
+RomPtr Project::createRom(const std::string & name, lt::ModelPtr model)
+{
     auto rom = std::make_shared<lt::Rom>(model);
     rom->setName(name);
-    rom->setPath(romsDir_ / generateRomId(name));
+    rom->setPath(generateRomPath(name));
 
     cache_.emplace(rom->path().string(), rom);
+    return rom;
+}
+
+RomPtr Project::importRom(const std::string & name,
+                          const std::filesystem::path & path,
+                          lt::PlatformPtr platform)
+{
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open ROM file '" + path.string() +
+                                 "'");
+
+    // Get file size
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // Allocate buffer
+    std::vector<uint8_t> buffer(size);
+    file.read(reinterpret_cast<char *>(buffer.data()), size);
+    file.close();
+
+    // Identify model
+    lt::ModelPtr model = platform->identify(
+        reinterpret_cast<const uint8_t *>(buffer.data()), buffer.size());
+    if (!model)
+        throw std::runtime_error(
+            "failed to identify model from ROM data for platform '" +
+            platform->name + "'");
+
+    lt::RomPtr rom = createRom(name, model);
+    rom->setData(std::move(buffer));
     return rom;
 }
 
