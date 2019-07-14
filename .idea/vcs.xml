@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/LibLibreTuner/lib/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/LibLibreTuner/lib/cparse" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/LibLibreTuner/lib/serial" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/LibLibreTuner/lib/yaml" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/QHexView" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/catch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/lua" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/sol2" vcs="Git" />
+  </component>
+</project>
