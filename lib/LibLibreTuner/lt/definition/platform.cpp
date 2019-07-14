@@ -156,16 +156,16 @@ void decodeModel(const YAML::Node & node,
     }
 }
 
-Platform Platform::loadDirectory(const std::filesystem::path & path)
+Platform Platform::loadDirectory(const std::filesystem::path & base_path)
 {
     // Load main.yaml
-    Platform platform = load_main(path / "main.yaml");
+    Platform platform = load_main(base_path / "main.yaml");
 
     // Load models
-    for (auto & entry : fs::directory_iterator(path))
+    for (auto & entry : fs::directory_iterator(base_path))
     {
         const fs::path & path = entry.path();
-        if (path.extension() != "yaml" || path.filename() == "main.yaml" ||
+        if (path.extension() != ".yaml" || path.filename() == "main.yaml" ||
             !entry.is_regular_file())
         {
             continue;

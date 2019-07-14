@@ -34,13 +34,11 @@ bool Model::isModel(const uint8_t * data, std::size_t size) const noexcept
     {
         // Verify size
         if (identifier.offset() + identifier.size() > size)
-        {
             return false;
-        }
 
-        if (!std::equal(data + identifier.offset(),
-                        data + identifier.offset() + identifier.size(),
-                        identifier.data()))
+        if (!std::equal(identifier.data(),
+                        identifier.data() + identifier.size(),
+                        data + identifier.offset()))
         {
             return false;
         }
