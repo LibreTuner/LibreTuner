@@ -3,6 +3,7 @@
 #include <QFileIconProvider>
 #include <logger.h>
 
+// This class is a mess
 struct TreeItem
 {
     QVector<TreeItem *> children;
@@ -100,11 +101,67 @@ private:
     lt::Rom::MetaData md_;
 };
 
+class TuneItem : public TreeItem
+{
+public:
+    explicit TuneItem(lt::Tune::MetaData md, TreeItem * parent = nullptr)
+        : TreeItem(parent), md_(std::move(md))
+    {
+    }
+
+    QVariant data(int column, int role) const override
+    {
+        if (column != 0)
+            return QVariant();
+
+        if (role == Qt::DisplayRole)
+            return QString::fromStdString(md_.name);
+
+        if (role == Qt::DecorationRole)
+        {
+            QFileIconProvider provider;
+            return provider.icon(QFileIconProvider::File);
+        }
+
+        if (role == Qt::UserRole)
+        {
+            return QVariant::fromValue(md_);
+        }
+
+        return QVariant();
+    }
+
+private:
+    lt::Tune::MetaData md_;
+};
+
 class RomsItem : public DirectoryItem
 {
 public:
     explicit RomsItem(lt::ProjectPtr project, TreeItem * parent = nullptr)
         : DirectoryItem("ROMs", parent), project_(std::move(project))
+    {
+    }
+
+    QVariant data(int column, int role) const override
+    {
+        if (column != 0)
+            return QVariant();
+
+        if (role == Qt::UserRole)
+            return QVariant::fromValue(project_);
+
+        return DirectoryItem::data(column, role);
+    }
+
+    lt::ProjectPtr project_;
+};
+
+class TunesItem : public DirectoryItem
+{
+public:
+    explicit TunesItem(lt::ProjectPtr project, TreeItem * parent = nullptr)
+        : DirectoryItem("Tunes", parent), project_(std::move(project))
     {
     }
 
@@ -129,7 +186,7 @@ public:
         : TreeItem(parent), project_(std::move(project))
     {
         roms_ = new RomsItem(project_, this);
-        tunes_ = new DirectoryItem("Tunes", this);
+        tunes_ = new TunesItem(project_, this);
         logs_ = new DirectoryItem("Logs", this);
     }
 
@@ -157,7 +214,7 @@ private:
     lt::ProjectPtr project_;
 
     RomsItem * roms_;
-    TreeItem * tunes_;
+    TunesItem * tunes_;
     TreeItem * logs_;
 };
 
@@ -167,6 +224,8 @@ Projects::Projects(QObject * parent) : QAbstractItemModel(parent)
 
     connect(&romsWatcher_, &QFileSystemWatcher::directoryChanged, this,
             &Projects::romsDirectoryChanged);
+    connect(&tunesWatcher_, &QFileSystemWatcher::directoryChanged, this,
+            &::Projects::tunesDirectoryChanged);
 }
 
 QModelIndex Projects::index(int row, int column,
@@ -229,9 +288,13 @@ void Projects::addProject(lt::ProjectPtr project)
 {
     Logger::debug("Adding project '" + project->name() + "'");
     QString romsDir = QString::fromStdString(project->romsDirectory().string());
+    QString tunesDir =
+        QString::fromStdString(project->tunesDirectory().string());
     if (!romsWatcher_.addPath(romsDir))
-        Logger::warning("Failed to add roms path '" +
-                        project->romsDirectory().string() +
+        Logger::warning("Failed to add roms path '" + romsDir.toStdString() +
+                        "' to file watcher.");
+    if (!tunesWatcher_.addPath(tunesDir))
+        Logger::warning("Failed to add tunes path '" + tunesDir.toStdString() +
                         "' to file watcher.");
 
     beginInsertRows(QModelIndex(), root_->children.size(),
@@ -241,6 +304,7 @@ void Projects::addProject(lt::ProjectPtr project)
 
     // Force update
     romsDirectoryChanged(romsDir);
+    tunesDirectoryChanged(tunesDir);
 }
 
 QVariant Projects::headerData(int section, Qt::Orientation orientation,
@@ -267,6 +331,22 @@ QModelIndex Projects::romsIndex(const QString & romsPath)
     return QModelIndex();
 }
 
+QModelIndex Projects::tunesIndex(const QString & tunesPath)
+{
+    std::filesystem::path dir(tunesPath.toStdString());
+    for (int row = 0; row < root_->children.size(); ++row)
+    {
+        QVariant data = root_->child(row)->data(0, Qt::UserRole);
+        if (data.canConvert<lt::ProjectPtr>())
+        {
+            auto project = data.value<lt::ProjectPtr>();
+            if (project->tunesDirectory() == dir)
+                return index(1, 0, index(row, 0, QModelIndex()));
+        }
+    }
+    return QModelIndex();
+}
+
 void Projects::romsDirectoryChanged(const QString & path)
 {
     QModelIndex index = romsIndex(path);
@@ -279,7 +359,7 @@ void Projects::romsDirectoryChanged(const QString & path)
 void Projects::refreshRoms(const QModelIndex & index)
 {
     auto project = index.data(Qt::UserRole).value<lt::ProjectPtr>();
-    auto romsItem = reinterpret_cast<RomItem *>(index.internalPointer());
+    auto romsItem = reinterpret_cast<RomsItem *>(index.internalPointer());
 
     // Found the correct project, reset roms
     if (!romsItem->children.empty())
@@ -301,4 +381,41 @@ void Projects::refreshRoms(const QModelIndex & index)
         }
         endInsertRows();
     }
+}
+
+// A copy of the above method (gross, but it's quicker than abstracting it).
+void Projects::refreshTunes(const QModelIndex & index)
+{
+    auto project = index.data(Qt::UserRole).value<lt::ProjectPtr>();
+    auto tunesItem = reinterpret_cast<TunesItem *>(index.internalPointer());
+
+    // Found the correct project, reset roms
+    if (!tunesItem->children.empty())
+    {
+        beginRemoveRows(index, 0, tunesItem->children.size() - 1);
+        qDeleteAll(tunesItem->children);
+        tunesItem->children.clear();
+        endRemoveRows();
+    }
+
+    // Get all tune metadata
+    auto tunes = project->queryTunes();
+    if (!tunes.empty())
+    {
+        beginInsertRows(index, 0, tunes.size() - 1);
+        for (const auto & tune : tunes)
+        {
+            new TuneItem(tune, tunesItem);
+        }
+        endInsertRows();
+    }
+}
+
+void Projects::tunesDirectoryChanged(const QString & path)
+{
+    QModelIndex index = tunesIndex(path);
+    if (!index.isValid())
+        return;
+
+    refreshTunes(index);
 }

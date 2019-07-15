@@ -37,16 +37,6 @@ CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
     ui_->comboProject->setItemDelegate(new QStyledItemDelegate());
     ui_->comboProject->setModel(&LT()->projects());
-
-    /*
-    for (const RomMeta &meta : LT()->roms()) {
-        ui_->comboBase->addItem(QString::fromStdString(meta.name),
-                                QString::fromStdString(meta.id));
-        if (base != nullptr && &meta == base) {
-            ui_->comboBase->setCurrentIndex(ui_->comboBase->count() - 1);
-        }
-    }*/
-    // TODO: Search ROM directory
 }
 
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
@@ -55,7 +45,10 @@ void CreateTuneDialog::on_buttonCreate_clicked()
 {
     lt::ProjectPtr project = selectedProject();
     if (!project)
+    {
+        Logger::info("No project selected");
         return;
+    }
 
     QVariant data = ui_->comboBase->currentData();
     if (!data.canConvert<lt::Rom::MetaData>())
@@ -67,10 +60,16 @@ void CreateTuneDialog::on_buttonCreate_clicked()
         [&]() {
             lt::RomPtr base = project->getRom(md.path.filename().string());
             if (!base)
+            {
+                Logger::warning("Failed to find base ROM, has it changed since "
+                                "this menu opened?");
                 return;
+            }
 
-            project->createTune(base, ui_->lineName->text().toStdString());
-            },
+            project->createTune(base, ui_->lineName->text().toStdString())
+                ->save();
+            accept();
+        },
         tr("Error creating tune"));
 
     /*RomMeta *meta = LT()->roms().fromId(romId);

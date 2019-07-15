@@ -27,24 +27,30 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role) const override;
 
-    void refreshRoms(const lt::Project &project);
+    void refreshRoms(const lt::Project & project);
 
     QModelIndex projectIndex(const lt::Project & project);
 
     // Returns the index of the ROM directory with path `romsPath`
     QModelIndex romsIndex(const QString & romsPath);
 
+    QModelIndex tunesIndex(const QString & tunesPath);
+
 private:
     TreeItem * root_;
     QFileSystemWatcher romsWatcher_;
+    QFileSystemWatcher tunesWatcher_;
 
     void refreshRoms(const QModelIndex & index);
+    void refreshTunes(const QModelIndex & index);
 
 private slots:
     void romsDirectoryChanged(const QString & path);
+    void tunesDirectoryChanged(const QString & path);
 };
 
 Q_DECLARE_METATYPE(lt::ProjectPtr)
 Q_DECLARE_METATYPE(lt::Rom::MetaData)
+Q_DECLARE_METATYPE(lt::Tune::MetaData)
 
 #endif // LIBRETUNER_PROJECTS_H
