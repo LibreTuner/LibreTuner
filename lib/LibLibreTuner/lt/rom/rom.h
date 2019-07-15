@@ -80,6 +80,9 @@ public:
         std::string platform;
         std::string model;
 
+        // Path is set after loading
+        std::filesystem::path path;
+
         template <class Archive>
         void serialize(Archive & archive, std::uint32_t const version)
         {
@@ -153,6 +156,7 @@ public:
         std::string name;
         // Base ROM id
         std::string base;
+        std::filesystem::path path;
 
         template <class Archive>
         void serialize(Archive & archive, std::uint32_t const version)

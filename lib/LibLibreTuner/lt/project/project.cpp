@@ -110,6 +110,7 @@ std::vector<MetaData> getMetaData(fs::path & dir, bool requiresExtension,
         {
             // TODO: Log exception
         }
+        md.path = entry.path();
         metadata.emplace_back(std::move(md));
     }
     return metadata;

@@ -23,6 +23,8 @@
 #include "logger.h"
 #include "uiutil.h"
 
+#include <lt/project/project.h>
+
 #include <QMessageBox>
 #include <QStyledItemDelegate>
 #include <QVariant>
@@ -33,6 +35,8 @@ CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
     ui_->setupUi(this);
 
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
+    ui_->comboProject->setItemDelegate(new QStyledItemDelegate());
+    ui_->comboProject->setModel(&LT()->projects());
 
     /*
     for (const RomMeta &meta : LT()->roms()) {
@@ -49,7 +53,26 @@ CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
 void CreateTuneDialog::on_buttonCreate_clicked()
 {
-    std::string romId = ui_->comboBase->currentData().toString().toStdString();
+    lt::ProjectPtr project = selectedProject();
+    if (!project)
+        return;
+
+    QVariant data = ui_->comboBase->currentData();
+    if (!data.canConvert<lt::Rom::MetaData>())
+        return;
+
+    auto md = data.value<lt::Rom::MetaData>();
+    // Load base
+    catchWarning(
+        [&]() {
+            lt::RomPtr base = project->getRom(md.path.filename().string());
+            if (!base)
+                return;
+
+            project->createTune(base, ui_->lineName->text().toStdString());
+            },
+        tr("Error creating tune"));
+
     /*RomMeta *meta = LT()->roms().fromId(romId);
     if (meta == nullptr) {
         Logger::warning("Rom with ID '" + romId + "' no longer exists");
@@ -66,4 +89,26 @@ void CreateTuneDialog::on_buttonCreate_clicked()
         tr("Error creating tune"));
 
     close();*/
+}
+
+void CreateTuneDialog::on_comboProject_currentIndexChanged(int index)
+{
+    ui_->comboBase->clear();
+    lt::ProjectPtr project = selectedProject();
+
+    // Populate base combo
+    for (const auto & rom : project->queryRoms())
+    {
+        ui_->comboBase->addItem(QString::fromStdString(rom.name),
+                                QVariant::fromValue(rom));
+    }
+}
+
+lt::ProjectPtr CreateTuneDialog::selectedProject()
+{
+    QVariant data = ui_->comboProject->currentData(Qt::UserRole);
+    if (!data.canConvert<lt::ProjectPtr>())
+        return lt::ProjectPtr();
+
+    return data.value<lt::ProjectPtr>();
 }

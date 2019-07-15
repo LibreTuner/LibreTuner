@@ -200,6 +200,7 @@ Tune::MetaData Tune::metadata() const noexcept
 {
     MetaData md;
     md.name = name_;
+    md.path = path_;
     if (base_)
         md.base = base_->path().filename().string();
     return md;
@@ -234,6 +235,7 @@ Rom::MetaData Rom::metadata() const noexcept
 {
     MetaData md;
     md.name = name_;
+    md.path = path_;
     if (model_)
     {
         md.model = model_->id;
