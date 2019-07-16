@@ -24,6 +24,14 @@ public:
     RomPtr createRom(const std::string & name,
                      lt::ModelPtr model = lt::ModelPtr());
 
+    /* Deletes ROM by filename. Returns true if the ROM was deleted or
+     * false if it could not be found or there is insufficient permission. */
+    bool deleteRom(const std::string & filename);
+
+    /* Deletes tune by filename. Returns true if the tune was deleted or
+     * false if it could not be found or there is insufficient permission. */
+    bool deleteTune(const std::string & filename);
+
     /* Creates a new ROM from a file containing the raw ROM from an ECU.
      * Throws an exception if the file cannot be opened or the model
      * cannot be determined. */

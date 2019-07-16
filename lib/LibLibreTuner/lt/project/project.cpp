@@ -257,6 +257,15 @@ RomPtr Project::importRom(const std::string & name,
     return rom;
 }
 
+bool Project::deleteRom(const std::string & filename) {
+    cache_.erase(filename);
+    return fs::remove(romsDir_ / filename);
+}
+
+bool Project::deleteTune(const std::string & filename) {
+    return fs::remove(tunesDir_ / filename);
+}
+
 } // namespace lt
 
 CEREAL_CLASS_VERSION(lt::Project, 1)
