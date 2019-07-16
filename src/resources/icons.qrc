@@ -17,5 +17,8 @@
         <file>icons/vline.png</file>
         <file>icons/download.svg</file>
         <file>icons/new_file.svg</file>
+        <file>icons/file_text.svg</file>
+        <file>icons/copy.svg</file>
+        <file>icons/trash.svg</file>
     </qresource>
 </RCC>
