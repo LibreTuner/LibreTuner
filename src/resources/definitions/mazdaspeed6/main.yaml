@@ -116,7 +116,7 @@ tables:
     height: 28
     axisx: rpm_500_linear
     axisy: load_3125
-    minimum: -15
+    minimum: -20
     maximum: 70
 
   12:
@@ -173,7 +173,7 @@ tables:
     height: 28
     axisx: rpm_500_linear
     axisy: load_3125
-    minimum: -15
+    minimum: -20
     maximum: 70
 
   18:
@@ -185,7 +185,7 @@ tables:
     height: 28
     axisx: rpm_500_linear
     axisy: load_3125
-    minimum: -15
+    minimum: -20
     maximum: 70
 
   19:
@@ -267,101 +267,111 @@ axes:
   #  minimum: 500
   #  increment: 500
 
-  - id: "rpm_500"
+  "rpm_500":
     size: 14
     type: "memory"
     datatype: "float"
     name: "RPM"
     
-  - id: "rpm_500_15"
+  "rpm_500_15":
     size: 15
     type: "memory"
     datatype: "float"
     name: "RPM"
     
-  - id: "rpm_500_linear"
+  "rpm_500_linear":
     type: "linear"
     datatype: "float"
     name: "RPM"
+    size: 14
     minimum: 500
     increment: 500
     
-  - id: "load_125"
+  "load_125":
     type: "linear"
     datatype: "float"
     name: "Load"
+    size: 31
     minimum: 0.125
     increment: 0.0625
     
-  - id: "load_025"
+  "load_025":
     type: "linear"
     datatype: "float"
     name: "Load"
+    size: 14
     minimum: 0.25
     increment: 0.0625
     
-  - id: "load_0625"
+  "load_0625":
     type: "linear"
     datatype: "float"
     name: "Load"
+    size: 32
     minimum: 0.0625
     increment: 0.0625
     
-  - id: "load_3125"
+  "load_3125":
     type: "linear"
     datatype: "float"
     name: "Load"
+    size: 28
     minimum: 0.3125
     increment: 0.0625
     
-  - id: "pressure_kpa"
+  "pressure_kpa":
     size: 8
     type: "memory"
     datatype: "float"
     name: "Barometric Pressure"
     
-  - id: "pressure_kpa_diff"
+  "pressure_kpa_diff":
     size: 11
     type: "memory"
     datatype: "float"
     name: "Boost Target Difference"
     
-  - id: "bsc_dc_volts"
+  "bsc_dc_volts":
     type: "linear"
     datatype: "float"
     name: "Battery Voltage"
+    size: 13
     minimum: 6.5
     increment: 1.25
     
-  - id: "temp_iat"
+  "temp_iat":
     type: "linear"
     datatype: "float"
     name: "Intake Air Temperature (Celsius)"
+    size: 14
     minimum: -40
     increment: 20
 
-  - id: "temp_coolant"
+  "temp_coolant":
     type: "linear"
     datatype: "float"
     name: "Coolant Temperature (Celsius)"
+    size: 14
     minimum: -40
     increment: 20
     
-  - id: "tps_0"
+  "tps_0":
     type: "linear"
     datatype: "float"
+    size: 14
     minimum: 0
     increment: 6.25
     name: "Requested Throttle Position"
     
-  - id: "maf_5"
+  "maf_5":
     type: "linear"
     datatype: "float"
+    size: 129
     minimum: 0
     increment: 0.039000001
     name: "Voltage"
     
-  - id: "voltage_batt"
+  "voltage_batt":
     type: "memory"
     datatype: "float"
     name: "Battery Voltage"
@@ -624,3 +634,17 @@ pids:
     code: 0x0015
     unit: "voltage"
     formula: "a / 200"
+
+  - id: 36
+    name: "Long term fuel trim (bank 2)"
+    description: "The percentage difference from the base amount calculated from long term oxygen sensor measurements. Negative means fuel is reduced (too rich). Positive means fuel is added (too lean)."
+    code: 0x0009
+    unit: "percentage"
+    formula: "a / 1.28 - 100"
+
+  - id: 37
+    name: "Short term fuel trim (bank 2)"
+    description: "The short term fuel trim calculated from the primary oxygen sensor"
+    code: 0x0008
+    unit: "percentage"
+    formula: "a / 1.28 - 100"
