@@ -41,7 +41,7 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
         return QVariant();
 
     if (role == Qt::DisplayRole)
-        return table_->get(index.column(), index.row());
+        return table_->get(index.row(), index.column());
 
     if (role == Qt::ForegroundRole)
     {
@@ -58,7 +58,7 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
             return QVariant();
         }
         double ratio =
-            static_cast<double>(table_->get(index.column(), index.row()) -
+            static_cast<double>(table_->get(index.row(), index.column()) -
                                 table_->minimum()) /
             (table_->maximum() - table_->minimum());
         if (ratio < 0.0)

@@ -1,20 +1,42 @@
 #include "explorerwidget.h"
 
 #include <QAbstractItemModel>
+#include <QEvent>
 #include <QFileIconProvider>
+#include <QKeyEvent>
 #include <QMessageBox>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVector>
-#include <QEvent>
-#include <QKeyEvent>
 
 #include "../../database/projects.h"
 #include "ui/windows/downloadwindow.h"
 #include "ui/windows/importromdialog.h"
 #include <lt/project/project.h>
 
+#include <logger.h>
 #include <memory>
+#include <uiutil.h>
+
+namespace detail
+{
+/* Traverses up the tree for a project. Returns
+ * lt::ProjectPtr() if the search fails. */
+lt::ProjectPtr find_project(QModelIndex index)
+{
+    while (index.isValid())
+    {
+        QVariant pData = index.data(Qt::UserRole);
+        if (pData.canConvert<lt::ProjectPtr>())
+        {
+            return pData.value<lt::ProjectPtr>();
+            break;
+        }
+        index = index.parent();
+    }
+    return lt::ProjectPtr();
+}
+} // namespace detail
 
 ExplorerWidget::ExplorerWidget(QWidget * parent) : QWidget(parent)
 {
@@ -30,6 +52,8 @@ ExplorerWidget::ExplorerWidget(QWidget * parent) : QWidget(parent)
     tree_->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tree_, &QTreeView::customContextMenuRequested, this,
             &ExplorerWidget::showContextMenu);
+
+    connect(tree_, &QTreeView::activated, this, &ExplorerWidget::onActivated);
 }
 
 void ExplorerWidget::showContextMenu(const QPoint & point)
@@ -47,20 +71,7 @@ void ExplorerWidget::setModel(QAbstractItemModel * model)
 void ExplorerWidget::populateMenu(const QModelIndex & index)
 {
     QVariant data = index.data(Qt::UserRole);
-    lt::ProjectPtr project;
-    QModelIndex projectIndex = index;
-    // Go through tree until we get the project
-    while (projectIndex.isValid())
-    {
-        QVariant pData = projectIndex.data(Qt::UserRole);
-        if (pData.canConvert<lt::ProjectPtr>())
-        {
-            project = pData.value<lt::ProjectPtr>();
-            break;
-        }
-        projectIndex = projectIndex.parent();
-    }
-    menu_.setProject(project);
+    menu_.setProject(detail::find_project(index));
 
     if (data.canConvert<lt::Rom::MetaData>())
         menu_.setRom(data.value<lt::Rom::MetaData>().path.filename().string());
@@ -73,7 +84,7 @@ bool ExplorerWidget::eventFilter(QObject * watched, QEvent * event)
 {
     if (event->type() == QEvent::KeyPress)
     {
-        QKeyEvent * keyEvent = static_cast<QKeyEvent*>(event);
+        QKeyEvent * keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Delete)
         {
             // Ugly hack with the menu
@@ -83,6 +94,29 @@ bool ExplorerWidget::eventFilter(QObject * watched, QEvent * event)
         }
     }
     return QWidget::eventFilter(watched, event);
+}
+
+void ExplorerWidget::onActivated(const QModelIndex & index)
+{
+    QVariant data = index.data(Qt::UserRole);
+    if (data.canConvert<lt::Tune::MetaData>())
+    {
+        auto meta = data.value<lt::Tune::MetaData>();
+        // Get project
+        lt::ProjectPtr project = detail::find_project(index);
+        if (!project)
+            return;
+
+        catchWarning(
+            [&]() {
+                lt::TunePtr tune =
+                    project->loadTune(meta.path.filename().string());
+                if (!tune)
+                    return;
+                emit tuneOpened(tune);
+            },
+            tr("Error loading tune"));
+    }
 }
 
 ExplorerMenu::ExplorerMenu(QWidget * parent) : QMenu(parent)

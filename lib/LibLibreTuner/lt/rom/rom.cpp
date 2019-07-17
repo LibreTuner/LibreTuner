@@ -133,14 +133,13 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
                 // Linear axis
                 builder
                     .setLinear(typeDefinition.start, typeDefinition.increment,
-                               typeDefinition.size)
-                    .build();
+                               typeDefinition.size);
             }
             else if constexpr (std::is_same_v<T, MemoryAxisDefinition>)
             {
                 // Memory axis
                 // TODO: offsets should work the same as tables.
-                int offset = base_->model()->getAxisOffset(def->id);
+                int offset = base_->model()->getAxisOffset(id);
                 int size = typeDefinition.size;
                 if (offset +
                         size * static_cast<int>(dataTypeSize(def->dataType)) >
@@ -153,7 +152,7 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
                 }
 
                 auto start = std::next(base_->data(), offset);
-                auto end = start + size;
+                auto end = std::next(start, size * static_cast<int>(dataTypeSize(def->dataType)));
 
                 switch (def->dataType)
                 {

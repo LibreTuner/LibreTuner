@@ -299,6 +299,7 @@ template <> struct convert<lt::AxisDefinition>
             linear.start = node["minimum"].as<double>();
             linear.increment =
                 node["increment"].as<double>(); // TODO: rename to "step"
+            linear.size = node["size"].as<int>();
             axis.def.emplace<lt::LinearAxisDefinition>(std::move(linear));
         }
         else
@@ -321,6 +322,18 @@ template <> struct convert<lt::Platform>
         {
             platform.logMode = n.as<std::string>();
             lt::lowercase_string(platform.logMode);
+        }
+
+        if (const auto & n = node["endianness"])
+        {
+            std::string endianness = n.as<std::string>();
+            lt::lowercase_string(endianness);
+            if (endianness == "big")
+                platform.endianness = lt::Endianness::Big;
+            else if (endianness == "litte")
+                platform.endianness = lt::Endianness::Little;
+            else
+                throw std::runtime_error("invalid endianness value '" + endianness + "'");
         }
 
         // Transfer

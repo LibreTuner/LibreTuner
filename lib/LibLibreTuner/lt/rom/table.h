@@ -153,12 +153,12 @@ public:
      * if the check fails. */
     inline int index(int row, int column) const
     {
-        assert(row > 0 && column > 0);
-        if (row >= width_ || column >= height_)
+        assert(row >= 0 && column >= 0);
+        if (row >= height_ || column >= width_)
             throw std::runtime_error("point (" + std::to_string(row) + ", " +
                                      std::to_string(column) +
                                      ") out of bounds.");
-        return row * height_ + column;
+        return row * width_ + column;
     }
 
     /* Returns the entry at position (`row`, `column`). Throws an
@@ -270,8 +270,10 @@ public:
         }
 
         template <typename T>
-        Builder & setEntries(std::vector<T> && entries) noexcept
+        Builder & setEntries(std::vector<T> && entries)
         {
+            if (entries.size() != (width_ * height_))
+                throw std::runtime_error("Invalid entries size. Expected " + std::to_string(width_ * height_) + ", got " + std::to_string(entries.size()));
             entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
                 std::move(entries));
             return *this;
@@ -299,6 +301,7 @@ public:
 
         BasicTable<PresentedType> build() noexcept
         {
+            // Verify entry size
             return BasicTable<PresentedType>(
                 std::move(name_), std::move(bounds_), std::move(entries_),
                 width_, height_, std::move(xAxis_), std::move(yAxis_), scale_);

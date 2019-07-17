@@ -140,7 +140,7 @@ inline void datatypeToType(DataType type, Func && func, Args &&... args)
 
 template <DataType Selected, DataType... Args> struct DataTypeExecutor_
 {
-    static int size(DataType dt)
+    inline static int size(DataType dt)
     {
         if (dt == Selected)
             return sizeof(typename DataTypeTraits<Selected>::Type);

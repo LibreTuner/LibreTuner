@@ -39,7 +39,7 @@ struct Platform
     /* Flash region */
     size_t flashOffset, flashSize;
 
-    Endianness endianness;
+    Endianness endianness{Endianness::Big};
 
     int lastAxisId = 0;
     uint32_t romsize;

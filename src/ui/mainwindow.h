@@ -61,6 +61,7 @@ private slots:
     void newLogClicked();
     void closeEvent(QCloseEvent * event) override;
     void newProject();
+    void openTune(const lt::TunePtr & tune);
 
 signals:
     void tableChanged(lt::Table * table);
@@ -102,8 +103,7 @@ private:
     void saveSettings();
     void loadSettings();
 
-    void setTune(const lt::TunePtr & tune,
-                 const std::filesystem::path & path = std::filesystem::path());
+    void setTune(const lt::TunePtr & tune);
 
     QDockWidget * createOverviewDock();
     QDockWidget * createLoggingDock();

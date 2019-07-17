@@ -314,9 +314,10 @@ std::vector<T> fromBytes_(It && begin, It && end)
         // Unroll this loop, compiler!
         for (std::size_t i = 0; i < sizeof(T); ++i)
         {
-            if (std::next(begin, 1) == end)
+            if (begin == end)
                 break;
             repr[i] = *begin;
+            std::advance(begin, 1);
         }
         // Convert endianness and emplace
         entries.emplace_back(

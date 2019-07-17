@@ -113,7 +113,7 @@ void MainWindow::saveTune(bool newPath)
         return;
     }
 
-    //LT()->roms().saveTune(*tune_, tunePath_);
+    // LT()->roms().saveTune(*tune_, tunePath_);
     tune_->clearDirty();
 }
 
@@ -202,20 +202,16 @@ bool MainWindow::checkSave()
     }
 }
 
-void MainWindow::setTune(const lt::TunePtr & tune,
-                         const std::filesystem::path & path)
+void MainWindow::setTune(const lt::TunePtr & tune)
 {
     // Save any previous tunes
     if (!checkSave())
-    {
         return;
-    }
 
     tableModel_.setTable(nullptr);
     emit tableChanged(nullptr);
 
     tune_ = tune;
-    tunePath_ = path;
     emit tuneChanged(tune_.get());
 
     flashCurrentAction_->setEnabled(!!tune);
@@ -377,7 +373,10 @@ QDockWidget * MainWindow::createExplorerDock()
 
     explorer_ = new ExplorerWidget(dock);
     explorer_->setModel(&LT()->projects());
-    connect(explorer_->menu().actionNewProject(), &QAction::triggered, this, &MainWindow::newProject);
+    connect(explorer_->menu().actionNewProject(), &QAction::triggered, this,
+            &MainWindow::newProject);
+    connect(explorer_, &ExplorerWidget::tuneOpened, this,
+            &MainWindow::openTune);
     dock->setWidget(explorer_);
     dock->setObjectName("explorer");
 
@@ -471,9 +470,7 @@ void MainWindow::setupMenu()
         catchCritical([this]() { saveTune(); }, tr("Error saving tune"));
     });
 
-    connect(newProjectAction, &QAction::triggered, [this]() {
-        newProject();
-    });
+    connect(newProjectAction, &QAction::triggered, [this]() { newProject(); });
 
     connect(downloadAction, &QAction::triggered, this,
             &MainWindow::on_buttonDownloadRom_clicked);
@@ -494,7 +491,7 @@ void MainWindow::setupMenu()
         catchCritical(
             [this, &fileName]() {
                 std::filesystem::path path(fileName.toStdString());
-                //setTune(LT()->roms().loadTune(path), path);
+                // setTune(LT()->roms().loadTune(path), path);
             },
             tr("Error opening tune"));
     });
@@ -514,11 +511,10 @@ void MainWindow::setupMenu()
         scanner.exec();
     });
 
-    QAction * diagnosticsAction = toolsMenu->addAction(tr("Trouble Code Scanner"));
-    connect(diagnosticsAction, &QAction::triggered, [this]()
-    {
-        diagnosticsWindow_.show();
-    });
+    QAction * diagnosticsAction =
+        toolsMenu->addAction(tr("Trouble Code Scanner"));
+    connect(diagnosticsAction, &QAction::triggered,
+            [this]() { diagnosticsWindow_.show(); });
 
     setMenuBar(menuBar);
 }
@@ -607,4 +603,9 @@ void MainWindow::newProject()
         lt::ProjectPtr project = LT()->createProject(path);
         project->setName(path.stem().string());
     }
+}
+
+void MainWindow::openTune(const lt::TunePtr & tune)
+{
+    setTune(tune);
 }

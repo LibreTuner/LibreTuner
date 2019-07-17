@@ -1,9 +1,9 @@
 #ifndef LIBRETUNER_EXPLORERWIDGET_H
 #define LIBRETUNER_EXPLORERWIDGET_H
 
-#include <QWidget>
 #include <QFileIconProvider>
 #include <QMenu>
+#include <QWidget>
 
 #include <lt/project/project.h>
 
@@ -12,6 +12,7 @@ class QAbstractItemModel;
 
 class ExplorerMenu : public QMenu
 {
+    Q_OBJECT
 public:
     explicit ExplorerMenu(QWidget * parent = nullptr);
 
@@ -21,7 +22,7 @@ public:
 
     QAction * actionNewProject() noexcept { return actionNewProject_; }
     QAction * actionDownloadRom() noexcept { return actionDownloadRom_; }
-    const lt::ProjectPtr &project() const noexcept { return project_; }
+    const lt::ProjectPtr & project() const noexcept { return project_; }
 
 public slots:
     void onDelete();
@@ -41,6 +42,7 @@ private:
 
 class ExplorerWidget : public QWidget
 {
+    Q_OBJECT
 public:
     explicit ExplorerWidget(QWidget * parent = nullptr);
 
@@ -50,6 +52,10 @@ public:
 
 private slots:
     void showContextMenu(const QPoint & point);
+    void onActivated(const QModelIndex & index);
+
+signals:
+    void tuneOpened(const lt::TunePtr & tune);
 
 public:
     bool eventFilter(QObject * watched, QEvent * event) override;
