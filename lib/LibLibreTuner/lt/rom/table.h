@@ -77,8 +77,8 @@ template <typename PresentedType> class BasicAxis
 {
 private:
     explicit BasicAxis(std::unique_ptr<Entries<PresentedType>> entries,
-                       int size)
-        : entries_(std::move(entries)), size_(size)
+                       std::string && name, int size)
+        : entries_(std::move(entries)), size_(size), name_(std::move(name))
     {
     }
 
@@ -106,17 +106,25 @@ public:
             return setEntries(std::move(entries));
         }
 
+        Builder & setName(std::string name)
+        {
+            name_ = std::move(name);
+            return *this;
+        }
+
         BasicAxis<PresentedType> build()
         {
             if (!entries_)
                 throw std::runtime_error(
                     "attempt to build axis without setting entries");
-            return BasicAxis<PresentedType>(std::move(entries_), size_);
+            return BasicAxis<PresentedType>(std::move(entries_),
+                                            std::move(name_), size_);
         }
 
     private:
         std::unique_ptr<Entries<PresentedType>> entries_;
         int size_;
+        std::string name_;
     };
 
     PresentedType index(int index) const noexcept
@@ -128,9 +136,12 @@ public:
 
     int size() const noexcept { return size_; }
 
+    const std::string & name() const noexcept { return name_; }
+
 private:
     std::unique_ptr<Entries<PresentedType>> entries_;
     int size_;
+    std::string name_;
 };
 
 // Defines the minimum and maximum bounds of table entries
@@ -269,11 +280,13 @@ public:
             return *this;
         }
 
-        template <typename T>
-        Builder & setEntries(std::vector<T> && entries)
+        template <typename T> Builder & setEntries(std::vector<T> && entries)
         {
             if (entries.size() != (width_ * height_))
-                throw std::runtime_error("Invalid entries size. Expected " + std::to_string(width_ * height_) + ", got " + std::to_string(entries.size()));
+                throw std::runtime_error("Invalid entries size. Expected " +
+                                         std::to_string(width_ * height_) +
+                                         ", got " +
+                                         std::to_string(entries.size()));
             entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
                 std::move(entries));
             return *this;

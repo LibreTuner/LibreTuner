@@ -124,6 +124,7 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
         return AxisPtr();
 
     Axis::Builder builder;
+    builder.setName(def->name);
 
     std::visit(
         [&](auto && typeDefinition) {
