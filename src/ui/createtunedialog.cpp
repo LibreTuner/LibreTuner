@@ -105,9 +105,9 @@ void CreateTuneDialog::on_comboProject_currentIndexChanged(int index)
 
 lt::ProjectPtr CreateTuneDialog::selectedProject()
 {
-    QVariant data = ui_->comboProject->currentData(Qt::UserRole);
-    if (!data.canConvert<lt::ProjectPtr>())
+    QVariant var = ui_->comboProject->currentData(Qt::UserRole);
+    if (!var.canConvert<lt::ProjectPtr>())
         return lt::ProjectPtr();
 
-    return data.value<lt::ProjectPtr>();
+    return var.value<lt::ProjectPtr>();
 }

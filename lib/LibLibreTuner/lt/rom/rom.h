@@ -25,8 +25,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <cereal/cereal.hpp>
-
 #include "../definition/model.h"
 #include "../definition/platform.h"
 #include "table.h"
@@ -217,9 +215,5 @@ struct TuneConstruct
     }
 };
 } // namespace lt
-
-// Declare cereal versions out of scope
-CEREAL_CLASS_VERSION(lt::Rom::MetaData, 1)
-CEREAL_CLASS_VERSION(lt::Tune::MetaData, 1)
 
 #endif // ROM_H

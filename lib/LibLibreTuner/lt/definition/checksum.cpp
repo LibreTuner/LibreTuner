@@ -37,9 +37,7 @@ uint32_t ChecksumBasic::compute(const uint8_t * data, int size, bool * ok) const
     if (size < offset_ + size_)
     {
         if (ok != nullptr)
-        {
             *ok = false;
-        }
         return 0;
     }
 
@@ -64,9 +62,7 @@ void ChecksumBasic::correct(uint8_t * data, int size) const
 {
     assert(size >= 0);
     if (size < offset_ + size_)
-    {
         throw std::runtime_error("checksum region exceeds the rom size.");
-    }
 
     bool foundMod = false;
     int modifiableOffset{0};
@@ -82,10 +78,8 @@ void ChecksumBasic::correct(uint8_t * data, int size) const
         }
     }
     if (!foundMod)
-    {
         throw std::runtime_error("failed to find a usable modifiable region "
                                  "for checksum correction.");
-    }
 
     // Zero the region
     writeBE<int32_t>(0, &data[offset_ + modifiableOffset], data + size);

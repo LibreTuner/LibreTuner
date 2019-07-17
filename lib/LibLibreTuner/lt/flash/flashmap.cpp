@@ -66,6 +66,8 @@ FlashMap FlashMap::fromTune(Tune & tune)
                   data.begin() + definition.offset.value() - offset);
     }
 
+    // Correct and verify checksums
+    model->checksums.correct(data.data(), data.size());
     return FlashMap(std::move(data), offset);
 }
 

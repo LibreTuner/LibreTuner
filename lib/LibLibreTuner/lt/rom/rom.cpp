@@ -263,3 +263,7 @@ void Rom::save() const
 }
 
 } // namespace lt
+
+// Declare cereal versions out of scope
+CEREAL_CLASS_VERSION(lt::Rom::MetaData, 1)
+CEREAL_CLASS_VERSION(lt::Tune::MetaData, 1)

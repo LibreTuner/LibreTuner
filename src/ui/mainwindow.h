@@ -28,7 +28,6 @@
 
 #include "database/links.h"
 #include "datalinkswidget.h"
-#include "lt/rom/rom.h"
 #include "models/tablemodel.h"
 #include "ui/windows/diagnosticswidget.h"
 
@@ -41,6 +40,13 @@ class SidebarWidget;
 class GraphWidget;
 class DefinitionsWindow;
 class ExplorerWidget;
+
+namespace lt
+{
+    class Tune;
+    using TunePtr = std::shared_ptr<Tune>;
+    struct TableDefinition;
+}
 
 class MainWindow : public QMainWindow
 {

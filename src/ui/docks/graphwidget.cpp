@@ -63,14 +63,12 @@ GraphWidget::~GraphWidget() { delete container_; }
 void GraphWidget::setModel(TableModel * model)
 {
     if (model_ != nullptr)
-    {
         disconnect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
-    }
+
     model_ = model;
     if (model != nullptr)
     {
         refresh();
-
         connect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
     }
 }
@@ -78,16 +76,12 @@ void GraphWidget::setModel(TableModel * model)
 void GraphWidget::refresh()
 {
     if (model_ == nullptr)
-    {
         return;
-    }
     lt::Table * table = model_->table();
     if (table == nullptr)
-    {
         return;
-    }
 
-    if (table->height() > 1)
+    if (!table->isOneDimensional())
     {
         // Two dimensional
         auto * modelProxy =
@@ -97,22 +91,24 @@ void GraphWidget::refresh()
             QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
         series3d_->setDataProxy(modelProxy);
-        /*
-                if (table->axisX()) {
-                    surface_->axisX()->setTitle(
-                        QString::fromStdString(table->axisX()->name()));
-                    surface_->axisX()->setTitleVisible(true);
-                } else {
-                    surface_->axisX()->setTitleVisible(false);
-                }
 
-                if (table->axisY()) {
-                    surface_->axisZ()->setTitle(
-                        QString::fromStdString(table->axisY()->name()));
-                    surface_->axisZ()->setTitleVisible(true);
-                } else {
-                    surface_->axisZ()->setTitleVisible(true);
-                }*/
+        if (table->xAxis())
+        {
+            surface_->axisX()->setTitle(
+                QString::fromStdString(table->xAxis()->name()));
+            surface_->axisX()->setTitleVisible(true);
+        }
+        else
+            surface_->axisX()->setTitleVisible(false);
+
+        if (table->yAxis())
+        {
+            surface_->axisZ()->setTitle(
+                QString::fromStdString(table->yAxis()->name()));
+            surface_->axisZ()->setTitleVisible(true);
+        }
+        else
+            surface_->axisZ()->setTitleVisible(true);
 
         chartView_->setVisible(false);
         container_->setVisible(true);
@@ -120,14 +116,22 @@ void GraphWidget::refresh()
     else if (table->height() == 1 && table->width() > 1)
     {
         auto * series = new QLineSeries;
-        /*if (table->axisX()) {
-            for (int x = 0; x < table->width(); ++x) {
-                series->append(table->axisX()->label(x),
-                               table->get(x, 0)); // Should always be a float
+        if (table->xAxis())
+        {
+            for (int x = 0; x < table->width(); ++x)
+            {
+                double index = 0;
+                if (x < table->xAxis()->size())
+                    index = table->xAxis()->index(x);
+                series->append(index,
+                               table->get(0, x)); // Should always be a float
             }
-        } else {
-            for (int x = 0; x < table->width(); ++x) {
-                series->append(x, table->get(x, 0)); // Should always be a float
+        }
+        else
+        {
+            for (int x = 0; x < table->width(); ++x)
+            {
+                series->append(x, table->get(0, x)); // Should always be a float
             }
         }
 
@@ -135,13 +139,14 @@ void GraphWidget::refresh()
         chart_->addSeries(series);
         chart_->createDefaultAxes();
 
-        if (table->axisX()) {
+        if (table->xAxis())
+        {
             chart_->axisX()->setTitleText(
-                QString::fromStdString(table->axisX()->name()));
+                QString::fromStdString(table->xAxis()->name()));
         }
 
         chartView_->setVisible(true);
-        container_->setVisible(false);*/
+        container_->setVisible(false);
     }
     else
     {

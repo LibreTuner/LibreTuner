@@ -85,14 +85,10 @@ void EditorWidget::setModel(TableModel * model)
 void EditorWidget::axesChanged()
 {
     if (model_ == nullptr)
-    {
         return;
-    }
     lt::Table * table = model_->table();
     if (table == nullptr)
-    {
         return;
-    }
 
     if (table->xAxis())
     {
