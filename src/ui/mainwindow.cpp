@@ -95,25 +95,14 @@ void MainWindow::saveTune(bool newPath)
     if (!tune_)
         return;
 
-    if (tunePath_.empty() || newPath)
-    {
-        QString qPath = QFileDialog::getSaveFileName(
-            this, tr("Save tune"), QString(), tr("Tune file (*.ltt)"));
-        if (qPath.isNull())
-        {
-            return;
-        }
-
-        tunePath_ = qPath.toStdString();
-    }
-    else if (!tune_->dirty())
+    if (!tune_->dirty())
     {
         // If the tune is not dirty and we're not saving to a new location,
         // don't save.
         return;
     }
 
-    // LT()->roms().saveTune(*tune_, tunePath_);
+    tune_->save();
     tune_->clearDirty();
 }
 

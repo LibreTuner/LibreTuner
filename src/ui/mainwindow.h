@@ -116,8 +116,6 @@ private:
 
     std::vector<QDockWidget *> docks_;
 
-    std::filesystem::path tunePath_;
-
     lt::TunePtr tune_;
 
     LinksListModel linksList_;
