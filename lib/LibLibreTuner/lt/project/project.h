@@ -44,10 +44,6 @@ public:
      * cannot be found. */
     TunePtr loadTune(const std::string & filename);
 
-    /* Saves a tune to a file. Throws an exception if serialization failed or
-     * the file couldn't be opened. */
-    void saveTune(const Tune & tune, std::filesystem::path & path);
-
     /* Searches all ROM files and extracts their metadata. Silently ignores
      * invalid ROMs. This is an expensive operation that should not
      * be called often. */

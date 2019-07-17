@@ -124,9 +124,7 @@ public:
         }
 
         if (role == Qt::UserRole)
-        {
             return QVariant::fromValue(md_);
-        }
 
         return QVariant();
     }

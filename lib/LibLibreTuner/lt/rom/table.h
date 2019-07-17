@@ -148,7 +148,7 @@ public:
     using AxisTypePtr = std::shared_ptr<AxisType>;
 
     /* Creates a one-dimensional index from a two-dimensional point.
-     * Calculated by multiplying the row and height and adding the
+     * Calculated by multiplying the row and width and adding the
      * column. Checks if the point is in bounds and throws an exception
      * if the check fails. */
     inline int index(int row, int column) const
