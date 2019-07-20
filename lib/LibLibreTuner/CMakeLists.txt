@@ -10,7 +10,9 @@ find_package(Threads REQUIRED)
 
 add_subdirectory(lib/cparse)
 add_subdirectory(lib/serial)
-add_subdirectory(lib/yaml)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(lib/json)
 
 # Options
 option(BUILD_TESTS "Build tests" OFF)
@@ -115,7 +117,7 @@ set(SOURCES
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial yaml-cpp)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial nlohmann_json::nlohmann_json)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

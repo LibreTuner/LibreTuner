@@ -2,12 +2,224 @@
 #include "../support/util.hpp"
 
 #include <fstream>
-#include <yaml-cpp/yaml.h>
+#include <nlohmann/json.hpp>
+#include <iostream>
 
 namespace fs = std::filesystem;
+using json = nlohmann::json;
+
+namespace nlohmann
+{
+template<>
+struct adl_serializer<lt::ChecksumPtr>
+{
+    static lt::ChecksumPtr from_json(const json & j)
+    {
+        const auto & mode = j.at("mode").get<std::string>();
+        const auto offset = j.at("offset").get<std::size_t>();
+        const auto size = j.at("size").get<std::size_t>();
+        const auto target = j.at("target").get<std::size_t>();
+
+        lt::ChecksumPtr sum;
+        if (mode == "basic")
+            sum = lt::ChecksumPtr(new lt::ChecksumBasic(offset, size, target));
+        else
+            throw std::runtime_error("invalid mode for checksum");
+
+        if (auto it = j.find("modify"); it != j.end())
+        {
+            for (auto & section : *it)
+            {
+                sum->addModifiable(section.at("offset").get<std::size_t>(),
+                                   section.at("size").get<std::size_t>());
+            }
+        }
+
+        return sum;
+    }
+};
+}
 
 namespace lt
 {
+
+void to_json(json & j, const lt::Pid & pid)
+{
+    j = json{{"name", pid.name},
+             {"description", pid.description},
+             {"code", pid.code},
+             {"formula", pid.formula},
+             {"unit", pid.unit}};
+}
+
+void from_json(const json & j, lt::Pid & pid)
+{
+    j.at("name").get_to(pid.name);
+    j.at("description").get_to(pid.description);
+    j.at("code").get_to(pid.code);
+    j.at("formula").get_to(pid.formula);
+    j.at("unit").get_to(pid.unit);
+}
+
+NLOHMANN_JSON_SERIALIZE_ENUM(DataType, {
+    {DataType::Invalid, nullptr},
+    {DataType::Float, "float"},
+    {DataType::Int8, "int8"},
+    {DataType::Int16, "int16"},
+    {DataType::Int32, "int32"},
+    {DataType::Uint8, "uint8"},
+    {DataType::Uint16, "uint16"},
+    {DataType::Uint32, "uint32"},
+})
+
+void from_json(const json & j, lt::TableDefinition & table)
+{
+    j.at("name").get_to(table.name);
+    j.at("description").get_to(table.description);
+
+    if (auto it = j.find("category"); it != j.end())
+        it->get_to(table.category);
+
+    j.at("datatype").get_to(table.dataType);
+
+    if (auto it = j.find("storeddatatype"); it != j.end())
+        it->get_to(table.storedDataType);
+    else
+        table.storedDataType = table.dataType;
+
+    if (auto it = j.find("width"); it != j.end())
+        it->get_to(table.width);
+    if (auto it = j.find("height"); it != j.end())
+        it->get_to(table.height);
+
+    if (auto it = j.find("axisx"); it != j.end())
+        it->get_to(table.axisX);
+    if (auto it = j.find("axisy"); it != j.end())
+        it->get_to(table.axisY);
+    if (auto it = j.find("scale"); it != j.end())
+        it->get_to(table.scale);
+
+    if (auto it = j.find("minimum"); it != j.end())
+        it->get_to(table.minimum);
+    if (auto it = j.find("maximum"); it != j.end())
+        it->get_to(table.maximum);
+}
+
+void from_json(const json & j, lt::AxisDefinition & axis)
+{
+    j.at("name").get_to(axis.name);
+    j.at("datatype").get_to(axis.dataType);
+
+    auto type = j.at("type").get<std::string>();
+    if (type == "memory")
+    {
+        lt::MemoryAxisDefinition memory;
+        j.at("size").get_to(memory.size);
+        axis.def.emplace<lt::MemoryAxisDefinition>(std::move(memory));
+    }
+    else if (type == "linear")
+    {
+        lt::LinearAxisDefinition linear;
+        j.at("minimum").get_to(linear.start);
+        j.at("increment").get_to(linear.increment);
+        j.at("size").get_to(linear.size);
+        axis.def.emplace<lt::LinearAxisDefinition>(std::move(linear));
+    }
+    else
+        throw std::runtime_error("invalid axis type '" + type + "'");
+}
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Endianness, {
+    {Endianness::Big, "big"},
+    {Endianness::Little, "little"},
+})
+
+void from_json(const json & j, lt::Platform & platform)
+{
+    j.at("id").get_to(platform.id);
+    j.at("name").get_to(platform.name);
+    j.at("romsize").get_to(platform.romsize);
+    j.at("baudrate").get_to(platform.baudrate);
+    if (auto it = j.find("logmode"); it != j.end())
+    {
+        it->get_to(platform.logMode);
+        lt::lowercase_string(platform.logMode);
+    }
+
+    if (auto it = j.find("endianness"); it != j.end())
+        it->get_to(platform.endianness);
+
+    // Transfer
+    if (auto transfer = j.find("transfer"); transfer != j.end())
+    {
+        if (auto it = transfer->find("flashmode"); it != transfer->end())
+        {
+            it->get_to(platform.flashMode);
+            lt::lowercase_string(platform.flashMode);
+        }
+        if (auto it = transfer->find("downloadmode"); it != transfer->end())
+        {
+            it->get_to(platform.downloadMode);
+            lt::lowercase_string(platform.downloadMode);
+        }
+        transfer->at("serverid").get_to(platform.serverId);
+    }
+
+    // Authentication
+    if (auto auth = j.find("auth"); auth != j.end())
+    {
+        // Key should be the same for both
+        if (auto it = auth->find("key"); it != auth->end())
+        {
+            it->get_to(platform.downloadAuthOptions.key);
+            platform.flashAuthOptions.key = platform.downloadAuthOptions.key;
+        }
+
+        // Session IDs
+        if (auto it = auth->find("sessionid"); it != auth->end())
+        {
+            it->get_to(platform.downloadAuthOptions.session);
+            platform.flashAuthOptions.session =
+                platform.downloadAuthOptions.session;
+        }
+        if (auto it = auth->find("download_sessionid"); it != auth->end())
+            it->get_to(platform.downloadAuthOptions.session);
+        if (auto it = auth->find("flash_sessionid"); it != auth->end())
+            it->get_to(platform.flashAuthOptions.session);
+    }
+
+    // VIN patterns
+    for (const auto & vin : j.at("vins"))
+    {
+        platform.vins.emplace_back(vin.get<std::string>());
+    }
+
+    if (auto axes = j.find("axes"); axes != j.end())
+    {
+        axes->get_to(platform.axes);
+        /*
+        for (auto it = axes.begin(); it != axes.end(); ++it)
+        {
+            platform.axes.emplace(it->first.as<std::string>(),
+                                  it->second.as<lt::AxisDefinition>());
+        }
+         */
+    }
+
+    // Tables
+    if (auto tables = j.find("tables"); tables != j.end())
+    {
+        for (auto & [id, table] : tables->items())
+        {
+            auto def = table.get<lt::TableDefinition>();
+            def.id = id;
+            platform.tables.emplace(id, std::move(def));
+        }
+    }
+
+    if (auto it = j.find("pids"); it != j.end())
+        it->get_to(platform.pids);
+}
 
 const TableDefinition * Platform::getTable(const std::string & id) const
     noexcept
@@ -64,70 +276,36 @@ PlatformPtr load_main(const fs::path & path)
                                  "permission to open it.");
     }
 
-    YAML::Node root = YAML::Load(file);
-    return std::make_shared<Platform>(root.as<Platform>());
+    json root;
+    file >> root;
+    return std::make_shared<Platform>(root.get<Platform>());
 }
 
-ChecksumPtr loadChecksum(const YAML::Node & checksum)
-{
-    const auto & mode = checksum["mode"].as<std::string>();
-    const auto offset = checksum["offset"].as<std::size_t>();
-    const auto size = checksum["size"].as<std::size_t>();
-    const auto target = checksum["target"].as<std::size_t>();
-
-    ChecksumPtr sum;
-    if (mode == "basic")
-        sum = lt::ChecksumPtr(new lt::ChecksumBasic(offset, size, target));
-    else
-        throw std::runtime_error("invalid mode for checksum");
-
-    const auto & modify = checksum["modify"];
-    if (modify)
-    {
-        for (const YAML::Node & node : modify)
-        {
-            sum->addModifiable(node["offset"].as<std::size_t>(),
-                               node["size"].as<std::size_t>());
-        }
-    }
-
-    return sum;
-}
-
-void decodeModel(const YAML::Node & node,
+void decodeModel(const json & j,
                  lt::Model & model) // [[expects: model.platform]]
 {
-    model.name = node["name"].as<std::string>();
-    model.id = node["id"].as<std::string>();
+    j.at("name").get_to(model.name);
+    j.at("id").get_to(model.id);
 
     // Axes
-    if (const auto & axes = node["axes"])
-    {
-        for (const auto & axis : axes)
-        {
-            const auto id = axis["id"].as<std::string>();
-            const auto offset = axis["offset"].as<std::size_t>();
-
-            model.axisOffsets.emplace(id, offset);
-        }
-    }
+    if (auto axes = j.find("axes"); axes != j.end())
+        axes->get_to(model.axisOffsets);
 
     auto platform = model.platform();
     // Platform will always be valid
 
     // Table offsets
-    if (const auto & tables = node["tables"])
+    if (auto tables = j.find("tables"); tables != j.end())
     {
-        for (auto it = tables.begin(); it != tables.end(); ++it)
+        for (auto & [id, offset] : tables->items())
         {
-            auto id = it->first.as<std::string>();
             // Get platform table
             if (const TableDefinition * platformTable = platform->getTable(id);
                 platformTable != nullptr)
             {
                 // Copy table and set offset
                 TableDefinition table(*platformTable);
-                table.offset = it->second.as<int>();
+                table.offset = offset;
                 model.tables.emplace(id, std::move(table));
             }
             else
@@ -138,45 +316,46 @@ void decodeModel(const YAML::Node & node,
     }
 
     // Identifiers
-    if (const auto & identifiers = node["identifiers"])
+    if (auto identifiers = j.find("identifiers"); identifiers != j.end())
     {
-        for (const auto & identifier : identifiers)
+        for (const auto & identifier : *identifiers)
         {
-            const auto offset = identifier["offset"].as<std::size_t>();
-            const auto & data = identifier["data"].as<std::string>();
-
+            const auto offset = identifier.at("offset").get<std::size_t>();
+            const auto & data = identifier.at("data").get<std::string>();
             model.identifiers.emplace_back(offset, data.begin(), data.end());
         }
     }
 
     // Checksums
-    if (const auto & checksums = node["checksums"])
+    if (auto checksums = j.find("checksums"); checksums != j.end())
     {
-        for (const auto & node : checksums)
+        for (const auto & node : *checksums)
         {
-            model.checksums.add(lt::loadChecksum(node));
+            model.checksums.add(node.get<ChecksumPtr>());
         }
     }
 }
 
 PlatformPtr Platform::loadDirectory(const std::filesystem::path & base_path)
 {
-    // Load main.yaml
-    PlatformPtr platform = load_main(base_path / "main.yaml");
+    // Load main.json
+    PlatformPtr platform = load_main(base_path / "main.json");
 
     // Load models
     for (auto & entry : fs::directory_iterator(base_path))
     {
         const fs::path & path = entry.path();
-        if (path.extension() != ".yaml" || path.filename() == "main.yaml" ||
+        if (path.extension() != ".json" || path.filename() == "main.json" ||
             !entry.is_regular_file())
         {
             continue;
         }
         std::ifstream file(path);
+        json j;
+        file >> j;
 
         auto model = std::make_shared<Model>(platform);
-        decodeModel(YAML::Load(file), *model);
+        decodeModel(j, *model);
         platform->models.emplace_back(std::move(model));
     }
     return platform;
@@ -224,195 +403,3 @@ ModelPtr Platforms::find(const std::string & platformId,
 }
 
 } // namespace lt
-
-// Declare YAML conversions outside lt namespace
-namespace YAML
-{
-template <> struct convert<lt::Pid>
-{
-    static bool decode(const Node & node, lt::Pid & pid)
-    {
-        pid.name = node["name"].as<std::string>();
-        pid.description = node["description"].as<std::string>();
-        pid.code = static_cast<uint16_t>(node["code"].as<std::size_t>());
-        pid.formula = node["formula"].as<std::string>();
-        pid.unit = node["unit"].as<std::string>();
-        return true;
-    }
-};
-
-template <> struct convert<lt::TableDefinition>
-{
-    static bool decode(const Node & node, lt::TableDefinition & table)
-    {
-        table.name = node["name"].as<std::string>();
-        table.description = node["description"].as<std::string>();
-
-        if (node["category"])
-            table.category = node["category"].as<std::string>();
-
-        table.dataType =
-            lt::datatype_from_string(node["datatype"].as<std::string>());
-        if (node["storeddatatype"])
-            table.storedDataType = lt::datatype_from_string(
-                node["storeddatatype"].as<std::string>());
-        else
-            table.storedDataType = table.dataType;
-
-        if (const auto & n = node["width"])
-            table.width = n.as<std::size_t>();
-        if (const auto & n = node["height"])
-            table.height = n.as<std::size_t>();
-
-        if (const auto & n = node["axisx"])
-            table.axisX = n.as<std::string>();
-        if (const auto & n = node["axisy"])
-            table.axisY = n.as<std::string>();
-        if (const auto & n = node["scale"])
-            table.scale = n.as<double>();
-
-        table.minimum =
-            node["minimum"].as<double>(std::numeric_limits<double>::min());
-        table.maximum =
-            node["maximum"].as<double>(std::numeric_limits<double>::max());
-        return true;
-    }
-};
-
-template <> struct convert<lt::AxisDefinition>
-{
-    static bool decode(const Node & node, lt::AxisDefinition & axis)
-    {
-        axis.name = node["name"].as<std::string>();
-        axis.dataType =
-            lt::datatype_from_string(node["datatype"].as<std::string>());
-        std::string type = node["type"].as<std::string>();
-        if (type == "memory")
-        {
-            lt::MemoryAxisDefinition memory;
-            memory.size = node["size"].as<std::size_t>();
-            axis.def.emplace<lt::MemoryAxisDefinition>(std::move(memory));
-        }
-        else if (type == "linear")
-        {
-            lt::LinearAxisDefinition linear;
-            linear.start = node["minimum"].as<double>();
-            linear.increment =
-                node["increment"].as<double>(); // TODO: rename to "step"
-            linear.size = node["size"].as<int>();
-            axis.def.emplace<lt::LinearAxisDefinition>(std::move(linear));
-        }
-        else
-        {
-            throw std::runtime_error("invalid axis type '" + type + "'");
-        }
-        return true;
-    }
-};
-
-template <> struct convert<lt::Platform>
-{
-    static bool decode(const Node & node, lt::Platform & platform)
-    {
-        platform.id = node["id"].as<std::string>();
-        platform.name = node["name"].as<std::string>();
-        platform.romsize = node["romsize"].as<std::size_t>();
-        platform.baudrate = node["baudrate"].as<std::size_t>();
-        if (const auto & n = node["logmode"])
-        {
-            platform.logMode = n.as<std::string>();
-            lt::lowercase_string(platform.logMode);
-        }
-
-        if (const auto & n = node["endianness"])
-        {
-            std::string endianness = n.as<std::string>();
-            lt::lowercase_string(endianness);
-            if (endianness == "big")
-                platform.endianness = lt::Endianness::Big;
-            else if (endianness == "litte")
-                platform.endianness = lt::Endianness::Little;
-            else
-                throw std::runtime_error("invalid endianness value '" + endianness + "'");
-        }
-
-        // Transfer
-        if (const auto & transfer = node["transfer"])
-        {
-            if (const auto & n = transfer["flashmode"])
-            {
-                platform.flashMode = n.as<std::string>();
-                lt::lowercase_string(platform.flashMode);
-            }
-            if (const auto & n = transfer["downloadmode"])
-            {
-                platform.downloadMode = n.as<std::string>();
-                lt::lowercase_string(platform.downloadMode);
-            }
-            platform.serverId = transfer["serverid"].as<std::size_t>();
-        }
-
-        // Authentication
-        if (const auto & auth = node["auth"])
-        {
-            // Key should be the same for both
-            if (const auto & n = auth["key"])
-            {
-                platform.downloadAuthOptions.key = n.as<std::string>();
-                platform.flashAuthOptions.key =
-                    platform.downloadAuthOptions.key;
-            }
-
-            // Session IDs
-            if (const auto & n = auth["sessionid"])
-            {
-                platform.downloadAuthOptions.session =
-                    static_cast<uint8_t>(n.as<std::size_t>());
-                platform.flashAuthOptions.session =
-                    platform.downloadAuthOptions.session;
-            }
-            if (const auto & n = auth["download_sessionid"])
-            {
-                platform.downloadAuthOptions.session =
-                    static_cast<uint8_t>(n.as<std::size_t>());
-            }
-            if (const auto & n = auth["flash_sessionid"])
-            {
-                platform.flashAuthOptions.session =
-                    static_cast<uint8_t>(n.as<std::size_t>());
-            }
-        }
-
-        // VIN patterns
-        for (const auto & vin : node["vins"])
-        {
-            platform.vins.emplace_back(vin.as<std::string>());
-        }
-
-        if (const auto & axes = node["axes"])
-        {
-            for (auto it = axes.begin(); it != axes.end(); ++it)
-            {
-                platform.axes.emplace(it->first.as<std::string>(),
-                                      it->second.as<lt::AxisDefinition>());
-            }
-        }
-
-        // Tables
-        if (const auto & tables = node["tables"])
-        {
-            for (auto it = tables.begin(); it != tables.end(); ++it)
-            {
-                auto id = it->first.as<std::string>();
-                auto def = it->second.as<lt::TableDefinition>();
-                def.id = id;
-                platform.tables.emplace(id, std::move(def));
-            }
-        }
-
-        if (const auto & pids = node["pids"])
-            platform.pids = pids.as<std::vector<lt::Pid>>();
-        return true;
-    }
-};
-} // namespace YAML
