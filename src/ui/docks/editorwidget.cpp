@@ -55,7 +55,7 @@ EditorWidget::EditorWidget(QWidget * parent) : QWidget(parent)
     view_->horizontalHeader()->setMinimumSectionSize(70);
     view_->horizontalHeader()->setStretchLastSection(true);
 
-    view_->setItemDelegate(new TableDelegate);
+    //view_->setItemDelegate(new TableDelegate);
 
     labelY_ = new VerticalLabel("Y-Axis");
     labelY_->setAlignment(Qt::AlignCenter);
@@ -94,23 +94,23 @@ void EditorWidget::axesChanged()
     {
         labelX_->setText(QString::fromStdString(table->xAxis()->name()));
         labelX_->setVisible(true);
-        view_->horizontalHeader()->setVisible(true);
+        //view_->horizontalHeader()->setVisible(true);
     }
     else
     {
         labelX_->setVisible(false);
-        view_->horizontalHeader()->setVisible(false);
+        //view_->horizontalHeader()->setVisible(false);
     }
 
     if (table->yAxis())
     {
         labelY_->setText(QString::fromStdString(table->yAxis()->name()));
         labelY_->setVisible(true);
-        view_->verticalHeader()->setVisible(true);
+        //view_->verticalHeader()->setVisible(true);
     }
     else
     {
         labelY_->setVisible(false);
-        view_->verticalHeader()->setVisible(false);
+        //view_->verticalHeader()->setVisible(false);
     }
 }
