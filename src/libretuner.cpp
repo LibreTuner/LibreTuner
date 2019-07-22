@@ -176,10 +176,15 @@ lt::PlatformLink LibreTuner::platformLink() const
     return lt::PlatformLink(*currentDatalink_, *currentPlatform_);
 }
 
-lt::ProjectPtr LibreTuner::createProject(const std::filesystem::path & path)
+lt::ProjectPtr LibreTuner::openProject(const std::filesystem::path & path,
+                                       bool create)
 {
     auto project = std::make_shared<lt::Project>(path, platforms_);
-    project->makeDirectories();
+    if (create)
+        project->makeDirectories();
+    else
+        catchCritical([&]() { project->load(); }, tr("Error loading project"));
+    project->setName(path.stem().string());
     projects_.addProject(project);
     return project;
 }

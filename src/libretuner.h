@@ -70,8 +70,9 @@ public:
 
     inline Projects & projects() noexcept { return projects_; }
 
-    // Creates a new project with path `path`.
-    lt::ProjectPtr createProject(const std::filesystem::path & path);
+    /* Opens project at directory `path`. If `create` is true, creates
+     * project directories and configuration. */
+    lt::ProjectPtr openProject(const std::filesystem::path & path, bool create);
 
     /* Returns the current platform or nullptr if none is selected */
     lt::PlatformPtr platform() const { return currentPlatform_; }

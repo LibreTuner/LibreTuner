@@ -43,10 +43,10 @@ class ExplorerWidget;
 
 namespace lt
 {
-    class Tune;
-    using TunePtr = std::shared_ptr<Tune>;
-    struct TableDefinition;
-}
+class Tune;
+using TunePtr = std::shared_ptr<Tune>;
+struct TableDefinition;
+} // namespace lt
 
 class MainWindow : public QMainWindow
 {
@@ -59,6 +59,9 @@ public:
     // the user for a path.
     void saveTune(bool newPath = false);
 
+    // Add path to recent projects. Ensures each path is unique
+    void addRecent(const QString & path);
+
 public slots:
     void setTable(const lt::TableDefinition * modTable);
 
@@ -67,6 +70,7 @@ private slots:
     void newLogClicked();
     void closeEvent(QCloseEvent * event) override;
     void newProject();
+    void openProject();
     void openTune(const lt::TunePtr & tune);
 
 signals:
@@ -77,10 +81,13 @@ signals:
 private:
     bool checkSave();
 
+    void addToRecentMenu(const QString & path);
+
     QComboBox * comboLogVehicles_;
     QComboBox * comboDatalink_;
     QListView * listLogs_;
     SidebarWidget * sidebar_;
+    QMenu * recentMenu_;
 
     TablesWidget * tables_;
     EditorWidget * editor_;
@@ -131,6 +138,8 @@ private:
     DiagnosticsWidget diagnosticsWindow_;
 
     QPointer<DefinitionsWindow> definitionsWindow_;
+
+    QStringList recentProjects_;
 };
 
 #endif // MAINWINDOW_H

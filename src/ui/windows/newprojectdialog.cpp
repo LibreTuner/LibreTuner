@@ -2,13 +2,13 @@
 
 #include <QFileDialog>
 #include <QFormLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QStandardPaths>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QStandardPaths>
+#include <QVBoxLayout>
 
 #include <QStyle>
 
@@ -17,7 +17,9 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
     setWindowTitle("Create new Project");
     resize(600, 200);
     lineName_ = new QLineEdit;
-    linePath_ = new QLineEdit(QDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).filePath("LibreTuner Projects"));
+    linePath_ = new QLineEdit(QDir(QStandardPaths::writableLocation(
+                                       QStandardPaths::DocumentsLocation))
+                                  .filePath("LibreTuner Projects"));
     linePath_->setClearButtonEnabled(true);
 
     auto * buttonCreate = new QPushButton(tr("Create"));
@@ -30,7 +32,8 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
     buttonLayout->addWidget(buttonCreate);
     buttonLayout->addWidget(buttonCancel);
 
-    auto * buttonBrowse = new QPushButton(style()->standardIcon(QStyle::SP_DirOpenIcon), QString());
+    auto * buttonBrowse = new QPushButton(
+        style()->standardIcon(QStyle::SP_DirOpenIcon), QString());
     auto * pathLayout = new QHBoxLayout;
     pathLayout->addWidget(linePath_);
     pathLayout->addWidget(buttonBrowse);
@@ -47,17 +50,18 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
     layout->addLayout(buttonLayout);
     setLayout(layout);
 
-    connect(buttonCancel, &QPushButton::clicked, this, &NewProjectDialog::reject);
+    connect(buttonCancel, &QPushButton::clicked, this,
+            &NewProjectDialog::reject);
 
-    connect(buttonBrowse, &QPushButton::clicked, [this]()
-    {
-        QString dir = QFileDialog::getExistingDirectory(nullptr, tr("Select Project Directory - LibreTuner"), linePath_->text());
+    connect(buttonBrowse, &QPushButton::clicked, [this]() {
+        QString dir = QFileDialog::getExistingDirectory(
+            nullptr, tr("Select Project Directory - LibreTuner"),
+            linePath_->text());
         if (!dir.isNull())
             linePath_->setText(dir);
     });
 
-    connect(buttonCreate, &QPushButton::clicked, [this]()
-    {
+    connect(buttonCreate, &QPushButton::clicked, [this]() {
         if (lineName_->text().trimmed().isEmpty())
         {
             QMessageBox::warning(nullptr, tr("Invalid Name"),
@@ -67,14 +71,21 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
         QDir dir = QDir(path());
         if (dir.exists())
         {
-            if (QMessageBox::question(nullptr, tr("Project Exists"), tr("A project with that path already exists, would you like to overwrite it?")) != QMessageBox::Yes)
+            if (QMessageBox::question(
+                    nullptr, tr("Project Exists"),
+                    tr("A project with that path already exists, would you "
+                       "like to open it instead?")) != QMessageBox::Yes)
                 return;
+            openProject_ = true;
         }
+        else
+            openProject_ = false;
 
         accept();
     });
 }
 
-QString NewProjectDialog::path() const {
+QString NewProjectDialog::path() const
+{
     return QDir(linePath_->text()).filePath(lineName_->text());
 }

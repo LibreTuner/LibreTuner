@@ -118,12 +118,16 @@ std::vector<MetaData> getMetaData(fs::path & dir, bool requiresExtension,
 
 std::vector<Rom::MetaData> Project::queryRoms()
 {
+    if (!fs::exists(romsDir_))
+        return std::vector<Rom::MetaData>();
     return getMetaData<Rom::MetaData>(romsDir_, enforceExtensions_,
                                       Rom::extension);
 }
 
 std::vector<Tune::MetaData> Project::queryTunes()
 {
+    if (!fs::exists(tunesDir_))
+        return std::vector<Tune::MetaData>();
     return getMetaData<Tune::MetaData>(tunesDir_, enforceExtensions_,
                                        Tune::extension);
 }
@@ -209,8 +213,9 @@ void Project::load()
 {
     std::ifstream file(path_, std::ios::binary | std::ios::in);
     if (!file.is_open())
-        throw std::runtime_error("failed to open project file '" +
-                                 path_.string() + "' for reading.");
+        return; // silently fail
+        //throw std::runtime_error("failed to open project file '" +
+        //                         path_.string() + "' for reading.");
 
     cereal::BinaryInputArchive ar(file);
     ar(*this);

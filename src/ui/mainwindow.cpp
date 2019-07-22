@@ -151,6 +151,13 @@ void MainWindow::loadSettings()
     QSize size = settings.value("mainwindow/size", QSize(900, 600)).toSize();
     resize(size);
     move(pos);
+
+    // Populate recent menu
+    recentProjects_ = settings.value("projects").toStringList();
+    for (const QString & path : recentProjects_)
+    {
+        addToRecentMenu(path);
+    }
 }
 
 bool MainWindow::checkSave()
@@ -224,6 +231,7 @@ void MainWindow::saveSettings()
     settings.setValue("mainwindow/size", size());
     settings.setValue("mainwindow/pos", pos());
     settings.setValue("mainwindow/state", saveState());
+    settings.setValue("projects", recentProjects_);
 }
 
 QDockWidget * MainWindow::createLoggingDock()
@@ -383,11 +391,13 @@ void MainWindow::setupMenu()
     QMenu * toolsMenu = menuBar->addMenu(tr("&Tools"));
 
     // File menu
+    recentMenu_ = fileMenu->addMenu(tr("Recent Projects"));
     auto * flashAction = fileMenu->addAction(tr("Flash Tune"));
     auto * openTuneAction = fileMenu->addAction(tr("&Open Tune"));
     openTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
     auto * createTuneAction = fileMenu->addAction(tr("&New Tune"));
     auto * newProjectAction = fileMenu->addAction(tr("New Project"));
+    auto * openProjectAction = fileMenu->addAction(tr("Open Project"));
 
     createTuneAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     auto * downloadAction = fileMenu->addAction(tr("&Download ROM"));
@@ -459,7 +469,11 @@ void MainWindow::setupMenu()
         catchCritical([this]() { saveTune(); }, tr("Error saving tune"));
     });
 
-    connect(newProjectAction, &QAction::triggered, [this]() { newProject(); });
+    connect(newProjectAction, &QAction::triggered, this,
+            &MainWindow::newProject);
+
+    connect(openProjectAction, &QAction::triggered, this,
+            &MainWindow::openProject);
 
     connect(downloadAction, &QAction::triggered, this,
             &MainWindow::on_buttonDownloadRom_clicked);
@@ -589,12 +603,39 @@ void MainWindow::newProject()
     if (dlg.exec() == QDialog::Accepted)
     {
         std::filesystem::path path = dlg.path().toStdString();
-        lt::ProjectPtr project = LT()->createProject(path);
-        project->setName(path.stem().string());
+        LT()->openProject(path, !dlg.open());
+
+        // Add to recent
+        addRecent(dlg.path());
     }
 }
 
-void MainWindow::openTune(const lt::TunePtr & tune)
+void MainWindow::openProject()
 {
-    setTune(tune);
+    QString path = QFileDialog::getExistingDirectory(
+        nullptr, "LibreTuner Project Directory");
+    if (path.isNull())
+        return;
+
+    lt::ProjectPtr project = LT()->openProject(path.toStdString(), false);
+    // Add to recent
+    addRecent(path);
+}
+
+void MainWindow::openTune(const lt::TunePtr & tune) { setTune(tune); }
+
+void MainWindow::addRecent(const QString & path)
+{
+    // Check for duplicates
+    if (recentProjects_.contains(path))
+        return;
+    recentProjects_.append(path);
+    addToRecentMenu(path);
+}
+
+void MainWindow::addToRecentMenu(const QString & path)
+{
+    QAction * action = recentMenu_->addAction(path);
+    connect(action, &QAction::triggered,
+            [this, path]() { LT()->openProject(path.toStdString(), false); });
 }

@@ -2,6 +2,7 @@
 
 #include <QFileIconProvider>
 #include <logger.h>
+#include <uiutil.h>
 
 // This class is a mess
 struct TreeItem
@@ -368,17 +369,19 @@ void Projects::refreshRoms(const QModelIndex & index)
         endRemoveRows();
     }
 
-    // Get all ROM metadata
-    auto roms = project->queryRoms();
-    if (!roms.empty())
-    {
-        beginInsertRows(index, 0, roms.size() - 1);
-        for (const auto & rom : roms)
+    // Get all ROM metadatal
+    catchWarning([&](){
+        auto roms = project->queryRoms();
+        if (!roms.empty())
         {
-            new RomItem(rom, romsItem);
+            beginInsertRows(index, 0, roms.size() - 1);
+            for (const auto & rom : roms)
+            {
+                new RomItem(rom, romsItem);
+            }
+            endInsertRows();
         }
-        endInsertRows();
-    }
+    }, tr("Error querying ROM metadata"));
 }
 
 // A copy of the above method (gross, but it's quicker than abstracting it).
@@ -397,16 +400,18 @@ void Projects::refreshTunes(const QModelIndex & index)
     }
 
     // Get all tune metadata
-    auto tunes = project->queryTunes();
-    if (!tunes.empty())
-    {
-        beginInsertRows(index, 0, tunes.size() - 1);
-        for (const auto & tune : tunes)
+    catchWarning([&](){
+        auto tunes = project->queryTunes();
+        if (!tunes.empty())
         {
-            new TuneItem(tune, tunesItem);
+            beginInsertRows(index, 0, tunes.size() - 1);
+            for (const auto & tune : tunes)
+            {
+                new TuneItem(tune, tunesItem);
+            }
+            endInsertRows();
         }
-        endInsertRows();
-    }
+    }, tr("Error querying tune metadata"));
 }
 
 void Projects::tunesDirectoryChanged(const QString & path)
