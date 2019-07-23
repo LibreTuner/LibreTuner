@@ -34,11 +34,12 @@ Building
 
 #### Linux
 1. `git clone https://github.com/Libretuner/LibreTuner.git`
-2. `git submodule update --init --recursive`
-3. `cd LibreTuner`
-4. `cmake .`
-5. `make`
-6. `./LibreTuner`
+2. `cd LibreTuner`
+3. `git submodule update --init --recursive`
+4. `cd LibreTuner`
+5. `cmake .`
+6. `make`
+7. `./LibreTuner`
 
 #### Windows
 TODO. (Use Qt Creator with MSVC)
