@@ -72,7 +72,10 @@ public:
 
     /* Opens project at directory `path`. If `create` is true, creates
      * project directories and configuration. */
-    lt::ProjectPtr openProject(const std::filesystem::path & path, bool create);
+    lt::ProjectPtr openProject(const std::filesystem::path & path);
+
+    /* Creates a new project at path `path`. */
+    lt::ProjectPtr createProject(const std::filesystem::path & path, const std::string & name);
 
     /* Returns the current platform or nullptr if none is selected */
     lt::PlatformPtr platform() const { return currentPlatform_; }

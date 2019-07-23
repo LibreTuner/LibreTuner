@@ -71,12 +71,21 @@ NewProjectDialog::NewProjectDialog(QWidget * parent) : QDialog(parent)
         QDir dir = QDir(path());
         if (dir.exists())
         {
-            if (QMessageBox::question(
-                    nullptr, tr("Project Exists"),
-                    tr("A project with that path already exists, would you "
-                       "like to open it instead?")) != QMessageBox::Yes)
-                return;
-            openProject_ = true;
+            QMessageBox msg(
+                QMessageBox::Question, tr("Directory Exists"),
+                tr("A project with that path already exists, would you "
+                   "like to load or overwrite it?"),
+                QMessageBox::Cancel);
+            auto * buttonLoad =
+                msg.addButton(tr("Load"), QMessageBox::AcceptRole);
+            auto * buttonOverwrite =
+                msg.addButton(tr("Overwrite"), QMessageBox::ResetRole);
+            msg.exec();
+
+            if (msg.clickedButton() == buttonLoad)
+                openProject_ = true;
+            else if (msg.clickedButton() != buttonOverwrite)
+                return; // "No" was clicked; do nothing.
         }
         else
             openProject_ = false;

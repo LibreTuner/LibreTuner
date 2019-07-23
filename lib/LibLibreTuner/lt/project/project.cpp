@@ -8,8 +8,10 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <nlohmann/json.hpp>
 
 namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 namespace lt
 {
@@ -183,42 +185,30 @@ fs::path Project::generateTunePath(std::string name)
     return generatePath(tunesDir_, std::move(name), Tune::extension);
 }
 
-template <class Archive>
-void save(Archive & archive, const lt::Project & project,
-          std::uint32_t const version)
-{
-    archive(project.name());
-}
-
-template <class Archive>
-void load(Archive & archive, lt::Project & project, std::uint32_t const version)
-{
-    std::string name;
-    archive(name);
-    project.setName(std::move(name));
-}
-
 void Project::save() const
 {
-    std::ofstream file(path_, std::ios::binary | std::ios::out);
+    fs::path path = path_ / config_filename;
+    std::ofstream file(path, std::ios::binary);
     if (!file.is_open())
         throw std::runtime_error("failed to open project file '" +
-                                 path_.string() + "' for writing.");
+                                 path.string() + "' for writing.");
 
-    cereal::BinaryOutputArchive ar(file);
-    ar(*this);
+    json j;
+    j["name"] = name_;
+    file << j;
 }
 
 void Project::load()
 {
-    std::ifstream file(path_, std::ios::binary | std::ios::in);
+    fs::path path = path_ / config_filename;
+    std::ifstream file(path, std::ios::binary);
     if (!file.is_open())
-        return; // silently fail
-        //throw std::runtime_error("failed to open project file '" +
-        //                         path_.string() + "' for reading.");
+        throw std::runtime_error("failed to open project file '" +
+                                 path.string() + "' for reading.");
 
-    cereal::BinaryInputArchive ar(file);
-    ar(*this);
+    json j;
+    file >> j;
+    j.at("name").get_to(name_);
 }
 
 RomPtr Project::createRom(const std::string & name, lt::ModelPtr model)
@@ -262,12 +252,14 @@ RomPtr Project::importRom(const std::string & name,
     return rom;
 }
 
-bool Project::deleteRom(const std::string & filename) {
+bool Project::deleteRom(const std::string & filename)
+{
     cache_.erase(filename);
     return fs::remove(romsDir_ / filename);
 }
 
-bool Project::deleteTune(const std::string & filename) {
+bool Project::deleteTune(const std::string & filename)
+{
     return fs::remove(tunesDir_ / filename);
 }
 

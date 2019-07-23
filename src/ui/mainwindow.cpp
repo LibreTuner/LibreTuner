@@ -599,15 +599,26 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::newProject()
 {
-    NewProjectDialog dlg;
-    if (dlg.exec() == QDialog::Accepted)
-    {
-        std::filesystem::path path = dlg.path().toStdString();
-        LT()->openProject(path, !dlg.open());
-
-        // Add to recent
-        addRecent(dlg.path());
-    }
+    // Wrap in guard
+    catchCritical(
+        [&]() {
+            NewProjectDialog dlg;
+            if (dlg.exec() == QDialog::Accepted)
+            {
+                std::filesystem::path path = dlg.path().toStdString();
+                if (dlg.open())
+                {
+                    if (LT()->openProject(path))
+                        addRecent(dlg.path());
+                }
+                else
+                {
+                    LT()->createProject(path, path.filename().string());
+                    addRecent(dlg.path());
+                }
+            }
+        },
+        tr("Error opening project"));
 }
 
 void MainWindow::openProject()
@@ -617,9 +628,8 @@ void MainWindow::openProject()
     if (path.isNull())
         return;
 
-    lt::ProjectPtr project = LT()->openProject(path.toStdString(), false);
-    // Add to recent
-    addRecent(path);
+    if (LT()->openProject(path.toStdString()))
+        addRecent(path);
 }
 
 void MainWindow::openTune(const lt::TunePtr & tune) { setTune(tune); }
@@ -628,7 +638,14 @@ void MainWindow::addRecent(const QString & path)
 {
     // Check for duplicates
     if (recentProjects_.contains(path))
+    {
+        // Move to top of list
+        recentProjects_.removeAll(path);
+        // Append and don't update menu
+        recentProjects_.append(path);
         return;
+    }
+
     recentProjects_.append(path);
     addToRecentMenu(path);
 }
@@ -636,6 +653,8 @@ void MainWindow::addRecent(const QString & path)
 void MainWindow::addToRecentMenu(const QString & path)
 {
     QAction * action = recentMenu_->addAction(path);
-    connect(action, &QAction::triggered,
-            [this, path]() { LT()->openProject(path.toStdString(), false); });
+    connect(action, &QAction::triggered, [this, path]() {
+        LT()->openProject(path.toStdString());
+        addRecent(path);
+    });
 }

@@ -80,6 +80,8 @@ public:
 
     std::filesystem::path logsDirectory() const noexcept;
 
+    static constexpr auto config_filename = "config.json";
+
 private:
     // Project directory
     std::filesystem::path path_;

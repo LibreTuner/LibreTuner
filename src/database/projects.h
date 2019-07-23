@@ -31,6 +31,8 @@ public:
 
     QModelIndex projectIndex(const lt::Project & project);
 
+    QModelIndex projectIndex(const QString & path);
+
     // Returns the index of the ROM directory with path `romsPath`
     QModelIndex romsIndex(const QString & romsPath);
 

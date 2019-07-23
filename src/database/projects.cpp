@@ -314,6 +314,21 @@ QVariant Projects::headerData(int section, Qt::Orientation orientation,
 
 Projects::~Projects() { delete root_; }
 
+QModelIndex Projects::projectIndex(const QString& path){
+    std::filesystem::path dir(path.toStdString());
+    for (int row = 0; row < root_->children.size(); ++row)
+    {
+        QVariant data = root_->child(row)->data(0, Qt::UserRole);
+        if (data.canConvert<lt::ProjectPtr>())
+        {
+            auto project = data.value<lt::ProjectPtr>();
+            if (project->path() == dir)
+                return index(row, 0, QModelIndex());
+        }
+    }
+    return QModelIndex();
+}
+
 QModelIndex Projects::romsIndex(const QString & romsPath)
 {
     std::filesystem::path dir(romsPath.toStdString());

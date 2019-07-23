@@ -176,15 +176,39 @@ lt::PlatformLink LibreTuner::platformLink() const
     return lt::PlatformLink(*currentDatalink_, *currentPlatform_);
 }
 
-lt::ProjectPtr LibreTuner::openProject(const std::filesystem::path & path,
-                                       bool create)
+lt::ProjectPtr LibreTuner::openProject(const std::filesystem::path & path)
+{
+    // Check if the project is already open
+    if (QModelIndex index =
+            projects_.projectIndex(QString::fromStdString(path.string()));
+        index.isValid())
+    {
+        return index.data(Qt::UserRole).value<lt::ProjectPtr>();
+    }
+
+    auto project = std::make_shared<lt::Project>(path, platforms_);
+    bool success = false;
+    catchCritical(
+        [&]() {
+            project->load();
+            success = true;
+        },
+        tr("Error loading project"));
+    if (!success)
+        return lt::ProjectPtr();
+
+    projects_.addProject(project);
+    return project;
+}
+
+lt::ProjectPtr LibreTuner::createProject(const std::filesystem::path & path,
+                                         const std::string & name)
 {
     auto project = std::make_shared<lt::Project>(path, platforms_);
-    if (create)
-        project->makeDirectories();
-    else
-        catchCritical([&]() { project->load(); }, tr("Error loading project"));
-    project->setName(path.stem().string());
+    project->makeDirectories();
+    project->setName(name);
+    project->save();
+
     projects_.addProject(project);
     return project;
 }
