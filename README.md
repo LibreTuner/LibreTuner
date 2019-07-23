@@ -1,11 +1,11 @@
 LibreTuner
 =========
-Open source tuning software for Mazda platforms
+Open source engine tuning software for Mazda platforms
 
-[Join the Discord server](https://discord.gg/QQvX2rB)
+Interested in contributing? [Join the Discord server](https://discord.gg/QQvX2rB)
 
 
-Screenshots
+Screenshots (outdated)
 -----------
 ![Main Window](https://user-images.githubusercontent.com/3116133/52010479-9b94cc00-24a3-11e9-904a-0d64776f6b6c.png)
 
@@ -15,25 +15,30 @@ Supported vehicles
 
 Planned support
 ---------------
+* Mazdaspeed3 (Gen 1 & 2)
 * First Generation RX-8
 
+
+Layout
+------
+All interesting code lives at `lib/LibLibreTuner`.
 
 Building
 --------
 ### Requirements
 * Qt5
-* CMake 2.8.11 or higher
+* CMake 3.10 or higher
+* A compiler that supports C++17
 
 ### Build instructions
 
-`git clone https://github.com/Libretuner/LibreTuner.git`
+#### Linux
+1. `git clone https://github.com/Libretuner/LibreTuner.git`
+2. `git submodule update --init --recursive`
+3. `cd LibreTuner`
+4. `cmake .`
+5. `make`
+6. `./LibreTuner`
 
-`git submodule update --init --recursive`
-
-`cd LibreTuner`
-
-`cmake .`
-
-`make`
-
-`./LibreTuner`
+#### Windows
+TODO. (Use Qt Creator with MSVC)
