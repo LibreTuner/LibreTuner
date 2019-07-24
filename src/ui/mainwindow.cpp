@@ -20,6 +20,7 @@
 #include "libretuner.h"
 
 #include "ui/windows/downloadwindow.h"
+#include "ui/windows/vehicleinformationwidget.h"
 
 #include "docks/editorwidget.h"
 #include "docks/explorerwidget.h"
@@ -503,6 +504,15 @@ void MainWindow::setupMenu()
 
     QAction * logAction = toolsMenu->addAction(tr("&CAN Log"));
     // connect(logAct, &QAction::triggered, [this] { canViewer_.show(); });
+    QAction * infoAction = toolsMenu->addAction(tr("Vehicle Information"));
+    connect(infoAction, &QAction::triggered, [this]() {
+        if (infoWidget_ == nullptr)
+        {
+            infoWidget_ = new VehicleInformationWidget(this);
+            infoWidget_->setWindowFlag(Qt::Window);
+        }
+        infoWidget_->show();
+    });
 
     QAction * datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
     connect(datalinksAction, &QAction::triggered,

@@ -114,7 +114,7 @@ set(libretuner_SRC
         database/projects.h
 
 
-    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
+    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS} ui/windows/vehicleinformationwidget.cpp ui/windows/vehicleinformationwidget.h)
 
 if (UNIX AND NOT APPLE)
 

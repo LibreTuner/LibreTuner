@@ -40,6 +40,7 @@ class SidebarWidget;
 class GraphWidget;
 class DefinitionsWindow;
 class ExplorerWidget;
+class VehicleInformationWidget;
 
 namespace lt
 {
@@ -138,6 +139,7 @@ private:
     DiagnosticsWidget diagnosticsWindow_;
 
     QPointer<DefinitionsWindow> definitionsWindow_;
+    VehicleInformationWidget * infoWidget_{nullptr};
 
     QStringList recentProjects_;
 };
