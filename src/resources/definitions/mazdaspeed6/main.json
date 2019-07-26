@@ -1,677 +1,1824 @@
 {
-  "name": "Mazdaspeed 6/Mazda 6 MPS/Mazdaspeed Atenza",
-  "id": "mazdaspeed6",
-  "romsize": 1048576,
-  "baudrate": 500000,
-  "logmode": "uds",
-  "vins": [
-     "JM1GG12L........."
-  ],
-  "transfer": {
-     "flashmode": "MazdaT1",
-     "downloadmode": "Mazda23",
-     "serverid": 2016
-  },
-  "auth": {
-     "key": "MazdA",
-     "download_sessionid": 135,
-     "flash_sessionid": 133
-  },
-  "tables": {
-     "0": {
-        "name": "Overload Protection Fuel Cut",
-        "description": "Overload Protection Fuel Cut",
-        "category": "Limits",
-        "datatype": "float",
-        "width": 14,
-        "height": 8,
-        "minimum": 0,
-        "maximum": 4
-     },
-     "1": {
-        "name": "Intake Cam Advance (VVT)",
-        "description": "Intake Cam Advance (VVT)",
-        "category": "Valve Timing",
-        "datatype": "float",
-        "width": 14,
-        "height": 32,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_0625",
-        "minimum": 0,
-        "maximum": 60
-     },
-     "2": {
-        "name": "Closed Loop AFR Target",
-        "description": "Closed Loop AFR Target",
-        "category": "Fuel Injection",
-        "datatype": "float",
-        "width": 10,
-        "height": 31,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_125",
-        "minimum": 0.5,
-        "maximum": 1.5
-     },
-     "4": {
-        "name": "Idle RPM (In Gear, No A/C)",
-        "description": "Idle RPM (In Gear, No A/C)",
-        "category": "Idle",
-        "datatype": "float",
-        "width": 8,
-        "axisx": "temp_coolant",
-        "minimum": 500,
-        "maximum": 2500
-     },
-     "6": {
-        "name": "Fan On Voltage Adjustment",
-        "description": "Fan On Voltage Adjustment",
-        "category": "Fan Control",
-        "datatype": "float",
-        "width": 7,
-        "axisx": "voltage_batt",
-        "minimum": 0,
-        "maximum": 2
-     },
-     "8": {
-        "name": "Idle RPM (Not in gear, A/C on)",
-        "description": "Idle RPM (Not in gear, A/C on)",
-        "category": "Idle",
-        "datatype": "float",
-        "width": 8,
-        "axisx": "pressure_kpa",
-        "minimum": 500,
-        "maximum": 2500
-     },
-     "9": {
-        "name": "Open Loop Timing (Normal)",
-        "description": "Open Loop Timing (Normal)",
-        "category": "Ignition",
-        "datatype": "float",
-        "width": 14,
-        "height": 28,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_3125",
-        "minimum": -25,
-        "maximum": 75
-     },
-     "10": {
-        "name": "Speed Limit Threshold (Throttle Close)",
-        "description": "Speed Limit Threshold (Throttle Close)",
-        "category": "Limits",
-        "datatype": "float",
-        "minimum": 3,
-        "maximum": 10
-     },
-     "11": {
-        "name": "Closed Loop Timing (Overload)",
-        "description": "Closed Loop Timing (Overload)",
-        "category": "Ignition",
-        "datatype": "float",
-        "width": 14,
-        "height": 28,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_3125",
-        "minimum": -20,
-        "maximum": 70
-     },
-     "12": {
-        "name": "Speed Limit (Throttle Close)",
-        "description": "Speed Limit (Throttle Close)",
-        "category": "Limits",
-        "datatype": "float",
-        "minimum": 0,
-        "maximum": 350
-     },
-     "13": {
-        "name": "Overboost Fuel Cut",
-        "description": "Overboost Fuel Cut",
-        "category": "Limits",
-        "datatype": "float",
-        "width": 14,
-        "height": 8,
-        "axisx": "rpm_500",
-        "axisy": "pressure_kpa",
-        "minimum": 0,
-        "maximum": 450
-     },
-     "14": {
-        "name": "Speed Limit (Fuel cut)",
-        "description": "Speed Limit (Fuel cut)",
-        "datatype": "float",
-        "category": "Limits",
-        "width": 1
-     },
-     "15": {
-        "name": "MAF Calibration 2",
-        "description": "MAF Calibration 2",
-        "category": "MAF",
-        "datatype": "float",
-        "width": 129,
-        "axisx": "maf_5",
-        "minimum": 0,
-        "maximum": 850
-     },
-     "16": {
-        "name": "RPM Limit",
-        "description": "RPM Limit",
-        "category": "Limits",
-        "datatype": "float",
-        "minimum": 0,
-        "maximum": 8500
-     },
-     "17": {
-        "name": "Closed Loop Timing (Normal)",
-        "description": "Closed Loop Timing (Normal)",
-        "category": "Ignition",
-        "datatype": "float",
-        "width": 14,
-        "height": 28,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_3125",
-        "minimum": -20,
-        "maximum": 70
-     },
-     "18": {
-        "name": "Open Loop Timing (Overload)",
-        "description": "Open Loop Timing (Overload)",
-        "category": "Ignition",
-        "datatype": "float",
-        "width": 14,
-        "height": 28,
-        "axisx": "rpm_500_linear",
-        "axisy": "load_3125",
-        "minimum": -20,
-        "maximum": 70
-     },
-     "19": {
-        "name": "Speed Limit Threshold (Fuel Cut)",
-        "description": "Speed Limit Threshold (Fuel Cut)",
-        "category": "Limits",
-        "datatype": "float",
-        "minimum": 3,
-        "maximum": 15
-     },
-     "20": {
-        "name": "Idle RPM (In Gear, A/C)",
-        "description": "Idle RPM (In Gear, A/C)",
-        "category": "Idle",
-        "datatype": "float",
-        "width": 8,
-        "axisx": "pressure_kpa",
-        "minimum": 500,
-        "maximum": 2500
-     },
-     "21": {
-        "name": "Overboost Throttle Cut",
-        "description": "Overboost Throttle Cut",
-        "category": "Limits",
-        "datatype": "float",
-        "width": 14,
-        "axisx": "rpm_500",
-        "minimum": 0,
-        "maximum": 450
-     },
-     "22": {
-        "name": "Fan On Engine Coolant Temperature",
-        "description": "Fan On Engine Coolant Temperature",
-        "category": "Fan Control",
-        "datatype": "float",
-        "width": 8,
-        "axisx": "pressure_kpa",
-        "minimum": 0,
-        "maximum": 180
-     },
-     "23": {
-        "name": "MAF Calibration 1",
-        "description": "MAF Calibration 1",
-        "category": "MAF",
-        "datatype": "float",
-        "width": 129,
-        "axisx": "maf_5",
-        "minimum": 0,
-        "maximum": 850
-     },
-     "24": {
-        "name": "Idle RPM - Neutral",
-        "description": "Idle RPM - Neutral",
-        "category": "Idle",
-        "datatype": "float",
-        "width": 8,
-        "axisx": "temp_coolant",
-        "minimum": 500,
-        "maximum": 2500
-     },
-     "25": {
-        "name": "Maximum Load Limit",
-        "description": "Maximum Load Limit",
-        "category": "Limits",
-        "datatype": "float",
-        "width": 14,
-        "axisx": "rpm_500_linear",
-        "minimum": 0,
-        "maximum": 4
-     }
-  },
-  "axes": {
-     "rpm_500": {
-        "size": 14,
-        "type": "memory",
-        "datatype": "float",
-        "name": "RPM"
-     },
-     "rpm_500_15": {
-        "size": 15,
-        "type": "memory",
-        "datatype": "float",
-        "name": "RPM"
-     },
-     "rpm_500_linear": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "RPM",
-        "size": 14,
-        "minimum": 500,
-        "increment": 500
-     },
-     "load_125": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Load",
-        "size": 31,
-        "minimum": 0.125,
-        "increment": 0.0625
-     },
-     "load_025": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Load",
-        "size": 14,
-        "minimum": 0.25,
-        "increment": 0.0625
-     },
-     "load_0625": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Load",
-        "size": 32,
-        "minimum": 0.0625,
-        "increment": 0.0625
-     },
-     "load_3125": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Load",
-        "size": 28,
-        "minimum": 0.3125,
-        "increment": 0.0625
-     },
-     "pressure_kpa": {
-        "size": 8,
-        "type": "memory",
-        "datatype": "float",
-        "name": "Barometric Pressure"
-     },
-     "pressure_kpa_diff": {
-        "size": 11,
-        "type": "memory",
-        "datatype": "float",
-        "name": "Boost Target Difference"
-     },
-     "bsc_dc_volts": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Battery Voltage",
-        "size": 13,
-        "minimum": 6.5,
-        "increment": 1.25
-     },
-     "temp_iat": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Intake Air Temperature (Celsius)",
-        "size": 14,
-        "minimum": -40,
-        "increment": 20
-     },
-     "temp_coolant": {
-        "type": "linear",
-        "datatype": "float",
-        "name": "Coolant Temperature (Celsius)",
-        "size": 14,
-        "minimum": -40,
-        "increment": 20
-     },
-     "tps_0": {
-        "type": "linear",
-        "datatype": "float",
-        "size": 14,
-        "minimum": 0,
-        "increment": 6.25,
-        "name": "Requested Throttle Position"
-     },
-     "maf_5": {
-        "type": "linear",
-        "datatype": "float",
-        "size": 129,
-        "minimum": 0,
-        "increment": 0.039000001,
-        "name": "Voltage"
-     },
-     "voltage_batt": {
-        "type": "memory",
-        "datatype": "float",
-        "name": "Battery Voltage",
-        "size": 7
-     }
-  },
-  "flashregion": {
-     "offset": 32768,
-     "size": 1015808
-  },
-  "pids": [
-     {
-        "id": 0,
-        "name": "Coolant Temperature",
-        "description": "Coolant Temperature",
-        "code": 5,
-        "unit": "temp_celsius",
-        "formula": "a - 40"
-     },
-     {
-        "id": 1,
-        "name": "Engine RPM",
-        "description": "Engine RPM",
-        "code": 12,
-        "unit": "rpm",
-        "formula": "(256 * a + b) / 4"
-     },
-     {
-        "id": 2,
-        "name": "Vehicle speed",
-        "description": "Speed of the vehicle in km/h",
-        "code": 13,
-        "unit": "km/h",
-        "formula": "a"
-     },
-     {
-        "id": 3,
-        "name": "Absolute load",
-        "description": "The absolute load of the engine; how hard the engine is working",
-        "code": 67,
-        "unit": "none",
-        "formula": "(a * 256 + b) / 255"
-     },
-     {
-        "id": 4,
-        "name": "Accelerator pedal position",
-        "description": "How far the pedal position is depressed",
-        "code": 4928,
-        "unit": "percentage",
-        "formula": "a * 1024 / 2601"
-     },
-     {
-        "id": 5,
-        "name": "Air-fuel equivalence ratio",
-        "description": "The ratio of actual AFR to stoichiometry for a given mixture. lambda = 1.0 is at stoichiometry, rich mixtures labmda < 1.0, and lean mixtures lambda > 1.0.",
-        "code": 5967,
-        "unit": "ratio",
-        "formula": "a / 128"
-     },
-     {
-        "id": 6,
-        "name": "Valve timing",
-        "description": "Timing advance in degrees of the camshafts",
-        "code": 5837,
-        "unit": "degrees",
-        "formula": "(a * 256 + b) / 16"
-     },
-     {
-        "id": 7,
-        "name": "Ambient air temperature",
-        "description": "Ambient air temperature",
-        "code": 70,
-        "unit": "temp_celsius",
-        "formula": "a - 40"
-     },
-     {
-        "id": 8,
-        "name": "Absolute Barometric pressure",
-        "description": "External atmospheric pressure",
-        "code": 51,
-        "unit": "pressure_kPa",
-        "formula": "a"
-     },
-     {
-        "id": 9,
-        "name": "Control module voltage",
-        "description": "Voltage supplied to ECU",
-        "code": 66,
-        "unit": "voltage",
-        "formula": "(256 * a + b) / 1000"
-     },
-     {
-        "id": 10,
-        "name": "Boost air temperature",
-        "description": "The temperature in the intake manifold",
-        "code": 5923,
-        "unit": "temp_celsius",
-        "formula": "(a * 0.625) - 40"
-     },
-     {
-        "id": 11,
-        "name": "Fuel–Air commanded equivalence ratio",
-        "description": "The target fuel-air equivalence ratio",
-        "code": 68,
-        "unit": "ratio",
-        "formula": "2 * (256 * a + b) / 65536"
-     },
-     {
-        "id": 12,
-        "name": "Target engine RPM",
-        "description": "The engine RPM the ECU is targetting",
-        "code": 2414,
-        "unit": "rpm",
-        "formula": "(a * 256 + b) / 4"
-     },
-     {
-        "id": 13,
-        "name": "Commanded throttle actuator",
-        "description": "The throttle position that the ECU is targetting",
-        "code": 76,
-        "unit": "percentage",
-        "formula": "a * 100 / 255"
-     },
-     {
-        "id": 14,
-        "name": "Fuel injection pulse width",
-        "description": "The time each injector is held open it its injection cycle",
-        "code": 5136,
-        "unit": "time",
-        "formula": "(a * 256 + b) * 0.008"
-     },
-     {
-        "id": 15,
-        "name": "Fuel Rail Gauge Pressure",
-        "description": "The high pressure fuel rail's pressure",
-        "code": 35,
-        "unit": "pressure_kPa",
-        "formula": "10 * (256 * a + b)"
-     },
-     {
-        "id": 16,
-        "name": "Intake air temperature",
-        "description": "The temperature of air measured by the MAF sensor",
-        "code": 15,
-        "unit": "temp_celsius",
-        "formula": "a - 40"
-     },
-     {
-        "id": 17,
-        "name": "Knock retard",
-        "description": "The degrees that the spark timing is retarded as response to the knock sensor",
-        "code": 5958,
-        "unit": "degrees",
-        "formula": "a * 0.3515625"
-     },
-     {
-        "id": 18,
-        "name": "Long term fuel trim",
-        "description": "The percentage difference from the base amount calculated from long term oxygen sensor measurements. Negative means fuel is reduced (too rich). Positive means fuel is added (too lean).",
-        "code": 7,
-        "unit": "percentage",
-        "formula": "a / 1.28 - 100"
-     },
-     {
-        "id": 19,
-        "name": "Short term fuel trim (primary)",
-        "description": "The short term fuel trim calculated from the primary oxygen sensor",
-        "code": 6,
-        "unit": "percentage",
-        "formula": "a / 1.28 - 100"
-     },
-     {
-        "id": 20,
-        "name": "Short term fuel trim (secondary)",
-        "description": "The short term fuel trim calculated from the secondary oxygen sensor",
-        "code": 5694,
-        "unit": "percentage",
-        "formula": "(a * 256 + b) * 0.00012207031"
-     },
-     {
-        "id": 21,
-        "name": "Intake manifold absolute pressure",
-        "description": "The pressure of the intake manifold",
-        "code": 11,
-        "unit": "pressure_kPa",
-        "formula": "a"
-     },
-     {
-        "id": 22,
-        "name": "Mass air flow rate",
-        "description": "The flow rate of air measured by the MAF sensor",
-        "code": 16,
-        "unit": "grams/sec",
-        "formula": "(256 * a + b) / 100"
-     },
-     {
-        "id": 23,
-        "name": "MAF sensor voltage",
-        "description": "The voltage output by the MAF sensor",
-        "code": 4471,
-        "unit": "voltage",
-        "formula": "(a * 256 + b) / 4096"
-     },
-     {
-        "id": 24,
-        "name": "Relative throttle position",
-        "description": "The throttle position relative to the learned closed position",
-        "code": 69,
-        "unit": "percentage",
-        "formula": "100 * a / 255"
-     },
-     {
-        "id": 25,
-        "name": "Timing advance",
-        "description": "The spark timing advance relative to TDC",
-        "code": 14,
-        "unit": "degrees",
-        "formula": "a / 2 - 64"
-     },
-     {
-        "id": 26,
-        "name": "Wastegate control solenoid duty cycle",
-        "description": "The duty cycle of the boost control solenoid.",
-        "code": 5857,
-        "unit": "percentage",
-        "formula": "(a * 256 + b) * 100 / 65536"
-     },
-     {
-        "id": 27,
-        "name": "Fuel injection amount",
-        "description": "The amount of fuel injected in each cylinder per cycle",
-        "code": 5970,
-        "unit": "fuel_injection",
-        "formula": "(a * 256 + b) / 32.728"
-     },
-     {
-        "id": 28,
-        "name": "Air to fuel ratio",
-        "description": "The air to fuel ratio measured by the wideband oxygen sensor",
-        "code": 5967,
-        "unit": "ratio",
-        "formula": "a / 128 * 14.7"
-     },
-     {
-        "id": 29,
-        "name": "Fuel–Air commanded ratio",
-        "description": "The air to fuel ratio targeted by the ECU",
-        "code": 68,
-        "unit": "none",
-        "formula": "2 * (256 * a + b) / 65536 * 14.7"
-     },
-     {
-        "id": 30,
-        "name": "Clutch pedal position",
-        "description": "Clutch pedal position. 0 is released, 1 is depressed.",
-        "code": 41489,
-        "unit": "none",
-        "formula": "b % 1"
-     },
-     {
-        "id": 31,
-        "name": "Neutral gear position",
-        "description": "0 - gearbox is in drive, 1 - gearbox is in neutral",
-        "code": 41489,
-        "unit": "none",
-        "formula": "(a / 4) % 2"
-     },
-     {
-        "id": 32,
-        "name": "MAP sensor voltage",
-        "description": "Voltage output by the MAP sensor",
-        "code": 2304,
-        "unit": "voltage",
-        "formula": "(a * 256 + b) / 1024"
-     },
-     {
-        "id": 33,
-        "name": "Fuel pressure sensor voltage",
-        "description": "Voltage output by the fuel sensor",
-        "code": 5771,
-        "unit": "voltage",
-        "formula": "(a * 256 + b) * 5 / 65535"
-     },
-     {
-        "id": 34,
-        "name": "Target fuel rail pressure",
-        "description": "The fuel rail pressure the ECU is targetting",
-        "code": 5959,
-        "unit": "pressure_kPa",
-        "formula": "(a * 256 + b) * 10"
-     },
-     {
-        "id": 35,
-        "name": "Oxygen sensor voltage",
-        "description": "Voltage of the narrow band oxygen sensor",
-        "code": 21,
-        "unit": "voltage",
-        "formula": "a / 200"
-     },
-     {
-        "id": 36,
-        "name": "Long term fuel trim (bank 2)",
-        "description": "The percentage difference from the base amount calculated from long term oxygen sensor measurements. Negative means fuel is reduced (too rich). Positive means fuel is added (too lean).",
-        "code": 9,
-        "unit": "percentage",
-        "formula": "a / 1.28 - 100"
-     },
-     {
-        "id": 37,
-        "name": "Short term fuel trim (bank 2)",
-        "description": "The short term fuel trim calculated from the primary oxygen sensor",
-        "code": 8,
-        "unit": "percentage",
-        "formula": "a / 1.28 - 100"
-     }
-  ]
+   "name": "Mazdaspeed 6/Mazda 6 MPS/Mazdaspeed Atenza",
+   "id": "mazdaspeed6",
+   "romsize": 1048576,
+   "baudrate": 500000,
+   "logmode": "uds",
+   "vins": [
+      "JM1GG12L........."
+   ],
+   "transfer": {
+      "flashmode": "MazdaT1",
+      "downloadmode": "Mazda23",
+      "serverid": 2016
+   },
+   "auth": {
+      "key": "MazdA",
+      "download_sessionid": 135,
+      "flash_sessionid": 133
+   },
+   "tables": {
+      "0": {
+         "name": "Overload Protection Fuel Cut",
+         "description": "Overload Protection Fuel Cut",
+         "category": "Limits",
+         "datatype": "float",
+         "width": 14,
+         "height": 8,
+         "axisx": "rpm_500_linear",
+         "axisy": "unid_temp2",
+         "minimum": 0,
+         "maximum": 4
+      },
+      "1": {
+         "name": "Intake Cam Advance (VVT)",
+         "description": "Intake Cam Advance (VVT)",
+         "category": "Valve Timing",
+         "datatype": "float",
+         "width": 14,
+         "height": 32,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_0625",
+         "minimum": 0,
+         "maximum": 60
+      },
+      "2": {
+         "name": "Closed Loop AFR Target",
+         "description": "Closed Loop AFR Target",
+         "category": "Fuel Injection",
+         "datatype": "float",
+         "width": 10,
+         "height": 31,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_125",
+         "minimum": 0.5,
+         "maximum": 1.5
+      },
+      "4": {
+         "name": "Idle RPM (In Gear, No A/C)",
+         "description": "Idle RPM (In Gear, No A/C)",
+         "category": "Idle",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "temp_coolant",
+         "minimum": 500,
+         "maximum": 2500
+      },
+      "6": {
+         "name": "Fan On Voltage Adjustment",
+         "description": "Fan On Voltage Adjustment",
+         "category": "Fan Control",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "voltage_batt",
+         "minimum": 0,
+         "maximum": 2
+      },
+      "8": {
+         "name": "Idle RPM (Not in gear, A/C on)",
+         "description": "Idle RPM (Not in gear, A/C on)",
+         "category": "Idle",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "pressure_kpa",
+         "minimum": 500,
+         "maximum": 2500
+      },
+      "9": {
+         "name": "Open Loop Timing (Normal)",
+         "description": "Open Loop Timing (Normal)",
+         "category": "Ignition",
+         "datatype": "float",
+         "width": 14,
+         "height": 28,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_3125",
+         "minimum": -25,
+         "maximum": 75
+      },
+      "10": {
+         "name": "Speed Limit Threshold (Throttle Close)",
+         "description": "Speed Limit Threshold (Throttle Close)",
+         "category": "Limits",
+         "datatype": "float",
+         "minimum": 3,
+         "maximum": 10
+      },
+      "11": {
+         "name": "Closed Loop Timing (Overload)",
+         "description": "Closed Loop Timing (Overload)",
+         "category": "Ignition",
+         "datatype": "float",
+         "width": 14,
+         "height": 28,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_3125",
+         "minimum": -20,
+         "maximum": 70
+      },
+      "12": {
+         "name": "Speed Limit (Throttle Close)",
+         "description": "Speed Limit (Throttle Close)",
+         "category": "Limits",
+         "datatype": "float",
+         "minimum": 0,
+         "maximum": 350
+      },
+      "13": {
+         "name": "Overboost Fuel Cut",
+         "description": "Overboost Fuel Cut",
+         "category": "Limits",
+         "datatype": "float",
+         "width": 14,
+         "height": 8,
+         "axisx": "rpm_500_linear",
+         "axisy": "pressure_kpa",
+         "minimum": 0,
+         "maximum": 450
+      },
+      "14": {
+         "name": "Speed Limit (Fuel cut)",
+         "description": "Speed Limit (Fuel cut)",
+         "datatype": "float",
+         "category": "Limits",
+         "width": 1
+      },
+      "15": {
+         "name": "MAF Calibration 2",
+         "description": "MAF Calibration 2",
+         "category": "MAF",
+         "datatype": "float",
+         "width": 129,
+         "axisx": "maf_5",
+         "minimum": 0,
+         "maximum": 850
+      },
+      "16": {
+         "name": "RPM Limit",
+         "description": "RPM Limit",
+         "category": "Limits",
+         "datatype": "float",
+         "minimum": 0,
+         "maximum": 8500
+      },
+      "17": {
+         "name": "Closed Loop Timing (Normal)",
+         "description": "Closed Loop Timing (Normal)",
+         "category": "Ignition",
+         "datatype": "float",
+         "width": 14,
+         "height": 28,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_3125",
+         "minimum": -20,
+         "maximum": 70
+      },
+      "18": {
+         "name": "Open Loop Timing (Overload)",
+         "description": "Open Loop Timing (Overload)",
+         "category": "Ignition",
+         "datatype": "float",
+         "width": 14,
+         "height": 28,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_3125",
+         "minimum": -20,
+         "maximum": 70
+      },
+      "19": {
+         "name": "Speed Limit Threshold (Fuel Cut)",
+         "description": "Speed Limit Threshold (Fuel Cut)",
+         "category": "Limits",
+         "datatype": "float",
+         "minimum": 3,
+         "maximum": 15
+      },
+      "20": {
+         "name": "Idle RPM (In Gear, A/C)",
+         "description": "Idle RPM (In Gear, A/C)",
+         "category": "Idle",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "pressure_kpa",
+         "minimum": 500,
+         "maximum": 2500
+      },
+      "21": {
+         "name": "Overboost Throttle Cut",
+         "description": "Overboost Throttle Cut",
+         "category": "Limits",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500",
+         "minimum": 0,
+         "maximum": 450
+      },
+      "22": {
+         "name": "Fan On Engine Coolant Temperature",
+         "description": "Fan On Engine Coolant Temperature",
+         "category": "Fan Control",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "pressure_kpa",
+         "minimum": 0,
+         "maximum": 180
+      },
+      "23": {
+         "name": "MAF Calibration 1",
+         "description": "MAF Calibration 1",
+         "category": "MAF",
+         "datatype": "float",
+         "width": 129,
+         "axisx": "maf_5",
+         "minimum": 0,
+         "maximum": 850
+      },
+      "24": {
+         "name": "Idle RPM - Neutral",
+         "description": "Idle RPM - Neutral",
+         "category": "Idle",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "temp_coolant",
+         "minimum": 500,
+         "maximum": 2500
+      },
+      "25": {
+         "name": "Maximum Load Limit",
+         "description": "Maximum Load Limit",
+         "category": "Limits",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear",
+         "minimum": 0,
+         "maximum": 4
+      },
+      "26": {
+         "name": "unid_2dtable_10x7_2B3B0",
+         "description": "unid_2dtable_10x7_2B3B0",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 10,
+         "height": 7
+      },
+      "27": {
+         "name": "RPM_map_to_index",
+         "description": "DO NOT CHANGE THIS TABLE. Used to map RPM to an index for 2d table calculations.",
+         "category": "Axis Maps",
+         "datatype": "float",
+         "width": 10,
+         "axisx": "rpm_2000_linear"
+      },
+      "28": {
+         "name": "Unknown_map_to_index",
+         "description": "DO NOT CHANGE THIS TABLE",
+         "category": "Axis Maps",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unknown_625_625"
+      },
+      "29": {
+         "name": "unid_1d_2AC7C",
+         "description": "",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unid_temp"
+      },
+      "30": {
+         "name": "unid_1d_2AC6C",
+         "description": "",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 4,
+         "axisx": "unknown_539_158"
+      },
+      "31": {
+         "name": "unid_1d__index_RPM_2AC44",
+         "description": "unid_1d__index_RPM_2AC44",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 10,
+         "axisx": "rpm_2000_linear"
+      },
+      "32": {
+         "name": "unid_2d_10x31_1C38C",
+         "description": "A condition is checked to use this table or unid_2d_10x31_1BEB4",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 10,
+         "height": 31
+      },
+      "33": {
+         "name": "unid_2d_10x31_1BEB4",
+         "description": "A condition is checked to use this table or unid_2d_10x31_1C38C",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 10,
+         "height": 31
+      },
+      "34": {
+         "name": "unid_1d_AB2C",
+         "description": "unid_1d_AB2C",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "35": {
+         "name": "unid_1d_AB0C",
+         "description": "unid_1d_AB0C",
+         "category": "Unidentified",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_-40_160"
+      },
+      "36": {
+         "name": "unid_2d_6x17_21EEC",
+         "description": "unid_2d_6x17_21EEC",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 6,
+         "height": 11
+      },
+      "37": {
+         "name": "unid_1d_ACE8",
+         "description": "unid_1d_ACE8",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unid_temp3"
+      },
+      "38": {
+         "name": "unid_1d_AD04",
+         "description": "unid_1d_AD04",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unid_temp3"
+      },
+      "39": {
+         "name": "unid_2d_10x14_227AC_BRANCH1",
+         "description": "One possible branch between 227AC, 229B4, 2239C, and 225A4",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 10,
+         "height": 13
+      },
+      "40": {
+         "name": "unid_2d_10x14_229B4_BRANCH2",
+         "description": "One possible branch between 227AC, 229B4, 2239C, and 225A4",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 10,
+         "height": 13
+      },
+      "41": {
+         "name": "unid_2d_10x14_2239C_BRANCH3",
+         "description": "One possible branch between 227AC, 229B4, 2239C, and 225A4",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 10,
+         "height": 13
+      },
+      "42": {
+         "name": "unid_2d_10x14_225A4_BRANCH4",
+         "description": "One possible branch between 227AC, 229B4, 2239C, and 225A4",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 10,
+         "height": 13
+      },
+      "43": {
+         "name": "unid_2d_14x9_2F9D4",
+         "description": "unid_2d_14x9_2F9D4",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 14,
+         "height": 9,
+         "minimum": 0.00390625
+      },
+      "44": {
+         "name": "unid_2d_14x9_2F5E4",
+         "description": "Maximum based off value from unid_2d_14x9_2F9D4 and unk_FFFF4694",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 14,
+         "height": 9,
+         "minimum": 0.032000002
+      },
+      "45": {
+         "name": "unid_1d__index_RPM_2FBCC",
+         "description": "unid_1d__index_RPM_2FBCC",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear",
+         "minimum": 0.0040000002
+      },
+      "46": {
+         "name": "unid_1d_AC38",
+         "description": "unid_1d_AC38",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 6,
+         "axisx": "unknown_0_100",
+         "minimum": 0,
+         "maximum": 1
+      },
+      "47": {
+         "name": "unid_1d_branch1_AC14",
+         "description": "Condition checked to branch to AC14, ABF0, ABCC, or ABA8.",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_-20_10"
+      },
+      "48": {
+         "name": "unid_1d_branch2_ABF0",
+         "description": "Condition checked to branch to AC14, ABF0, ABCC, or ABA8.",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_-20_10"
+      },
+      "49": {
+         "name": "unid_1d_branch3_ABCC",
+         "description": "Condition checked to branch to AC14, ABF0, ABCC, or ABA8.",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_-20_10"
+      },
+      "50": {
+         "name": "unid_1d_branch4_ABA8",
+         "description": "Condition checked to branch to AC14, ABF0, ABCC, or ABA8.",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_-20_10"
+      },
+      "51": {
+         "name": "unid_1d_C368",
+         "description": "Related to unid_1d_C380",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 6,
+         "axisx": "unknown_-20_20"
+      },
+      "52": {
+         "name": "unid_1d_C380",
+         "description": "Related to unid_1d_C368",
+         "category": "Unidentified_2",
+         "datatype": "float",
+         "width": 6,
+         "axisx": "unknown_-20_20"
+      },
+      "53": {
+         "name": "unid_2d_11x9_22210",
+         "description": "Unknown condition causes calculation with this table or unid_2d_11x9_22084",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 11,
+         "height": 9,
+         "axisy": "unknown_125_0625",
+         "axisx": "rpm_500_100_11"
+      },
+      "54": {
+         "name": "unid_2d_11x9_22084",
+         "description": "Unknown condition causes calculation with this table or unid_2d_11x9_22210",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 11,
+         "height": 9,
+         "axisy": "unknown_125_0625",
+         "axisx": "rpm_500_100_11"
+      },
+      "55": {
+         "name": "unid_1d__index_RPM_AF5C",
+         "description": "unid_1d__index_RPM_AF5C",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "rpm_1000_linear"
+      },
+      "56": {
+         "name": "unid_1d__index_RpmDifference_AF78",
+         "description": "unid_1d__index_RpmDifference_AF78",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "rpm_difference"
+      },
+      "57": {
+         "name": "unid_1d_AB84",
+         "description": "unid_1d_AB84",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_-20_10"
+      },
+      "58": {
+         "name": "unid_1d_ADA0",
+         "description": "unid_1d_ADA0",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 9,
+         "axisx": "unknown_0_625"
+      },
+      "59": {
+         "name": "unid_1d__index_RPM_ADC4",
+         "description": "unid_1d__index_RPM_ADC4",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 11,
+         "axisx": "rpm_500_250"
+      },
+      "60": {
+         "name": "unid_1d_ADF0",
+         "description": "unid_1d_ADF0",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unknown_20_10"
+      },
+      "61": {
+         "name": "unid_1d_AD78",
+         "description": "unid_1d_AD78",
+         "category": "Unidentified_3",
+         "datatype": "float",
+         "width": 10,
+         "axisx": "unknown_0_0625"
+      },
+      "62": {
+         "name": "unid_1d__index_RPM_A2A4",
+         "description": "Related to fuel cut",
+         "category": "Unidentified_4",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear"
+      },
+      "63": {
+         "name": "unid_1d__index_RPM_D20C",
+         "description": "unid_1d__index_RPM_D20C",
+         "category": "Unidentified_4",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear"
+      },
+      "64": {
+         "name": "unid_1d_A22C",
+         "description": "unid_1d_A22C",
+         "category": "Unidentified_4",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "65": {
+         "name": "unid_1d_A24C",
+         "description": "unid_1d_A24C",
+         "category": "Unidentified_4",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "66": {
+         "name": "unid_1d_A6F4",
+         "description": "unid_1d_A6F4",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "67": {
+         "name": "unid_1d_A730",
+         "description": "unid_1d_A730",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "68": {
+         "name": "unid_1d_A8EC",
+         "description": "unid_1d_A8EC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unid_temp3"
+      },
+      "69": {
+         "name": "unid_1d_A7E4",
+         "description": "unid_1d_A7E4",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "70": {
+         "name": "unid_1d_A684",
+         "description": "unid_1d_A684",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear"
+      },
+      "71": {
+         "name": "unid_1d_A6BC",
+         "description": "unid_1d_A6BC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "rpm_500_linear"
+      },
+      "72": {
+         "name": "unid_1d_A664",
+         "description": "unid_1d_A664",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "73": {
+         "name": "unid_1d_A644",
+         "description": "unid_1d_A644",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "74": {
+         "name": "unid_1d_A76C",
+         "description": "unid_1d_A76C",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "75": {
+         "name": "unid_1d_A7A8",
+         "description": "unid_1d_A7A8",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "76": {
+         "name": "unid_2d_1B110",
+         "description": "unid_2d_1B110",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 7,
+         "height": 5,
+         "axisx": "unid_temp3",
+         "axisy": "unknown_-40_20_5"
+      },
+      "77": {
+         "name": "unid_2d_1AEC4",
+         "description": "unid_2d_1AEC4",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 7,
+         "height": 5,
+         "axisx": "unid_temp3",
+         "axisy": "unknown_-40_20_5"
+      },
+      "78": {
+         "name": "unid_2d_43104",
+         "description": "unid_2d_43104",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 7,
+         "height": 5,
+         "axisx": "unid_temp3",
+         "axisy": "unknown_-40_20_5"
+      },
+      "79": {
+         "name": "unid_1d_A804",
+         "description": "Other possible branch: unid_1d_A878",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 29,
+         "axisx": "load_025_29"
+      },
+      "80": {
+         "name": "unid_1d_A878",
+         "description": "Other possible branch: unid_1d_A804",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 29,
+         "axisx": "load_025_29"
+      },
+      "81": {
+         "name": "unid_2d_42454",
+         "description": "Other possible branch: unid_2d_42AAC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_025_29"
+      },
+      "82": {
+         "name": "unid_2d_42AAC",
+         "description": "Other possible branch: unid_2d_42454",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500_linear",
+         "axisy": "load_025_29"
+      },
+      "83": {
+         "name": "unid_1d_A99C",
+         "description": "unid_1d_A99C",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "84": {
+         "name": "unid_1d_A9BC",
+         "description": "unid_1d_A9BC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "85": {
+         "name": "unid_1d_C824",
+         "description": "unid_1d_C824",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "rpm_500_250"
+      },
+      "86": {
+         "name": "unid_1d_C804",
+         "description": "unid_1d_C804",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "87": {
+         "name": "unid_1d_C840",
+         "description": "unid_1d_C840",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_37770"
+      },
+      "88": {
+         "name": "unid_1d_A908",
+         "description": "unid_1d_A908",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "89": {
+         "name": "unid_1d_A928",
+         "description": "unid_1d_A928",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "90": {
+         "name": "unid_1d_A55C",
+         "description": "unid_1d_A55C",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "91": {
+         "name": "unid_2d_18360",
+         "description": "unid_2d_18360",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "height": 3,
+         "axisx": "unid_temp2",
+         "axisy": "speed_0_15"
+      },
+      "92": {
+         "name": "unid_1d_A948",
+         "description": "unid_1d_A948",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "93": {
+         "name": "unid_1d_A9DC",
+         "description": "unid_1d_A9DC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "94": {
+         "name": "unid_1d_A9FC",
+         "description": "unid_1d_A9FC",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "95": {
+         "name": "unid_2d_24B00",
+         "description": "unid_2d_24B00",
+         "category": "Unidentified_5",
+         "datatype": "float",
+         "width": 13,
+         "height": 16,
+         "axisx": "unknown_0_10_13",
+         "axisy": "unknown_125_125"
+      },
+      "96": {
+         "name": "unid_2d_1A720",
+         "description": "unid_2d_1A720",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 5,
+         "height": 6,
+         "axisx": "rpm_1000_1000_5",
+         "axisy": "unknown_1_1_6"
+      },
+      "97": {
+         "name": "unid_2d_1B85C",
+         "description": "unid_2d_1B85C",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500",
+         "axisy": "load_025_29"
+      },
+      "98": {
+         "name": "unid_1d_D578",
+         "description": "unid_1d_D578",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "unknown_0_2_7"
+      },
+      "99": {
+         "name": "unid_2d_271E0",
+         "description": "Branches: unid_2d_271E0, unid_2d_26B88, unid_2d_26530",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500",
+         "axisy": "load_025_29"
+      },
+      "100": {
+         "name": "unid_2d_26B88",
+         "description": "Branches: unid_2d_271E0, unid_2d_26B88, unid_2d_26530",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500",
+         "axisy": "load_025_29"
+      },
+      "101": {
+         "name": "unid_2d_26530",
+         "description": "Branches: unid_2d_271E0, unid_2d_26B88, unid_2d_26530",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 29,
+         "axisx": "rpm_500",
+         "axisy": "load_025_29"
+      },
+      "102": {
+         "name": "unid_1d_A57C",
+         "description": "unid_1d_A57C",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 7,
+         "axisx": "rpm_250_125"
+      },
+      "103": {
+         "name": "unid_1d_A4D4",
+         "description": "unid_1d_A4D4",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "104": {
+         "name": "unid_1d_A510",
+         "description": "unid_1d_A510",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_-40_10"
+      },
+      "105": {
+         "name": "unid_2d_19BE0",
+         "description": "Branches: unid_2d_19BE0, unid_2d_19F40",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "106": {
+         "name": "unid_2d_19F40",
+         "description": "Branches: unid_2d_19BE0, unid_2d_19F40",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "107": {
+         "name": "unid_2d_19AC0",
+         "description": "Branches: unid_2d_19AC0, unid_2d_19E20",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "108": {
+         "name": "unid_2d_19E20",
+         "description": "Branches: unid_2d_19AC0, unid_2d_19E20",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "109": {
+         "name": "unid_2d_199A0",
+         "description": "Branches: unid_2d_199A0, unid_2d_19D00",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "110": {
+         "name": "unid_2d_19D00",
+         "description": "Branches: unid_2d_199A0, unid_2d_19D00",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "111": {
+         "name": "unid_2d_1A2A0",
+         "description": "Branches: unid_2d_1A2A0, unid_2d_1A600",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "112": {
+         "name": "unid_2d_1A600",
+         "description": "Branches: unid_2d_1A2A0, unid_2d_1A600",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "113": {
+         "name": "unid_2d_1A180",
+         "description": "Branches: unid_2d_1A180, unid_2d_1A4E0",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "114": {
+         "name": "unid_2d_1A4E0",
+         "description": "Branches: unid_2d_1A180, unid_2d_1A4E0",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "115": {
+         "name": "unid_2d_1A060",
+         "description": "Branches: unid_2d_1A060, unid_2d_1A3C0",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "116": {
+         "name": "unid_2d_1A3C0",
+         "description": "Branches: unid_2d_1A060, unid_2d_1A3C0",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "height": 9,
+         "minimum": 0.000015258789,
+         "axisx": "unid_temp2",
+         "axisy": "unknown_0_25_9"
+      },
+      "117": {
+         "name": "unid_1d_BEB8",
+         "description": "unid_1d_BEB8",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 25,
+         "axisx": "unknown_0_51_25"
+      },
+      "118": {
+         "name": "unid_1d_BF1C",
+         "description": "unid_1d_BF1C",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "119": {
+         "name": "unid_1d_BF5C",
+         "description": "unid_1d_BF5C",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unknown_0_0625"
+      },
+      "120": {
+         "name": "unid_2d_24F30",
+         "description": "unid_2d_24F30",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 16,
+         "axisx": "rpm_500",
+         "axisy": "unknown_125_125"
+      },
+      "121": {
+         "name": "unid_1d_B9BC",
+         "description": "unid_1d_B9BC",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      },
+      "122": {
+         "name": "unid_1d_BDF0",
+         "description": "unid_1d_BDF0",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 25,
+         "axisx": "unknown_0_51_25"
+      },
+      "123": {
+         "name": "unid_1d_BE54",
+         "description": "unid_1d_BE54",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 25,
+         "axisx": "unknown_0_51_25"
+      },
+      "124": {
+         "name": "unid_2d_2B4C8",
+         "description": "unid_2d_2B4C8",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 16,
+         "axisx": "rpm_500",
+         "axisy": "unknown_125_125"
+      },
+      "125": {
+         "name": "unid_2d_2B848",
+         "description": "unid_2d_2B848",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "height": 16,
+         "axisx": "rpm_500",
+         "axisy": "unknown_125_125"
+      },
+      "126": {
+         "name": "unid_1d_BDB8",
+         "description": "unid_1d_BDB8",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 14,
+         "axisx": "unknown_0_51_14"
+      },
+      "127": {
+         "name": "unid_1d_BF3C",
+         "description": "unid_1d_BF3C",
+         "category": "Unidentified_6",
+         "datatype": "float",
+         "width": 8,
+         "axisx": "unid_temp2"
+      }
+   },
+   "axes": {
+      "rpm_500": {
+         "size": 14,
+         "type": "memory",
+         "datatype": "float",
+         "name": "RPM"
+      },
+      "rpm_500_15": {
+         "size": 15,
+         "type": "memory",
+         "datatype": "float",
+         "name": "RPM"
+      },
+      "unknown_37770": {
+         "size": 15,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Unknown"
+      },
+      "speed_0_15": {
+         "size": 13,
+         "type": "linear",
+         "datatype": "float",
+         "name": "Speed (km/h)",
+         "minimum": 0,
+         "increment": 15
+      },
+      "rpm_500_linear": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 14,
+         "minimum": 500,
+         "increment": 500
+      },
+      "rpm_500_250": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 11,
+         "minimum": 500,
+         "increment": 250
+      },
+      "rpm_250_125": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 7,
+         "minimum": 250,
+         "increment": 125
+      },
+      "unknown_0_51_25": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 25,
+         "minimum": 0,
+         "increment": 5.1199999
+      },
+      "unknown_0_51_14": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 14,
+         "minimum": 0,
+         "increment": 5.1199999
+      },
+      "unknown_0_25_9": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 9,
+         "minimum": 0,
+         "increment": 0.25
+      },
+      "unknown_0_2_7": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 7,
+         "minimum": 0,
+         "increment": 2
+      },
+      "unknown_625_625": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 7,
+         "minimum": 62.5,
+         "increment": 6.25
+      },
+      "unknown_539_158": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 4,
+         "minimum": 53.928001,
+         "increment": 15.827
+      },
+      "unknown_0_100": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 6,
+         "minimum": 0,
+         "increment": 100
+      },
+      "unknown_-20_10": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 9,
+         "minimum": -20,
+         "increment": 10
+      },
+      "unknown_-20_20": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 6,
+         "minimum": -20,
+         "increment": 20
+      },
+      "unknown_-40_10": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 15,
+         "minimum": -40,
+         "increment": 10
+      },
+      "unknown_-40_20_5": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 5,
+         "minimum": -40,
+         "increment": 20
+      },
+      "unknown_20_10": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 7,
+         "minimum": 20,
+         "increment": 10
+      },
+      "unknown_125_0625": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (Load?)",
+         "size": 9,
+         "minimum": 0.125,
+         "increment": 0.0625
+      },
+      "unknown_125_125": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (Load?)",
+         "size": 16,
+         "minimum": 0.125,
+         "increment": 0.125
+      },
+      "unknown_0_625": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 9,
+         "minimum": 0,
+         "increment": 6.25
+      },
+      "unknown_0_0625": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 10,
+         "minimum": 0,
+         "increment": 0.0625
+      },
+      "unknown_0_10_13": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 13,
+         "minimum": 0,
+         "increment": 10
+      },
+      "unknown_1_1_6": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 6,
+         "minimum": 1,
+         "increment": 1
+      },
+      "unid_temp": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (temperature?)",
+         "size": 9,
+         "minimum": -40,
+         "increment": 20
+      },
+      "unid_temp2": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (temperature?)",
+         "size": 8,
+         "minimum": -40,
+         "increment": 20
+      },
+      "unid_temp3": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (temperature?)",
+         "size": 7,
+         "minimum": -40,
+         "increment": 20
+      },
+      "unid_-40_160": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 8,
+         "minimum": -40,
+         "increment": 160
+      },
+      "rpm_2000_linear": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 10,
+         "minimum": 2000,
+         "increment": 500
+      },
+      "rpm_1000_linear": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 7,
+         "minimum": 1000,
+         "increment": 500
+      },
+      "rpm_1000_1000_5": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 5,
+         "minimum": 1000,
+         "increment": 1000
+      },
+      "rpm_500_100_11": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "RPM",
+         "size": 11,
+         "minimum": 500,
+         "increment": 100
+      },
+      "rpm_difference": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Real RPM - Target RPM",
+         "size": 8,
+         "minimum": -200,
+         "increment": 100
+      },
+      "load_125": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Load",
+         "size": 31,
+         "minimum": 0.125,
+         "increment": 0.0625
+      },
+      "load_025": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Load",
+         "size": 14,
+         "minimum": 0.25,
+         "increment": 0.0625
+      },
+      "load_025_29": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Load",
+         "size": 29,
+         "minimum": 0.25,
+         "increment": 0.0625
+      },
+      "load_0625": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Load",
+         "size": 32,
+         "minimum": 0.0625,
+         "increment": 0.0625
+      },
+      "load_3125": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Load",
+         "size": 28,
+         "minimum": 0.3125,
+         "increment": 0.0625
+      },
+      "pressure_kpa": {
+         "size": 8,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Barometric Pressure"
+      },
+      "pressure_kpa_diff": {
+         "size": 11,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Boost Target Difference"
+      },
+      "bsc_dc_volts": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Battery Voltage",
+         "size": 13,
+         "minimum": 6.5,
+         "increment": 1.25
+      },
+      "temp_iat": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Intake Air Temperature (Celsius)",
+         "size": 14,
+         "minimum": -40,
+         "increment": 20
+      },
+      "temp_coolant": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Coolant Temperature (Celsius)",
+         "size": 14,
+         "minimum": -40,
+         "increment": 20
+      },
+      "tps_0": {
+         "type": "linear",
+         "datatype": "float",
+         "size": 14,
+         "minimum": 0,
+         "increment": 6.25,
+         "name": "Requested Throttle Position"
+      },
+      "maf_5": {
+         "type": "linear",
+         "datatype": "float",
+         "size": 129,
+         "minimum": 0,
+         "increment": 0.039000001,
+         "name": "Voltage"
+      },
+      "voltage_batt": {
+         "type": "memory",
+         "datatype": "float",
+         "name": "Battery Voltage",
+         "size": 7
+      }
+   },
+   "flashregion": {
+      "offset": 32768,
+      "size": 1015808
+   },
+   "pids": [
+      {
+         "id": 0,
+         "name": "Coolant Temperature",
+         "description": "Coolant Temperature",
+         "code": 5,
+         "unit": "temp_celsius",
+         "formula": "a - 40"
+      },
+      {
+         "id": 1,
+         "name": "Engine RPM",
+         "description": "Engine RPM",
+         "code": 12,
+         "unit": "rpm",
+         "formula": "(256 * a + b) / 4"
+      },
+      {
+         "id": 2,
+         "name": "Vehicle speed",
+         "description": "Speed of the vehicle in km/h",
+         "code": 13,
+         "unit": "km/h",
+         "formula": "a"
+      },
+      {
+         "id": 3,
+         "name": "Absolute load",
+         "description": "The absolute load of the engine; how hard the engine is working",
+         "code": 67,
+         "unit": "none",
+         "formula": "(a * 256 + b) / 255"
+      },
+      {
+         "id": 4,
+         "name": "Accelerator pedal position",
+         "description": "How far the pedal position is depressed",
+         "code": 4928,
+         "unit": "percentage",
+         "formula": "a * 1024 / 2601"
+      },
+      {
+         "id": 5,
+         "name": "Air-fuel equivalence ratio",
+         "description": "The ratio of actual AFR to stoichiometry for a given mixture. lambda = 1.0 is at stoichiometry, rich mixtures labmda < 1.0, and lean mixtures lambda > 1.0.",
+         "code": 5967,
+         "unit": "ratio",
+         "formula": "a / 128"
+      },
+      {
+         "id": 6,
+         "name": "Valve timing",
+         "description": "Timing advance in degrees of the camshafts",
+         "code": 5837,
+         "unit": "degrees",
+         "formula": "(a * 256 + b) / 16"
+      },
+      {
+         "id": 7,
+         "name": "Ambient air temperature",
+         "description": "Ambient air temperature",
+         "code": 70,
+         "unit": "temp_celsius",
+         "formula": "a - 40"
+      },
+      {
+         "id": 8,
+         "name": "Absolute Barometric pressure",
+         "description": "External atmospheric pressure",
+         "code": 51,
+         "unit": "pressure_kPa",
+         "formula": "a"
+      },
+      {
+         "id": 9,
+         "name": "Control module voltage",
+         "description": "Voltage supplied to ECU",
+         "code": 66,
+         "unit": "voltage",
+         "formula": "(256 * a + b) / 1000"
+      },
+      {
+         "id": 10,
+         "name": "Boost air temperature",
+         "description": "The temperature in the intake manifold",
+         "code": 5923,
+         "unit": "temp_celsius",
+         "formula": "(a * 0.625) - 40"
+      },
+      {
+         "id": 11,
+         "name": "Fuel–Air commanded equivalence ratio",
+         "description": "The target fuel-air equivalence ratio",
+         "code": 68,
+         "unit": "ratio",
+         "formula": "2 * (256 * a + b) / 65536"
+      },
+      {
+         "id": 12,
+         "name": "Target engine RPM",
+         "description": "The engine RPM the ECU is targetting",
+         "code": 2414,
+         "unit": "rpm",
+         "formula": "(a * 256 + b) / 4"
+      },
+      {
+         "id": 13,
+         "name": "Commanded throttle actuator",
+         "description": "The throttle position that the ECU is targetting",
+         "code": 76,
+         "unit": "percentage",
+         "formula": "a * 100 / 255"
+      },
+      {
+         "id": 14,
+         "name": "Fuel injection pulse width",
+         "description": "The time each injector is held open it its injection cycle",
+         "code": 5136,
+         "unit": "time",
+         "formula": "(a * 256 + b) * 0.008"
+      },
+      {
+         "id": 15,
+         "name": "Fuel Rail Gauge Pressure",
+         "description": "The high pressure fuel rail's pressure",
+         "code": 35,
+         "unit": "pressure_kPa",
+         "formula": "10 * (256 * a + b)"
+      },
+      {
+         "id": 16,
+         "name": "Intake air temperature",
+         "description": "The temperature of air measured by the MAF sensor",
+         "code": 15,
+         "unit": "temp_celsius",
+         "formula": "a - 40"
+      },
+      {
+         "id": 17,
+         "name": "Knock retard",
+         "description": "The degrees that the spark timing is retarded as response to the knock sensor",
+         "code": 5958,
+         "unit": "degrees",
+         "formula": "a * 0.3515625"
+      },
+      {
+         "id": 18,
+         "name": "Long term fuel trim",
+         "description": "The percentage difference from the base amount calculated from long term oxygen sensor measurements. Negative means fuel is reduced (too rich). Positive means fuel is added (too lean).",
+         "code": 7,
+         "unit": "percentage",
+         "formula": "a / 1.28 - 100"
+      },
+      {
+         "id": 19,
+         "name": "Short term fuel trim (primary)",
+         "description": "The short term fuel trim calculated from the primary oxygen sensor",
+         "code": 6,
+         "unit": "percentage",
+         "formula": "a / 1.28 - 100"
+      },
+      {
+         "id": 20,
+         "name": "Short term fuel trim (secondary)",
+         "description": "The short term fuel trim calculated from the secondary oxygen sensor",
+         "code": 5694,
+         "unit": "percentage",
+         "formula": "(a * 256 + b) * 0.00012207031"
+      },
+      {
+         "id": 21,
+         "name": "Intake manifold absolute pressure",
+         "description": "The pressure of the intake manifold",
+         "code": 11,
+         "unit": "pressure_kPa",
+         "formula": "a"
+      },
+      {
+         "id": 22,
+         "name": "Mass air flow rate",
+         "description": "The flow rate of air measured by the MAF sensor",
+         "code": 16,
+         "unit": "grams/sec",
+         "formula": "(256 * a + b) / 100"
+      },
+      {
+         "id": 23,
+         "name": "MAF sensor voltage",
+         "description": "The voltage output by the MAF sensor",
+         "code": 4471,
+         "unit": "voltage",
+         "formula": "(a * 256 + b) / 4096"
+      },
+      {
+         "id": 24,
+         "name": "Relative throttle position",
+         "description": "The throttle position relative to the learned closed position",
+         "code": 69,
+         "unit": "percentage",
+         "formula": "100 * a / 255"
+      },
+      {
+         "id": 25,
+         "name": "Timing advance",
+         "description": "The spark timing advance relative to TDC",
+         "code": 14,
+         "unit": "degrees",
+         "formula": "a / 2 - 64"
+      },
+      {
+         "id": 26,
+         "name": "Wastegate control solenoid duty cycle",
+         "description": "The duty cycle of the boost control solenoid.",
+         "code": 5857,
+         "unit": "percentage",
+         "formula": "(a * 256 + b) * 100 / 65536"
+      },
+      {
+         "id": 27,
+         "name": "Fuel injection amount",
+         "description": "The amount of fuel injected in each cylinder per cycle",
+         "code": 5970,
+         "unit": "fuel_injection",
+         "formula": "(a * 256 + b) / 32.728"
+      },
+      {
+         "id": 28,
+         "name": "Air to fuel ratio",
+         "description": "The air to fuel ratio measured by the wideband oxygen sensor",
+         "code": 5967,
+         "unit": "ratio",
+         "formula": "a / 128 * 14.7"
+      },
+      {
+         "id": 29,
+         "name": "Fuel–Air commanded ratio",
+         "description": "The air to fuel ratio targeted by the ECU",
+         "code": 68,
+         "unit": "none",
+         "formula": "2 * (256 * a + b) / 65536 * 14.7"
+      },
+      {
+         "id": 30,
+         "name": "Clutch pedal position",
+         "description": "Clutch pedal position. 0 is released, 1 is depressed.",
+         "code": 41489,
+         "unit": "none",
+         "formula": "b % 1"
+      },
+      {
+         "id": 31,
+         "name": "Neutral gear position",
+         "description": "0 - gearbox is in drive, 1 - gearbox is in neutral",
+         "code": 41489,
+         "unit": "none",
+         "formula": "(a / 4) % 2"
+      },
+      {
+         "id": 32,
+         "name": "MAP sensor voltage",
+         "description": "Voltage output by the MAP sensor",
+         "code": 2304,
+         "unit": "voltage",
+         "formula": "(a * 256 + b) / 1024"
+      },
+      {
+         "id": 33,
+         "name": "Fuel pressure sensor voltage",
+         "description": "Voltage output by the fuel sensor",
+         "code": 5771,
+         "unit": "voltage",
+         "formula": "(a * 256 + b) * 5 / 65535"
+      },
+      {
+         "id": 34,
+         "name": "Target fuel rail pressure",
+         "description": "The fuel rail pressure the ECU is targetting",
+         "code": 5959,
+         "unit": "pressure_kPa",
+         "formula": "(a * 256 + b) * 10"
+      },
+      {
+         "id": 35,
+         "name": "Oxygen sensor voltage",
+         "description": "Voltage of the narrow band oxygen sensor",
+         "code": 21,
+         "unit": "voltage",
+         "formula": "a / 200"
+      },
+      {
+         "id": 36,
+         "name": "Long term fuel trim (bank 2)",
+         "description": "The percentage difference from the base amount calculated from long term oxygen sensor measurements. Negative means fuel is reduced (too rich). Positive means fuel is added (too lean).",
+         "code": 9,
+         "unit": "percentage",
+         "formula": "a / 1.28 - 100"
+      },
+      {
+         "id": 37,
+         "name": "Short term fuel trim (bank 2)",
+         "description": "The short term fuel trim calculated from the primary oxygen sensor",
+         "code": 8,
+         "unit": "percentage",
+         "formula": "a / 1.28 - 100"
+      }
+   ]
 }

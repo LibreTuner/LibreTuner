@@ -53,7 +53,7 @@ struct TableDefinition
     int width{1};
     int height{1};
     double maximum{std::numeric_limits<double>::max()};
-    double minimum{std::numeric_limits<double>::min()};
+    double minimum{std::numeric_limits<double>::lowest()};
     double scale = 1.0;
     std::string axisX;
     std::string axisY;
