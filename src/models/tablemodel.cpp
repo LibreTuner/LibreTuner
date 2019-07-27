@@ -115,7 +115,7 @@ bool TableModel::setData(const QModelIndex & index, const QVariant & value,
         return false;
     }
 
-    table_->set(index.column(), index.row(), val);
+    table_->set(index.row(), index.column(), val);
     return true;
 }
 

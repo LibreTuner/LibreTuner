@@ -81,11 +81,16 @@ void from_json(const json & j, lt::TableDefinition & table)
         it->get_to(table.category);
 
     j.at("datatype").get_to(table.dataType);
+    if (table.dataType == DataType::Invalid)
+        throw std::runtime_error("invalid datatype in table " + table.name);
 
     if (auto it = j.find("storeddatatype"); it != j.end())
         it->get_to(table.storedDataType);
     else
         table.storedDataType = table.dataType;
+
+    if (table.storedDataType == DataType::Invalid)
+        throw std::runtime_error("invalid storeddatatype in table " + table.name);
 
     if (auto it = j.find("width"); it != j.end())
         it->get_to(table.width);

@@ -134,6 +134,7 @@ inline void datatypeToType(DataType type, Func && func, Args &&... args)
         func.template operator()<int32_t>(std::forward<Args>(args)...);
         break;
     case DataType::Invalid:
+        throw std::runtime_error("Invalid datatype");
         break;
     }
 }
