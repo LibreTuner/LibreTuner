@@ -1143,6 +1143,44 @@
          "datatype": "float",
          "width": 8,
          "axisx": "unid_temp2"
+      },
+      "128": {
+         "name": "unid_1d_D3C8",
+         "description": "unid_1d_D3C8",
+         "category": "Unidentified_7",
+         "datatype": "uint16",
+         "width": 20,
+         "axisx": "unknown_500_500_20"
+      },
+      "129": {
+         "name": "unid_2d_41794",
+         "description": "unid_2d_41794",
+         "category": "Unidentified_7",
+         "datatype": "float",
+         "width": 19,
+         "height": 20,
+         "axisx": "rpm_500_19",
+         "axisy": "unknown_10_170_20"
+      },
+      "130": {
+         "name": "unid_2d_41738",
+         "description": "unid_2d_41738",
+         "category": "Unidentified_7",
+         "datatype": "uint8",
+         "width": 13,
+         "height": 7,
+         "axisx": "unknown_-40_10_13",
+         "axisy": "unknown_-30_5_7"
+      },
+      "131": {
+         "name": "unid_2d_412C4",
+         "description": "unid_2d_412C4",
+         "category": "Unidentified_7",
+         "datatype": "uint16",
+         "width": 19,
+         "height": 30,
+         "axisx": "rpm_500_19_2",
+         "axisy": "unknown_0_200_30"
       }
    },
    "axes": {
@@ -1157,6 +1195,30 @@
          "type": "memory",
          "datatype": "float",
          "name": "RPM"
+      },
+      "rpm_500_19": {
+         "size": 19,
+         "type": "memory",
+         "datatype": "float",
+         "name": "RPM"
+      },
+      "rpm_500_19_2": {
+         "size": 19,
+         "type": "memory",
+         "datatype": "float",
+         "name": "RPM"
+      },
+     "unknown_10_170_20": {
+         "size": 20,
+         "type": "memory",
+         "datatype": "float",
+         "name": "RPM"
+      },
+      "unknown_0_200_30": {
+         "size": 30,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Unknown"
       },
       "unknown_37770": {
          "size": 15,
@@ -1195,6 +1257,14 @@
          "size": 7,
          "minimum": 250,
          "increment": 125
+      },
+      "unknown_500_500_20": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown (RPM?)",
+         "size": 20,
+         "minimum": 500,
+         "increment": 500
       },
       "unknown_0_51_25": {
          "type": "linear",
@@ -1339,6 +1409,22 @@
          "size": 6,
          "minimum": 1,
          "increment": 1
+      },
+      "unknown_-30_5_7": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 7,
+         "minimum": -30,
+         "increment": 5
+      },
+      "unknown_-40_10_13": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 13,
+         "minimum": -40,
+         "increment": 10
       },
       "unid_temp": {
          "type": "linear",
