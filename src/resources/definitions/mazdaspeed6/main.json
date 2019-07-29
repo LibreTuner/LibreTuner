@@ -1181,6 +1181,14 @@
          "height": 30,
          "axisx": "rpm_500_19_2",
          "axisy": "unknown_0_200_30"
+      },
+      "132": {
+         "name": "unid_2d_412C4",
+         "description": "unid_2d_412C4",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 22,
+         "axisx": "unknown_0_0.05_22"
       }
    },
    "axes": {
@@ -1225,6 +1233,14 @@
          "type": "memory",
          "datatype": "float",
          "name": "Unknown"
+      },
+      "unknown_0_0.05_22": {
+         "size": 22,
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "minimum": 0,
+         "increment": 0.05
       },
       "speed_0_15": {
          "size": 13,
