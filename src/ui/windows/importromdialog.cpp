@@ -20,7 +20,7 @@
 ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
     : QDialog(parent), project_(std::move(project))
 {
-    setWindowTitle(tr("LibreTuner - Download"));
+    setWindowTitle(tr("LibreTuner - Import ROM"));
 
     comboPlatform_ = new QComboBox;
     comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
