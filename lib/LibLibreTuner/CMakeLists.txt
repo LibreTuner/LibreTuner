@@ -113,7 +113,7 @@ set(SOURCES
 	${LINK_SOURCES}
 	${SESSION_SOURCES}
 	${DATALOG_SOURCES}
-	${PROJECT_SOURCES})
+	${PROJECT_SOURCES} lt/rom/view.h lt/rom/view.cpp)
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})

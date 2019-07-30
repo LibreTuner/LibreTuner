@@ -7,14 +7,16 @@
 
 #include "../support/types.h"
 #include "../support/util.hpp"
+#include "view.h"
 
 namespace lt
 {
 
 // Provides a way to interface with the underlying data of many tables/axes
 // by using a common datatype.
-template <typename PresentedType> struct Entries
+template <typename PresentedType> class Entries
 {
+public:
     virtual PresentedType get(int index) const noexcept = 0;
     virtual void set(int index, PresentedType value) noexcept = 0;
 
@@ -25,51 +27,24 @@ template <typename PresentedType> struct Entries
 };
 
 // Type-defined implementation of Entries
-template <typename PresentedType, typename T>
+template <typename PresentedType, typename T, Endianness endianness>
 struct EntriesImpl : public Entries<PresentedType>
 {
 private:
-    template <Endianness endianness>
-    inline std::vector<uint8_t> intoBytes_() const noexcept
-    {
-        // Endianness-aware byte serialization
-        std::vector<uint8_t> out;
-        out.reserve(entries_.size() * sizeof(T));
-        for (T entry : entries_)
-        {
-            entry = endian::convert<T, endian::current, endianness>(entry);
-            // Get byte representation and append to buffer
-            uint8_t * repr = reinterpret_cast<uint8_t *>(&entry);
-            out.insert(out.end(), repr, &repr[sizeof(T)]);
-        }
-        return out;
-    }
 
 public:
     EntriesImpl(std::vector<T> && entries) : entries_(std::move(entries)) {}
 
     PresentedType get(int index) const noexcept override
     {
-        return static_cast<PresentedType>(entries_[index]);
+        return static_cast<PresentedType>(view_.get<T>(index * sizeof(T)));
     }
     void set(int index, PresentedType value) noexcept
     {
-        entries_[index] = static_cast<T>(value);
+        view_.set<T>(static_cast<T>(value));
     }
-    std::vector<uint8_t> intoBytes(Endianness endianness) const
-        noexcept override
-    {
-        switch (endianness)
-        {
-        case Endianness::Big:
-            return intoBytes_<Endianness::Big>();
-        case Endianness::Little:
-            return intoBytes_<Endianness::Little>();
-        default:
-            return std::vector<uint8_t>();
-        }
-    }
-    std::vector<T> entries_;
+
+    View view_;
 };
 
 /* A memory axis uses a defined set of values as indicies. */

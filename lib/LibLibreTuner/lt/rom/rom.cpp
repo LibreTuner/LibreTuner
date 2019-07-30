@@ -262,6 +262,7 @@ void Rom::save() const
     archive(construct);
 }
 
+
 } // namespace lt
 
 // Declare cereal versions out of scope

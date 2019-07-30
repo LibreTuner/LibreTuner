@@ -27,10 +27,17 @@
 
 #include "../definition/model.h"
 #include "../definition/platform.h"
-#include "table.h"
 
 namespace lt
 {
+
+template<typename T>
+class BasicTable;
+using Table = BasicTable<double>;
+template<typename T>
+class BasicAxis;
+using Axis = BasicAxis<double>;
+using AxisPtr = std::shared_ptr<Axis>;
 
 class Rom
 {
@@ -113,6 +120,9 @@ using TableMap = std::unordered_map<std::string, std::unique_ptr<Table>>;
 class Tune
 {
 public:
+    using iterator = std::vector<uint8_t>::iterator;
+    using const_iterator = std::vector<uint8_t>::const_iterator;
+
     static constexpr auto extension = ".ltr";
 
     explicit Tune(RomPtr rom) : base_(std::move(rom)) { assert(base_); }
@@ -169,8 +179,16 @@ public:
     // Saves tune to `path_`
     void save() const;
 
+    iterator begin() { return data_.begin(); }
+    const_iterator cbegin() const { return data_.cbegin(); };
+    iterator end() { return data_.end(); }
+    const_iterator cend() { return data_.cend(); }
+    std::vector<uint8_t>::size_type size() const { return data_.size(); }
+
 private:
     std::string name_;
+
+    std::vector<uint8_t> data_;
 
     RomPtr base_;
     TableMap tables_;
