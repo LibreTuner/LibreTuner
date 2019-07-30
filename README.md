@@ -5,9 +5,9 @@ Open source engine tuning software for Mazda platforms
 Interested in contributing? [Join the Discord server](https://discord.gg/QQvX2rB)
 
 
-Screenshots (outdated)
+Screenshots
 -----------
-![Main Window](https://user-images.githubusercontent.com/3116133/52010479-9b94cc00-24a3-11e9-904a-0d64776f6b6c.png)
+![Main Window](https://user-images.githubusercontent.com/3116133/62159853-ab6d5b80-b2e0-11e9-931d-1b15481e83fb.png)
 
 Supported vehicles
 ------------------
