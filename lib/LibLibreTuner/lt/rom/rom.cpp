@@ -64,45 +64,43 @@ Table * Tune::getTable(const std::string & id, bool create)
         if (def == nullptr)
             return nullptr;
 
-        if (base_->size() < def->offset.value() + def->byteSize())
+        if (size() < def->offset.value() + def->byteSize())
         {
             throw std::runtime_error("table '" + id +
                                      "' could not be created because it "
                                      "exceeds the size of the ROM");
         }
-        auto data = base_->cbegin();
-        std::advance(data, def->offset.value());
-        return setTable(id, &*data, def->byteSize());
+
+        Table::Builder builder;
+        builder.setBounds(def->minimum, def->maximum)
+            .setName(def->name)
+            .setScale(def->scale)
+            .setSize(def->width, def->height);
+
+        if (!def->axisX.empty())
+            builder.setXAxis(getAxis(def->axisX, true));
+        if (!def->axisY.empty())
+            builder.setYAxis(getAxis(def->axisY, true));
+
+        switch (endianness())
+        {
+        case Endianness::Big:
+            builder.setEntries(create_entries<double, Endianness::Big>(
+                def->dataType,
+                data_.view(def->offset.value(), def->byteSize())));
+            break;
+        case Endianness ::Little:
+            builder.setEntries(create_entries<double, Endianness::Little>(
+                def->dataType,
+                data_.view(def->offset.value(), def->byteSize())));
+            break;
+        }
+
+        // Emplace table and use returned iterator to get the inserted table
+        return tables_.emplace(id, std::make_unique<Table>(builder.build()))
+            .first->second.get();
     }
     return nullptr;
-}
-
-Table * Tune::setTable(const std::string & id, const uint8_t * data,
-                       std::size_t length)
-{
-    const TableDefinition * def = base_->model()->getTable(id);
-    if (def == nullptr)
-        return nullptr;
-
-    Table::Builder builder;
-    builder.setBounds(def->minimum, def->maximum)
-        .setName(def->name)
-        .setScale(def->scale)
-        .setSize(def->width, def->height);
-
-    if (!def->axisX.empty())
-        builder.setXAxis(getAxis(def->axisX, true));
-    if (!def->axisY.empty())
-        builder.setYAxis(getAxis(def->axisY, true));
-
-    // Deserialize
-    auto begin = data;
-    auto end = &data[length];
-    datatypeToType(def->dataType, builder, begin, end, endianness());
-
-    // Emplace table and use returned iterator to get the inserted table
-    return tables_.emplace(id, std::make_unique<Table>(builder.build()))
-        .first->second.get();
 }
 
 AxisPtr Tune::getAxis(const std::string & id, bool create)
@@ -132,19 +130,17 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
             if constexpr (std::is_same_v<T, LinearAxisDefinition>)
             {
                 // Linear axis
-                builder
-                    .setLinear(typeDefinition.start, typeDefinition.increment,
-                               typeDefinition.size);
+                builder.setLinear(typeDefinition.start,
+                                  typeDefinition.increment);
             }
             else if constexpr (std::is_same_v<T, MemoryAxisDefinition>)
             {
                 // Memory axis
                 // TODO: offsets should work the same as tables.
                 int offset = base_->model()->getAxisOffset(id);
-                int size = typeDefinition.size;
-                if (offset +
-                        size * static_cast<int>(dataTypeSize(def->dataType)) >
-                    base_->size())
+                int size = typeDefinition.size *
+                           static_cast<int>(dataTypeSize(def->dataType));
+                if (offset + size > base_->size())
                 {
                     throw std::runtime_error(
                         "axis exceeds rom size (rom size: " +
@@ -152,41 +148,18 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
                         std::to_string(offset + size) + ")");
                 }
 
-                auto start = std::next(base_->data(), offset);
-                auto end = std::next(start, size * static_cast<int>(dataTypeSize(def->dataType)));
+                View view = data_.view(offset, size);
 
-                switch (def->dataType)
+                switch (endianness())
                 {
-                case DataType::Float:
+                case Endianness::Big:
+                    builder.setEntries(create_entries<double, Endianness::Big>(
+                        def->dataType, view));
+                    break;
+                case Endianness::Little:
                     builder.setEntries(
-                        fromBytes<float>(start, end, endianness()));
-                    break;
-                case DataType::Uint8:
-                    builder.setEntries(
-                        fromBytes<uint8_t>(start, end, endianness()));
-                    break;
-                case DataType::Uint16:
-                    builder.setEntries(
-                        fromBytes<uint16_t>(start, end, endianness()));
-                    break;
-                case DataType::Uint32:
-                    builder.setEntries(
-                        fromBytes<uint32_t>(start, end, endianness()));
-                    break;
-                case DataType::Int8:
-                    builder.setEntries(
-                        fromBytes<int8_t>(start, end, endianness()));
-                    break;
-                case DataType::Int16:
-                    builder.setEntries(
-                        fromBytes<int16_t>(start, end, endianness()));
-                    break;
-                case DataType::Int32:
-                    builder.setEntries(
-                        fromBytes<int32_t>(start, end, endianness()));
-                    break;
-                default:
-                    break;
+                        create_entries<double, Endianness::Little>(
+                            def->dataType, view));
                 }
             }
         },
@@ -211,24 +184,27 @@ void Tune::save() const
     if (path_.empty())
         throw std::runtime_error("attempt to save ROM without a path");
 
-    TuneConstruct construct;
-    construct.meta = metadata();
-
-    for (auto & [id, table] : tables_)
-    {
-        TableConstruct tc;
-        tc.id = id;
-        tc.data = table->intoBytes(endianness());
-        construct.tables.emplace_back(std::move(tc));
-    }
-
     std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
         throw std::runtime_error("failed to open tune file '" + path_.string() +
                                  "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
-    archive(construct);
+    archive(metadata(), data_);
+}
+
+Tune::Tune(RomPtr rom) : Tune(rom, MemoryBuffer(rom->cbegin(), rom->cend())) {}
+
+Tune::Tune(RomPtr rom, MemoryBuffer && data)
+    : base_(std::move(rom)), data_(std::move(data))
+{
+    assert(base_);
+
+    if (base_->size() != size())
+        throw std::runtime_error("The base ROM and tune data size do not match (" +
+                                 std::to_string(base_->size()) + " vs " +
+                                 std::to_string(size()) +
+                                 "). The tune or base ROM is corrupt.");
 }
 
 Rom::MetaData Rom::metadata() const noexcept
@@ -249,9 +225,6 @@ void Rom::save() const
 {
     if (path_.empty())
         throw std::runtime_error("attempt to save ROM without a path");
-    RomConstruct construct;
-    construct.meta = metadata();
-    construct.data = std::vector<uint8_t>(data_);
 
     std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
@@ -259,9 +232,8 @@ void Rom::save() const
                                  "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
-    archive(construct);
+    archive(metadata(), data_);
 }
-
 
 } // namespace lt
 

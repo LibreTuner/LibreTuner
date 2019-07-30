@@ -32,20 +32,21 @@ RomPtr Project::getRom(const std::string & filename)
 
     // Deserialize ROM with cereal
     cereal::BinaryInputArchive archive(file);
-    RomConstruct construct;
-    archive(construct);
+    Rom::MetaData meta;
+    std::vector<uint8_t> data;
+    archive(meta, data);
 
     // Find the model
     ModelPtr model =
-        platforms_.find(construct.meta.platform, construct.meta.model);
+        platforms_.find(meta.platform, meta.model);
     if (!model)
         throw std::runtime_error("Unknown platform and rom combination '" +
-                                 construct.meta.platform + "' and '" +
-                                 construct.meta.model + "'");
+                                 meta.platform + "' and '" +
+                                 meta.model + "'");
     auto rom = std::make_shared<Rom>(model);
     rom->setPath(romsDir_ / filename);
-    rom->setName(construct.meta.name);
-    rom->setData(std::move(construct.data));
+    rom->setName(meta.name);
+    rom->setData(std::move(data));
     // Insert into cache
     cache_.emplace(filename, rom);
     return rom;
@@ -58,22 +59,18 @@ TunePtr Project::loadTune(const std::string & filename)
         return TunePtr();
 
     cereal::BinaryInputArchive archive(file);
-    TuneConstruct construct;
-    archive(construct);
+    Tune::MetaData meta;
+    MemoryBuffer data;
+    archive(meta, data);
 
-    RomPtr rom = getRom(construct.meta.base);
+    RomPtr rom = getRom(meta.base);
     if (!rom)
         throw std::runtime_error("unable to find ROM with id '" +
-                                 construct.meta.base + "'");
+                                 meta.base + "'");
 
-    auto tune = std::make_shared<Tune>(rom);
+    auto tune = std::make_shared<Tune>(rom, std::move(data));
     tune->setPath(tunesDir_ / filename);
-    tune->setName(construct.meta.name);
-
-    for (const TableConstruct & table : construct.tables)
-    {
-        tune->setTable(table.id, table.data.data(), table.data.size());
-    }
+    tune->setName(meta.name);
     return tune;
 }
 

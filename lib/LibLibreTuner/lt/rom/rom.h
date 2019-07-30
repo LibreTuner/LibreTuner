@@ -27,17 +27,11 @@
 
 #include "../definition/model.h"
 #include "../definition/platform.h"
+#include "../buffer/memorybuffer.h"
+#include "table.h"
 
 namespace lt
 {
-
-template<typename T>
-class BasicTable;
-using Table = BasicTable<double>;
-template<typename T>
-class BasicAxis;
-using Axis = BasicAxis<double>;
-using AxisPtr = std::shared_ptr<Axis>;
 
 class Rom
 {
@@ -120,12 +114,13 @@ using TableMap = std::unordered_map<std::string, std::unique_ptr<Table>>;
 class Tune
 {
 public:
-    using iterator = std::vector<uint8_t>::iterator;
-    using const_iterator = std::vector<uint8_t>::const_iterator;
+    using iterator = MemoryBuffer::iterator;
+    using const_iterator = MemoryBuffer::const_iterator;
 
     static constexpr auto extension = ".ltr";
 
-    explicit Tune(RomPtr rom) : base_(std::move(rom)) { assert(base_); }
+    explicit Tune(RomPtr rom);
+    explicit Tune(RomPtr rom, MemoryBuffer && data);
 
     inline const std::string & name() const noexcept { return name_; }
     inline const RomPtr & base() const noexcept { return base_; }
@@ -145,9 +140,6 @@ public:
     // If `create` is true and the table has not been initialized, creates
     // the table from the ROM data and definitions.
     Table * getTable(const std::string & id, bool create = true);
-
-    Table * setTable(const std::string & id, const uint8_t * data,
-                     std::size_t length);
 
     AxisPtr getAxis(const std::string & id, bool create = true);
 
@@ -179,59 +171,25 @@ public:
     // Saves tune to `path_`
     void save() const;
 
-    iterator begin() { return data_.begin(); }
-    const_iterator cbegin() const { return data_.cbegin(); };
-    iterator end() { return data_.end(); }
-    const_iterator cend() { return data_.cend(); }
-    std::vector<uint8_t>::size_type size() const { return data_.size(); }
+    inline iterator begin() { return data_.begin(); }
+    inline const_iterator cbegin() const { return data_.cbegin(); };
+    inline iterator end() { return data_.end(); }
+    inline const_iterator cend() { return data_.cend(); }
+    inline std::vector<uint8_t>::size_type size() const { return data_.size(); }
 
 private:
     std::string name_;
 
-    std::vector<uint8_t> data_;
-
     RomPtr base_;
     TableMap tables_;
+
+    MemoryBuffer data_;
 
     std::unordered_map<std::string, AxisPtr> axes_;
 
     std::filesystem::path path_;
 };
 using TunePtr = std::shared_ptr<Tune>;
-
-// Serialization
-struct RomConstruct
-{
-    Rom::MetaData meta;
-    std::vector<uint8_t> data;
-
-    template <class Archive> void serialize(Archive & archive)
-    {
-        archive(meta, data);
-    }
-};
-
-struct TableConstruct
-{
-    std::string id;
-    std::vector<uint8_t> data;
-
-    template <class Archive> void serialize(Archive & archive)
-    {
-        archive(id, data);
-    }
-};
-
-struct TuneConstruct
-{
-    Tune::MetaData meta;
-    std::vector<TableConstruct> tables;
-
-    template <class Archive> void serialize(Archive & archive)
-    {
-        archive(meta, tables);
-    }
-};
 } // namespace lt
 
 #endif // ROM_H

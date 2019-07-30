@@ -51,7 +51,7 @@ FlashMap FlashMap::fromTune(Tune & tune)
                               rom->data() + rom->size() - offset);
 
     // Try each table
-    for (const auto & [id, definition] : model->tables)
+    /*for (const auto & [id, definition] : model->tables)
     {
         Table * table = tune.getTable(id, false);
         if (table == nullptr)
@@ -64,7 +64,7 @@ FlashMap FlashMap::fromTune(Tune & tune)
 
         std::copy(serialized.begin(), serialized.end(),
                   data.begin() + definition.offset.value() - offset);
-    }
+    }*/
 
     // Correct and verify checksums
     model->checksums.correct(data.data(), data.size());

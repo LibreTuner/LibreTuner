@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
+#include "../buffer/view.h"
 #include "../support/types.h"
 #include "../support/util.hpp"
-#include "view.h"
 
 namespace lt
 {
@@ -17,41 +17,113 @@ namespace lt
 template <typename PresentedType> class Entries
 {
 public:
-    virtual PresentedType get(int index) const noexcept = 0;
-    virtual void set(int index, PresentedType value) noexcept = 0;
+    virtual PresentedType get(int index) const = 0;
+    virtual void set(int index, PresentedType value) = 0;
+    virtual int size() const noexcept =0;
 
-    // Serializes the entries into a byte array
-    virtual std::vector<uint8_t> intoBytes(Endianness endianness) const
-        noexcept = 0;
     virtual ~Entries() = default;
 };
+
+template <typename T> using EntriesPtr = std::unique_ptr<Entries<T>>;
 
 // Type-defined implementation of Entries
 template <typename PresentedType, typename T, Endianness endianness>
 struct EntriesImpl : public Entries<PresentedType>
 {
-private:
-
 public:
-    EntriesImpl(std::vector<T> && entries) : entries_(std::move(entries)) {}
+    EntriesImpl(View view) : view_(std::move(view)) {}
 
-    PresentedType get(int index) const noexcept override
+    PresentedType get(int index) const override
     {
-        return static_cast<PresentedType>(view_.get<T>(index * sizeof(T)));
+        return static_cast<PresentedType>(
+            view_.get<T, endianness>(index * sizeof(T)));
     }
-    void set(int index, PresentedType value) noexcept
+    void set(int index, PresentedType value)
     {
-        view_.set<T>(static_cast<T>(value));
+        view_.set<T, endianness>(static_cast<T>(value), index * sizeof(T));
+    }
+    int size() const noexcept {
+        return view_.size() / sizeof(T);
     }
 
+private:
     View view_;
+};
+
+template <typename PresentedType, Endianness endianness>
+EntriesPtr<PresentedType> create_entries(DataType type, View view)
+{
+    switch (type)
+    {
+    case DataType::Uint8:
+        return std::make_unique<
+            EntriesImpl<PresentedType, uint8_t, endianness>>(view);
+    case DataType::Uint16:
+        return std::make_unique<
+            EntriesImpl<PresentedType, uint16_t, endianness>>(view);
+    case DataType::Uint32:
+        return std::make_unique<
+            EntriesImpl<PresentedType, uint32_t, endianness>>(view);
+    case DataType::Int8:
+        return std::make_unique<EntriesImpl<PresentedType, int8_t, endianness>>(
+            view);
+    case DataType::Int16:
+        return std::make_unique<
+            EntriesImpl<PresentedType, int16_t, endianness>>(view);
+    case DataType::Int32:
+        return std::make_unique<
+            EntriesImpl<PresentedType, int32_t, endianness>>(view);
+    case DataType::Float:
+        return std::make_unique<EntriesImpl<PresentedType, float, endianness>>(
+            view);
+    }
+}
+
+template <typename PresentedType> class AxisEntries
+{
+public:
+    virtual ~AxisEntries() = default;
+    virtual PresentedType get(int index) const =0;
+};
+template<typename PresentedType>
+using AxisEntriesPtr = std::unique_ptr<AxisEntries<PresentedType>>;
+
+template <typename PresentedType> class AxisMemoryEntries : public AxisEntries<PresentedType>
+{
+public:
+    AxisMemoryEntries(EntriesPtr<PresentedType> && entries)
+        : entries_(std::move(entries))
+    {
+    }
+
+    PresentedType get(int index) const override { return entries_->get(index); }
+
+private:
+    EntriesPtr<PresentedType> entries_;
+};
+
+template <typename PresentedType> class AxisLinearEntries : public AxisEntries<PresentedType>
+{
+public:
+    AxisLinearEntries(PresentedType first, PresentedType step)
+        : first_(first), step_(step)
+    {
+    }
+
+    PresentedType get(int index) const override
+    {
+        return first_ + index * step_;
+    }
+
+private:
+    PresentedType first_, step_;
 };
 
 /* A memory axis uses a defined set of values as indicies. */
 template <typename PresentedType> class BasicAxis
 {
 private:
-    explicit BasicAxis(std::unique_ptr<Entries<PresentedType>> entries,
+    explicit BasicAxis(AxisEntriesPtr<PresentedType> && entries,
                        std::string && name, int size)
         : entries_(std::move(entries)), size_(size), name_(std::move(name))
     {
@@ -61,24 +133,18 @@ public:
     class Builder
     {
     public:
-        template <typename T> Builder & setEntries(std::vector<T> && entries)
+        Builder & setEntries(EntriesPtr<PresentedType> && entries)
         {
-            size_ = entries.size();
-            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
-                std::move(entries));
+            size_ = entries->size();
+            entries_ = std::make_unique<AxisMemoryEntries<PresentedType>>(std::move(entries));
             return *this;
         }
 
-        /* Creates a set of linear entries. A linear axis
-         * uses the form y = mx + b where m is the step, b
-         * is the start, and x is the index. */
-        template <typename T> Builder & setLinear(T start, T step, int size)
+        Builder & setLinear(PresentedType first, PresentedType step)
         {
-            std::vector<T> entries;
-            for (int i = 0; i < size; ++i, start += step)
-                entries.emplace_back(start);
-            size_ = size;
-            return setEntries(std::move(entries));
+            entries_ = std::make_unique<AxisLinearEntries<PresentedType>>(first, step);
+            size_ = std::numeric_limits<int>::max();
+            return *this;
         }
 
         Builder & setName(std::string name)
@@ -97,7 +163,7 @@ public:
         }
 
     private:
-        std::unique_ptr<Entries<PresentedType>> entries_;
+        AxisEntriesPtr<PresentedType> entries_;
         int size_;
         std::string name_;
     };
@@ -114,7 +180,7 @@ public:
     const std::string & name() const noexcept { return name_; }
 
 private:
-    std::unique_ptr<Entries<PresentedType>> entries_;
+    AxisEntriesPtr<PresentedType> entries_;
     int size_;
     std::string name_;
 };
@@ -197,16 +263,10 @@ public:
      * (height = 1) */
     inline bool isOneDimensional() const noexcept { return height_ == 1; }
 
-    // Serializes entries into bytes
-    std::vector<uint8_t> intoBytes(Endianness endianness) const noexcept
-    {
-        return entries_->intoBytes(endianness);
-    }
-
 private:
     std::string name_;
     Bounds<PresentedType> bounds_;
-    std::unique_ptr<Entries<PresentedType>> entries_;
+    EntriesPtr<PresentedType> entries_;
     int width_, height_;
     AxisTypePtr xAxis_, yAxis_;
     double scale_;
@@ -255,24 +315,10 @@ public:
             return *this;
         }
 
-        template <typename T> Builder & setEntries(std::vector<T> && entries)
+        Builder & setEntries(EntriesPtr<PresentedType> && entries)
         {
-            if (entries.size() != (width_ * height_))
-                throw std::runtime_error("Invalid entries size. Expected " +
-                                         std::to_string(width_ * height_) +
-                                         ", got " +
-                                         std::to_string(entries.size()));
-            entries_ = std::make_unique<EntriesImpl<PresentedType, T>>(
-                std::move(entries));
+            entries_ = std::move(entries);
             return *this;
-        }
-
-        // Deserializes entries from bytes
-        template <typename T, typename It>
-        inline Builder & operator()(It begin, It end, Endianness endianness)
-        {
-            return setEntries(fromBytes<T>(std::forward<It>(begin),
-                                           std::forward<It>(end), endianness));
         }
 
         inline Builder & setXAxis(AxisTypePtr xAxis) noexcept
@@ -289,7 +335,7 @@ public:
 
         BasicTable<PresentedType> build() noexcept
         {
-            // Verify entry size
+            // TODO: Verify entry size
             return BasicTable<PresentedType>(
                 std::move(name_), std::move(bounds_), std::move(entries_),
                 width_, height_, std::move(xAxis_), std::move(yAxis_), scale_);
@@ -302,7 +348,7 @@ public:
         AxisTypePtr yAxis_;
         std::string name_;
         Bounds<PresentedType> bounds_;
-        std::unique_ptr<Entries<PresentedType>> entries_;
+        EntriesPtr<PresentedType> entries_;
     };
     friend class Builder;
 };
