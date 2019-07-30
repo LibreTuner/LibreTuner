@@ -1183,12 +1183,70 @@
          "axisy": "unknown_0_200_30"
       },
       "132": {
-         "name": "unid_2d_412C4",
-         "description": "unid_2d_412C4",
+         "name": "unid_1d_CEB0",
+         "description": "unid_1d_CEB0",
          "category": "Unidentified_8",
          "datatype": "float",
          "width": 22,
          "axisx": "unknown_0_0.05_22"
+      },
+      "133": {
+         "name": "unknown_1d_D058",
+         "description": "unknown_1d_D058",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 28,
+         "axisx": "unknown_axis_CF08"
+      },
+      "134": {
+         "name": "unknown_1d_CFE8",
+         "description": "unknown_1d_CFE8",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 28,
+         "axisx": "unknown_axis_CF08"
+      },
+      "135": {
+         "name": "unknown_1d_CF78",
+         "description": "unknown_1d_CF78",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 28,
+         "axisx": "unknown_axis_CF08"
+      },
+      "136": {
+         "name": "unid_1d_C87C",
+         "description": "unid_1d_C87C",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 4,
+         "axisx": "unknown_0_1_4"
+      },
+      "137": {
+         "name": "unid_1d_C88C",
+         "description": "unid_1d_C88C",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 4,
+         "axisx": "unknown_0_1_4"
+      },
+      "138": {
+         "name": "unid_2d_249C0",
+         "description": "unid_2d_249C0",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 10,
+         "height": 8,
+         "axisx": "rpm_500_linear",
+         "axisy": "absload_125_125"
+      },
+      "139": {
+         "name": "unknown_1d_C8D8",
+         "description": "unknown_1d_C8D8",
+         "category": "Unidentified_8",
+         "datatype": "float",
+         "width": 15,
+         "axisx": "unknown_axis_C89C"
       }
    },
    "axes": {
@@ -1222,6 +1280,18 @@
          "datatype": "float",
          "name": "RPM"
       },
+      "unknown_axis_CF08": {
+         "size": 28,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Unknown"
+      },
+      "unknown_axis_C89C": {
+         "size": 15,
+         "type": "memory",
+         "datatype": "float",
+         "name": "Unknown"
+      },
       "unknown_0_200_30": {
          "size": 30,
          "type": "memory",
@@ -1233,6 +1303,14 @@
          "type": "memory",
          "datatype": "float",
          "name": "Unknown"
+      },
+      "absload_125_125": {
+         "size": 8,
+         "type": "linear",
+         "datatype": "float",
+         "name": "Absolute Load",
+         "minimum": 0.125,
+         "increment": 0.125
       },
       "unknown_0_0.05_22": {
          "size": 22,
@@ -1273,6 +1351,14 @@
          "size": 7,
          "minimum": 250,
          "increment": 125
+      },
+      "unknown_0_1_4": {
+         "type": "linear",
+         "datatype": "float",
+         "name": "Unknown",
+         "size": 4,
+         "minimum": 0,
+         "increment": 1
       },
       "unknown_500_500_20": {
          "type": "linear",
