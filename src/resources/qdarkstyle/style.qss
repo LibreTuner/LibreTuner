@@ -1572,6 +1572,10 @@ QTreeView::branch:open:has-children:has-siblings:hover {
     image: url(:/qss_icons/rc/branch_open-on.png);
 }
 
+QTableView::item {
+    padding: 4px;
+}
+
 QListView::item:!selected:hover,
 QTreeView::item:!selected:hover,
 QTableView::item:!selected:hover,
