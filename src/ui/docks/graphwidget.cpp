@@ -47,6 +47,7 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
 
     surface_->addSeries(series3d_);
     surface_->setHorizontalAspectRatio(1.0);
+    surface_->axisZ()->setReversed(true);
 
     QLinearGradient gr;
     gr.setColorAt(0.0, Qt::green);
