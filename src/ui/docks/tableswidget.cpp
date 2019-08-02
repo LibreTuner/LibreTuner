@@ -28,13 +28,23 @@ void TablesWidget::setModel(const lt::Model & model)
     view_->clear();
     std::vector<std::pair<std::string, QTreeWidgetItem *>> categories_;
 
+    std::vector<std::reference_wrapper<const lt::TableDefinition>> defs;
     for (const auto & [id, table] : model.tables)
+    {
+        defs.emplace_back(std::cref(table));
+    }
+    std::sort(defs.begin(), defs.end(), [](const lt::TableDefinition &first, const lt::TableDefinition &second)
+    {
+        return first.name < second.name;
+    });
+
+    for (const auto & table : defs)
     {
         QTreeWidgetItem * par = nullptr;
 
         for (auto & cat : categories_)
         {
-            if (cat.first == table.category)
+            if (cat.first == table.get().category)
             {
                 par = cat.second;
                 break;
@@ -44,14 +54,14 @@ void TablesWidget::setModel(const lt::Model & model)
         if (par == nullptr)
         {
             par = new QTreeWidgetItem(view_);
-            par->setText(0, QString::fromStdString(table.category));
+            par->setText(0, QString::fromStdString(table.get().category));
             par->setData(0, Qt::UserRole, QVariant(-1));
 
-            categories_.emplace_back(table.category, par);
+            categories_.emplace_back(table.get().category, par);
         }
 
         auto * item = new QTreeWidgetItem(par);
-        item->setText(0, QString::fromStdString(table.name));
-        item->setData(0, Qt::UserRole, QVariant::fromValue(&table));
+        item->setText(0, QString::fromStdString(table.get().name));
+        item->setData(0, Qt::UserRole, QVariant::fromValue(&table.get()));
     }
 }
