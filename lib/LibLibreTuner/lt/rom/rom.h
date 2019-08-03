@@ -117,7 +117,7 @@ public:
     using iterator = MemoryBuffer::iterator;
     using const_iterator = MemoryBuffer::const_iterator;
 
-    static constexpr auto extension = ".ltr";
+    static constexpr auto extension = ".ltt";
 
     explicit Tune(RomPtr rom);
     explicit Tune(RomPtr rom, MemoryBuffer && data);
