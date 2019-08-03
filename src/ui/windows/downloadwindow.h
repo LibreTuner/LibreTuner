@@ -29,6 +29,7 @@
 class QLineEdit;
 class QComboBox;
 class AuthOptionsView;
+class ProjectCombo;
 
 namespace lt {
 class Project;
@@ -36,7 +37,7 @@ using ProjectPtr = std::shared_ptr<Project>;
 }
 
 /**
- * Window for downloading firmware from the ECU
+ * Downloads ROM on connected control unit.
  */
 class DownloadWindow : public QDialog
 {
@@ -55,9 +56,9 @@ protected:
 
 private:
     QComboBox * comboPlatform_;
+    ProjectCombo * comboProject_;
     QLineEdit * lineName_;
     AuthOptionsView * authOptions_;
-    lt::ProjectPtr project_;
 
     lt::PlatformLink getPlatformLink();
 };

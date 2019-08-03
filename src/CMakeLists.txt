@@ -45,8 +45,8 @@ set(libretuner_SRC
     ui/backgroundtask.h
     ui/qcustomplot.cpp
     ui/qcustomplot.h
-    ui/createtunedialog.cpp
-    ui/createtunedialog.h
+        ui/windows/createtunedialog.cpp
+        ui/windows/createtunedialog.h
     ui/fileselectwidget.cpp
     ui/fileselectwidget.h
     ui/flasherwindow.cpp
@@ -72,8 +72,6 @@ set(libretuner_SRC
     ui/docks/logview.cpp
     ui/docks/editorwidget.cpp
     ui/docks/editorwidget.h
-        ui/windows/diagnosticswidget.cpp
-        ui/windows/diagnosticswidget.h
     ui/docks/graphwidget.cpp
     ui/docks/graphwidget.h
     ui/docks/hexeditwidget.cpp
@@ -89,6 +87,10 @@ set(libretuner_SRC
     ui/windows/downloadwindow.h
     ui/windows/importromdialog.cpp
     ui/windows/importromdialog.h
+    ui/windows/vehicleinformationwidget.cpp
+    ui/windows/vehicleinformationwidget.h
+    ui/windows/diagnosticswidget.cpp
+    ui/windows/diagnosticswidget.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
@@ -98,6 +100,9 @@ set(libretuner_SRC
     ui/widget/customcombo.h
     ui/widget/datalinksettings.cpp
     ui/widget/datalinksettings.h
+    ui/widget/projectcombo.cpp
+    ui/widget/projectcombo.h
+
 
     models/tablemodel.cpp
     models/tablemodel.h
@@ -110,11 +115,11 @@ set(libretuner_SRC
     database/definitions.h
     database/links.cpp
     database/links.h
-        database/projects.cpp
-        database/projects.h
+    database/projects.cpp
+    database/projects.h
 
 
-    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS} ui/windows/vehicleinformationwidget.cpp ui/windows/vehicleinformationwidget.h)
+    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
 
 if (UNIX AND NOT APPLE)
 
@@ -129,7 +134,7 @@ endif ()
 #set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
 qt5_wrap_ui(libretuner_SRC
     ui/canviewer.ui
-    ui/createtunedialog.ui
+        ui/windows/createtunedialog.ui
 
     framelesswindow/framelesswindow.ui
 )

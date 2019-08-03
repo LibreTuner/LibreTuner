@@ -33,7 +33,7 @@
 
 #include "windows/definitionswindow.h"
 
-#include "createtunedialog.h"
+#include "ui/windows/createtunedialog.h"
 #include "datalinkswidget.h"
 #include "dataloggerwindow.h"
 #include "flasherwindow.h"

@@ -37,6 +37,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QPushButton>
+#include <QStyledItemDelegate>
 #include <QThread>
 #include <QVBoxLayout>
 
@@ -44,18 +45,24 @@
 #include <thread>
 #include <utility>
 
-DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent)
-    : QDialog(parent), project_(project)
+#include "../widget/projectcombo.h"
+
+DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent) : QDialog(parent)
 {
     setWindowTitle(tr("LibreTuner - Download"));
 
     comboPlatform_ = new QComboBox;
+    comboPlatform_->setItemDelegate(new QStyledItemDelegate());
     comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
+
+    comboProject_ = new ProjectCombo;
+    // TODO: Set project combo to project passed above
 
     lineName_ = new QLineEdit;
 
     // Main options
     auto * form = new QFormLayout;
+    form->addRow(tr("Project"), comboProject_);
     form->addRow(tr("Platform"), comboPlatform_);
     form->addRow(tr("Name"), lineName_);
 
@@ -95,11 +102,10 @@ DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent)
 
     connect(buttonDownload, &QPushButton::clicked, [this]() { download(); });
     connect(buttonClose, &QPushButton::clicked, this, &QWidget::hide);
-    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_,
-            &QWidget::setVisible);
+    connect(buttonAdvanced, &QAbstractButton::toggled, authOptions_, &QWidget::setVisible);
 
-    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &DownloadWindow::platformChanged);
+    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &DownloadWindow::platformChanged);
 
     platformChanged(comboPlatform_->currentIndex());
 }
@@ -108,34 +114,29 @@ void DownloadWindow::platformChanged(int /*index*/)
 {
     QVariant var = comboPlatform_->currentData(Qt::UserRole);
     if (!var.canConvert<lt::PlatformPtr>())
-    {
         return;
-    }
 
     const auto & platform = var.value<lt::PlatformPtr>();
     if (!platform)
-    {
         return;
-    }
 
     authOptions_->setDefaultOptions(platform->downloadAuthOptions);
 }
 
 void DownloadWindow::download()
 {
-    if (!project_)
+    lt::ProjectPtr project = comboProject_->selectedProject();
+    if (!project)
     {
-        QMessageBox::critical(nullptr, tr("Invalid project"),
-                              tr("A project has not been selected."));
+        QMessageBox::critical(nullptr, tr("Invalid project"), tr("A project has not been selected."));
         return;
     }
     catchCritical(
-        [this]() {
+        [&]() {
             lt::PlatformLink pLink = getPlatformLink();
 
             // Create progress dialog
-            QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0,
-                                     100, this);
+            QProgressDialog progress(tr("Downloading ROM..."), tr("Abort"), 0, 100, this);
             progress.setWindowModality(Qt::WindowModal);
             progress.setWindowTitle(tr("LibreTuner - Download"));
             progress.setValue(0);
@@ -143,83 +144,66 @@ void DownloadWindow::download()
 
             lt::download::DownloaderPtr downloader = pLink.downloader();
             downloader->setProgressCallback([&](float prog) {
-                QMetaObject::invokeMethod(&progress, "setValue",
-                                          Qt::QueuedConnection,
-                                          Q_ARG(int, prog * 100));
+                QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection, Q_ARG(int, prog * 100));
             });
 
-            BackgroundTask<bool()> task(
-                [&]() -> bool { return downloader->download(); });
+            BackgroundTask<bool()> task([&]() -> bool { return downloader->download(); });
 
             bool canceled = false;
 
-            connect(&progress, &QProgressDialog::canceled,
-                    [&downloader, &canceled]() {
-                        downloader->cancel();
-                        canceled = true;
-                    });
+            connect(&progress, &QProgressDialog::canceled, [&downloader, &canceled]() {
+                downloader->cancel();
+                canceled = true;
+            });
 
             task();
 
-            if (!canceled)
+            if (canceled)
+                return;
+            bool success = task.future().get();
+            if (!success)
+                throw std::runtime_error("Unknown error");
+            auto data = downloader->data();
+            try
             {
-                bool success = task.future().get();
-                if (!success)
-                    throw std::runtime_error("Unknown error");
-                auto data = downloader->data();
-                try
+                lt::ModelPtr model = pLink.platform().identify(data.first, data.second);
+                if (!model)
+                    throw std::runtime_error("Could not identify calibration");
+
+                lt::RomPtr rom = project->createRom(lineName_->text().toStdString(), model);
+                rom->setData(std::vector<uint8_t>(data.first, data.first + data.second));
+                rom->save();
+
+                QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully").exec();
+            }
+            catch (const std::runtime_error & err)
+            {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Download Error");
+                msgBox.setText("The ROM was downloaded, but an error occurred while "
+                               "saving. Would you like to save the binary data? "
+                               "Please send this to the LibreTuner developers. In the "
+                               "future, this will be automatic.");
+                msgBox.setInformativeText(err.what());
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::Yes);
+
+                int ret = msgBox.exec();
+                if (ret == QMessageBox::Yes)
                 {
-                    lt::ModelPtr model =
-                        pLink.platform().identify(data.first, data.second);
-                    if (!model)
-                        throw std::runtime_error(
-                            "Could not identify calibration");
+                    QString fileName =
+                        QFileDialog::getSaveFileName(this, tr("Save ROM"), "", tr("Binary (*.bin);;All Files (*)"));
+                    if (fileName.isEmpty())
+                        return;
 
-                    lt::RomPtr rom = project_->createRom(
-                        lineName_->text().toStdString(), model);
-                    rom->setData(std::vector<uint8_t>(
-                        data.first, data.first + data.second));
-                    rom->save();
-
-                    QMessageBox(QMessageBox::Information, "Download Finished",
-                                "ROM downloaded successfully")
-                        .exec();
-                }
-                catch (const std::runtime_error & err)
-                {
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Download Error");
-                    msgBox.setText(
-                        "The ROM was downloaded, but an error occurred while "
-                        "saving. Would you like to save the binary data? "
-                        "Please send this to the LibreTuner developers. In the "
-                        "future, this will be automatic.");
-                    msgBox.setInformativeText(err.what());
-                    msgBox.setStandardButtons(QMessageBox::Yes |
-                                              QMessageBox::No);
-                    msgBox.setDefaultButton(QMessageBox::Yes);
-
-                    int ret = msgBox.exec();
-                    if (ret == QMessageBox::Yes)
+                    QFile file(fileName);
+                    if (!file.open(QIODevice::WriteOnly))
                     {
-                        QString fileName = QFileDialog::getSaveFileName(
-                            this, tr("Save ROM"), "",
-                            tr("Binary (*.bin);;All Files (*)"));
-                        if (fileName.isEmpty())
-                            return;
-
-                        QFile file(fileName);
-                        if (!file.open(QIODevice::WriteOnly))
-                        {
-                            QMessageBox::information(this,
-                                                     tr("Unable to open file"),
-                                                     file.errorString());
-                            return;
-                        }
-                        file.write(reinterpret_cast<const char *>(data.first),
-                                   static_cast<qint64>(data.second));
-                        file.close();
+                        QMessageBox::information(this, tr("Unable to open file"), file.errorString());
+                        return;
                     }
+                    file.write(reinterpret_cast<const char *>(data.first), static_cast<qint64>(data.second));
+                    file.close();
                 }
             }
         },

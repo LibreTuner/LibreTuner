@@ -33,17 +33,15 @@ CreateTuneDialog::CreateTuneDialog(lt::RomPtr base)
     : ui_(new Ui::CreateTuneDialog)
 {
     ui_->setupUi(this);
-
     ui_->comboBase->setItemDelegate(new QStyledItemDelegate());
-    ui_->comboProject->setItemDelegate(new QStyledItemDelegate());
-    ui_->comboProject->setModel(&LT()->projects());
+    on_comboProject_currentIndexChanged(0);
 }
 
 CreateTuneDialog::~CreateTuneDialog() { delete ui_; }
 
 void CreateTuneDialog::on_buttonCreate_clicked()
 {
-    lt::ProjectPtr project = selectedProject();
+    lt::ProjectPtr project = ui_->comboProject->selectedProject();
     if (!project)
     {
         Logger::info("No project selected");
@@ -93,7 +91,7 @@ void CreateTuneDialog::on_buttonCreate_clicked()
 void CreateTuneDialog::on_comboProject_currentIndexChanged(int index)
 {
     ui_->comboBase->clear();
-    lt::ProjectPtr project = selectedProject();
+    lt::ProjectPtr project = ui_->comboProject->selectedProject();
 
     // Populate base combo
     for (const auto & rom : project->queryRoms())
@@ -101,13 +99,4 @@ void CreateTuneDialog::on_comboProject_currentIndexChanged(int index)
         ui_->comboBase->addItem(QString::fromStdString(rom.name),
                                 QVariant::fromValue(rom));
     }
-}
-
-lt::ProjectPtr CreateTuneDialog::selectedProject()
-{
-    QVariant var = ui_->comboProject->currentData(Qt::UserRole);
-    if (!var.canConvert<lt::ProjectPtr>())
-        return lt::ProjectPtr();
-
-    return var.value<lt::ProjectPtr>();
 }

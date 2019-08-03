@@ -36,6 +36,8 @@ namespace lt
 class Project;
 using ProjectPtr = std::shared_ptr<Project>;
 }
+
+class ProjectCombo;
 /**
  * @todo write docs
  */
@@ -52,8 +54,6 @@ public:
 private:
     Ui::CreateTuneDialog * ui_;
     lt::TunePtr tune_;
-
-    lt::ProjectPtr selectedProject();
 
 private slots:
     void on_buttonCreate_clicked();

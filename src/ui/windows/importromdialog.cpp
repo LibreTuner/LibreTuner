@@ -17,20 +17,23 @@
 #include "libretuner.h"
 #include "uiutil.h"
 
+#include "../widget/projectcombo.h"
+
 ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
-    : QDialog(parent), project_(std::move(project))
+    : QDialog(parent)
 {
     setWindowTitle(tr("LibreTuner - Import ROM"));
 
     comboPlatform_ = new QComboBox;
     comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
 
+    comboProject_ = new ProjectCombo;
+
     lineName_ = new QLineEdit;
 
     linePath_ = new QLineEdit;
     linePath_->setClearButtonEnabled(true);
-    auto * buttonBrowse = new QPushButton(
-        style()->standardIcon(QStyle::SP_DirOpenIcon), QString());
+    auto * buttonBrowse = new QPushButton(style()->standardIcon(QStyle::SP_DirOpenIcon), QString());
 
     auto * pathLayout = new QHBoxLayout;
     pathLayout->addWidget(linePath_);
@@ -38,6 +41,7 @@ ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
 
     // Main options
     auto * form = new QFormLayout;
+    form->addRow(tr("Project"), comboProject_);
     form->addRow(tr("Platform"), comboPlatform_);
     form->addRow(tr("Name"), lineName_);
     form->addRow(tr("Path"), pathLayout);
@@ -65,22 +69,19 @@ ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
 
     connect(buttonClose, &QPushButton::clicked, this, &QDialog::reject);
 
-    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ImportRomDialog::platformChanged);
+    connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &ImportRomDialog::platformChanged);
 
     connect(buttonBrowse, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(
-            nullptr, tr("Select raw ROM file"), linePath_->text(),
-            tr("Binary (*.bin);;All Files (*)"));
+        QString path = QFileDialog::getOpenFileName(nullptr, tr("Select raw ROM file"), linePath_->text(),
+                                                    tr("Binary (*.bin);;All Files (*)"));
         if (!path.isNull())
         {
             linePath_->setText(path);
 
             if (lineName_->text().isEmpty())
-                lineName_->setText(QString::fromStdString(
-                    std::filesystem::path(path.toStdString())
-                        .filename()
-                        .string()));
+                lineName_->setText(
+                    QString::fromStdString(std::filesystem::path(path.toStdString()).filename().string()));
         }
     });
 
@@ -95,11 +96,11 @@ ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
 
         catchWarning(
             [&]() {
+                lt::ProjectPtr project = comboProject_->selectedProject();
+                if (!project)
+                    return;
                 // Import and save ROM
-                project_
-                    ->importRom(lineName_->text().toStdString(),
-                                linePath_->text().toStdString(), platform)
-                    ->save();
+                project->importRom(lineName_->text().toStdString(), linePath_->text().toStdString(), platform)->save();
                 accept();
             },
             tr("Error importing ROM"));

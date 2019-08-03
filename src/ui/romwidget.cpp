@@ -20,7 +20,7 @@
 #include "logger.h"
 #include "rommanager.h"
 
-#include "createtunedialog.h"
+#include "ui/windows/createtunedialog.h"
 #include <QGraphicsPixmapItem>
 #include <QPainter>
 #include <QPushButton>

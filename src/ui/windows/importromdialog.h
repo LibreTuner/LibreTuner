@@ -5,6 +5,7 @@
 
 class QLineEdit;
 class QComboBox;
+class ProjectCombo;
 
 namespace lt
 {
@@ -24,8 +25,7 @@ private:
     QLineEdit * lineName_;
     QLineEdit * linePath_;
     QComboBox * comboPlatform_;
-
-    lt::ProjectPtr  project_;
+    ProjectCombo * comboProject_;
 };
 
 #endif // LIBRETUNER_IMPORTROMDIALOG_H
