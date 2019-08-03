@@ -63,7 +63,8 @@
 MainWindow::MainWindow(QWidget * parent)
     : QMainWindow(parent), linksList_(LT()->links())
 {
-    resize(QSize(1100, 630));
+    //resize(QSize(1100, 630));
+    resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     setWindowTitle("LibreTuner");
 

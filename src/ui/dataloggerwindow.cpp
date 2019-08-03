@@ -27,6 +27,7 @@
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QDesktopWidget>
 
 #include "backgroundtask.h"
 #include "libretuner.h"
@@ -41,7 +42,7 @@ DataLoggerWindow::DataLoggerWindow(QWidget * parent)
 {
     setAttribute(Qt::WA_DeleteOnClose, false);
     setWindowTitle("LibreTuner - Data Logger");
-    resize(1200, 800);
+    resize(QDesktopWidget().availableGeometry(this).size() * 0.75);
 
     QLabel * pidLabel = new QLabel("Available PIDs");
 
