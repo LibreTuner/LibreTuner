@@ -8,3 +8,4 @@ AccessModifierOffset: -4
 IndentCaseLabels: false
 BreakBeforeBraces: Allman
 PointerAlignment: Middle
+ColumnLimit: 120
