@@ -12,7 +12,7 @@ class Project
 public:
     /* Initializes base path for storage. Tunes and ROMs path are set to
      * '`base`/tunes' and '`base`/roms' respectively. */
-    Project(std::filesystem::path base, const Platforms & platforms);
+    Project(const std::filesystem::path& base, const Platforms & platforms);
 
     /* Loads a ROM by filename. If the ROM is cached, it will be returned.
      * Otherwise, the directory is searched and if the ROM cannot
