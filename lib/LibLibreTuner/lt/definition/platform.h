@@ -78,9 +78,9 @@ struct Platform
 
     /* Loads platform directory in the format
      * platform_1/    // Platform directory name is unused
-     *    main.yaml    // Platform definition
-     *    model1.yaml  // Model definition
-     *    model2.yaml
+     *    main.json    // Platform definition
+     *    model1.json  // Model definition
+     *    model2.json
      */
     static PlatformPtr loadDirectory(const std::filesystem::path & path);
 };
@@ -93,9 +93,9 @@ public:
      * should be stored as follows:
      * `path`/
      *    platform_1/    // Platform directory name is unused
-     *      main.yaml    // Platform definition
-     *      model1.yaml  // Model definition
-     *      model2.yaml
+     *      main.json    // Platform definition
+     *      model1.json  // Model definition
+     *      model2.json
      */
     void loadDirectory(const std::filesystem::path & path);
 
