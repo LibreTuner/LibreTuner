@@ -13,6 +13,14 @@ Supported vehicles
 ------------------
 * Mazdaspeed6 / Mazda 6 MPS / Mazdaspeed Atenza
 
+
+Supported Interfaces
+--------------------
+* J2534 interfaces with CAN support including Tactrix OpenPort 2.0
+* OBDLink SX
+* ELM327 devices (but many cheap knock-offs have been known to have issues)
+* SocketCAN
+
 Planned support
 ---------------
 * Mazdaspeed3 (Gen 1 & 2)
