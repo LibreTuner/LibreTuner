@@ -13,7 +13,7 @@ namespace lt::network
 struct IsoTpOptions
 {
     uint32_t sourceId = 0x7E0, destId = 0x7E8;
-    std::chrono::milliseconds timeout{1000};
+    std::chrono::milliseconds timeout{10000};
 };
 
 class IsoTpPacket
@@ -91,6 +91,8 @@ class IsoTp
 {
 public:
     virtual void recv(IsoTpPacket & result) = 0;
+
+    virtual ~IsoTp() = default;
 
     // Sends a request and waits for a response
     virtual void request(const IsoTpPacket & req, IsoTpPacket & result) = 0;

@@ -37,7 +37,7 @@ public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
     J2534Can(const j2534::DevicePtr & device, uint32_t baudrate = 500000);
 
-    virtual ~J2534Can() override;
+    ~J2534Can() override;
 
     // Can interface
 public:
@@ -48,6 +48,8 @@ public:
 
 private:
     j2534::Channel channel_;
+
+    CanMessageBuffer buffer_;
 };
 
 } // namespace network

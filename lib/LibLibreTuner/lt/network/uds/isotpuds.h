@@ -14,6 +14,7 @@ class IsoTpUds : public Uds
 public:
     // Takes ownership of an ISO-TP interface
     IsoTpUds(IsoTpPtr && isotp) : isotp_(std::move(isotp)) { assert(isotp_); }
+    ~IsoTpUds() override = default;
 
     // Inherited via Uds
     virtual UdsPacket requestRaw(const UdsPacket & packet) override;

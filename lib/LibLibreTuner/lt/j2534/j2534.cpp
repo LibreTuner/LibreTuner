@@ -94,7 +94,7 @@ void J2534::readMsgs(uint32_t channel, PASSTHRU_MSG * pMsg, uint32_t & pNumMsgs,
 {
     assert(initialized());
     int32_t res = PassThruReadMsgs(channel, pMsg, &pNumMsgs, timeout);
-    if (res != 0)
+    if (res != 0 && res != 0x09 && res != 0x10)
     {
         throw Error(lastError());
     }

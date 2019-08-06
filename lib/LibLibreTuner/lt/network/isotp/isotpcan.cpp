@@ -12,9 +12,7 @@ uint8_t calculate_st(std::chrono::microseconds time)
 {
     assert(time.count() >= 0);
     if (time.count() == 0)
-    {
         return 0;
-    }
 
     if (time >= std::chrono::milliseconds(1))
     {
@@ -30,13 +28,9 @@ uint8_t calculate_st(std::chrono::microseconds time)
 std::chrono::microseconds calculate_time(uint8_t st)
 {
     if (st <= 127)
-    {
         return std::chrono::milliseconds(st);
-    }
     if (st >= 0xF1 && st <= 0xF9)
-    {
         return std::chrono::microseconds((st - 0xF0) * 100);
-    }
     return std::chrono::microseconds(0);
 }
 } // namespace detail
@@ -285,9 +279,7 @@ CanMessage IsoTpCan::recvNextFrame()
         if (message.id() == options_.destId)
         {
             if (message.length() == 0)
-            {
                 throw std::runtime_error("received empty frame");
-            }
             return message;
         }
     }

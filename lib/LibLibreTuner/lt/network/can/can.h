@@ -80,32 +80,26 @@ private:
 class CanMessageBuffer
 {
 public:
-    CanMessageBuffer(std::size_t limit = 200) : limit_(limit) {}
+    CanMessageBuffer(std::size_t limit = 2048) : limit_(limit) {}
 
     void add(const CanMessage & message)
     {
         buffer_.emplace(message);
         if (buffer_.size() > limit_)
-        {
             buffer_.pop();
-        }
     }
 
     void add(CanMessage && message)
     {
         buffer_.emplace(std::move(message));
         if (buffer_.size() > limit_)
-        {
             buffer_.pop();
-        }
     }
 
     bool pop(CanMessage & message)
     {
         if (buffer_.empty())
-        {
             return false;
-        }
         CanMessage front = buffer_.front();
         buffer_.pop();
 
