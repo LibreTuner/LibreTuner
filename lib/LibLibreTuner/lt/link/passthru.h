@@ -24,6 +24,9 @@ public:
 
     network::CanPtr can(uint32_t baudrate) override;
 
+    // Creates ISO-TP interface from J2534 device if available or uses built-in ISO-TP stack with CAN.
+    network::IsoTpPtr isotp(const network::IsoTpOptions & options) override;
+
     DataLinkFlags flags() const noexcept override;
 
 private:

@@ -28,7 +28,7 @@ network::CanPtr PlatformLink::can()
 network::IsoTpPtr PlatformLink::isotp()
 {
     network::IsoTpPtr isotp = datalink_.isotp(
-        network::IsoTpOptions{platform_.serverId, platform_.serverId + 8});
+        network::IsoTpOptions{platform_.serverId, platform_.serverId + 8, platform_.baudrate});
     if (!isotp)
     {
         throw std::runtime_error(

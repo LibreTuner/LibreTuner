@@ -13,7 +13,8 @@ namespace lt::network
 struct IsoTpOptions
 {
     uint32_t sourceId = 0x7E0, destId = 0x7E8;
-    std::chrono::milliseconds timeout{10000};
+    uint32_t baudrate = 500000;
+    std::chrono::milliseconds timeout{6000};
 };
 
 class IsoTpPacket
@@ -40,24 +41,12 @@ public:
     inline void clear() { data_.clear(); }
 
     inline std::vector<uint8_t>::iterator begin() { return data_.begin(); }
-    inline std::vector<uint8_t>::const_iterator begin() const
-    {
-        return data_.begin();
-    }
-    inline std::vector<uint8_t>::const_iterator cbegin() const
-    {
-        return data_.cbegin();
-    }
+    inline std::vector<uint8_t>::const_iterator begin() const { return data_.begin(); }
+    inline std::vector<uint8_t>::const_iterator cbegin() const { return data_.cbegin(); }
 
     inline std::vector<uint8_t>::iterator end() { return data_.end(); }
-    inline std::vector<uint8_t>::const_iterator end() const
-    {
-        return data_.end();
-    }
-    inline std::vector<uint8_t>::const_iterator cend() const
-    {
-        return data_.cend();
-    }
+    inline std::vector<uint8_t>::const_iterator end() const { return data_.end(); }
+    inline std::vector<uint8_t>::const_iterator cend() const { return data_.cend(); }
 
     inline uint8_t * data() { return data_.data(); }
     inline const uint8_t * data() const { return data_.data(); }

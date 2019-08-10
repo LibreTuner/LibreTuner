@@ -1,6 +1,7 @@
 #include "passthru.h"
 #include "../network/can/j2534can.h"
 #include "../support/types.h"
+#include <network/isotp/isotpj2534.h>
 
 namespace lt
 {
@@ -8,9 +9,9 @@ NetworkProtocol passthruToNetworkProtocol(j2534::Protocol passthru)
 {
     NetworkProtocol protocol{NetworkProtocol::None};
     if ((passthru & j2534::Protocol::CAN) != j2534::Protocol::None)
-    {
         protocol |= NetworkProtocol::Can;
-    }
+    if ((passthru & j2534::Protocol::ISO15765) != j2534::Protocol::None)
+        protocol |= NetworkProtocol::IsoTp;
     return protocol;
 }
 
@@ -21,11 +22,11 @@ PassThruLink::PassThruLink(j2534::Info && info)
 
 void PassThruLink::checkInterface()
 {
-    if (!interface_)
-    {
-        interface_ = j2534::J2534::create(j2534::Info(info_));
-        interface_->init();
-    }
+    if (interface_)
+        return;
+
+    interface_ = j2534::J2534::create(j2534::Info(info_));
+    interface_->init();
 }
 
 network::CanPtr PassThruLink::can(uint32_t baudrate)
@@ -36,18 +37,17 @@ network::CanPtr PassThruLink::can(uint32_t baudrate)
 
 void PassThruLink::checkDevice()
 {
+    if (device_)
+        return;
+
+    checkInterface();
+    if (port_.empty())
+        device_ = interface_->open();
+    else
+        device_ = interface_->open(port_.c_str());
+
     if (!device_)
-    {
-        checkInterface();
-        if (port_.empty())
-            device_ = interface_->open();
-        else
-            device_ = interface_->open(port_.c_str());
-        if (!device_)
-        {
-            throw std::runtime_error("Failed to create PassThru device.");
-        }
-    }
+        throw std::runtime_error("Failed to create PassThru device.");
 }
 
 NetworkProtocol PassThruLink::supportedProtocols() const
@@ -58,6 +58,14 @@ NetworkProtocol PassThruLink::supportedProtocols() const
 DataLinkFlags PassThruLink::flags() const noexcept
 {
     return DataLinkFlags::Port;
+}
+
+network::IsoTpPtr PassThruLink::isotp(const network::IsoTpOptions & options) {
+    checkDevice();
+    if ((info_.protocols & j2534::Protocol::ISO15765) != j2534::Protocol::None)
+        return std::make_unique<network::IsoTpJ2534>(*device_, options);
+    // Fall back to our ISO-TP stack
+    return DataLink::isotp(options);
 }
 
 std::vector<std::unique_ptr<PassThruLink>> detect_passthru_links()

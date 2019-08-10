@@ -85,7 +85,8 @@ ImportRomDialog::ImportRomDialog(lt::ProjectPtr project, QWidget * parent)
         }
     });
 
-    platformChanged(comboPlatform_->currentIndex());
+    if (comboPlatform_->count() > 0)
+        platformChanged(comboPlatform_->currentIndex());
 
     connect(buttonImport, &QPushButton::clicked, [this]() {
         QVariant var = comboPlatform_->currentData(Qt::UserRole);

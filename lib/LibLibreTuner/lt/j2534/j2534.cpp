@@ -358,16 +358,22 @@ std::vector<Info> detect_interfaces()
         info.functionLibrary = keyValue;
 
         // Check for CAN support
-        DWORD can;
+        DWORD proto;
         keySize = sizeof(DWORD);
         if (RegQueryValueEx(hKeyDevice, "CAN", nullptr, &keyType,
-                            reinterpret_cast<uint8_t *>(&can),
+                            reinterpret_cast<uint8_t *>(&proto),
                             &keySize) == ERROR_SUCCESS)
         {
-            if (can)
-            {
+            if (proto)
                 info.protocols = info.protocols | Protocol::CAN;
-            }
+        }
+        keySize = sizeof(DWORD);
+        if (RegQueryValueEx(hKeyDevice, "ISO15765", nullptr, &keyType,
+                            reinterpret_cast<uint8_t *>(&proto),
+                            &keySize) == ERROR_SUCCESS)
+        {
+            if (proto)
+                info.protocols = info.protocols | Protocol::ISO15765;
         }
 
         interfaces.emplace_back(std::move(info));

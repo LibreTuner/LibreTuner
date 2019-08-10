@@ -107,7 +107,8 @@ DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent) : QDial
     connect(comboPlatform_, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DownloadWindow::platformChanged);
 
-    platformChanged(comboPlatform_->currentIndex());
+    if (comboPlatform_->count() > 0)
+        platformChanged(comboPlatform_->currentIndex());
 }
 
 void DownloadWindow::platformChanged(int /*index*/)
