@@ -35,7 +35,7 @@ void TablesWidget::setModel(const lt::Model & model)
     }
     std::sort(defs.begin(), defs.end(), [](const lt::TableDefinition &first, const lt::TableDefinition &second)
     {
-        return first.name < second.name;
+        return (first.category != second.category) ? (first.category < second.category) : first.name < second.name;
     });
 
     for (const auto & table : defs)

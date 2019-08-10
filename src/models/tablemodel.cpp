@@ -32,12 +32,11 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
     if (table_ == nullptr || !index.isValid())
         return QVariant();
 
-    if (role != Qt::UserRole && role != Qt::DisplayRole &&
-        role != Qt::BackgroundColorRole && role != Qt::ForegroundRole)
+    if (role != Qt::UserRole && role != Qt::DisplayRole && role != Qt::BackgroundColorRole &&
+        role != Qt::ForegroundRole)
         return QVariant();
 
-    if (index.row() < 0 || index.row() >= table_->height() ||
-        index.column() < 0 || index.column() >= table_->width())
+    if (index.row() < 0 || index.row() >= table_->height() || index.column() < 0 || index.column() >= table_->width())
         return QVariant();
 
     if (role == Qt::DisplayRole)
@@ -54,25 +53,20 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
     if (role == Qt::BackgroundColorRole)
     {
         if (table_->isSingle())
-        {
             return QVariant();
-        }
-        double ratio =
-            static_cast<double>(table_->get(index.row(), index.column()) -
-                                table_->minimum()) /
-            (table_->maximum() - table_->minimum());
-        if (ratio < 0.0)
-        {
-            return QVariant();
-        }
+
+        double diff = table_->maximum() - table_->minimum();
+        if (diff == 0.0)
+            return QColor::fromHsvF((1.0 / 3.0), 1.0, 1.0);
+        double ratio = static_cast<double>(table_->get(index.row(), index.column()) - table_->minimum()) / diff;
+        ratio = std::clamp(ratio, 0.0, 1.0);
         return QColor::fromHsvF((1.0 - ratio) * (1.0 / 3.0), 1.0, 1.0);
     }
 
     return QVariant();
 }
 
-QVariant TableModel::headerData(int section, Qt::Orientation orientation,
-                                int role) const
+QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (table_ == nullptr || role != Qt::DisplayRole)
         return QVariant();
@@ -89,8 +83,7 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation,
     return QString::number(std::floor(axis->index(section) * 100.0) / 100.0);
 }
 
-bool TableModel::setData(const QModelIndex & index, const QVariant & value,
-                         int role)
+bool TableModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     if (table_ == nullptr || !index.isValid())
     {
@@ -102,8 +95,7 @@ bool TableModel::setData(const QModelIndex & index, const QVariant & value,
         return false;
     }
 
-    if (index.row() < 0 || index.row() >= table_->height() ||
-        index.column() < 0 || index.column() >= table_->width())
+    if (index.row() < 0 || index.row() >= table_->height() || index.column() < 0 || index.column() >= table_->width())
     {
         return false;
     }
@@ -123,8 +115,7 @@ Qt::ItemFlags TableModel::flags(const QModelIndex & index) const
 {
     if (index.isValid())
     {
-        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled |
-               Qt::ItemNeverHasChildren;
+        return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
     }
     return Qt::NoItemFlags;
 }
