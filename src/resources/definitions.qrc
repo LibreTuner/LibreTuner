@@ -2,5 +2,53 @@
     <qresource prefix="/">
         <file>definitions/mazdaspeed6/main.json</file>
         <file>definitions/mazdaspeed6/l38k.json</file>
+        <file>definitions/mx5_nc/L831ED.json</file>
+        <file>definitions/mx5_nc/L831EE.json</file>
+        <file>definitions/mx5_nc/L831EF.json</file>
+        <file>definitions/mx5_nc/L831EG.json</file>
+        <file>definitions/mx5_nc/LF4XEE.json</file>
+        <file>definitions/mx5_nc/LF4XEG.json</file>
+        <file>definitions/mx5_nc/LF5AEG.json</file>
+        <file>definitions/mx5_nc/LF9KEC.json</file>
+        <file>definitions/mx5_nc/LF9VEB.json</file>
+        <file>definitions/mx5_nc/LFDJEA.json</file>
+        <file>definitions/mx5_nc/LFDMEA.json</file>
+        <file>definitions/mx5_nc/LFFCED.json</file>
+        <file>definitions/mx5_nc/LFG1ER.json</file>
+        <file>definitions/mx5_nc/LFG2EF.json</file>
+        <file>definitions/mx5_nc/LFG2EG.json</file>
+        <file>definitions/mx5_nc/LFG2EM.json</file>
+        <file>definitions/mx5_nc/LFG2EP.json</file>
+        <file>definitions/mx5_nc/LFG3EE.json</file>
+        <file>definitions/mx5_nc/LFG3EF.json</file>
+        <file>definitions/mx5_nc/LFG3EG.json</file>
+        <file>definitions/mx5_nc/LFG3EK.json</file>
+        <file>definitions/mx5_nc/LFG3EN.json</file>
+        <file>definitions/mx5_nc/LFG7ED.json</file>
+        <file>definitions/mx5_nc/LFG7EG.json</file>
+        <file>definitions/mx5_nc/LFGJED.json</file>
+        <file>definitions/mx5_nc/LFGKED.json</file>
+        <file>definitions/mx5_nc/LFGMEE.json</file>
+        <file>definitions/mx5_nc/LFH9EC.json</file>
+        <file>definitions/mx5_nc/LFH9ED.json</file>
+        <file>definitions/mx5_nc/LFH9EE.json</file>
+        <file>definitions/mx5_nc/LFH9EF.json</file>
+        <file>definitions/mx5_nc/LFJ1EC.json</file>
+        <file>definitions/mx5_nc/LFJ1EE.json</file>
+        <file>definitions/mx5_nc/LFJ1EF.json</file>
+        <file>definitions/mx5_nc/LFLEEC.json</file>
+        <file>definitions/mx5_nc/LFLGEC.json</file>
+        <file>definitions/mx5_nc/LFLMEC.json</file>
+        <file>definitions/mx5_nc/LFLMED.json</file>
+        <file>definitions/mx5_nc/LFLPEA.json</file>
+        <file>definitions/mx5_nc/LFLPEB.json</file>
+        <file>definitions/mx5_nc/LFLPEC.json</file>
+        <file>definitions/mx5_nc/LFLPED.json</file>
+        <file>definitions/mx5_nc/LFLXEC.json</file>
+        <file>definitions/mx5_nc/LFMAEB.json</file>
+        <file>definitions/mx5_nc/LFN4EK.json</file>
+        <file>definitions/mx5_nc/LFN5EN.json</file>
+        <file>definitions/mx5_nc/LFZZEA.json</file>
+        <file>definitions/mx5_nc/main.json</file>
     </qresource>
 </RCC>
