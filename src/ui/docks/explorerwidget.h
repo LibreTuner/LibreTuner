@@ -22,6 +22,7 @@ public:
 
     QAction * actionNewProject() noexcept { return actionNewProject_; }
     QAction * actionDownloadRom() noexcept { return actionDownloadRom_; }
+    QAction * actionCreateTune() noexcept { return actionCreateTune_; }
     const lt::ProjectPtr & project() const noexcept { return project_; }
 
 public slots:

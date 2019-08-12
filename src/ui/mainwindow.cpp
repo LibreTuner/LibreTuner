@@ -33,11 +33,11 @@
 
 #include "windows/definitionswindow.h"
 
-#include "ui/windows/createtunedialog.h"
 #include "datalinkswidget.h"
 #include "dataloggerwindow.h"
 #include "flasherwindow.h"
 #include "sessionscannerdialog.h"
+#include "ui/windows/createtunedialog.h"
 #include "uiutil.h"
 
 #include "titlebar.h"
@@ -60,10 +60,9 @@
 #include <lt/link/datalink.h>
 #include <ui/windows/newprojectdialog.h>
 
-MainWindow::MainWindow(QWidget * parent)
-    : QMainWindow(parent), linksList_(LT()->links())
+MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), linksList_(LT()->links())
 {
-    //resize(QSize(1100, 630));
+    // resize(QSize(1100, 630));
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     setWindowTitle("LibreTuner");
@@ -143,11 +142,9 @@ void MainWindow::restoreDocks()
 void MainWindow::loadSettings()
 {
     QSettings settings;
-    QByteArray geo =
-        settings.value("mainwindow/geometry", QByteArray()).toByteArray();
+    QByteArray geo = settings.value("mainwindow/geometry", QByteArray()).toByteArray();
     restoreGeometry(geo);
-    QByteArray state =
-        settings.value("mainwindow/state", QByteArray()).toByteArray();
+    QByteArray state = settings.value("mainwindow/state", QByteArray()).toByteArray();
     restoreState(state);
     QPoint pos = settings.value("mainwindow/pos", QPoint(200, 200)).toPoint();
     QSize size = settings.value("mainwindow/size", QSize(900, 600)).toSize();
@@ -178,8 +175,7 @@ bool MainWindow::checkSave()
     mb.setWindowTitle(tr("Unsaved changes"));
     mb.setInformativeText(tr("Do you want to save your changes?"));
     mb.setIcon(QMessageBox::Question);
-    mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard |
-                          QMessageBox::Save);
+    mb.setStandardButtons(QMessageBox::Cancel | QMessageBox::Discard | QMessageBox::Save);
     mb.setDefaultButton(QMessageBox::Save);
     switch (mb.exec())
     {
@@ -217,8 +213,7 @@ void MainWindow::setTune(const lt::TunePtr & tune)
 
     if (tune)
     {
-        setWindowTitle(tr("LibreTuner") + " - " +
-                       QString::fromStdString(tune->name()));
+        setWindowTitle(tr("LibreTuner") + " - " + QString::fromStdString(tune->name()));
     }
     else
     {
@@ -248,8 +243,7 @@ QDockWidget * MainWindow::createLoggingDock()
 
     QPushButton * buttonNewLog = new QPushButton(tr("New Log"));
     hlayout->addWidget(buttonNewLog);
-    connect(buttonNewLog, &QPushButton::clicked, this,
-            &MainWindow::newLogClicked);
+    connect(buttonNewLog, &QPushButton::clicked, this, &MainWindow::newLogClicked);
 
     comboLogVehicles_ = new QComboBox();
     QSizePolicy policy = comboLogVehicles_->sizePolicy();
@@ -372,10 +366,9 @@ QDockWidget * MainWindow::createExplorerDock()
 
     explorer_ = new ExplorerWidget(dock);
     explorer_->setModel(&LT()->projects());
-    connect(explorer_->menu().actionNewProject(), &QAction::triggered, this,
-            &MainWindow::newProject);
-    connect(explorer_, &ExplorerWidget::tuneOpened, this,
-            &MainWindow::openTune);
+    connect(explorer_->menu().actionNewProject(), &QAction::triggered, this, &MainWindow::newProject);
+    connect(explorer_->menu().actionCreateTune(), &QAction::triggered, this, &MainWindow::openCreateTune);
+    connect(explorer_, &ExplorerWidget::tuneOpened, this, &MainWindow::openTune);
     dock->setWidget(explorer_);
     dock->setObjectName("explorer");
 
@@ -433,8 +426,7 @@ void MainWindow::setupMenu()
 
     auto * nativeThemeAction = themeMenu->addAction(tr("Native"));
 
-    connect(nativeThemeAction, &QAction::triggered,
-            []() { LT()->setStyleSheet(""); });
+    connect(nativeThemeAction, &QAction::triggered, []() { LT()->setStyleSheet(""); });
 
     connect(flashAction, &QAction::triggered, []() {
         /*FlasherWindow flasher;
@@ -450,35 +442,16 @@ void MainWindow::setupMenu()
         }
     });
 
-    connect(createTuneAction, &QAction::triggered, [this]() {
-        // Check if an unsaved tune is in the workspace first
-        if (!checkSave())
-        {
-            return;
-        }
-        CreateTuneDialog dlg;
-        dlg.exec();
-        lt::TunePtr tune = dlg.tune();
-        if (!tune)
-        {
-            return;
-        }
+    connect(createTuneAction, &QAction::triggered, this, &MainWindow::openCreateTune);
 
-        setTune(dlg.tune());
-    });
+    connect(saveCurrentAction_, &QAction::triggered,
+            [this]() { catchCritical([this]() { saveTune(); }, tr("Error saving tune")); });
 
-    connect(saveCurrentAction_, &QAction::triggered, [this]() {
-        catchCritical([this]() { saveTune(); }, tr("Error saving tune"));
-    });
+    connect(newProjectAction, &QAction::triggered, this, &MainWindow::newProject);
 
-    connect(newProjectAction, &QAction::triggered, this,
-            &MainWindow::newProject);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProject);
 
-    connect(openProjectAction, &QAction::triggered, this,
-            &MainWindow::openProject);
-
-    connect(downloadAction, &QAction::triggered, this,
-            &MainWindow::on_buttonDownloadRom_clicked);
+    connect(downloadAction, &QAction::triggered, this, &MainWindow::on_buttonDownloadRom_clicked);
 
     connect(openTuneAction, &QAction::triggered, [this]() {
         // Check if we have an unsaved tune in the workspace
@@ -486,8 +459,7 @@ void MainWindow::setupMenu()
         {
             return;
         }
-        QString fileName = QFileDialog::getOpenFileName(
-            nullptr, tr("Open Tune"), QString(), tr("Tune Files (*.ltt)"));
+        QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Tune"), QString(), tr("Tune Files (*.ltt)"));
         if (fileName.isNull())
         {
             return;
@@ -516,8 +488,7 @@ void MainWindow::setupMenu()
     });
 
     QAction * datalinksAction = toolsMenu->addAction(tr("Setup &Datalinks"));
-    connect(datalinksAction, &QAction::triggered,
-            [this]() { datalinksWindow_.show(); });
+    connect(datalinksAction, &QAction::triggered, [this]() { datalinksWindow_.show(); });
 
     auto * sessionScanAct = toolsMenu->addAction(tr("Session Scanner"));
     connect(sessionScanAct, &QAction::triggered, [this]() {
@@ -525,10 +496,8 @@ void MainWindow::setupMenu()
         scanner.exec();
     });
 
-    QAction * diagnosticsAction =
-        toolsMenu->addAction(tr("Trouble Code Scanner"));
-    connect(diagnosticsAction, &QAction::triggered,
-            [this]() { diagnosticsWindow_.show(); });
+    QAction * diagnosticsAction = toolsMenu->addAction(tr("Trouble Code Scanner"));
+    connect(diagnosticsAction, &QAction::triggered, [this]() { diagnosticsWindow_.show(); });
 
     setMenuBar(menuBar);
 }
@@ -537,39 +506,35 @@ void MainWindow::setupStatusBar()
 {
     auto * comboPlatform = new QComboBox;
     comboPlatform->setModel(new PlatformsModel(&LT()->definitions(), this));
-    connect(comboPlatform, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [comboPlatform](int) {
-                QVariant var = comboPlatform->currentData(Qt::UserRole);
-                if (!var.canConvert<lt::PlatformPtr>())
-                {
-                    return;
-                }
-                LT()->setPlatform(var.value<lt::PlatformPtr>());
-            });
+    connect(comboPlatform, QOverload<int>::of(&QComboBox::currentIndexChanged), [comboPlatform](int) {
+        QVariant var = comboPlatform->currentData(Qt::UserRole);
+        if (!var.canConvert<lt::PlatformPtr>())
+        {
+            return;
+        }
+        LT()->setPlatform(var.value<lt::PlatformPtr>());
+    });
 
     comboDatalink_ = new QComboBox;
     comboDatalink_->setModel(&linksList_);
 
-    connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this](int) {
-                QVariant var = comboDatalink_->currentData(Qt::UserRole);
-                if (!var.canConvert<lt::DataLink *>())
-                {
-                    return;
-                }
+    connect(comboDatalink_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
+        QVariant var = comboDatalink_->currentData(Qt::UserRole);
+        if (!var.canConvert<lt::DataLink *>())
+        {
+            return;
+        }
 
-                LT()->setDatalink(var.value<lt::DataLink *>());
-            });
+        LT()->setDatalink(var.value<lt::DataLink *>());
+    });
 
     if (LT()->platform())
     {
-        comboPlatform->setCurrentText(
-            QString::fromStdString(LT()->platform()->name));
+        comboPlatform->setCurrentText(QString::fromStdString(LT()->platform()->name));
     }
     if (LT()->datalink())
     {
-        comboDatalink_->setCurrentText(
-            QString::fromStdString(LT()->datalink()->name()));
+        comboDatalink_->setCurrentText(QString::fromStdString(LT()->datalink()->name()));
     }
 
     statusBar()->addPermanentWidget(comboPlatform);
@@ -634,8 +599,7 @@ void MainWindow::newProject()
 
 void MainWindow::openProject()
 {
-    QString path = QFileDialog::getExistingDirectory(
-        nullptr, "LibreTuner Project Directory");
+    QString path = QFileDialog::getExistingDirectory(nullptr, "LibreTuner Project Directory");
     if (path.isNull())
         return;
 
@@ -668,4 +632,19 @@ void MainWindow::addToRecentMenu(const QString & path)
         LT()->openProject(path.toStdString());
         addRecent(path);
     });
+}
+
+void MainWindow::openCreateTune()
+{
+    // Check if an unsaved tune is in the workspace first
+    if (!checkSave())
+        return;
+
+    CreateTuneDialog dlg;
+    dlg.exec();
+    lt::TunePtr tune = dlg.tune();
+    if (!tune)
+        return;
+
+    setTune(dlg.tune());
 }

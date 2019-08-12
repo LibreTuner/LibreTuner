@@ -65,6 +65,7 @@ public:
 
 public slots:
     void setTable(const lt::TableDefinition * modTable);
+    void openCreateTune();
 
 private slots:
     void on_buttonDownloadRom_clicked();
