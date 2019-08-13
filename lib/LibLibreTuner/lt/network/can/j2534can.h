@@ -35,7 +35,7 @@ class J2534Can : public Can
 {
 public:
     // Attempts to open a J2534 channel for CAN. May throw an exception
-    J2534Can(const j2534::DevicePtr & device, uint32_t baudrate = 500000);
+    explicit J2534Can(const j2534::DevicePtr & device, uint32_t baudrate = 500000);
 
     ~J2534Can() override;
 

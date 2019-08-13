@@ -33,7 +33,7 @@ RomPtr Project::getRom(const std::string & filename)
     // Deserialize ROM with cereal
     cereal::BinaryInputArchive archive(file);
     Rom::MetaData meta;
-    std::vector<uint8_t> data;
+    MemoryBuffer data;
     archive(meta, data);
 
     // Find the model
@@ -54,6 +54,14 @@ RomPtr Project::getRom(const std::string & filename)
 
 TunePtr Project::loadTune(const std::string & filename)
 {
+    // Search the cache
+    if (auto it = tuneCache_.find(filename); it != tuneCache_.end())
+    {
+        // Check if the pointer has expired
+        if (auto tune = it->second.lock())
+            return tune;
+    }
+
     std::ifstream file(tunesDir_ / filename, std::ios::binary | std::ios::in);
     if (!file.is_open())
         return TunePtr();
@@ -71,6 +79,7 @@ TunePtr Project::loadTune(const std::string & filename)
     auto tune = std::make_shared<Tune>(rom, std::move(data));
     tune->setPath(tunesDir_ / filename);
     tune->setName(meta.name);
+    tuneCache_.emplace(filename, tune);
     return tune;
 }
 
@@ -245,7 +254,7 @@ RomPtr Project::importRom(const std::string & name,
             platform->name + "'");
 
     lt::RomPtr rom = createRom(name, model);
-    rom->setData(std::move(buffer));
+    rom->setData(MemoryBuffer(std::move(buffer)));
     return rom;
 }
 
@@ -257,6 +266,7 @@ bool Project::deleteRom(const std::string & filename)
 
 bool Project::deleteTune(const std::string & filename)
 {
+    tuneCache_.erase(filename);
     return fs::remove(tunesDir_ / filename);
 }
 

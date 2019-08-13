@@ -32,6 +32,21 @@ namespace fs = std::filesystem;
 
 namespace lt
 {
+namespace detail
+{
+EntriesPtr<double> createEntries(Endianness endianness, DataType dataType, const View & view)
+{
+    switch (endianness)
+    {
+    case Endianness::Big:
+        return create_entries<double, Endianness::Big>(dataType, view);
+    case Endianness::Little:
+        return create_entries<double, Endianness::Big>(dataType, view);
+    default:
+        return EntriesPtr<double>();
+    }
+}
+} // namespace detail
 
 bool Tune::dirty() const noexcept
 {
@@ -74,6 +89,7 @@ Table * Tune::getTable(const std::string & id, bool create)
         Table::Builder builder;
         builder.setBounds(def->minimum, def->maximum)
             .setName(def->name)
+            .setDescription(def->description)
             .setScale(def->scale)
             .setSize(def->width, def->height);
 
@@ -82,23 +98,11 @@ Table * Tune::getTable(const std::string & id, bool create)
         if (!def->axisY.empty())
             builder.setYAxis(getAxis(def->axisY, true));
 
-        switch (endianness())
-        {
-        case Endianness::Big:
-            builder.setEntries(create_entries<double, Endianness::Big>(
-                def->dataType,
-                data_.view(def->offset.value(), def->byteSize())));
-            break;
-        case Endianness ::Little:
-            builder.setEntries(create_entries<double, Endianness::Little>(
-                def->dataType,
-                data_.view(def->offset.value(), def->byteSize())));
-            break;
-        }
+        builder.setEntries(detail::createEntries(endianness(), def->dataType, data_.view(def->offset.value(), def->byteSize())));
+        builder.setBaseEntries(detail::createEntries(endianness(), def->dataType, base_->view(def->offset.value(), def->byteSize())));
 
         // Emplace table and use returned iterator to get the inserted table
-        return tables_.emplace(id, std::make_unique<Table>(builder.build()))
-            .first->second.get();
+        return tables_.emplace(id, std::make_unique<Table>(builder.build())).first->second.get();
     }
     return nullptr;
 }
@@ -130,22 +134,18 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
             if constexpr (std::is_same_v<T, LinearAxisDefinition>)
             {
                 // Linear axis
-                builder.setLinear(typeDefinition.start,
-                                  typeDefinition.increment);
+                builder.setLinear(typeDefinition.start, typeDefinition.increment);
             }
             else if constexpr (std::is_same_v<T, MemoryAxisDefinition>)
             {
                 // Memory axis
                 // TODO: offsets should work the same as tables.
                 int offset = base_->model()->getAxisOffset(id);
-                int size = typeDefinition.size *
-                           static_cast<int>(dataTypeSize(def->dataType));
+                int size = typeDefinition.size * static_cast<int>(dataTypeSize(def->dataType));
                 if (offset + size > base_->size())
                 {
-                    throw std::runtime_error(
-                        "axis exceeds rom size (rom size: " +
-                        std::to_string(base_->size()) + ", axis ends at " +
-                        std::to_string(offset + size) + ")");
+                    throw std::runtime_error("axis exceeds rom size (rom size: " + std::to_string(base_->size()) +
+                                             ", axis ends at " + std::to_string(offset + size) + ")");
                 }
 
                 View view = data_.view(offset, size);
@@ -153,20 +153,16 @@ AxisPtr Tune::getAxis(const std::string & id, bool create)
                 switch (endianness())
                 {
                 case Endianness::Big:
-                    builder.setEntries(create_entries<double, Endianness::Big>(
-                        def->dataType, view));
+                    builder.setEntries(create_entries<double, Endianness::Big>(def->dataType, view));
                     break;
                 case Endianness::Little:
-                    builder.setEntries(
-                        create_entries<double, Endianness::Little>(
-                            def->dataType, view));
+                    builder.setEntries(create_entries<double, Endianness::Little>(def->dataType, view));
                 }
             }
         },
         def->def);
 
-    return axes_.emplace(id, std::make_shared<Axis>(builder.build()))
-        .first->second;
+    return axes_.emplace(id, std::make_shared<Axis>(builder.build())).first->second;
 }
 
 Tune::MetaData Tune::metadata() const noexcept
@@ -186,8 +182,7 @@ void Tune::save() const
 
     std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open tune file '" + path_.string() +
-                                 "' for writing");
+        throw std::runtime_error("failed to open tune file '" + path_.string() + "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
     archive(metadata(), data_);
@@ -195,16 +190,13 @@ void Tune::save() const
 
 Tune::Tune(RomPtr rom) : Tune(rom, MemoryBuffer(rom->cbegin(), rom->cend())) {}
 
-Tune::Tune(RomPtr rom, MemoryBuffer && data)
-    : base_(std::move(rom)), data_(std::move(data))
+Tune::Tune(RomPtr rom, MemoryBuffer && data) : base_(std::move(rom)), data_(std::move(data))
 {
     assert(base_);
 
     if (base_->size() != size())
-        throw std::runtime_error("The base ROM and tune data size do not match (" +
-                                 std::to_string(base_->size()) + " vs " +
-                                 std::to_string(size()) +
-                                 "). The tune or base ROM is corrupt.");
+        throw std::runtime_error("The base ROM and tune data size do not match (" + std::to_string(base_->size()) +
+                                 " vs " + std::to_string(size()) + "). The tune or base ROM is corrupt.");
 }
 
 Rom::MetaData Rom::metadata() const noexcept
@@ -228,8 +220,7 @@ void Rom::save() const
 
     std::ofstream file(path_, std::ios::binary | std::ios::out);
     if (!file.is_open())
-        throw std::runtime_error("failed to open ROM file '" + path_.string() +
-                                 "' for writing");
+        throw std::runtime_error("failed to open ROM file '" + path_.string() + "' for writing");
 
     cereal::BinaryOutputArchive archive(file);
     archive(metadata(), data_);

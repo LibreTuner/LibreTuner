@@ -16,6 +16,7 @@ public:
     MemoryBuffer(const MemoryBuffer&) = delete;
     MemoryBuffer(MemoryBuffer&&) = default;
     MemoryBuffer & operator=(const MemoryBuffer&) = delete;
+    MemoryBuffer & operator=(MemoryBuffer&&) = default;
 
     MemoryBuffer() = default;
     explicit MemoryBuffer(std::vector<uint8_t> && data) : data_(std::move(data))

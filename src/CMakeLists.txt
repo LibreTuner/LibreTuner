@@ -45,8 +45,6 @@ set(libretuner_SRC
     ui/backgroundtask.h
     ui/qcustomplot.cpp
     ui/qcustomplot.h
-        ui/windows/createtunedialog.cpp
-        ui/windows/createtunedialog.h
     ui/fileselectwidget.cpp
     ui/fileselectwidget.h
     ui/flasherwindow.cpp
@@ -91,6 +89,8 @@ set(libretuner_SRC
     ui/windows/vehicleinformationwidget.h
     ui/windows/diagnosticswidget.cpp
     ui/windows/diagnosticswidget.h
+    ui/windows/createtunedialog.cpp
+    ui/windows/createtunedialog.h
     
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
@@ -102,7 +102,10 @@ set(libretuner_SRC
     ui/widget/datalinksettings.h
     ui/widget/projectcombo.cpp
     ui/widget/projectcombo.h
-
+    ui/widget/scalarview.cpp
+    ui/widget/scalarview.h
+    ui/widget/tableview.cpp
+    ui/widget/tableview.h
 
     models/tablemodel.cpp
     models/tablemodel.h

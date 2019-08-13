@@ -71,7 +71,9 @@ public:
     }
 
     // Sets the ROM data
-    void setData(std::vector<uint8_t> && data) { data_ = std::move(data); }
+    void setData(MemoryBuffer && data) { data_ = std::move(data); }
+    View view(int offset, int size) { return data_.view(offset, size); }
+    View view() { return data_.view(); }
 
     struct MetaData
     {
@@ -101,10 +103,7 @@ private:
 
     std::filesystem::path path_;
 
-    // Tunes SHOULD NOT be tied to ROMs but instead to platforms
-    // std::vector<std::unique_ptr<Tune>> tunes_;
-
-    std::vector<uint8_t> data_;
+    MemoryBuffer data_;
 };
 using RomPtr = std::shared_ptr<Rom>;
 using WeakRomPtr = std::weak_ptr<Rom>;
@@ -190,6 +189,7 @@ private:
     std::filesystem::path path_;
 };
 using TunePtr = std::shared_ptr<Tune>;
+using WeakTunePtr = std::weak_ptr<Tune>;
 } // namespace lt
 
 #endif // ROM_H

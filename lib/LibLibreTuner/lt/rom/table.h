@@ -19,7 +19,7 @@ template <typename PresentedType> class Entries
 public:
     virtual PresentedType get(int index) const = 0;
     virtual void set(int index, PresentedType value) = 0;
-    virtual int size() const noexcept =0;
+    virtual int size() const noexcept = 0;
 
     virtual ~Entries() = default;
 };
@@ -27,24 +27,17 @@ public:
 template <typename T> using EntriesPtr = std::unique_ptr<Entries<T>>;
 
 // Type-defined implementation of Entries
-template <typename PresentedType, typename T, Endianness endianness>
-struct EntriesImpl : public Entries<PresentedType>
+template <typename PresentedType, typename T, Endianness endianness> struct EntriesImpl : public Entries<PresentedType>
 {
 public:
     EntriesImpl(View view) : view_(std::move(view)) {}
 
     PresentedType get(int index) const override
     {
-        return static_cast<PresentedType>(
-            view_.get<T, endianness>(index * sizeof(T)));
+        return static_cast<PresentedType>(view_.get<T, endianness>(index * sizeof(T)));
     }
-    void set(int index, PresentedType value)
-    {
-        view_.set<T, endianness>(static_cast<T>(value), index * sizeof(T));
-    }
-    int size() const noexcept {
-        return view_.size() / sizeof(T);
-    }
+    void set(int index, PresentedType value) { view_.set<T, endianness>(static_cast<T>(value), index * sizeof(T)); }
+    int size() const noexcept { return view_.size() / sizeof(T); }
 
 private:
     View view_;
@@ -56,26 +49,19 @@ EntriesPtr<PresentedType> create_entries(DataType type, View view)
     switch (type)
     {
     case DataType::Uint8:
-        return std::make_unique<
-            EntriesImpl<PresentedType, uint8_t, endianness>>(view);
+        return std::make_unique<EntriesImpl<PresentedType, uint8_t, endianness>>(view);
     case DataType::Uint16:
-        return std::make_unique<
-            EntriesImpl<PresentedType, uint16_t, endianness>>(view);
+        return std::make_unique<EntriesImpl<PresentedType, uint16_t, endianness>>(view);
     case DataType::Uint32:
-        return std::make_unique<
-            EntriesImpl<PresentedType, uint32_t, endianness>>(view);
+        return std::make_unique<EntriesImpl<PresentedType, uint32_t, endianness>>(view);
     case DataType::Int8:
-        return std::make_unique<EntriesImpl<PresentedType, int8_t, endianness>>(
-            view);
+        return std::make_unique<EntriesImpl<PresentedType, int8_t, endianness>>(view);
     case DataType::Int16:
-        return std::make_unique<
-            EntriesImpl<PresentedType, int16_t, endianness>>(view);
+        return std::make_unique<EntriesImpl<PresentedType, int16_t, endianness>>(view);
     case DataType::Int32:
-        return std::make_unique<
-            EntriesImpl<PresentedType, int32_t, endianness>>(view);
+        return std::make_unique<EntriesImpl<PresentedType, int32_t, endianness>>(view);
     case DataType::Float:
-        return std::make_unique<EntriesImpl<PresentedType, float, endianness>>(
-            view);
+        return std::make_unique<EntriesImpl<PresentedType, float, endianness>>(view);
     }
 }
 
@@ -83,18 +69,14 @@ template <typename PresentedType> class AxisEntries
 {
 public:
     virtual ~AxisEntries() = default;
-    virtual PresentedType get(int index) const =0;
+    virtual PresentedType get(int index) const = 0;
 };
-template<typename PresentedType>
-using AxisEntriesPtr = std::unique_ptr<AxisEntries<PresentedType>>;
+template <typename PresentedType> using AxisEntriesPtr = std::unique_ptr<AxisEntries<PresentedType>>;
 
 template <typename PresentedType> class AxisMemoryEntries : public AxisEntries<PresentedType>
 {
 public:
-    AxisMemoryEntries(EntriesPtr<PresentedType> && entries)
-        : entries_(std::move(entries))
-    {
-    }
+    AxisMemoryEntries(EntriesPtr<PresentedType> && entries) : entries_(std::move(entries)) {}
 
     PresentedType get(int index) const override { return entries_->get(index); }
 
@@ -105,15 +87,9 @@ private:
 template <typename PresentedType> class AxisLinearEntries : public AxisEntries<PresentedType>
 {
 public:
-    AxisLinearEntries(PresentedType first, PresentedType step)
-        : first_(first), step_(step)
-    {
-    }
+    AxisLinearEntries(PresentedType first, PresentedType step) : first_(first), step_(step) {}
 
-    PresentedType get(int index) const override
-    {
-        return first_ + index * step_;
-    }
+    PresentedType get(int index) const override { return first_ + index * step_; }
 
 private:
     PresentedType first_, step_;
@@ -123,8 +99,7 @@ private:
 template <typename PresentedType> class BasicAxis
 {
 private:
-    explicit BasicAxis(AxisEntriesPtr<PresentedType> && entries,
-                       std::string && name, int size)
+    explicit BasicAxis(AxisEntriesPtr<PresentedType> && entries, std::string && name, int size)
         : entries_(std::move(entries)), size_(size), name_(std::move(name))
     {
     }
@@ -156,10 +131,8 @@ public:
         BasicAxis<PresentedType> build()
         {
             if (!entries_)
-                throw std::runtime_error(
-                    "attempt to build axis without setting entries");
-            return BasicAxis<PresentedType>(std::move(entries_),
-                                            std::move(name_), size_);
+                throw std::runtime_error("attempt to build axis without setting entries");
+            return BasicAxis<PresentedType>(std::move(entries_), std::move(name_), size_);
         }
 
     private:
@@ -207,8 +180,7 @@ public:
     {
         assert(row >= 0 && column >= 0);
         if (row >= height_ || column >= width_)
-            throw std::runtime_error("point (" + std::to_string(row) + ", " +
-                                     std::to_string(column) +
+            throw std::runtime_error("point (" + std::to_string(row) + ", " + std::to_string(column) +
                                      ") out of bounds.");
         return row * width_ + column;
     }
@@ -217,21 +189,40 @@ public:
      * exception if the point is out-of-bounds. */
     PresentedType get(int row, int column) const
     {
-        return static_cast<PresentedType>(entries_->get(index(row, column)) *
-                                          scale_);
+        return static_cast<PresentedType>(entries_->get(index(row, column)) * scale_);
+    }
+
+    /* Returns the entry at position (`row`, `column`) of base entries. Throws an
+     * exception if the point is out-of-bounds. */
+    PresentedType getBase(int row, int column) const
+    {
+        if (!baseEntries_)
+            return PresentedType{};
+        return static_cast<PresentedType>(baseEntries_->get(index(row, column)) * scale_);
+    }
+
+    /* Resets cell to base cell if one exists. Returns true if cell was reset. */
+    bool reset(int row, int column)
+    {
+        if (!baseEntries_)
+            return false;
+
+        int idx = index(row, column);
+        entries_->set(idx, baseEntries_->get(idx));
+        return true;
     }
 
     /* Sets the entry at position (`row`, `column`) to `value`. Throws
      * an exception if the point is out-of-bounds. */
-    void set(int row, int column, PresentedType value) noexcept
+    void set(int row, int column, PresentedType value)
     {
-        entries_->set(index(row, column),
-                      static_cast<PresentedType>(value / scale_));
+        entries_->set(index(row, column), static_cast<PresentedType>(value / scale_));
         dirty_ = true;
     }
 
     // Getters
     inline const std::string & name() const noexcept { return name_; }
+    inline const std::string & description() const noexcept { return description_; }
     inline int width() const noexcept { return width_; }
     inline int height() const noexcept { return height_; }
     inline AxisTypePtr xAxis() const noexcept { return xAxis_; }
@@ -247,17 +238,11 @@ public:
     inline void clearDirty() noexcept { dirty_ = false; }
 
     // Returns true if the value is within the entry bounds
-    inline bool inBounds(PresentedType value) const noexcept
-    {
-        return bounds_.within(value);
-    }
+    inline bool inBounds(PresentedType value) const noexcept { return bounds_.within(value); }
 
-    /* Returns true if the table holds a single value
+    /* Returns true if the table contains a single cell
      * (width = height = 1) */
-    inline bool isSingle() const noexcept
-    {
-        return width_ == 1 && height_ == 1;
-    }
+    inline bool isScalar() const noexcept { return width_ == 1 && height_ == 1; }
 
     /* Returns true if the table contains a single row
      * (height = 1) */
@@ -265,19 +250,20 @@ public:
 
 private:
     std::string name_;
+    std::string description_;
     Bounds<PresentedType> bounds_;
     EntriesPtr<PresentedType> entries_;
+    EntriesPtr<PresentedType> baseEntries_;
     int width_, height_;
     AxisTypePtr xAxis_, yAxis_;
     double scale_;
     bool dirty_{false};
 
-    BasicTable(std::string name, Bounds<PresentedType> bounds,
-               std::unique_ptr<Entries<PresentedType>> && entries, int width,
-               int height, AxisTypePtr && xAxis, AxisTypePtr && yAxis,
-               double scale)
-        : name_(std::move(name)), bounds_(std::move(bounds)),
-          entries_(std::move(entries)), width_(width), height_(height),
+    BasicTable(std::string name, std::string description, Bounds<PresentedType> bounds,
+               EntriesPtr<PresentedType> && entries, EntriesPtr<PresentedType> && baseEntries, int width, int height,
+               AxisTypePtr && xAxis, AxisTypePtr && yAxis, double scale)
+        : name_(std::move(name)), description_(std::move(description)), bounds_(std::move(bounds)),
+          entries_(std::move(entries)), baseEntries_(std::move(baseEntries)), width_(width), height_(height),
           xAxis_(std::move(xAxis)), yAxis_(std::move(yAxis)), scale_(scale)
     {
         assert(entries_);
@@ -301,8 +287,13 @@ public:
             return *this;
         }
 
-        inline Builder & setBounds(PresentedType minimum,
-                                   PresentedType maximum) noexcept
+        inline Builder & setDescription(std::string description) noexcept
+        {
+            description_ = std::move(description);
+            return *this;
+        }
+
+        inline Builder & setBounds(PresentedType minimum, PresentedType maximum) noexcept
         {
             bounds_.minimum = minimum;
             bounds_.maximum = maximum;
@@ -321,6 +312,12 @@ public:
             return *this;
         }
 
+        Builder & setBaseEntries(EntriesPtr<PresentedType> && entries)
+        {
+            baseEntries_ = std::move(entries);
+            return *this;
+        }
+
         inline Builder & setXAxis(AxisTypePtr xAxis) noexcept
         {
             xAxis_ = std::move(xAxis);
@@ -333,12 +330,20 @@ public:
             return *this;
         }
 
-        BasicTable<PresentedType> build() noexcept
+        BasicTable<PresentedType> build()
         {
-            // TODO: Verify entry size
-            return BasicTable<PresentedType>(
-                std::move(name_), std::move(bounds_), std::move(entries_),
-                width_, height_, std::move(xAxis_), std::move(yAxis_), scale_);
+            if (!entries_)
+                throw std::runtime_error("table entries were not set before build()");
+            if (entries_->size() != width_ * height_)
+                throw std::runtime_error("entries size does not match given size (" + std::to_string(entries_->size()) +
+                                         " != " + std::to_string(width_ * height_) + ")");
+            if (baseEntries_ && baseEntries_->size() != entries_->size())
+                throw std::runtime_error("base entries size does not match entries size (" +
+                                         std::to_string(baseEntries_->size()) +
+                                         " != " + std::to_string(entries_->size()) + ")");
+            return BasicTable<PresentedType>(std::move(name_), std::move(description_), std::move(bounds_),
+                                             std::move(entries_), std::move(baseEntries_), width_, height_,
+                                             std::move(xAxis_), std::move(yAxis_), scale_);
         }
 
     private:
@@ -347,8 +352,10 @@ public:
         AxisTypePtr xAxis_;
         AxisTypePtr yAxis_;
         std::string name_;
+        std::string description_;
         Bounds<PresentedType> bounds_;
         EntriesPtr<PresentedType> entries_;
+        EntriesPtr<PresentedType> baseEntries_;
     };
     friend class Builder;
 };

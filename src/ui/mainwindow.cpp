@@ -30,6 +30,7 @@
 #include "docks/sidebarwidget.h"
 #include "docks/tableswidget.h"
 #include "ui/windows/diagnosticswidget.h"
+#include "widget/scalarview.h"
 
 #include "windows/definitionswindow.h"
 
@@ -46,6 +47,7 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QListView>
+#include <QMdiArea>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -58,6 +60,7 @@
 #include <database/definitions.h>
 #include <future>
 #include <lt/link/datalink.h>
+#include <ui/widget/tableview.h>
 #include <ui/windows/newprojectdialog.h>
 
 MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), linksList_(LT()->links())
@@ -82,8 +85,6 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), linksList_(LT()-
     loggingDock_ = createLoggingDock();
     sidebarDock_ = createSidebarDock();
     tablesDock_ = createTablesDock();
-    editorDock_ = createEditorDock();
-    graphDock_ = createGraphDock();
     explorerDock_ = createExplorerDock();
 
     restoreDocks();
@@ -135,8 +136,6 @@ void MainWindow::restoreDocks()
     // Top (central)
 
     tabifyDockWidget(overviewDock_, loggingDock_);
-    tabifyDockWidget(overviewDock_, editorDock_);
-    tabifyDockWidget(overviewDock_, graphDock_);
 }
 
 void MainWindow::loadSettings()
@@ -162,13 +161,9 @@ void MainWindow::loadSettings()
 bool MainWindow::checkSave()
 {
     if (!tune_)
-    {
         return true;
-    }
     if (!tune_->dirty())
-    {
         return true;
-    }
 
     QMessageBox mb;
     mb.setText(tr("This tune has been modified"));
@@ -198,12 +193,17 @@ bool MainWindow::checkSave()
 
 void MainWindow::setTune(const lt::TunePtr & tune)
 {
+    if (tune_ == tune)
+        return;
     // Save any previous tunes
     if (!checkSave())
         return;
 
-    tableModel_.setTable(nullptr);
-    emit tableChanged(nullptr);
+    for (auto & [id, view] : views_)
+    {
+        if (view)
+            view->close();
+    }
 
     tune_ = tune;
     emit tuneChanged(tune_.get());
@@ -212,13 +212,9 @@ void MainWindow::setTune(const lt::TunePtr & tune)
     saveCurrentAction_->setEnabled(!!tune);
 
     if (tune)
-    {
         setWindowTitle(tr("LibreTuner") + " - " + QString::fromStdString(tune->name()));
-    }
     else
-    {
         setWindowTitle(tr("LibreTuner"));
-    }
 }
 
 void MainWindow::saveSettings()
@@ -297,11 +293,43 @@ void MainWindow::setTable(const lt::TableDefinition * table)
 
     sidebar_->fillTableInfo(table);
 
+    if (auto it = views_.find(table->id); it != views_.end())
+    {
+        if (it->second)
+        {
+            it->second->show();
+            return;
+        }
+    }
+
     catchWarning(
         [&]() {
             lt::Table * tab = tune_->getTable(table->id, true);
-            tableModel_.setTable(tab);
-            emit tableChanged(tab);
+            if (tab == nullptr)
+                return;
+            if (tab->isScalar())
+            {
+                auto * view = new ScalarView;
+                view->setTable(tab);
+                view->setAttribute(Qt::WA_DeleteOnClose);
+                view->setWindowFlag(Qt::WindowStaysOnTopHint);
+                view->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
+                view->show();
+                views_[table->id] = view;
+            }
+            else
+            {
+                auto * view = new TableView;
+                view->resize(QGuiApplication::primaryScreen()->size() * 0.5);
+                view->setTable(tab);
+                view->setAttribute(Qt::WA_DeleteOnClose);
+                view->setWindowFlag(Qt::WindowStaysOnTopHint);
+                view->show();
+                views_[table->id] = view;
+            }
+
+            // tableModel_.setTable(tab);
+            // emit tableChanged(tab);
         },
         tr("Error creating table"));
 }
@@ -316,22 +344,9 @@ QDockWidget * MainWindow::createTablesDock()
     connect(tables_, &TablesWidget::activated, this, &MainWindow::setTable);
     connect(this, &MainWindow::tuneChanged, [this](const lt::Tune * tune) {
         if (tune == nullptr)
-        {
             return;
-        }
         tables_->setModel(*tune->base()->model());
     });
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-QDockWidget * MainWindow::createEditorDock()
-{
-    QDockWidget * dock = new QDockWidget("Editor", this);
-    dock->setObjectName("editor");
-    editor_ = new EditorWidget(dock);
-    editor_->setModel(&tableModel_);
-    dock->setWidget(editor_);
     docks_.emplace_back(dock);
     return dock;
 }
@@ -342,19 +357,6 @@ QDockWidget * MainWindow::createOverviewDock()
     dock->setObjectName("overview");
 
     dock->setWidget(new OverviewWidget);
-
-    docks_.emplace_back(dock);
-    return dock;
-}
-
-QDockWidget * MainWindow::createGraphDock()
-{
-    QDockWidget * dock = new QDockWidget("Graph", this);
-
-    graph_ = new GraphWidget(dock);
-    dock->setWidget(graph_);
-    dock->setObjectName("graph");
-    graph_->setModel(&tableModel_);
 
     docks_.emplace_back(dock);
     return dock;

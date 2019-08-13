@@ -25,6 +25,7 @@
 #include <QPointer>
 
 #include <filesystem>
+#include <unordered_map>
 
 #include "database/links.h"
 #include "datalinkswidget.h"
@@ -32,6 +33,7 @@
 #include "ui/windows/diagnosticswidget.h"
 
 class QListView;
+class QMdiArea;
 
 class EditorWidget;
 class TablesWidget;
@@ -76,8 +78,6 @@ private slots:
     void openTune(const lt::TunePtr & tune);
 
 signals:
-    void tableChanged(lt::Table * table);
-
     void tuneChanged(const lt::Tune * tune);
 
 private:
@@ -92,8 +92,6 @@ private:
     QMenu * recentMenu_;
 
     TablesWidget * tables_;
-    EditorWidget * editor_;
-    GraphWidget * graph_;
     ExplorerWidget * explorer_;
 
     QAction * flashCurrentAction_;
@@ -125,8 +123,6 @@ private:
     QDockWidget * createLogDock();
     QDockWidget * createSidebarDock();
     QDockWidget * createTablesDock();
-    QDockWidget * createEditorDock();
-    QDockWidget * createGraphDock();
     QDockWidget * createExplorerDock();
 
     std::vector<QDockWidget *> docks_;
@@ -134,7 +130,6 @@ private:
     lt::TunePtr tune_;
 
     LinksListModel linksList_;
-    TableModel tableModel_;
 
     DatalinksWidget datalinksWindow_;
     DiagnosticsWidget diagnosticsWindow_;
@@ -143,6 +138,8 @@ private:
     VehicleInformationWidget * infoWidget_{nullptr};
 
     QStringList recentProjects_;
+
+    std::unordered_map<std::string, QPointer<QWidget>> views_;
 };
 
 #endif // MAINWINDOW_H

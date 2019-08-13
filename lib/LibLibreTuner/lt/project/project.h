@@ -91,6 +91,7 @@ private:
 
     // Caches loaded ROMs
     std::unordered_map<std::string, WeakRomPtr> cache_;
+    std::unordered_map<std::string, WeakTunePtr> tuneCache_;
     const Platforms & platforms_;
 
     /* If true, tunes and ROMs must have the proper extension

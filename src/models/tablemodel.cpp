@@ -44,7 +44,7 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
 
     if (role == Qt::ForegroundRole)
     {
-        if (table_->isSingle())
+        if (table_->isScalar())
             return QVariant();
 
         return QColor(0, 0, 0);
@@ -52,7 +52,7 @@ QVariant TableModel::data(const QModelIndex & index, int role) const
 
     if (role == Qt::BackgroundColorRole)
     {
-        if (table_->isSingle())
+        if (table_->isScalar())
             return QVariant();
 
         double diff = table_->maximum() - table_->minimum();
@@ -86,28 +86,21 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
 bool TableModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     if (table_ == nullptr || !index.isValid())
-    {
         return false;
-    }
 
     if (role != Qt::EditRole)
-    {
         return false;
-    }
 
     if (index.row() < 0 || index.row() >= table_->height() || index.column() < 0 || index.column() >= table_->width())
-    {
         return false;
-    }
 
     bool ok;
     double val = value.toDouble(&ok);
     if (!ok)
-    {
         return false;
-    }
 
     table_->set(index.row(), index.column(), val);
+    emit dataChanged(index, index);
     return true;
 }
 

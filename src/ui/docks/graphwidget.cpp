@@ -27,20 +27,13 @@ using namespace QtCharts;
 
 GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
 {
+    // 3D
     surface_ = new QtDataVisualization::Q3DSurface;
     container_ = QWidget::createWindowContainer(surface_);
-    chart_ = new QChart();
-    chart_->legend()->hide();
-    chartView_ = new QChartView(chart_, this);
-    chartView_->setRenderHint(QPainter::Antialiasing);
 
-    chartView_->setVisible(false);
-    container_->setVisible(false);
-
-    auto * hLayout = new QHBoxLayout;
-    setLayout(hLayout);
-    hLayout->addWidget(container_);
-    hLayout->addWidget(chartView_);
+    auto * theme = new QtDataVisualization::Q3DTheme(QtDataVisualization::Q3DTheme::ThemeIsabelle);
+    surface_->addTheme(theme);
+    surface_->setActiveTheme(theme);
 
     series3d_ = new QtDataVisualization::QSurface3DSeries;
     // I have no fucking clue if Q3DSeries takes ownership of series
@@ -57,9 +50,23 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     series3d_->setBaseGradient(gr);
     series3d_->setColorStyle(
         QtDataVisualization::Q3DTheme::ColorStyleRangeGradient);
+
+    // 2D
+    chart_ = new QChart();
+    chart_->legend()->hide();
+    chartView_ = new QChartView(chart_, this);
+    chartView_->setRenderHint(QPainter::Antialiasing);
+
+    chartView_->setVisible(false);
+    //container_->setVisible(false);
+
+    auto * hLayout = new QHBoxLayout;
+    setLayout(hLayout);
+    hLayout->addWidget(container_);
+    hLayout->addWidget(chartView_);
 }
 
-GraphWidget::~GraphWidget() { delete container_; }
+GraphWidget::~GraphWidget() { /*delete container_;*/ }
 
 void GraphWidget::setModel(TableModel * model)
 {
@@ -112,7 +119,8 @@ void GraphWidget::refresh()
             surface_->axisZ()->setTitleVisible(true);
 
         chartView_->setVisible(false);
-        container_->setVisible(true);
+        //container_->setVisible(true);
+        container_->show();
     }
     else if (table->height() == 1 && table->width() > 1)
     {

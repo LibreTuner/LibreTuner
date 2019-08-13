@@ -172,7 +172,7 @@ void DownloadWindow::download()
                     throw std::runtime_error("Could not identify calibration");
 
                 lt::RomPtr rom = project->createRom(lineName_->text().toStdString(), model);
-                rom->setData(std::vector<uint8_t>(data.first, data.first + data.second));
+                rom->setData(lt::MemoryBuffer(data.first, std::next(data.first, data.second)));
                 rom->save();
 
                 QMessageBox(QMessageBox::Information, "Download Finished", "ROM downloaded successfully").exec();
