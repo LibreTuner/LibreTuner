@@ -114,5 +114,6 @@ void TableView::axesChanged()
 void TableView::setTable(lt::Table * table)
 {
     model_.setTable(table);
-    // axesChanged();
+    if (table != nullptr)
+        setWindowTitle(QString::fromStdString(table->name()));
 }
