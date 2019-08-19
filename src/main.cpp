@@ -18,13 +18,6 @@
 
 #include "libretuner.h"
 
-#include "lt/serialize/serialize.h"
-#include "lt/serialize/sinks.h"
-
-#include <algorithm>
-#include <csignal>
-#include <iostream>
-
 int main(int argc, char * argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
