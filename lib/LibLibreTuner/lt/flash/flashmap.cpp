@@ -21,6 +21,7 @@
 #include "../rom/rom.h"
 
 #include <cassert>
+#include <utility>
 
 namespace lt
 {

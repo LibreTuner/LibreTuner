@@ -3,18 +3,18 @@
 namespace lt
 {
 
-const TableDefinition * Model::getTable(const std::string & id) const
+const TableDefinition * Model::getTable(const std::string & tableId) const
 {
-    if (auto it = tables.find(id); it != tables.end())
+    if (auto it = tables.find(tableId); it != tables.end())
     {
         return &it->second;
     }
     return nullptr;
 }
 
-std::size_t Model::getAxisOffset(const std::string & id) const noexcept
+std::size_t Model::getAxisOffset(const std::string & axisId) const noexcept
 {
-    auto it = axisOffsets.find(id);
+    auto it = axisOffsets.find(axisId);
     if (it == axisOffsets.end())
     {
         return 0;

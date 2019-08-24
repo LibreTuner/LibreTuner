@@ -18,7 +18,7 @@ public:
 
     template <typename T, Endianness endianness> T get(int offset = 0) const
     {
-        if (offset + sizeof(T) > size())
+        if (offset + static_cast<int>(sizeof(T)) > size())
             throw std::runtime_error("TuneView::get(): index out of range");
         auto it = std::next(buffer_.begin(), offset_ + offset);
 
@@ -36,7 +36,7 @@ public:
 
     template <typename T, Endianness endianness> void set(T t, int offset = 0)
     {
-        if (offset + sizeof(T) > size())
+        if (offset + static_cast<int>(sizeof(T)) > size())
             throw std::runtime_error("TuneView::get(): index out of range");
         auto it = std::next(buffer_.begin(), offset_ + offset);
 

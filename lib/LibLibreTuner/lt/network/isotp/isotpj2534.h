@@ -26,11 +26,11 @@ public:
     }
 
 private:
-    IsoTpOptions options_;
     j2534::Channel channel_;
+    IsoTpOptions options_;
 };
 
-};
+}
 
 
 

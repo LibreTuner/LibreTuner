@@ -22,7 +22,7 @@ struct TreeItem
         qDeleteAll(children);
     }
 
-    virtual QVariant data(int column, int role) const { return QVariant(); }
+    virtual QVariant data(int /*column*/, int /*role*/) const { return QVariant(); }
 
     TreeItem * child(int index)
     {
@@ -272,7 +272,7 @@ int Projects::rowCount(const QModelIndex & parent) const
     return parentItem->children.size();
 }
 
-int Projects::columnCount(const QModelIndex & parent) const { return 1; }
+int Projects::columnCount(const QModelIndex & /*parent*/) const { return 1; }
 
 QVariant Projects::data(const QModelIndex & index, int role) const
 {
@@ -306,8 +306,8 @@ void Projects::addProject(lt::ProjectPtr project)
     tunesDirectoryChanged(tunesDir);
 }
 
-QVariant Projects::headerData(int section, Qt::Orientation orientation,
-                              int role) const
+QVariant Projects::headerData(int /*section*/, Qt::Orientation /*orientation*/,
+                              int /*role*/) const
 {
     return QVariant();
 }

@@ -62,6 +62,8 @@ EntriesPtr<PresentedType> create_entries(DataType type, View view)
         return std::make_unique<EntriesImpl<PresentedType, int32_t, endianness>>(view);
     case DataType::Float:
         return std::make_unique<EntriesImpl<PresentedType, float, endianness>>(view);
+    default:
+        return EntriesPtr<PresentedType>();
     }
 }
 

@@ -108,7 +108,7 @@ bool J2534Can::recv(CanMessage & message, std::chrono::milliseconds timeout)
         channel_.readMsgs(msgs.data(), pNumMsgs, timeout.count());
 
         // Fill buffer
-        for (int i = 0; i < pNumMsgs; ++i)
+        for (std::size_t i = 0; i < pNumMsgs; ++i)
         {
             j2534::PASSTHRU_MSG & msg = msgs[i];
             if (msg.DataSize < 4)
