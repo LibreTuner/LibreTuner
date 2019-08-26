@@ -8,6 +8,7 @@
 #include "../buffer/view.h"
 #include "../support/types.h"
 #include "../support/util.hpp"
+#include "unit.h"
 
 namespace lt
 {
@@ -188,19 +189,25 @@ public:
     }
 
     /* Returns the entry at position (`row`, `column`). Throws an
-     * exception if the point is out-of-bounds. */
+     * exception if the point is out-of-bounds. Handles scale and unit conversion. */
     PresentedType get(int row, int column) const
     {
-        return static_cast<PresentedType>(entries_->get(index(row, column)) * scale_);
+        PresentedType entry = static_cast<PresentedType>(entries_->get(index(row, column)) * scale_);
+        if (!unit_)
+            return entry;
+        return unit_->convert(entry);
     }
 
     /* Returns the entry at position (`row`, `column`) of base entries. Throws an
-     * exception if the point is out-of-bounds. */
+     * exception if the point is out-of-bounds. Handles scale and unit conversion. */
     PresentedType getBase(int row, int column) const
     {
         if (!baseEntries_)
             return PresentedType{};
-        return static_cast<PresentedType>(baseEntries_->get(index(row, column)) * scale_);
+        PresentedType entry = static_cast<PresentedType>(baseEntries_->get(index(row, column)) * scale_);
+        if (!unit_)
+            return entry;
+        return unit_->convert(entry);
     }
 
     /* Resets cell to base cell if one exists. Returns true if cell was reset. */
@@ -215,10 +222,13 @@ public:
     }
 
     /* Sets the entry at position (`row`, `column`) to `value`. Throws
-     * an exception if the point is out-of-bounds. */
+     * an exception if the point is out-of-bounds. Handles scale and unit conversion. */
     void set(int row, int column, PresentedType value)
     {
-        entries_->set(index(row, column), static_cast<PresentedType>(value / scale_));
+        double entry = value / scale_;
+        if (unit_)
+            entry = unit_->convert(entry);
+        entries_->set(index(row, column), static_cast<PresentedType>(entry));
         dirty_ = true;
     }
 
@@ -231,6 +241,7 @@ public:
     inline AxisTypePtr yAxis() const noexcept { return yAxis_; }
     inline PresentedType minimum() const noexcept { return bounds_.minimum; }
     inline PresentedType maximum() const noexcept { return bounds_.maximum; }
+    inline UnitGroup * unit() const noexcept { return unit_.get(); }
 
     /* Returns true if the dirty bit is set. Thit bit is set
      * every time set() is called. */
@@ -260,13 +271,14 @@ private:
     AxisTypePtr xAxis_, yAxis_;
     double scale_;
     bool dirty_{false};
+    std::unique_ptr<UnitGroup> unit_;
 
     BasicTable(std::string name, std::string description, Bounds<PresentedType> bounds,
                EntriesPtr<PresentedType> && entries, EntriesPtr<PresentedType> && baseEntries, int width, int height,
-               AxisTypePtr && xAxis, AxisTypePtr && yAxis, double scale)
+               AxisTypePtr && xAxis, AxisTypePtr && yAxis, double scale, std::unique_ptr<UnitGroup> && unit)
         : name_(std::move(name)), description_(std::move(description)), bounds_(std::move(bounds)),
           entries_(std::move(entries)), baseEntries_(std::move(baseEntries)), width_(width), height_(height),
-          xAxis_(std::move(xAxis)), yAxis_(std::move(yAxis)), scale_(scale)
+          xAxis_(std::move(xAxis)), yAxis_(std::move(yAxis)), scale_(scale), unit_(std::move(unit))
     {
         assert(entries_);
     }
@@ -345,7 +357,7 @@ public:
                                          " != " + std::to_string(entries_->size()) + ")");
             return BasicTable<PresentedType>(std::move(name_), std::move(description_), std::move(bounds_),
                                              std::move(entries_), std::move(baseEntries_), width_, height_,
-                                             std::move(xAxis_), std::move(yAxis_), scale_);
+                                             std::move(xAxis_), std::move(yAxis_), scale_, std::move(unit_));
         }
 
     private:
@@ -358,6 +370,7 @@ public:
         Bounds<PresentedType> bounds_;
         EntriesPtr<PresentedType> entries_;
         EntriesPtr<PresentedType> baseEntries_;
+        std::unique_ptr<UnitGroup> unit_;
     };
     friend class Builder;
 };
