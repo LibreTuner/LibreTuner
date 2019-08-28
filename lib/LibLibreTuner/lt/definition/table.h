@@ -48,6 +48,7 @@ struct TableDefinition
     std::string name;
     std::string description;
     std::string category;
+    std::string unit;
     DataType dataType;
     DataType storedDataType;
     int width{1};

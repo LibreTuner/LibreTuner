@@ -75,6 +75,7 @@ void from_json(const json & j, lt::TableDefinition & table)
 {
     j.at("name").get_to(table.name);
     j.at("description").get_to(table.description);
+    j.at("unit").get_to(table.unit);
 
     if (auto it = j.find("category"); it != j.end())
         it->get_to(table.category);

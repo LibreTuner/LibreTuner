@@ -344,6 +344,12 @@ public:
             return *this;
         }
 
+        inline Builder & setUnit(std::unique_ptr<UnitGroup> && unit) noexcept
+        {
+            unit_ = std::move(unit);
+            return *this;
+        }
+
         BasicTable<PresentedType> build()
         {
             if (!entries_)

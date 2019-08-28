@@ -90,6 +90,7 @@ Table * Tune::getTable(const std::string & id, bool create)
         builder.setBounds(def->minimum, def->maximum)
             .setName(def->name)
             .setDescription(def->description)
+            .setUnit(make_group(def->unit))
             .setScale(def->scale)
             .setSize(def->width, def->height);
 
