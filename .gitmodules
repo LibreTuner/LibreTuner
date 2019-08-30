@@ -1,9 +1,6 @@
 [submodule "lib/cparse"]
 	path = lib/LibLibreTuner/lib/cparse
 	url = https://github.com/LibreTuner/cparse.git
-[submodule "lib/yaml"]
-	path = lib/yaml
-	url = https://github.com/jbeder/yaml-cpp.git
 [submodule "lib/QHexView"]
 	path = lib/QHexView
 	url = https://github.com/Dax89/QHexView.git
@@ -19,9 +16,6 @@
 [submodule "lib/LibLibreTuner/lib/serial"]
 	path = lib/LibLibreTuner/lib/serial
 	url = https://github.com/Altenius/SerialPP.git
-[submodule "lib/LibLibreTuner/cereal"]
-	path = lib/LibrLibreTuner/cereal
-	url = https://github.com/USCiLab/cereal.git
 [submodule "lib/LibLibreTuner/lib/cereal"]
 	path = lib/LibLibreTuner/lib/cereal
 	url = https://github.com/USCiLab/cereal.git
