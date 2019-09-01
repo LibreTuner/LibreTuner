@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <memory>
+
 class QLineEdit;
 class QComboBox;
 class ProjectCombo;

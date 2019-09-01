@@ -85,7 +85,7 @@ public:
         std::filesystem::path path;
 
         template <class Archive>
-        void serialize(Archive & archive, std::uint32_t const version)
+        void serialize(Archive & archive, std::uint32_t const /*version*/)
         {
             archive(name, platform, model);
         }
@@ -158,7 +158,7 @@ public:
         std::filesystem::path path;
 
         template <class Archive>
-        void serialize(Archive & archive, std::uint32_t const version)
+        void serialize(Archive & archive, std::uint32_t const /*version*/)
         {
             archive(name, base);
         }
