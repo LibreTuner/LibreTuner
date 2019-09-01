@@ -24,6 +24,7 @@
 #include "lt/libretuner.h"
 
 #include <QDir>
+#include <QDirIterator>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QStyledItemDelegate>
@@ -65,8 +66,39 @@ LibreTuner::LibreTuner(int & argc, char * argv[])
 
     Logger::debug("Loading platforms");
 
+    fs::path definitionPath = rootPath_ / "definitions";
+    if (!fs::exists(definitionPath))
+    {
+        // Copy definitions
+        Logger::info("Copying definitions to " + definitionPath.string());
+        QDir destDir(QString::fromStdString(definitionPath.string()));
+        destDir.mkpath(".");
+
+        QDir sourceDir(":/definitions");
+        QDirIterator it(sourceDir, QDirIterator::Subdirectories);
+        while (it.hasNext())
+        {
+            QString path = it.next();
+            QString relativePath = sourceDir.relativeFilePath(path);
+            if (it.fileInfo().isDir())
+            {
+                destDir.mkpath(relativePath);
+                continue;
+            }
+
+            if (!it.fileInfo().isFile())
+                continue;
+
+            QFile file(path);
+            QString toPath(destDir.filePath(relativePath));
+            Logger::debug("Copying " + toPath.toStdString());
+            if (!file.copy(toPath))
+                Logger::warning("Failed to copy definition: " + toPath.toStdString());
+        }
+    }
+
     catchCritical(
-        [&]() { platforms_.loadDirectory(rootPath_ / "definitions"); },
+        [&]() { platforms_.loadDirectory(definitionPath); },
         "Error loading definitions");
 
     links_.setPath(rootPath_ / "links.lts");
