@@ -11,7 +11,8 @@ Screenshots
 
 Supported vehicles
 ------------------
-* Mazdaspeed6 / Mazda 6 MPS / Mazdaspeed Atenza
+* 2005-2007 Mazdaspeed6 / Mazda 6 MPS / Mazdaspeed Atenza
+* MX-5 NC (Only editing)
 
 
 Supported Interfaces
