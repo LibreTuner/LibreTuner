@@ -17,7 +17,7 @@ Supported vehicles
 
 Supported Interfaces
 --------------------
-* J2534 interfaces with CAN support including Tactrix OpenPort 2.0
+* J2534 interfaces with CAN support.
 * OBDLink SX
 * ELM327 devices (but many cheap knock-offs have been known to have issues)
 * SocketCAN
