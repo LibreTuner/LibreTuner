@@ -28,6 +28,7 @@ public:
     double convert(double value) override { return G::convert(base_, target_, value); }
     std::vector<UnitName> units() override
     {
+        // TODO: Don't copy the table each time.
         return std::vector<UnitName>(G::units.begin(), G::units.end());
     }
 

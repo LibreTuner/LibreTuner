@@ -80,11 +80,9 @@ Table * Tune::getTable(const std::string & id, bool create)
             return nullptr;
 
         if (size() < def->offset.value() + def->byteSize())
-        {
             throw std::runtime_error("table '" + id +
                                      "' could not be created because it "
                                      "exceeds the size of the ROM");
-        }
 
         Table::Builder builder;
         builder.setBounds(def->minimum, def->maximum)
