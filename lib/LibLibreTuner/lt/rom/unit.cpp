@@ -26,10 +26,10 @@ public:
     explicit GroupImpl(Unit base) : base_(base), target_(base) {}
 
     double convert(double value) override { return G::convert(base_, target_, value); }
-    std::vector<UnitName> units() override
+    const std::vector<UnitName> &units() override
     {
-        // TODO: Don't copy the table each time.
-        return std::vector<UnitName>(G::units.begin(), G::units.end());
+        static std::vector<UnitName> un(G::units.begin(), G::units.end());
+        return un;
     }
 
 private:

@@ -78,7 +78,7 @@ public:
     virtual double convert(double value) =0;
 
     /* Returns a copy of units names. */
-    virtual std::vector<UnitName> units() =0;
+    virtual const std::vector<UnitName> &units() =0;
 };
 
 /* Makes a unit group using base unit. */

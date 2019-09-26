@@ -113,6 +113,8 @@ set(libretuner_SRC
     models/dtcmodel.h
     models/serialportmodel.cpp
     models/serialportmodel.h
+    models/unitgroupmodel.cpp
+    models/unitgroupmodel.h
 
     database/definitions.cpp
     database/definitions.h
