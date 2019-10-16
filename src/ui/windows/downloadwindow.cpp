@@ -56,7 +56,7 @@ DownloadWindow::DownloadWindow(lt::ProjectPtr project, QWidget * parent) : QDial
     comboPlatform_->setModel(new PlatformsModel(&LT()->definitions(), this));
 
     comboProject_ = new ProjectCombo;
-    // TODO: Set project combo to project passed above
+    comboProject_->setProject(project);
 
     lineName_ = new QLineEdit;
 

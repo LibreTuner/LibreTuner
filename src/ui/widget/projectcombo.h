@@ -17,6 +17,9 @@ public:
     explicit ProjectCombo(QWidget * parent = nullptr);
 
     lt::ProjectPtr selectedProject();
+
+    // Sets selected project
+    void setProject(const lt::ProjectPtr & project);
 };
 
 #endif // LIBRETUNER_PROJECTCOMBO_H

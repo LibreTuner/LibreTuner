@@ -17,3 +17,15 @@ lt::ProjectPtr ProjectCombo::selectedProject()
 
     return var.value<lt::ProjectPtr>();
 }
+
+void ProjectCombo::setProject(const lt::ProjectPtr & project)
+{
+    if (!project)
+        return;
+
+    for (int i = 0; i < model()->rowCount(); ++i) {
+        QVariant v = model()->data(model()->index(i, 0));
+        if (v.canConvert<lt::ProjectPtr>() && v.value<lt::ProjectPtr>() == project)
+            setCurrentIndex(i);
+    }
+}
