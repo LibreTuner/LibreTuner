@@ -26,26 +26,25 @@ network::CanPtr ElmDataLink::can(uint32_t /*baudrate*/)
     return nullptr;
 }
 
-void ElmDataLink::createDevice()
+network::Elm327Ptr ElmDataLink::createDevice()
 {
-    if (device_ && device_->isOpen())
-    {
-        return;
-    }
+    if (auto device = device_.lock(); device && device->isOpen())
+        return device;
+
     serial::Settings settings;
     settings.baudrate = uartBaudrate_;
 
-    device_ = std::make_shared<network::Elm327>(port_, settings);
-    device_->open();
+    network::Elm327Ptr device = std::make_shared<network::Elm327>(port_, settings);
+    device->open();
+    device_ = device;
+    return device;
 }
 
 void ElmDataLink::setPort(const std::string & port) { port_ = port; }
 
 network::IsoTpPtr ElmDataLink::isotp(const network::IsoTpOptions & options)
 {
-    createDevice();
-
-    return std::make_unique<network::IsoTpElm>(device_, options);
+    return std::make_unique<network::IsoTpElm>(createDevice(), options);
 }
 
 int ElmDataLink::baudrate() { return uartBaudrate_; }

@@ -29,7 +29,7 @@ public:
     void setPort(const std::string & port) override;
 
     // If the device has not been initialized, initializes it
-    void createDevice();
+    network::Elm327Ptr createDevice();
 
     inline void setBaudrate(int baudrate) override;
 
@@ -39,7 +39,7 @@ public:
 
 private:
     std::string port_;
-    network::Elm327Ptr device_;
+    std::weak_ptr<network::Elm327> device_;
     int uartBaudrate_{0}; // Baudrate of 0 to keep unchanged
 };
 
