@@ -32,12 +32,12 @@ public:
 private:
     std::string port_;
     // device_ must be destructed before interface_
-    j2534::DevicePtr device_;
+    std::weak_ptr<j2534::Device> device_;
     j2534::J2534Ptr interface_;
     j2534::Info info_;
 
     void checkInterface();
-    void checkDevice();
+    j2534::DevicePtr getDevice();
 };
 using PassThruLinkPtr = std::unique_ptr<PassThruLink>;
 

@@ -11,7 +11,8 @@ namespace lt::network
 class IsoTpJ2534 : public IsoTp
 {
 public:
-    explicit IsoTpJ2534(j2534::Device & device,
+    // `device` MUST NOT be empty
+    explicit IsoTpJ2534(j2534::DevicePtr device,
         IsoTpOptions options = IsoTpOptions());
 
     void recv(IsoTpPacket & result) override;
@@ -26,6 +27,7 @@ public:
     }
 
 private:
+    j2534::DevicePtr device_;
     j2534::Channel channel_;
     IsoTpOptions options_;
 };

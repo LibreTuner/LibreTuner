@@ -3,8 +3,8 @@
 
 namespace lt::network
 {
-IsoTpJ2534::IsoTpJ2534(j2534::Device & device, IsoTpOptions options)
-    : channel_(device.connect(j2534::Protocol::ISO15765, 0, options.baudrate)), options_(options)
+IsoTpJ2534::IsoTpJ2534(j2534::DevicePtr device, IsoTpOptions options)
+    : device_(std::move(device)), channel_(device_->connect(j2534::Protocol::ISO15765, 0, options.baudrate)), options_(options)
 {
     // Setup the filter
     j2534::PASSTHRU_MSG msgMask{};

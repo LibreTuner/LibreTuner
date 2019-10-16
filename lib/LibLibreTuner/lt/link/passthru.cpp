@@ -31,23 +31,27 @@ void PassThruLink::checkInterface()
 
 network::CanPtr PassThruLink::can(uint32_t baudrate)
 {
-    checkDevice();
-    return std::make_unique<network::J2534Can>(device_, baudrate);
+    return std::make_unique<network::J2534Can>(getDevice(), baudrate);
 }
 
-void PassThruLink::checkDevice()
+j2534::DevicePtr PassThruLink::getDevice()
 {
-    if (device_)
-        return;
+    if (auto device = device_.lock())
+        return device;
+
+    j2534::DevicePtr device;
 
     checkInterface();
     if (port_.empty())
-        device_ = interface_->open();
+        device = interface_->open();
     else
-        device_ = interface_->open(port_.c_str());
+        device = interface_->open(port_.c_str());
 
-    if (!device_)
+    if (!device)
         throw std::runtime_error("Failed to create PassThru device.");
+
+    device_ = device;
+    return device;
 }
 
 NetworkProtocol PassThruLink::supportedProtocols() const
@@ -61,9 +65,8 @@ DataLinkFlags PassThruLink::flags() const noexcept
 }
 
 network::IsoTpPtr PassThruLink::isotp(const network::IsoTpOptions & options) {
-    checkDevice();
     if ((info_.protocols & j2534::Protocol::ISO15765) != j2534::Protocol::None)
-        return std::make_unique<network::IsoTpJ2534>(*device_, options);
+        return std::make_unique<network::IsoTpJ2534>(getDevice(), options);
     // Fall back to our ISO-TP stack
     return DataLink::isotp(options);
 }
