@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "elm327.h"
 
 #include <iomanip>
@@ -8,7 +10,7 @@ namespace lt::network
 {
 
 Elm327::Elm327(std::string port, serial::Settings serialSettings)
-    : device_(port, serialSettings), reader_(device_)
+    : device_(std::move(port), serialSettings), reader_(device_)
 {
 }
 
@@ -45,31 +47,19 @@ std::vector<std::string> Elm327::sendCommand(const std::string & command)
     {
         line = reader_.readLine(">");
         if (line.empty())
-        {
             continue;
-        }
         if (line == command && response.empty())
-        {
             continue;
-        }
         if (line == ">")
-        {
             break;
-        }
 
         if (line == "?")
-        {
             throw std::runtime_error("received ? from elm");
-        }
 
         if (line == "CAN ERROR")
-        {
             throw std::runtime_error("received CAN ERROR");
-        }
         if (line == "NO DATA")
-        {
             throw std::runtime_error("received no data");
-        }
 
         response.emplace_back(std::move(line));
     }
