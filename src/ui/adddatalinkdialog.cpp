@@ -103,20 +103,20 @@ void AddDatalinkDialog::addClicked()
 
 void AddDatalinkDialog::typeIndexChanged(int index)
 {
-    switch (index)
-    {
-    case 0: // SocketCAN
-        settings_->setFlags(lt::DataLinkFlags::Port |
-                            lt::DataLinkFlags::Baudrate);
-        settings_->setPortType(lt::DataLinkPortType::NetworkCan);
-        break;
-    case 1: // ELM
-        settings_->setFlags(lt::DataLinkFlags::Port |
-                            lt::DataLinkFlags::Baudrate);
-        settings_->setPortType(lt::DataLinkPortType::Serial);
-        break;
-    default:
-        settings_->setFlags(lt::DataLinkFlags::None);
-    }
-    settings_->setPort("");
+    catchCritical([&]() {
+        switch (index)
+        {
+        case 0: // SocketCAN
+            settings_->setFlags(lt::DataLinkFlags::Port | lt::DataLinkFlags::Baudrate);
+            settings_->setPortType(lt::DataLinkPortType::NetworkCan);
+            break;
+        case 1: // ELM
+            settings_->setFlags(lt::DataLinkFlags::Port | lt::DataLinkFlags::Baudrate);
+            settings_->setPortType(lt::DataLinkPortType::Serial);
+            break;
+        default:
+            settings_->setFlags(lt::DataLinkFlags::None);
+        }
+        settings_->setPort("");
+    }, tr("Error changing data link type"));
 }
