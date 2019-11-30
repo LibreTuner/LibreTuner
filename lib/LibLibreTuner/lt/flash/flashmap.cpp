@@ -48,8 +48,8 @@ FlashMap FlashMap::fromTune(Tune & tune)
 
     std::size_t offset = platform->flashOffset;
 
-    std::vector<uint8_t> data(rom->data() + offset,
-                              rom->data() + rom->size() - offset);
+    std::vector<uint8_t> new_rom(rom->data(),
+                              rom->data() + rom->size());
 
     // Try each table
     /*for (const auto & [id, definition] : model->tables)
@@ -68,8 +68,12 @@ FlashMap FlashMap::fromTune(Tune & tune)
     }*/
 
     // Correct and verify checksums
-    model->checksums.correct(data.data(), data.size());
-    return FlashMap(std::move(data), offset);
+    model->checksums.correct(new_rom.data(), new_rom.size());
+
+    std::vector<uint8_t> flash_region(new_rom.data() + offset,
+                              new_rom.data() + new_rom.size() - offset);
+
+    return FlashMap(std::move(flash_region), offset);
 }
 
 } // namespace lt

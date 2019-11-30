@@ -223,6 +223,13 @@ void from_json(const json & j, lt::Platform & platform)
         }
     }
 
+    // Flash region
+    if (auto fr = j.find("flashregion"); fr != j.end())
+    {
+        fr->at("size").get_to(platform.flashSize);
+        fr->at("offset").get_to(platform.flashOffset);
+    }
+
     if (auto it = j.find("pids"); it != j.end())
         it->get_to(platform.pids);
 }
