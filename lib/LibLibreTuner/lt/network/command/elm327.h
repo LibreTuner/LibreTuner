@@ -34,7 +34,7 @@ public:
     // Opens serial device
     void open();
 
-    inline bool isOpen() const noexcept { return device_.isOpen(); }
+    inline bool isOpen() const noexcept { return device_.is_open(); }
 
     void setProtocol(ElmProtocol protocol);
 

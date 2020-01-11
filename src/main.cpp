@@ -20,7 +20,15 @@
 
 int main(int argc, char * argv[])
 {
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setOrganizationName("LibreTuner");
+    QCoreApplication::setApplicationName("LibreTuner");
+
+#ifdef Q_OS_WIN
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    #endif
+#endif
     LibreTuner app(argc, argv);
 
     return LibreTuner::exec();

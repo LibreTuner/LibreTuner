@@ -54,6 +54,7 @@ LibreTuner::LibreTuner(int & argc, char * argv[])
 
     setOrganizationDomain("libretuner.org");
     setApplicationName("LibreTuner");
+    setLayoutDirection(Qt::LeftToRight);
 
     // Setup LT context
     lt::setLogCallback(
