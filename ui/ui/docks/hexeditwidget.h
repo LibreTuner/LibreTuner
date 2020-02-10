@@ -5,7 +5,7 @@
 #include <qhexview.h>
 
 #include "lt/rom/rom.h"
-
+/*
 class RomHexBuffer : public QHexBuffer
 {
     Q_OBJECT
@@ -40,6 +40,6 @@ public:
 
 private:
     RomHexBuffer * buffer_;
-};
+};*/
 
 #endif // LIBRETUNER_HEXEDITWIDGET_H

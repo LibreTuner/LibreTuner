@@ -12,6 +12,7 @@ namespace lt::network
 Elm327::Elm327(std::string port, serial::Settings serialSettings)
     : device_(std::move(port), serialSettings), reader_(device_)
 {
+
 }
 
 void Elm327::open() { device_.open(); }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(LibreTuner)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # Find includes in corresponding build directories
@@ -9,9 +9,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
-set(libretuner_SRC
+set(UI_SRC
     main.cpp
-    
+
     libretuner.cpp
     libretuner.h
     timer.cpp
@@ -29,7 +29,7 @@ set(libretuner_SRC
     serializeddata.cpp
     serializeddata.h
     uiutil.h
-    
+
     plugin/plugin.cpp
     plugin/plugin.h
     plugin/pluginstate.cpp
@@ -91,7 +91,7 @@ set(libretuner_SRC
     ui/windows/diagnosticswidget.h
     ui/windows/createtunedialog.cpp
     ui/windows/createtunedialog.h
-    
+
     ui/widget/datalogview.cpp
     ui/widget/datalogview.h
     ui/widget/datalogliveview.cpp
@@ -122,43 +122,27 @@ set(libretuner_SRC
     database/links.h
     database/projects.cpp
     database/projects.h
-
-
-    ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
-
-if (UNIX AND NOT APPLE)
-
-endif ()
-
-if (WIN32)
-
-endif ()
-
+)
 
 # Create code from a list of Qt designer ui files.
-#set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
-qt5_wrap_ui(libretuner_SRC
+set(CMAKE_AUTOUIC ON) # use this if you have CMake 3.x instead of the following
+qt5_wrap_ui(UI_SRC
     ui/canviewer.ui
         ui/windows/createtunedialog.ui
 
     framelesswindow/framelesswindow.ui
 )
 
-qt5_add_resources(libretuner_SRC
+qt5_add_resources(UI_SRC
     resources/icons.qrc
     resources/definitions.qrc
     resources/codes.qrc
     resources/qdarkstyle/style.qrc
 )
 
-
-add_executable(LibreTuner ${libretuner_SRC})
-
-target_link_libraries(LibreTuner Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport cparse ${CMAKE_THREAD_LIBS_INIT} Lua LibLibreTuner)
-
-target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView)
-
-
+add_executable(LibreTuner ${UI_SRC})
+target_link_libraries(LibreTuner ${CONAN_LIBS} ${CMAKE_THREAD_LIBS_INIT} LibLibreTuner)
+target_include_directories(LibreTuner PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../lib/QHexView ${CMAKE_CURRENT_BINARY_DIR}/ui)
 
 if (UNIX AND NOT APPLE)
     target_compile_definitions(LibreTuner PRIVATE WITH_SOCKETCAN=1)
@@ -178,7 +162,6 @@ if(MSVC)
 else()
   target_compile_options(LibreTuner PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-missing-braces)
 endif()
-
 
 if (MINGW)
     target_compile_options(LibreTuner PRIVATE -mwindows)

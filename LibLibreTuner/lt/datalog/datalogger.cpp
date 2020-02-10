@@ -20,9 +20,9 @@
 
 #include <utility>
 
-#include <shunting-yard.h>
+// #include <shunting-yard.h>
 
-extern void cparse_startup();
+// extern void cparse_startup();
 
 namespace lt
 {
@@ -31,18 +31,18 @@ class PidEvaluator
 {
 public:
     explicit PidEvaluator(const Pid & pid)
-        : pid_(pid), expression_(pid.formula.c_str())
+        : pid_(pid) /*, expression_(pid.formula.c_str())*/
     {
     }
     PidEvaluator(PidEvaluator &&) = default;
     PidEvaluator & operator=(const PidEvaluator &) = delete;
     PidEvaluator(const PidEvaluator &) = delete;
 
-    void setX(uint8_t x) { vars_["a"] = x; }
-    void setY(uint8_t y) { vars_["b"] = y; }
-    void setZ(uint8_t z) { vars_["c"] = z; }
+    void setX(uint8_t x) { /*vars_["a"] = x;*/ }
+    void setY(uint8_t y) { /*vars_["b"] = y;*/ }
+    void setZ(uint8_t z) { /*vars_["c"] = z;*/ }
 
-    double evaluate() const { return expression_.eval(vars_).asDouble(); }
+    double evaluate() const { return 0; /*expression_.eval(vars_).asDouble();*/ }
 
     inline const Pid & pid() const noexcept { return pid_; }
     inline uint16_t code() const { return pid_.code; }
@@ -50,14 +50,14 @@ public:
 private:
     const Pid & pid_;
 
-    TokenMap vars_;
-    calculator expression_;
+    // TokenMap vars_;
+    // calculator expression_;
 };
 
 class CParseInit
 {
 public:
-    CParseInit() { cparse_startup(); }
+    CParseInit() { /*cparse_startup();*/ }
 };
 
 UdsDataLogger::UdsDataLogger(DataLog & log, network::UdsPtr && uds)

@@ -4,11 +4,12 @@
 #include <QHBoxLayout>
 #include <QIODevice>
 
+/*
 HexEditWidget::HexEditWidget(QWidget * parent) : QWidget(parent)
 {
     buffer_ = new RomHexBuffer;
 
-    /*auto *document = new QHexDocument(buffer_);
+    auto *document = new QHexDocument(buffer_);
     auto *hexView = new QHexView;
     hexView->setDocument(document);
 
@@ -17,7 +18,7 @@ HexEditWidget::HexEditWidget(QWidget * parent) : QWidget(parent)
 
     layout->addWidget(hexView);
 
-    setLayout(layout);*/
+    setLayout(layout);
 }
 
 int RomHexBuffer::length() const
@@ -30,9 +31,9 @@ int RomHexBuffer::length() const
     return rom_->size();
 }
 
-void RomHexBuffer::insert(int /*offset*/, const QByteArray & /*data*/) {}
+void RomHexBuffer::insert(int offset, const QByteArray & data) {}
 
-void RomHexBuffer::remove(int /*offset*/, int /*length*/) {}
+void RomHexBuffer::remove(int offset, int length) {}
 
 QByteArray RomHexBuffer::read(int offset, int length)
 {
@@ -54,7 +55,7 @@ QByteArray RomHexBuffer::read(int offset, int length)
                       size);
 }
 
-void RomHexBuffer::read(QIODevice * /*iodevice*/) {}
+void RomHexBuffer::read(QIODevice * iodevice) {}
 
 void RomHexBuffer::write(QIODevice * iodevice)
 {
@@ -63,4 +64,4 @@ void RomHexBuffer::write(QIODevice * iodevice)
         return;
     }
     iodevice->write(reinterpret_cast<const char *>(rom_->data()), rom_->size());
-}
+}*/

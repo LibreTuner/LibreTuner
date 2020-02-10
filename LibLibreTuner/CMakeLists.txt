@@ -1,33 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
 project(LibLibreTuner)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-
 
 # Dependencies
 find_package(Threads REQUIRED)
-
-add_subdirectory(lib/cparse)
-add_subdirectory(lib/serial)
-
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(lib/json)
+add_subdirectory(depends/serial)
 
 # Options
 option(BUILD_TESTS "Build tests" OFF)
 
-
 if(BUILD_TESTS)
-        #add_subdirectory(test)
+    #add_subdirectory(test)
 endif()
 
 # Sources
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lt)
 
-
 set(ROOT_HEADERS
-    ${SOURCE_DIR}/libretuner.h)
+        ${SOURCE_DIR}/libretuner.h)
 
 file(GLOB_RECURSE NETWORK_CAN_HEADERS ${SOURCE_DIR}/network/can/*.h)
 file(GLOB_RECURSE NETWORK_ISOTP_HEADERS ${SOURCE_DIR}/network/isotp/*.h)
@@ -50,7 +42,7 @@ file(GLOB_RECURSE PROJECT_HEADERS ${SOURCE_DIR}/project/*.h)
 file(GLOB_RECURSE BUFFER_HEADERS ${SOURCE_DIR}/buffer/*.h)
 
 set(ROOT_SOURCES
-    ${SOURCE_DIR}/context.cpp)
+        ${SOURCE_DIR}/context.cpp)
 file(GLOB_RECURSE NETWORK_CAN_SOURCES ${SOURCE_DIR}/network/can/*.cpp)
 file(GLOB_RECURSE NETWORK_ISOTP_SOURCES ${SOURCE_DIR}/network/isotp/*.cpp)
 file(GLOB_RECURSE NETWORK_UDS_SOURCES ${SOURCE_DIR}/network/uds/*.cpp)
@@ -72,63 +64,63 @@ file(GLOB_RECURSE PROJECT_SOURCES ${SOURCE_DIR}/project/*.cpp)
 file(GLOB_RECURSE BUFFER_SOURCES ${SOURCE_DIR}/buffer/*.cpp)
 
 set(NETWORK_HEADERS
-    ${NETWORK_CAN_HEADERS}
-    ${NETWORK_ISOTP_HEADERS}
-    ${NETWORK_UDS_HEADERS}
-	${NETWORK_COMMAND_HEADERS})
+        ${NETWORK_CAN_HEADERS}
+        ${NETWORK_ISOTP_HEADERS}
+        ${NETWORK_UDS_HEADERS}
+        ${NETWORK_COMMAND_HEADERS})
 
 set(NETWORK_SOURCES
-    ${NETWORK_CAN_SOURCES}
-    ${NETWORK_ISOTP_SOURCES}
-    ${NETWORK_UDS_SOURCES}
-	${NETWORK_COMMAND_SOURCES})
+        ${NETWORK_CAN_SOURCES}
+        ${NETWORK_ISOTP_SOURCES}
+        ${NETWORK_UDS_SOURCES}
+        ${NETWORK_COMMAND_SOURCES})
 
 set(HEADERS
-    ${ROOT_HEADERS}
-    ${NETWORK_HEADERS}
-    ${OS_HEADERS}
-	${J2534_HEADERS}
-	${DOWNLOAD_HEADERS}
-	${AUTH_HEADERS}
-	${SUPPORT_HEADERS}
-	${FLASH_HEADERS}
-	${DIAGNOSTICS_HEADERS}
-	${DEFINITION_HEADERS}
-	${ROM_HEADERS}
-	${LINK_HEADERS}
-	${SESSION_HEADERS}
-	${DATALOG_HEADERS}
-	${PROJECT_HEADERS}
-	${BUFFER_HEADERS})
+        ${ROOT_HEADERS}
+        ${NETWORK_HEADERS}
+        ${OS_HEADERS}
+        ${J2534_HEADERS}
+        ${DOWNLOAD_HEADERS}
+        ${AUTH_HEADERS}
+        ${SUPPORT_HEADERS}
+        ${FLASH_HEADERS}
+        ${DIAGNOSTICS_HEADERS}
+        ${DEFINITION_HEADERS}
+        ${ROM_HEADERS}
+        ${LINK_HEADERS}
+        ${SESSION_HEADERS}
+        ${DATALOG_HEADERS}
+        ${PROJECT_HEADERS}
+        ${BUFFER_HEADERS})
 
 set(SOURCES
-    ${ROOT_SOURCES}
-    ${NETWORK_SOURCES}
-    ${OS_SOURCES}
-	${J2534_SOURCES}
-	${DOWNLOAD_SOURCES}
-	${AUTH_SOURCES}
-	${SUPPORT_SOURCES}
-	${FLASH_SOURCES}
-	${DIAGNOSTICS_SOURCES}
-	${DEFINITION_SOURCES}
-	${ROM_SOURCES}
-	${LINK_SOURCES}
-	${SESSION_SOURCES}
-	${DATALOG_SOURCES}
-	${PROJECT_SOURCES}
-	${BUFFER_SOURCES})
+        ${ROOT_SOURCES}
+        ${NETWORK_SOURCES}
+        ${OS_SOURCES}
+        ${J2534_SOURCES}
+        ${DOWNLOAD_SOURCES}
+        ${AUTH_SOURCES}
+        ${SUPPORT_SOURCES}
+        ${FLASH_SOURCES}
+        ${DIAGNOSTICS_SOURCES}
+        ${DEFINITION_SOURCES}
+        ${ROM_SOURCES}
+        ${LINK_SOURCES}
+        ${SESSION_SOURCES}
+        ${DATALOG_SOURCES}
+        ${PROJECT_SOURCES}
+        ${BUFFER_SOURCES})
 
 
 add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} cparse Serial nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} ${CONAN_LIBS} Qt5::Widgets Qt5::DataVisualization Qt5::Charts Qt5::PrintSupport Serial)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
+#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/cereal/include)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set warnings
 if(MSVC)
-	target_compile_options(LibLibreTuner PRIVATE /W4)
+    target_compile_options(LibLibreTuner PRIVATE /W4)
 else()
-	target_compile_options(LibLibreTuner PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-missing-braces)
+    target_compile_options(LibLibreTuner PRIVATE -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-missing-braces)
 endif()
