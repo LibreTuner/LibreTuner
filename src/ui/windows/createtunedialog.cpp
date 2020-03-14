@@ -49,10 +49,10 @@ void CreateTuneDialog::on_buttonCreate_clicked()
     }
 
     QVariant data = ui_->comboBase->currentData();
-    if (!data.canConvert<lt::Rom::MetaData>())
+    if (!data.canConvert<lt::Calibration::MetaData>())
         return;
 
-    auto md = data.value<lt::Rom::MetaData>();
+    auto md = data.value<lt::Calibration::MetaData>();
     // Load base
     catchWarning(
         [&]() {

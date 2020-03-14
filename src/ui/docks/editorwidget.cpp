@@ -3,7 +3,7 @@
 #include "libretuner.h"
 
 #include "../verticallabel.h"
-#include "models/tablemodel.h"
+#include "models/TableModel.h"
 
 #include <QAbstractItemView>
 #include <QHBoxLayout>

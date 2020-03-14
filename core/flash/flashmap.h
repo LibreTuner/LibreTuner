@@ -16,20 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OverboostApp.h"
+#ifndef FLASHMAP_H
+#define FLASHMAP_H
 
-int main(int argc, char * argv[])
+#include <memory>
+#include <string>
+#include <vector>
+
+namespace lt
 {
-    QCoreApplication::setOrganizationName("LibreTuner");
-    QCoreApplication::setApplicationName("LibreTuner");
 
-#ifdef Q_OS_WIN
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-    #endif
-#endif
-    OverboostApp app(argc, argv);
+/**
+ * Describes regions of memory to be reprogrammed
+ */
+class FlashMap
+{
+public:
+    FlashMap(const std::vector<uint8_t> & data, std::size_t offset);
+    FlashMap(std::vector<uint8_t> && data, std::size_t offset);
 
-    return OverboostApp::exec();
-}
+    // static FlashMap fromTune(Tune & tune);
+
+    // The address offset the data should be flashed to
+    size_t offset() const { return offset_; }
+
+    const std::vector<uint8_t> & data() const { return data_; }
+
+private:
+    std::vector<uint8_t> data_;
+    std::size_t offset_;
+};
+
+} // namespace lt
+
+#endif // FLASHMAP_H

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(LibreTuner)
+project(Overboost)
 
 
 # Find the QtWidgets library
@@ -11,11 +11,9 @@ option(Test "Build all tests." OFF)
 set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Build yaml-cpp tests")
 
 add_subdirectory(lib/QHexView)
-add_subdirectory(lib/lua)
-#add_subdirectory(lib/sol2)
-#add_subdirectory(lib/catch)
+add_subdirectory(lib/serial)
+add_subdirectory(lib/json)
 
-add_subdirectory(lib/LibLibreTuner)
-
+add_subdirectory(core)
 add_subdirectory(src)
 # add_subdirectory(test)

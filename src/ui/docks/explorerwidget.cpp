@@ -73,11 +73,10 @@ void ExplorerWidget::populateMenu(const QModelIndex & index)
     QVariant data = index.data(Qt::UserRole);
     menu_.setProject(detail::find_project(index));
 
-    if (data.canConvert<lt::Rom::MetaData>())
-        menu_.setRom(data.value<lt::Rom::MetaData>().path.filename().string());
+    if (data.canConvert<lt::Calibration::MetaData>())
+        menu_.setRom(data.value<lt::Calibration::MetaData>().path.filename().string());
     else if (data.canConvert<lt::Tune::MetaData>())
-        menu_.setTune(
-            data.value<lt::Tune::MetaData>().path.filename().string());
+        menu_.setTune(data.value<lt::Tune::MetaData>().path.filename().string());
 }
 
 bool ExplorerWidget::eventFilter(QObject * watched, QEvent * event)

@@ -71,8 +71,7 @@ private:
 class RomItem : public TreeItem
 {
 public:
-    explicit RomItem(lt::Rom::MetaData md, TreeItem * parent = nullptr)
-        : TreeItem(parent), md_(std::move(md))
+    explicit RomItem(lt::Calibration::MetaData md, TreeItem * parent = nullptr) : TreeItem(parent), md_(std::move(md))
     {
     }
 
@@ -99,7 +98,7 @@ public:
     }
 
 private:
-    lt::Rom::MetaData md_;
+    lt::Calibration::MetaData md_;
 };
 
 class TuneItem : public TreeItem

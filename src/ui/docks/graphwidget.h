@@ -27,7 +27,7 @@
 
 #include <memory>
 
-#include "models/tablemodel.h"
+#include "models/TableModel.h"
 
 /**
  * @todo write docs

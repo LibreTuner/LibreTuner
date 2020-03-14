@@ -1,24 +1,12 @@
-[submodule "lib/cparse"]
-	path = lib/LibLibreTuner/lib/cparse
-	url = https://github.com/LibreTuner/cparse.git
 [submodule "lib/QHexView"]
 	path = lib/QHexView
 	url = https://github.com/Dax89/QHexView.git
-[submodule "lib/sol2"]
-	path = lib/sol2
-	url = https://github.com/ThePhD/sol2.git
-[submodule "lib/lua"]
-	path = lib/lua
-	url = https://github.com/Altenius/Lua.git
 [submodule "lib/catch"]
 	path = lib/catch
 	url = https://github.com/catchorg/Catch2.git
-[submodule "lib/LibLibreTuner/lib/serial"]
-	path = lib/LibLibreTuner/lib/serial
+[submodule "lib/serial"]
+	path = lib/serial
 	url = https://github.com/Altenius/SerialPP.git
-[submodule "lib/LibLibreTuner/lib/cereal"]
-	path = lib/LibLibreTuner/lib/cereal
-	url = https://github.com/USCiLab/cereal.git
-[submodule "lib/LibLibreTuner/lib/json"]
-	path = lib/LibLibreTuner/lib/json
+[submodule "lib/json"]
+	path = lib/json
 	url = https://github.com/nlohmann/json.git

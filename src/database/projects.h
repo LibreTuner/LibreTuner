@@ -52,7 +52,7 @@ private slots:
 };
 
 Q_DECLARE_METATYPE(lt::ProjectPtr)
-Q_DECLARE_METATYPE(lt::Rom::MetaData)
+Q_DECLARE_METATYPE(lt::Calibration::MetaData)
 Q_DECLARE_METATYPE(lt::Tune::MetaData)
 
 #endif // LIBRETUNER_PROJECTS_H

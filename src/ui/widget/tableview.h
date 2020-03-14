@@ -4,7 +4,7 @@
 #include <QWidget>
 
 #include "../verticallabel.h"
-#include "models/tablemodel.h"
+#include "models/TableModel.h"
 
 class QTableView;
 class QLabel;

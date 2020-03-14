@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "lt/link/datalink.h"
+#include <link/datalink.h>
 
 #include <QAbstractItemModel>
 
