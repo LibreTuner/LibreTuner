@@ -16,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "graphwidget.h"
-#include "lt/rom/table.h"
+#include "GraphWidget.h"
 
 #include <QCategory3DAxis>
 #include <QChart>
@@ -27,11 +26,13 @@ using namespace QtCharts;
 
 GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
 {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     // 3D
     surface_ = new QtDataVisualization::Q3DSurface;
     container_ = QWidget::createWindowContainer(surface_);
 
-    auto * theme = new QtDataVisualization::Q3DTheme(QtDataVisualization::Q3DTheme::ThemeIsabelle);
+    auto * theme = new QtDataVisualization::Q3DTheme(QtDataVisualization::Q3DTheme::ThemePrimaryColors);
     surface_->addTheme(theme);
     surface_->setActiveTheme(theme);
 
@@ -48,8 +49,7 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     gr.setColorAt(1.0, Qt::red);
 
     series3d_->setBaseGradient(gr);
-    series3d_->setColorStyle(
-        QtDataVisualization::Q3DTheme::ColorStyleRangeGradient);
+    series3d_->setColorStyle(QtDataVisualization::Q3DTheme::ColorStyleRangeGradient);
 
     // 2D
     chart_ = new QChart();
@@ -58,7 +58,7 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     chartView_->setRenderHint(QPainter::Antialiasing);
 
     chartView_->setVisible(false);
-    //container_->setVisible(false);
+    // container_->setVisible(false);
 
     auto * hLayout = new QHBoxLayout;
     setLayout(hLayout);
@@ -66,7 +66,9 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     hLayout->addWidget(chartView_);
 }
 
-GraphWidget::~GraphWidget() { /*delete container_;*/ }
+GraphWidget::~GraphWidget()
+{ /*delete container_;*/
+}
 
 void GraphWidget::setModel(TableModel * model)
 {
@@ -85,62 +87,55 @@ void GraphWidget::refresh()
 {
     if (model_ == nullptr)
         return;
-    lt::Table * table = model_->table();
-    if (table == nullptr)
-        return;
+    const lt::Table & table = model_->table();
 
-    if (!table->isOneDimensional())
+    if (!table.isOneDimensional())
     {
         // Two dimensional
-        auto * modelProxy =
-            new QtDataVisualization::QItemModelSurfaceDataProxy(model_);
+        auto * modelProxy = new QtDataVisualization::QItemModelSurfaceDataProxy(model_);
         modelProxy->setUseModelCategories(true);
-        series3d_->setDrawMode(
-            QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
+        series3d_->setDrawMode(QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
 
         series3d_->setDataProxy(modelProxy);
 
-        if (table->xAxis())
+        if (table.xAxis())
         {
-            surface_->axisX()->setTitle(
-                QString::fromStdString(table->xAxis()->name()));
+            surface_->axisX()->setTitle(QString::fromStdString(table.xAxis()->name()));
             surface_->axisX()->setTitleVisible(true);
         }
         else
             surface_->axisX()->setTitleVisible(false);
 
-        if (table->yAxis())
+        if (table.yAxis())
         {
-            surface_->axisZ()->setTitle(
-                QString::fromStdString(table->yAxis()->name()));
+            surface_->axisZ()->setTitle(QString::fromStdString(table.yAxis()->name()));
             surface_->axisZ()->setTitleVisible(true);
         }
         else
             surface_->axisZ()->setTitleVisible(true);
 
         chartView_->setVisible(false);
-        //container_->setVisible(true);
+        // container_->setVisible(true);
         container_->show();
     }
-    else if (table->height() == 1 && table->width() > 1)
+    else if (table.height() == 1 && table.width() > 1)
     {
         auto * series = new QLineSeries;
-        if (table->xAxis())
+        if (table.xAxis())
         {
-            for (int x = 0; x < table->width(); ++x)
+            for (int x = 0; x < table.width(); ++x)
             {
                 double index = 0;
-                if (x < table->xAxis()->size())
-                    index = table->xAxis()->index(x);
-                series->append(index,
-                               table->get(0, x)); // Should always be a float
+                if (x < table.xAxis()->size())
+                    index = table.xAxis()->index(x);
+                series->append(index, table.get(0, x)); // Should always be a float
             }
         }
         else
         {
-            for (int x = 0; x < table->width(); ++x)
+            for (int x = 0; x < table.width(); ++x)
             {
-                series->append(x, table->get(0, x)); // Should always be a float
+                series->append(x, table.get(0, x)); // Should always be a float
             }
         }
 
@@ -148,10 +143,9 @@ void GraphWidget::refresh()
         chart_->addSeries(series);
         chart_->createDefaultAxes();
 
-        if (table->xAxis())
+        if (table.xAxis())
         {
-            chart_->axisX()->setTitleText(
-                QString::fromStdString(table->xAxis()->name()));
+            chart_->axisX()->setTitleText(QString::fromStdString(table.xAxis()->name()));
         }
 
         chartView_->setVisible(true);

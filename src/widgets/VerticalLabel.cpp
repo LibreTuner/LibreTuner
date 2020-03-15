@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "verticallabel.h"
+#include "VerticalLabel.h"
 
 #include <QPainter>
 #include <QPainterPath>
@@ -32,10 +32,10 @@ VerticalLabel::VerticalLabel(const QString & text, QWidget * parent)
 void VerticalLabel::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setPen(palette().color(QPalette::Foreground));
+    painter.setPen(palette().color(QPalette::WindowText));
     painter.setBrush(Qt::Dense1Pattern);
 
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    // painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.translate(0, height());
     painter.rotate(270);

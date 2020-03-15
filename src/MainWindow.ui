@@ -1,88 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>MainWindow</class>
-    <widget class="QMainWindow" name="MainWindow">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>800</width>
-                <height>600</height>
-            </rect>
-        </property>
-        <property name="windowTitle">
-            <string>Overboost</string>
-        </property>
-        <widget class="QWidget" name="centralwidget">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                    <widget class="QTabWidget" name="tabs">
-                        <widget class="QWidget" name="tab">
-                            <attribute name="title">
-                                <string>Tab 1</string>
-                            </attribute>
-                        </widget>
-                        <widget class="QWidget" name="tab_2">
-                            <attribute name="title">
-                                <string>Tab 2</string>
-                            </attribute>
-                        </widget>
-                    </widget>
-                </item>
-            </layout>
-        </widget>
-        <widget class="QMenuBar" name="menubar">
-            <property name="geometry">
-                <rect>
-                    <x>0</x>
-                    <y>0</y>
-                    <width>800</width>
-                    <height>21</height>
-                </rect>
-            </property>
-            <widget class="QMenu" name="menuCalibration">
-                <property name="title">
-                    <string>File</string>
-                </property>
-                <addaction name="actionSettings"/>
-                <addaction name="actionOpen"/>
-            </widget>
-            <addaction name="menuCalibration"/>
-        </widget>
-        <widget class="QStatusBar" name="statusbar"/>
-        <widget class="QDockWidget" name="dockTables">
-            <property name="windowTitle">
-                <string>Tables</string>
-            </property>
-            <attribute name="dockWidgetArea">
-                <number>1</number>
-            </attribute>
-            <widget class="QWidget" name="dockWidgetContents">
-                <layout class="QVBoxLayout" name="verticalLayout">
-                    <item>
-                        <widget class="QTreeView" name="treeView">
-                            <property name="sortingEnabled">
-                                <bool>true</bool>
-                            </property>
-                        </widget>
-                    </item>
-                </layout>
-            </widget>
-        </widget>
-        <action name="actionSettings">
-            <property name="text">
-                <string>Settings</string>
-            </property>
-        </action>
-        <action name="actionOpen">
-            <property name="text">
-                <string>Open</string>
-            </property>
-            <property name="shortcut">
-                <string>Ctrl+O</string>
-            </property>
-        </action>
-    </widget>
-    <resources/>
-    <connections/>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Overboost</string>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabs">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuCalibration">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSettings"/>
+    <addaction name="actionOpen"/>
+   </widget>
+   <addaction name="menuCalibration"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockTables">
+   <property name="windowTitle">
+    <string>Tables</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QTreeView" name="treeView">
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>Graph</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="GraphWidget" name="graph" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GraphWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">widgets/GraphWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

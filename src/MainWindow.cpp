@@ -11,16 +11,26 @@
 
 #include <models/TableModel.h>
 #include <rom/rom.h>
+#include <widgets/TableView.h>
 
 MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
     tablesSortModel_.setSourceModel(&tablesModel_);
     ui->treeView->setModel(&tablesSortModel_);
+
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+    restoreState(settings.value("State").toByteArray());
+    restoreGeometry(settings.value("Geometry").toByteArray());
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+    delete ui;
+}
 
 void MainWindow::displayQuickStartDialog()
 {
@@ -66,7 +76,7 @@ void MainWindow::importCalibration(const QString & path)
 
     // Add path to history
     QSettings settings;
-    settings.beginGroup("Quick Start");
+    settings.beginGroup("QuickStart");
     QStringList history = settings.value("History").toStringList();
     if (!history.contains(path))
     {
@@ -89,14 +99,35 @@ void MainWindow::on_treeView_activated(const QModelIndex & index)
     if (ti == nullptr)
         return;
 
+    if (auto it = openedTables_.find(ti->id); it != openedTables_.end() && it->second)
+        return;
+
     if (auto table = calibration_.getTable(ti->id))
     {
-        auto * model = new TableModel(std::move(*table));
+        QPointer<TableView> view = new TableView(std::move(*table));
+        view->setAttribute(Qt::WA_DeleteOnClose);
+        ui->tabs->setCurrentIndex(ui->tabs->addTab(view, QString::fromStdString(ti->name)));
 
-        auto * view = new QTableView(this);
-        view->setModel(model);
-        view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        view->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        ui->tabs->addTab(view, QString::fromStdString(ti->name));
+        openedTables_.insert_or_assign(ti->id, std::move(view));
     }
+}
+
+void MainWindow::on_tabs_tabCloseRequested(int index)
+{
+    delete ui->tabs->widget(index);
+}
+
+void MainWindow::on_tabs_currentChanged(int index)
+{
+    auto * tab = reinterpret_cast<TableView*>(ui->tabs->widget(index));
+    ui->graph->setModel(tab->model());
+}
+
+void MainWindow::closeEvent(QCloseEvent * event) {
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+    settings.setValue("State", saveState());
+    settings.setValue("Geometry", saveGeometry());
+
+    QWidget::closeEvent(event);
 }

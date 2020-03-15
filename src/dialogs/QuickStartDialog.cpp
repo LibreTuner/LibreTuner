@@ -10,7 +10,7 @@ QuickStartDialog::QuickStartDialog(QWidget * parent) : QDialog(parent), ui(new U
 
     // Load history
     QSettings settings;
-    settings.beginGroup("Quick Start");
+    settings.beginGroup("QuickStart");
     prevCalibrations_ = settings.value("History").toStringList();
 
     // Setup history model

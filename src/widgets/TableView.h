@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../verticallabel.h"
+#include "verticallabel.h"
 #include "models/TableModel.h"
 
 class QTableView;
@@ -14,10 +14,12 @@ class QBoxLayout;
 class TableView : public QWidget
 {
 public:
-    explicit TableView(QWidget * parent = nullptr);
+    explicit TableView(lt::Table && table, QWidget * parent = nullptr);
     ~TableView() override;
 
-    void setTable(lt::Table * table);
+    void setTable(lt::Table && table);
+
+    TableModel * model() { return &model_; }
 
 private slots:
     void axesChanged();
@@ -26,7 +28,6 @@ private:
     QTableView * view_;
     QLabel * labelX_;
     VerticalLabel * labelY_;
-    GraphWidget * graph_;
     QBoxLayout * layout_;
 
     TableModel model_;

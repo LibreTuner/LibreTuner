@@ -34,6 +34,13 @@ set(libretuner_SRC
         models/TableModel.cpp
         models/TableModel.h
 
+        widgets/TableView.cpp
+        widgets/TableView.h
+        widgets/VerticalLabel.cpp
+        widgets/VerticalLabel.h
+        widgets/GraphWidget.cpp
+        widgets/GraphWidget.h
+
         ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
 
 if (UNIX AND NOT APPLE)

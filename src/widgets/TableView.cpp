@@ -1,6 +1,5 @@
-#include "tableview.h"
+#include "TableView.h"
 
-#include <QAbstractItemView>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -8,8 +7,7 @@
 #include <QStyledItemDelegate>
 #include <QTableView>
 #include <QVBoxLayout>
-
-#include "../docks/graphwidget.h"
+#include <QSplitter>
 
 class TableDelegate : public QStyledItemDelegate
 {
@@ -29,10 +27,10 @@ public:
 
 TableView::~TableView()
 {
-    delete graph_;
+
 }
 
-TableView::TableView(QWidget * parent)
+TableView::TableView(lt::Table && table, QWidget * parent) : model_(std::move(table))
 {
     auto * vLayout = new QVBoxLayout;
     labelX_ = new QLabel("X-Axis");
@@ -60,35 +58,27 @@ TableView::TableView(QWidget * parent)
 
     vLayout->addLayout(hLayout);
 
-    graph_ = new GraphWidget;
-    graph_->setModel(&model_);
-    graph_->setWindowFlag(Qt::WindowStaysOnTopHint);
-    graph_->resize(QGuiApplication::primaryScreen()->size() * 0.5);
+    auto * tableWidget = new QWidget;
+    tableWidget->setLayout(vLayout);
 
-    auto * buttonGraph = new QPushButton(tr("Open Graph"));
-
-    auto * layoutButtons = new QHBoxLayout;
-    layoutButtons->addWidget(buttonGraph);
-    layoutButtons->addStretch();
+    auto * splitter = new QSplitter(Qt::Vertical);
+    splitter->addWidget(tableWidget);
 
     layout_ = new QVBoxLayout;
-    layout_->addLayout(vLayout);
-    layout_->addLayout(layoutButtons);
+    layout_->addWidget(splitter);
     setLayout(layout_);
 
     connect(&model_, &TableModel::modelReset, this, &TableView::axesChanged);
-    connect(buttonGraph, &QPushButton::clicked, graph_, &GraphWidget::show);
+    axesChanged();
 }
 
 void TableView::axesChanged()
 {
-    lt::Table * table = model_.table();
-    if (table == nullptr)
-        return;
+    const lt::Table & table = model_.table();
 
-    if (table->xAxis())
+    if (table.xAxis())
     {
-        labelX_->setText(QString::fromStdString(table->xAxis()->name()));
+        labelX_->setText(QString::fromStdString(table.xAxis()->name()));
         labelX_->setVisible(true);
         // view_->horizontalHeader()->setVisible(true);
     }
@@ -98,9 +88,9 @@ void TableView::axesChanged()
         // view_->horizontalHeader()->setVisible(false);
     }
 
-    if (table->yAxis())
+    if (table.yAxis())
     {
-        labelY_->setText(QString::fromStdString(table->yAxis()->name()));
+        labelY_->setText(QString::fromStdString(table.yAxis()->name()));
         labelY_->setVisible(true);
         // view_->verticalHeader()->setVisible(true);
     }
@@ -111,9 +101,7 @@ void TableView::axesChanged()
     }
 }
 
-void TableView::setTable(lt::Table * table)
+void TableView::setTable(lt::Table && table)
 {
-    model_.setTable(table);
-    if (table != nullptr)
-        setWindowTitle(QString::fromStdString(table->name()));
+    model_.setTable(std::move(table));
 }
