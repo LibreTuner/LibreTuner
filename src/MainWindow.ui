@@ -4,10 +4,10 @@
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>800</width>
-    <height>600</height>
+       <x>0</x>
+       <y>0</y>
+       <width>1047</width>
+       <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+        <width>1047</width>
      <height>21</height>
     </rect>
    </property>
@@ -76,7 +76,7 @@
     <string>Graph</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>8</number>
+       <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -87,26 +87,54 @@
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+         <number>0</number>
      </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="GraphWidget" name="graph" native="true"/>
-     </item>
+        <property name="rightMargin">
+            <number>0</number>
+        </property>
+        <property name="bottomMargin">
+            <number>0</number>
+        </property>
+        <item>
+            <widget class="GraphWidget" name="graph" native="true"/>
+        </item>
     </layout>
    </widget>
   </widget>
-  <action name="actionSettings">
-   <property name="text">
-    <string>Settings</string>
-   </property>
-  </action>
-  <action name="actionOpen">
+     <widget class="QDockWidget" name="dockSidebar">
+         <property name="windowTitle">
+             <string>Sidebar</string>
+         </property>
+         <attribute name="dockWidgetArea">
+             <number>2</number>
+         </attribute>
+         <widget class="QWidget" name="dockWidgetContents_3">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+                 <item>
+                     <widget class="QLabel" name="labelDescription">
+                         <property name="text">
+                             <string>Select a table</string>
+                         </property>
+                         <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="wordWrap">
+                             <bool>true</bool>
+                         </property>
+                     </widget>
+                 </item>
+                 <item>
+                     <widget class="QTreeView" name="treeDetails"/>
+                 </item>
+             </layout>
+         </widget>
+     </widget>
+     <action name="actionSettings">
+         <property name="text">
+             <string>Settings</string>
+         </property>
+     </action>
+     <action name="actionOpen">
    <property name="text">
     <string>Open</string>
    </property>

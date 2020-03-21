@@ -33,6 +33,8 @@ set(libretuner_SRC
         models/CategorizedTablesModel.h
         models/TableModel.cpp
         models/TableModel.h
+        models/TableDetailsModel.cpp
+        models/TableDetailsModel.h
 
         widgets/TableView.cpp
         widgets/TableView.h

@@ -39,6 +39,11 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     series3d_ = new QtDataVisualization::QSurface3DSeries;
     // I have no fucking clue if Q3DSeries takes ownership of series
 
+    modelProxy_ = new QtDataVisualization::QItemModelSurfaceDataProxy;
+    modelProxy_->setUseModelCategories(true);
+    series3d_->setDrawMode(QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
+    series3d_->setDataProxy(modelProxy_);
+
     surface_->addSeries(series3d_);
     surface_->setHorizontalAspectRatio(1.0);
     surface_->axisZ()->setReversed(true);
@@ -61,6 +66,7 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
     // container_->setVisible(false);
 
     auto * hLayout = new QHBoxLayout;
+    hLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(hLayout);
     hLayout->addWidget(container_);
     hLayout->addWidget(chartView_);
@@ -78,25 +84,28 @@ void GraphWidget::setModel(TableModel * model)
     model_ = model;
     if (model != nullptr)
     {
-        refresh();
         connect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
     }
+    refresh();
 }
 
 void GraphWidget::refresh()
 {
     if (model_ == nullptr)
+    {
+        modelProxy_->setItemModel(nullptr);
+        chart_->removeAllSeries();
+        chartView_->setVisible(false);
+        container_->setVisible(false);
         return;
+    }
+
     const lt::Table & table = model_->table();
 
     if (!table.isOneDimensional())
     {
         // Two dimensional
-        auto * modelProxy = new QtDataVisualization::QItemModelSurfaceDataProxy(model_);
-        modelProxy->setUseModelCategories(true);
-        series3d_->setDrawMode(QtDataVisualization::QSurface3DSeries::DrawSurfaceAndWireframe);
-
-        series3d_->setDataProxy(modelProxy);
+        modelProxy_->setItemModel(model_);
 
         if (table.xAxis())
         {

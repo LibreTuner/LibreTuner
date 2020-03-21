@@ -6,6 +6,7 @@
 #include <QPointer>
 
 #include <models/CategorizedTablesModel.h>
+#include <models/TableDetailsModel.h>
 #include <rom/rom.h>
 
 class GraphWidget;
@@ -44,6 +45,7 @@ private:
 
     CategorizedTablesModel tablesModel_;
     QSortFilterProxyModel tablesSortModel_;
+    TableDetailsModel detailsModel_;
 
     lt::Calibration calibration_;
 

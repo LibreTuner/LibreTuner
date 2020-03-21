@@ -49,6 +49,7 @@ private:
     QWidget * container_;
     QtCharts::QChart * chart_;
     QtCharts::QChartView * chartView_;
+    QtDataVisualization::QItemModelSurfaceDataProxy * modelProxy_;
 
     QtDataVisualization::QSurface3DSeries * series3d_;
 };

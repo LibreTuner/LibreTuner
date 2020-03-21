@@ -2,8 +2,9 @@
 #define LIBRETUNER_TABLEVIEW_H
 
 #include <QWidget>
+#include <definition/table.h>
 
-#include "verticallabel.h"
+#include "VerticalLabel.h"
 #include "models/TableModel.h"
 
 class QTableView;

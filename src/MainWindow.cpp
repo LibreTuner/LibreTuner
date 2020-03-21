@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainW
 
     tablesSortModel_.setSourceModel(&tablesModel_);
     ui->treeView->setModel(&tablesSortModel_);
+    ui->treeDetails->setModel(&detailsModel_);
 
     QSettings settings;
     settings.beginGroup("MainWindow");
@@ -72,6 +73,11 @@ void MainWindow::importCalibration(const QString & path)
     calibration_.setModel(model);
     calibration_.setData(lt::MemoryBuffer(data.begin(), data.end()));
 
+    {
+        QFileInfo fi(path);
+        setWindowTitle("Overboost - " + fi.baseName());
+    }
+
     tablesModel_.setDefinition(model);
 
     // Add path to history
@@ -100,7 +106,11 @@ void MainWindow::on_treeView_activated(const QModelIndex & index)
         return;
 
     if (auto it = openedTables_.find(ti->id); it != openedTables_.end() && it->second)
+    {
+        if (it->second)
+            ui->tabs->setCurrentWidget(it->second);
         return;
+    }
 
     if (auto table = calibration_.getTable(ti->id))
     {
@@ -119,8 +129,17 @@ void MainWindow::on_tabs_tabCloseRequested(int index)
 
 void MainWindow::on_tabs_currentChanged(int index)
 {
-    auto * tab = reinterpret_cast<TableView*>(ui->tabs->widget(index));
+    auto * tab = reinterpret_cast<TableView *>(ui->tabs->widget(index));
+    if (tab == nullptr)
+    {
+        ui->graph->setModel(nullptr);
+        detailsModel_.setTable(nullptr);
+        return;
+    }
+
     ui->graph->setModel(tab->model());
+    detailsModel_.setTable(&tab->model()->table());
+    ui->labelDescription->setText(QString::fromStdString(tab->model()->table().description()));
 }
 
 void MainWindow::closeEvent(QCloseEvent * event) {
