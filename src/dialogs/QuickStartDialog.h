@@ -9,6 +9,12 @@ namespace Ui
 class QuickStartDialog;
 }
 
+enum class QuickStartMode
+{
+    Open,
+    Download,
+};
+
 class QuickStartDialog : public QDialog
 {
     Q_OBJECT
@@ -19,8 +25,12 @@ public:
 
     const QString & selectedCalibration() const { return selectedCalibration_; };
 
+    QuickStartMode mode() const { return mode_; }
+
 private slots:
     void on_buttonOpen_clicked();
+
+    void on_buttonDownload_clicked();
 
 private:
     Ui::QuickStartDialog * ui;
@@ -29,6 +39,8 @@ private:
 
     QStringList prevCalibrations_;
     QStringListModel prevCalibrationsModel_;
+
+    QuickStartMode mode_;
 };
 
 #endif // QUICKSTART_H

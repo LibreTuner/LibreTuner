@@ -64,6 +64,9 @@ public:
     View view(int offset, int size) { return data_.view(offset, size); }
     View view() { return data_.view(); }
 
+    // Recalculates checksum(s)
+    void correctChecksums();
+
     // Gets table by id. Returns none if the table does not exist.
     // If `create` is true and the table has not been initialized, creates
     // the table from the ROM data and definitions.

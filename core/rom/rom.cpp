@@ -315,6 +315,8 @@ std::unique_ptr<Axis> Calibration::getAxis(const std::string & id, bool create)
     return std::make_unique<Axis>(builder.build());
 }
 
+void Calibration::correctChecksums() { model_->checksums.correct(data_.data(), data_.size()); }
+
 } // namespace lt
 
 // Declare cereal versions out of scope

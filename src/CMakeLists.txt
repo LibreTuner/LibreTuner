@@ -15,7 +15,8 @@ set(libretuner_SRC
 
         OverboostApp.cpp
         OverboostApp.h
-
+        BackgroundTask.cpp
+        BackgroundTask.h
         MainWindow.cpp
         MainWindow.h
         MainWindow.ui
@@ -26,6 +27,9 @@ set(libretuner_SRC
         dialogs/ImportCalibrationDialog.cpp
         dialogs/ImportCalibrationDialog.h
         dialogs/ImportCalibrationDialog.ui
+        dialogs/DownloadDialog.cpp
+        dialogs/DownloadDialog.h
+        dialogs/DownloadDialog.ui
 
         models/PlatformsModel.cpp
         models/PlatformsModel.h

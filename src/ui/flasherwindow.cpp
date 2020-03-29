@@ -18,8 +18,8 @@
 
 #include "flasherwindow.h"
 
+#include "BackgroundTask.h"
 #include "authoptionsview.h"
-#include "backgroundtask.h"
 #include "fileselectwidget.h"
 #include "libretuner.h"
 #include "logger.h"

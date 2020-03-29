@@ -13,7 +13,7 @@
 #include <sstream>
 #include <thread>
 
-#include "backgroundtask.h"
+#include "BackgroundTask.h"
 #include "libretuner.h"
 #include "lt/session/sessionscanner.h"
 

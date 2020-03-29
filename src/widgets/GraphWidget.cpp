@@ -67,6 +67,8 @@ GraphWidget::GraphWidget(QWidget * parent) : QWidget(parent)
 
     auto * hLayout = new QHBoxLayout;
     hLayout->setContentsMargins(0, 0, 0, 0);
+    chart_->layout()->setContentsMargins(0, 0, 0, 0);
+    chart_->setBackgroundRoundness(0);
     setLayout(hLayout);
     hLayout->addWidget(container_);
     hLayout->addWidget(chartView_);
@@ -127,9 +129,10 @@ void GraphWidget::refresh()
         // container_->setVisible(true);
         container_->show();
     }
-    else if (table.height() == 1 && table.width() > 1)
+    else if (!table.isScalar())
     {
         auto * series = new QLineSeries;
+
         if (table.xAxis())
         {
             for (int x = 0; x < table.width(); ++x)

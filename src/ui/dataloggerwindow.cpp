@@ -29,7 +29,7 @@
 #include <QVBoxLayout>
 #include <QDesktopWidget>
 
-#include "backgroundtask.h"
+#include "BackgroundTask.h"
 #include "libretuner.h"
 #include "lt/datalog/datalogger.h"
 #include "lt/definition/platform.h"

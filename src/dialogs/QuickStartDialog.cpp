@@ -1,4 +1,5 @@
 #include "QuickStartDialog.h"
+#include "DownloadDialog.h"
 #include "ui_QuickStartDialog.h"
 
 #include <QFileDialog>
@@ -19,6 +20,7 @@ QuickStartDialog::QuickStartDialog(QWidget * parent) : QDialog(parent), ui(new U
 
     connect(ui->listCalibrations, &QListView::activated, [this](const QModelIndex & index) {
         selectedCalibration_ = prevCalibrationsModel_.data(index).toString();
+        mode_ = QuickStartMode::Open;
         accept();
     });
 }
@@ -35,5 +37,12 @@ void QuickStartDialog::on_buttonOpen_clicked()
 
     prevCalibrations_.push_front(url);
     selectedCalibration_ = std::move(url);
+    mode_ = QuickStartMode::Open;
+    accept();
+}
+
+void QuickStartDialog::on_buttonDownload_clicked()
+{
+    mode_ = QuickStartMode::Download;
     accept();
 }

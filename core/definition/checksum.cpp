@@ -98,7 +98,7 @@ void ChecksumBasic::correct(uint8_t * data, int size) const
     }
 }
 
-void Checksums::correct(uint8_t * data, size_t size)
+void Checksums::correct(uint8_t * data, size_t size) const
 {
     for (const ChecksumPtr & checksum : checksums_)
     {

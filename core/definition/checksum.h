@@ -85,7 +85,7 @@ public:
 
     /* Corrects the checksums for the data using modifiable sections.
      * Returns (false, errmsg) on failure and (true, "") on success. */
-    void correct(uint8_t * data, size_t size);
+    void correct(uint8_t * data, size_t size) const;
 
 private:
     std::vector<ChecksumPtr> checksums_;
