@@ -81,12 +81,18 @@ GraphWidget::~GraphWidget()
 void GraphWidget::setModel(TableModel * model)
 {
     if (model_ != nullptr)
+    {
         disconnect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
+        if (model_->table().isOneDimensional() && !model_->table().isScalar())
+            disconnect(model, &TableModel::dataChanged, this, &GraphWidget::refresh);
+    }
 
     model_ = model;
     if (model != nullptr)
     {
         connect(model, &TableModel::modelReset, this, &GraphWidget::refresh);
+        if (model->table().isOneDimensional() && !model->table().isScalar())
+            connect(model, &TableModel::dataChanged, this, &GraphWidget::refresh);
     }
     refresh();
 }

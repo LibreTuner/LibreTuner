@@ -21,6 +21,9 @@ public:
     // Returns selected platform
     const lt::Platform * selectedPlatform() const;
 
+protected:
+    void closeEvent(QCloseEvent * event) override;
+
 private:
     Ui::ImportCalibrationDialog * ui;
 

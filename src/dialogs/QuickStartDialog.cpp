@@ -32,10 +32,9 @@ void QuickStartDialog::on_buttonOpen_clicked()
     QString url = QFileDialog::getOpenFileName(this, tr("Open calibration file"), QString(),
                                                "Calibration (*.rom *.bin);;All files (*)");
 
-    if (url.isEmpty() || prevCalibrations_.contains(url))
-        return;
+    if (!url.isEmpty() && !prevCalibrations_.contains(url))
+        prevCalibrations_.push_front(url);
 
-    prevCalibrations_.push_front(url);
     selectedCalibration_ = std::move(url);
     mode_ = QuickStartMode::Open;
     accept();

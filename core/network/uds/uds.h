@@ -51,10 +51,7 @@ struct UdsPacket
     bool empty() const noexcept { return data.empty() && code == 0; }
 
     bool negative() const noexcept { return code == UDS_RES_NEGATIVE; }
-    uint8_t negativeCode() const noexcept
-    {
-        return data.size() > 1 ? 0 : data[1];
-    }
+    uint8_t negativeCode() const noexcept { return data.size() > 1 ? data[1] : 0; }
 };
 
 class Uds

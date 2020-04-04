@@ -45,7 +45,6 @@
                 </item>
             </layout>
         </widget>
-        <widget class="QWizardPage" name="wizardPage2"/>
     </widget>
     <resources/>
     <connections/>

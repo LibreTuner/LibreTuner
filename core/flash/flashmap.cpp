@@ -26,14 +26,22 @@
 namespace lt
 {
 
-FlashMap::FlashMap(const std::vector<uint8_t> & data, std::size_t offset)
-    : data_(data), offset_(offset)
-{
-}
+FlashMap::FlashMap(const std::vector<uint8_t> & data, std::size_t offset) : data_(data), offset_(offset) {}
 
-FlashMap::FlashMap(std::vector<uint8_t> && data, std::size_t offset)
-    : data_(std::move(data)), offset_(offset)
+FlashMap::FlashMap(std::vector<uint8_t> && data, std::size_t offset) : data_(std::move(data)), offset_(offset) {}
+
+FlashMap::FlashMap(const Calibration & calibration)
 {
+    const lt::Model * model = calibration.model();
+    if (model == nullptr)
+        throw std::runtime_error("invalid calibration");
+
+    const lt::Platform & platform = model->platform();
+    offset_ = platform.flashOffset;
+    std::vector<uint8_t> new_rom(calibration.data(), std::next(calibration.data(), calibration.size()));
+    std::vector<uint8_t> flash_region(std::next(new_rom.data(), offset_), std::next(new_rom.data(), new_rom.size()));
+
+    data_ = std::move(flash_region);
 }
 
 /*

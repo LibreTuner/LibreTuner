@@ -29,6 +29,7 @@ public:
     void importCalibration(const QString & path);
 
     void displayDownloadDialog();
+    void displayFlashDialog();
 
     // Tries to close existing calibration. Returns false if the user chooses to keep it open.
     bool closeCalibration();
@@ -43,23 +44,28 @@ public:
     bool setCalibration(const lt::Platform * platform, const uint8_t * data, std::size_t size,
                         const QString & path = QString());
 
+    void addRecentFiles();
+
 protected:
     void closeEvent(QCloseEvent * event) override;
 
 private slots:
     void on_actionOpen_triggered();
-
     void on_treeView_activated(const QModelIndex & index);
-
     void on_tabs_tabCloseRequested(int index);
-
     void on_tabs_currentChanged(int index);
-
     void on_actionDownload_triggered();
-
     void on_actionSave_triggered();
-
     void on_actionSave_As_triggered();
+
+    void updateSearch();
+    void updateRecent();
+
+    void on_actionFlash_triggered();
+
+    void on_buttonModifyScale_clicked();
+
+    void on_buttonModifyAdd_clicked();
 
 private:
     Ui::MainWindow * ui;

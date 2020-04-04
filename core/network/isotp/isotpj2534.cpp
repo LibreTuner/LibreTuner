@@ -1,4 +1,5 @@
 #include "isotpj2534.h"
+#include <fstream>
 #include <iostream>
 
 namespace lt::network
@@ -57,6 +58,16 @@ void IsoTpJ2534::recv(IsoTpPacket & result)
         if (id != options_.destId)
             continue;
         result.setData(std::next(std::begin(msg.Data), 4), msg.DataSize - 4);
+
+        // LOGGING
+        std::ofstream file("j2534_out.txt", std::ios::app);
+        file << "[" << std::hex << id << "] ->";
+        for (int i = 0; i < result.size(); ++i)
+        {
+            file << std::hex << " " << static_cast<uint32_t>(result.data()[i]);
+        }
+        file << "\n";
+        file.close();
         return;
     }
 }
@@ -87,9 +98,19 @@ void IsoTpJ2534::send(const IsoTpPacket & packet)
 
     uint32_t numMsgs = 1;
     // TODO: Configurable timeout (100ms should be good for now, right?)
-    channel_.writeMsgs(&msg, numMsgs, 100);
+    channel_.writeMsgs(&msg, numMsgs, 1000);
     if (numMsgs != 1)
         throw std::runtime_error("Message write timed out");
+
+    // LOGGING
+    std::ofstream file("j2534_out.txt", std::ios::app);
+    file << "[" << std::hex << id << "] <-";
+    for (int i = 0; i < packet.size(); ++i)
+    {
+        file << std::hex << " " << static_cast<uint32_t>(packet.data()[i]);
+    }
+    file << "\n";
+    file.close();
 }
 
 }

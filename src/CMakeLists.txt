@@ -30,6 +30,9 @@ set(libretuner_SRC
         dialogs/DownloadDialog.cpp
         dialogs/DownloadDialog.h
         dialogs/DownloadDialog.ui
+        dialogs/FlashDialog.cpp
+        dialogs/FlashDialog.h
+        dialogs/FlashDialog.ui
 
         models/PlatformsModel.cpp
         models/PlatformsModel.h

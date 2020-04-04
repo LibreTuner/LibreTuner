@@ -50,5 +50,16 @@
         <file>definitions/mx5_nc/LFN5EN.json</file>
         <file>definitions/mx5_nc/LFZZEA.json</file>
         <file>definitions/mx5_nc/main.json</file>
+        <file>definitions/mazdaspeed3/l39s.json</file>
+        <file>definitions/mazdaspeed3/main.json</file>
+        <file>definitions/mazdaspeed6/l38j.json</file>
+        <file>definitions/mazdaspeed6/l38k.yaml</file>
+        <file>definitions/mazdaspeed6/main.yaml</file>
+        <file>definitions/mazdaspeed6_dump/l38k.json</file>
+        <file>definitions/mazdaspeed6_dump/l38k.yaml</file>
+        <file>definitions/mazdaspeed6_dump/main.json</file>
+        <file>definitions/mazdaspeed6_dump/main.yaml</file>
+        <file>definitions/mazdaspeed6_vpt/l38j.json</file>
+        <file>definitions/mazdaspeed6_vpt/main.json</file>
     </qresource>
 </RCC>

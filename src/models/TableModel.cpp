@@ -112,3 +112,29 @@ Qt::ItemFlags TableModel::flags(const QModelIndex & index) const
     }
     return Qt::NoItemFlags;
 }
+
+void TableModel::scaleAll(double scale)
+{
+    for (int r = 0; r < table_.height(); ++r)
+    {
+        for (int c = 0; c < table_.width(); ++c)
+        {
+            table_.set(r, c, table_.get(r, c) * scale);
+        }
+    }
+
+    emit dataChanged(index(0, 0), index(table_.height() - 1, table_.width() - 1));
+}
+
+void TableModel::addAll(double amount)
+{
+    for (int r = 0; r < table_.height(); ++r)
+    {
+        for (int c = 0; c < table_.width(); ++c)
+        {
+            table_.set(r, c, table_.get(r, c) + amount);
+        }
+    }
+
+    emit dataChanged(index(0, 0), index(table_.height() - 1, table_.width() - 1));
+}

@@ -1,0 +1,6331 @@
+{
+  "tables": {
+    "_anal_14x1_A5E8": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A5E8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A5E8"
+    },
+    "_anal_11x1_2F3C0": {
+      "category": "Auto-analyzed (sub_C5B68)",
+      "description": "Auto-analyzed table at 2F3C0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-15_5",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_2F3C0"
+    },
+    "_anal_8x1_AC90": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AC90",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_AC90"
+    },
+    "_anal_29x1_2F32C": {
+      "category": "Auto-analyzed (sub_C5062)",
+      "description": "Auto-analyzed table at 2F32C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 29,
+      "name": "_anal_29x1_2F32C"
+    },
+    "_anal_9x1_A400": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A400",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A400"
+    },
+    "_anal_17x1_C578": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C578",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_C578"
+    },
+    "_anal_8x1_DCF0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DCF0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40408_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_DCF0"
+    },
+    "_anal_12x27_21E68": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 21E68",
+      "datatype": "float",
+      "height": 27,
+      "width": 12,
+      "name": "_anal_12x27_21E68"
+    },
+    "_anal_11x12_249EC": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 249EC",
+      "datatype": "float",
+      "height": 12,
+      "width": 11,
+      "name": "_anal_11x12_249EC"
+    },
+    "_anal_7x4_267EC": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 267EC",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_267EC"
+    },
+    "_anal_14x16_3360C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 3360C",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_3360C"
+    },
+    "_anal_14x1_CD18": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CD18",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CD18"
+    },
+    "_anal_8x1_A350": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at A350",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A350"
+    },
+    "_anal_14x4_23718": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 23718",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_23718"
+    },
+    "_anal_15x10_23EDC": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at 23EDC",
+      "datatype": "float",
+      "height": 10,
+      "width": 15,
+      "name": "_anal_15x10_23EDC"
+    },
+    "_anal_7x1_2EF40": {
+      "category": "Auto-analyzed (sub_A3E40)",
+      "description": "Auto-analyzed table at 2EF40",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EF40"
+    },
+    "_anal_13x4_2E2EC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2E2EC",
+      "datatype": "float",
+      "height": 4,
+      "width": 13,
+      "name": "_anal_13x4_2E2EC"
+    },
+    "_anal_10x1_B4A0": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B4A0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B4A0"
+    },
+    "_anal_22x1_D0D0": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at D0D0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 22,
+      "name": "_anal_22x1_D0D0"
+    },
+    "_anal_56x1_C010": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C010",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 56,
+      "name": "_anal_56x1_C010"
+    },
+    "_anal_14x1_BB2C": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BB2C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BB2C"
+    },
+    "_anal_14x1_2F58C": {
+      "category": "Auto-analyzed (sub_B14C8)",
+      "description": "Auto-analyzed table at 2F58C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F58C"
+    },
+    "_anal_8x3_2A770": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A770",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A770"
+    },
+    "_anal_14x14_3A680": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 3A680",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_3A680"
+    },
+    "_anal_15x1_CAF8": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at CAF8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CABC_15",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_CAF8"
+    },
+    "_anal_8x6_2AD30": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2AD30",
+      "datatype": "float",
+      "height": 6,
+      "width": 8,
+      "name": "_anal_8x6_2AD30"
+    },
+    "_anal_6x17_22888": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 22888",
+      "datatype": "float",
+      "height": 17,
+      "width": 6,
+      "name": "_anal_6x17_22888"
+    },
+    "_anal_13x1_E358": {
+      "category": "Auto-analyzed (sub_66980)",
+      "description": "Auto-analyzed table at E358",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E324_13",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_E358"
+    },
+    "_anal_13x31_13364": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 13364",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_13364"
+    },
+    "_anal_14x16_2FBE4": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 2FBE4",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_2FBE4"
+    },
+    "_anal_14x1_B284": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at B284",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B284"
+    },
+    "_anal_14x1_BAF4": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BAF4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BAF4"
+    },
+    "_anal_9x1_2F0FC": {
+      "category": "Auto-analyzed (sub_BEA08)",
+      "description": "Auto-analyzed table at 2F0FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F0FC"
+    },
+    "_anal_9x1_C2F0": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C2F0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_6",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_C2F0"
+    },
+    "_anal_14x8_19378": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at 19378",
+      "datatype": "float",
+      "height": 8,
+      "width": 14,
+      "name": "_anal_14x8_19378"
+    },
+    "_anal_14x1_CCE0": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CCE0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CCE0"
+    },
+    "_anal_11x1_3BF9C": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BF9C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BF9C"
+    },
+    "_anal_14x1_D400": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at D400",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D400"
+    },
+    "_anal_14x1_D71C": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D71C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D71C"
+    },
+    "_anal_5x1_BDFC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BDFC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_BDFC"
+    },
+    "_anal_11x1_3BC68": {
+      "category": "Auto-analyzed (sub_E332E)",
+      "description": "Auto-analyzed table at 3BC68",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BC68"
+    },
+    "_anal_8x1_CA04": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at CA04",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_CA04"
+    },
+    "_anal_7x1_E880": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at E880",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_2",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_E880"
+    },
+    "_anal_11x1_3B294": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B294",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B14C_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B294"
+    },
+    "_anal_14x1_A658": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A658",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A658"
+    },
+    "_anal_14x1_3B54C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B54C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B54C"
+    },
+    "_anal_7x1_D81C": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at D81C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D81C"
+    },
+    "_anal_10x31_1CE70": {
+      "category": "Auto-analyzed (sub_54474)",
+      "description": "Auto-analyzed table at 1CE70",
+      "datatype": "float",
+      "height": 31,
+      "width": 10,
+      "name": "_anal_10x31_1CE70"
+    },
+    "_anal_7x1_B034": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at B034",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B034"
+    },
+    "_anal_14x29_1C818": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1C818",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_1C818"
+    },
+    "_anal_7x1_A2F8": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at A2F8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_A2F8"
+    },
+    "_anal_14x1_E1E8": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E1E8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E1E8"
+    },
+    "_anal_6x1_B460": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B460",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_B460"
+    },
+    "_anal_13x31_152E0": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 152E0",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_152E0"
+    },
+    "_anal_11x1_C4D8": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at C4D8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_C4D8"
+    },
+    "_anal_8x1_2F1A8": {
+      "category": "Auto-analyzed (sub_BF84A)",
+      "description": "Auto-analyzed table at 2F1A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2F1A8"
+    },
+    "_anal_10x10_28424": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at 28424",
+      "datatype": "float",
+      "height": 10,
+      "width": 10,
+      "name": "_anal_10x10_28424"
+    },
+    "_anal_28x1_CF10": {
+      "category": "Auto-analyzed (sub_B14C8)",
+      "description": "Auto-analyzed table at CF10",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CEA0_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_CF10"
+    },
+    "_anal_15x1_B100": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B100",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_B100"
+    },
+    "_anal_7x1_E79C": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E79C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_E79C"
+    },
+    "_anal_8x1_C3E0": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at C3E0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_C3E0"
+    },
+    "_anal_8x1_ABFC": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at ABFC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_ABFC"
+    },
+    "_anal_11x1_DD64": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DD64",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_90_1",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_DD64"
+    },
+    "_anal_13x31_10104": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 10104",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_10104"
+    },
+    "_anal_8x28_1EB60": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1EB60",
+      "datatype": "float",
+      "height": 28,
+      "width": 8,
+      "name": "_anal_8x28_1EB60"
+    },
+    "_anal_15x17_38B34": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 38B34",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_38B34"
+    },
+    "_anal_7x1_D88C": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D88C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D88C"
+    },
+    "_anal_13x31_FAB8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at FAB8",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_FAB8"
+    },
+    "_anal_15x17_43634": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 43634",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_43634"
+    },
+    "_anal_5x1_DC44": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC44"
+    },
+    "_anal_12x1_DA44": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at DA44",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_944C_12",
+      "height": 1,
+      "width": 12,
+      "name": "_anal_12x1_DA44"
+    },
+    "_anal_8x1_A558": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at A558",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A558"
+    },
+    "_anal_7x8_2ABE0": {
+      "category": "Auto-analyzed (sub_760E0)",
+      "description": "Auto-analyzed table at 2ABE0",
+      "datatype": "float",
+      "height": 8,
+      "width": 7,
+      "name": "_anal_7x8_2ABE0"
+    },
+    "_anal_10x31_27DBC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 27DBC",
+      "datatype": "float",
+      "height": 31,
+      "width": 10,
+      "name": "_anal_10x31_27DBC"
+    },
+    "_anal_15x1_2EF5C": {
+      "category": "Auto-analyzed (sub_A4C48)",
+      "description": "Auto-analyzed table at 2EF5C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_2EF5C"
+    },
+    "_anal_9x1_A4B0": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A4B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_12",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A4B0"
+    },
+    "_anal_7x1_2EEB4": {
+      "category": "Auto-analyzed (sub_AA198)",
+      "description": "Auto-analyzed table at 2EEB4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_30_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EEB4"
+    },
+    "_anal_14x1_A578": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at A578",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A578"
+    },
+    "_anal_8x31_20EB8": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 20EB8",
+      "datatype": "float",
+      "height": 31,
+      "width": 8,
+      "name": "_anal_8x31_20EB8"
+    },
+    "_anal_11x1_3BF44": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BF44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BF44"
+    },
+    "_anal_8x9_1B1B8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B1B8",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B1B8"
+    },
+    "_anal_14x1_3B5F4": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B5F4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B5F4"
+    },
+    "_anal_7x1_CA44": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at CA44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_CA44"
+    },
+    "_anal_4x1_2ECCC": {
+      "category": "Auto-analyzed (sub_B1BA8)",
+      "description": "Auto-analyzed table at 2ECCC",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_2ECAC_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_2ECCC"
+    },
+    "_anal_28x1_CF80": {
+      "category": "Auto-analyzed (sub_B14C8)",
+      "description": "Auto-analyzed table at CF80",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CEA0_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_CF80"
+    },
+    "_anal_5x1_AD24": {
+      "category": "Auto-analyzed (sub_583C6)",
+      "description": "Auto-analyzed table at AD24",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_AD24"
+    },
+    "_anal_9x1_BE50": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at BE50",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_2",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_BE50"
+    },
+    "_anal_14x1_D2F4": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D2F4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D2F4"
+    },
+    "_anal_8x1_DCB0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DCB0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_403C8_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_DCB0"
+    },
+    "_anal_13x16_30374": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 30374",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_30374"
+    },
+    "_anal_5x1_DBCC": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DBCC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DBCC"
+    },
+    "_anal_10x8_2641C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2641C",
+      "datatype": "float",
+      "height": 8,
+      "width": 10,
+      "name": "_anal_10x8_2641C"
+    },
+    "_anal_15x33_441EC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 441EC",
+      "datatype": "float",
+      "height": 33,
+      "width": 15,
+      "name": "_anal_15x33_441EC"
+    },
+    "_anal_13x1_E38C": {
+      "category": "Auto-analyzed (sub_66980)",
+      "description": "Auto-analyzed table at E38C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E324_13",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_E38C"
+    },
+    "_anal_8x1_C2B0": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C2B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_C2B0"
+    },
+    "_anal_7x5_42324": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at 42324",
+      "datatype": "float",
+      "height": 5,
+      "width": 7,
+      "name": "_anal_7x5_42324"
+    },
+    "_anal_3x1_DC98": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC98",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_20",
+      "height": 1,
+      "width": 3,
+      "name": "_anal_3x1_DC98"
+    },
+    "_anal_8x1_2F188": {
+      "category": "Auto-analyzed (sub_C0E88)",
+      "description": "Auto-analyzed table at 2F188",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_0",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2F188"
+    },
+    "_anal_11x1_3B268": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B268",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B14C_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B268"
+    },
+    "_anal_12x27_22378": {
+      "category": "Auto-analyzed (sub_6A6A6)",
+      "description": "Auto-analyzed table at 22378",
+      "datatype": "float",
+      "height": 27,
+      "width": 12,
+      "name": "_anal_12x27_22378"
+    },
+    "_anal_7x1_E694": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at E694",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E678_7",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_E694"
+    },
+    "_anal_13x1_DD30": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DD30",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_400_25",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_DD30"
+    },
+    "_anal_13x31_14648": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 14648",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_14648"
+    },
+    "_anal_14x1_BABC": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BABC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BABC"
+    },
+    "_anal_11x1_3B94C": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B94C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B94C"
+    },
+    "_anal_13x31_11A34": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 11A34",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_11A34"
+    },
+    "_anal_13x15_243D4": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at 243D4",
+      "datatype": "float",
+      "height": 15,
+      "width": 13,
+      "name": "_anal_13x15_243D4"
+    },
+    "_anal_21x1_3BDE8": {
+      "category": "Auto-analyzed (sub_E4128)",
+      "description": "Auto-analyzed table at 3BDE8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-100_10",
+      "height": 1,
+      "width": 21,
+      "name": "_anal_21x1_3BDE8"
+    },
+    "_anal_8x1_B858": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B858",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_B858"
+    },
+    "_anal_14x1_A6C8": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A6C8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A6C8"
+    },
+    "_anal_11x1_3B9FC": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3B9FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B9FC"
+    },
+    "_anal_129x1_C800": {
+      "category": "Auto-analyzed (sub_764EE)",
+      "description": "Auto-analyzed table at C800",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 129,
+      "name": "_anal_129x1_C800"
+    },
+    "_anal_14x1_40700": {
+      "category": "Auto-analyzed (sub_6BED4)",
+      "description": "Auto-analyzed table at 40700",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_40700"
+    },
+    "_anal_14x1_BA4C": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at BA4C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BA4C"
+    },
+    "_anal_10x1_B478": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B478",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B478"
+    },
+    "_anal_14x29_2D9B4": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 2D9B4",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_2D9B4"
+    },
+    "_anal_14x28_25C4C": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 25C4C",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_25C4C"
+    },
+    "_anal_14x1_BB64": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BB64",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BB64"
+    },
+    "_anal_8x3_2A530": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A530",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A530"
+    },
+    "_anal_10x1_2EF98": {
+      "category": "Auto-analyzed (sub_A577A)",
+      "description": "Auto-analyzed table at 2EF98",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_2000_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_2EF98"
+    },
+    "_anal_7x1_2EEEC": {
+      "category": "Auto-analyzed (sub_AA198)",
+      "description": "Auto-analyzed table at 2EEEC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_30_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EEEC"
+    },
+    "_anal_17x1_D8FC": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at D8FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_D8FC"
+    },
+    "_anal_14x29_26AB4": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 26AB4",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_26AB4"
+    },
+    "_anal_14x1_A690": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A690",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A690"
+    },
+    "_anal_8x6_2ADF0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2ADF0",
+      "datatype": "float",
+      "height": 6,
+      "width": 8,
+      "name": "_anal_8x6_2ADF0"
+    },
+    "_anal_14x8_19538": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at 19538",
+      "datatype": "float",
+      "height": 8,
+      "width": 14,
+      "name": "_anal_14x8_19538"
+    },
+    "_anal_4x1_BF88": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at BF88",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_BF78_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_BF88"
+    },
+    "_anal_8x1_CC88": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CC88",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_CC88"
+    },
+    "_anal_14x4_23B78": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 23B78",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_23B78"
+    },
+    "_anal_15x1_A9C8": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at A9C8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_A9C8"
+    },
+    "_anal_11x1_E0A8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at E0A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_10",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_E0A8"
+    },
+    "_anal_14x1_B878": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B878",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_1",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B878"
+    },
+    "_anal_11x1_3B89C": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B89C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B7EC_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B89C"
+    },
+    "_anal_13x1_C334": {
+      "category": "Auto-analyzed (sub_934B4)",
+      "description": "Auto-analyzed table at C334",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_C334"
+    },
+    "_anal_28x1_D278": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at D278",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_D128_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_D278"
+    },
+    "_anal_13x4_2E21C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2E21C",
+      "datatype": "float",
+      "height": 4,
+      "width": 13,
+      "name": "_anal_13x4_2E21C"
+    },
+    "_anal_6x1_C504": {
+      "category": "Auto-analyzed (sub_75FEC)",
+      "description": "Auto-analyzed table at C504",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_C504"
+    },
+    "_anal_15x1_B13C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B13C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_B13C"
+    },
+    "_anal_11x1_3C020": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3C020",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3C020"
+    },
+    "_anal_11x1_37E80": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37E80",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_37E10_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_37E80"
+    },
+    "_anal_14x1_D438": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at D438",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D438"
+    },
+    "_anal_11x6_2E114": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at 2E114",
+      "datatype": "float",
+      "height": 6,
+      "width": 11,
+      "name": "_anal_11x6_2E114"
+    },
+    "_anal_13x16_313B4": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 313B4",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_313B4"
+    },
+    "_anal_8x1_A938": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at A938",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A938"
+    },
+    "_anal_14x1_CDC0": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CDC0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CDC0"
+    },
+    "_anal_11x1_3BF70": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BF70",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BF70"
+    },
+    "_anal_14x1_2F5FC": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2F5FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F5FC"
+    },
+    "_anal_14x29_2D35C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 2D35C",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_2D35C"
+    },
+    "_anal_13x31_10D9C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 10D9C",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_10D9C"
+    },
+    "_anal_13x31_165C4": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 165C4",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_165C4"
+    },
+    "_anal_14x16_3398C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 3398C",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_3398C"
+    },
+    "_anal_13x1_2ED10": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2ED10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2ED10"
+    },
+    "_anal_29x1_A198": {
+      "category": "Auto-analyzed (sub_764EE)",
+      "description": "Auto-analyzed table at A198",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 29,
+      "name": "_anal_29x1_A198"
+    },
+    "_anal_9x1_A3B8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A3B8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A3B8"
+    },
+    "_anal_13x1_37D44": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at 37D44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_0",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_37D44"
+    },
+    "_anal_13x1_A448": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A448",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_A448"
+    },
+    "_anal_28x1_D208": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at D208",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_D128_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_D208"
+    },
+    "_anal_6x1_37E68": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37E68",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_37DF8_6",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_37E68"
+    },
+    "_anal_9x15_1BDC4": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at 1BDC4",
+      "datatype": "float",
+      "height": 15,
+      "width": 9,
+      "name": "_anal_9x15_1BDC4"
+    },
+    "_anal_21x1_3BD40": {
+      "category": "Auto-analyzed (sub_E4128)",
+      "description": "Auto-analyzed table at 3BD40",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-100_10",
+      "height": 1,
+      "width": 21,
+      "name": "_anal_21x1_3BD40"
+    },
+    "_anal_12x14_24134": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at 24134",
+      "datatype": "float",
+      "height": 14,
+      "width": 12,
+      "name": "_anal_12x14_24134"
+    },
+    "_anal_7x1_E780": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E780",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_E780"
+    },
+    "_anal_5x1_DC1C": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC1C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC1C"
+    },
+    "_anal_9x1_2F144": {
+      "category": "Auto-analyzed (sub_BF84A)",
+      "description": "Auto-analyzed table at 2F144",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F144"
+    },
+    "_anal_15x4_257DC": {
+      "category": "Auto-analyzed (sub_78DA0)",
+      "description": "Auto-analyzed table at 257DC",
+      "datatype": "float",
+      "height": 4,
+      "width": 15,
+      "name": "_anal_15x4_257DC"
+    },
+    "_anal_14x28_2C71C": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 2C71C",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_2C71C"
+    },
+    "_anal_5x1_ACFC": {
+      "category": "Auto-analyzed (sub_583C6)",
+      "description": "Auto-analyzed table at ACFC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_ACFC"
+    },
+    "_anal_13x1_B784": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B784",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_7",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_B784"
+    },
+    "_anal_6x1_AE7C": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at AE7C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_100",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_AE7C"
+    },
+    "_anal_15x1_D364": {
+      "category": "Auto-analyzed (sub_58B18)",
+      "description": "Auto-analyzed table at D364",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_D364"
+    },
+    "_anal_13x31_18B8C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 18B8C",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_18B8C"
+    },
+    "_anal_13x31_13FFC": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 13FFC",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_13FFC"
+    },
+    "_anal_13x1_A47C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A47C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1000_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_A47C"
+    },
+    "_anal_14x1_A520": {
+      "category": "Auto-analyzed (sub_6AA5C)",
+      "description": "Auto-analyzed table at A520",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A520"
+    },
+    "_anal_6x1_C5D4": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at C5D4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_C5D4"
+    },
+    "_anal_10x1_2F02C": {
+      "category": "Auto-analyzed (sub_BEA08)",
+      "description": "Auto-analyzed table at 2F02C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_2F02C"
+    },
+    "_anal_11x1_3B870": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B870",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B7EC_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B870"
+    },
+    "_anal_9x9_1FFE4": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1FFE4",
+      "datatype": "float",
+      "height": 9,
+      "width": 9,
+      "name": "_anal_9x9_1FFE4"
+    },
+    "_anal_9x1_B814": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B814",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_6_1",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B814"
+    },
+    "_anal_8x1_A830": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at A830",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A830"
+    },
+    "_anal_8x1_A2B8": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at A2B8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A2B8"
+    },
+    "_anal_14x1_D5B0": {
+      "category": "Auto-analyzed (sub_6AA5C)",
+      "description": "Auto-analyzed table at D5B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D5B0"
+    },
+    "_anal_19x20_40B1C": {
+      "category": "Auto-analyzed (Unidentified_7)",
+      "description": "Auto-analyzed table at 40B1C",
+      "datatype": "float",
+      "height": 20,
+      "width": 19,
+      "name": "_anal_19x20_40B1C"
+    },
+    "_anal_14x1_ADA8": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at ADA8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_AD38_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_ADA8"
+    },
+    "_anal_15x17_42E3C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 42E3C",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_42E3C"
+    },
+    "_anal_14x1_2EDAC": {
+      "category": "Auto-analyzed (sub_AEF90)",
+      "description": "Auto-analyzed table at 2EDAC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2EDAC"
+    },
+    "_anal_14x1_A620": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A620",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A620"
+    },
+    "_anal_12x1_B554": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B554",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_450_50",
+      "height": 1,
+      "width": 12,
+      "name": "_anal_12x1_B554"
+    },
+    "_anal_8x1_ADE0": {
+      "category": "Auto-analyzed (sub_54474)",
+      "description": "Auto-analyzed table at ADE0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_160",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_ADE0"
+    },
+    "_anal_14x9_36C38": {
+      "category": "Auto-analyzed (sub_82A78)",
+      "description": "Auto-analyzed table at 36C38",
+      "datatype": "float",
+      "height": 9,
+      "width": 14,
+      "name": "_anal_14x9_36C38"
+    },
+    "_anal_11x1_3BE94": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BE94",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BE94"
+    },
+    "_anal_7x1_ABC0": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at ABC0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_ABC0"
+    },
+    "_anal_6x1_C464": {
+      "category": "Auto-analyzed (Unidentified_6)",
+      "description": "Auto-analyzed table at C464",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_C464"
+    },
+    "_anal_8x9_1B518": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B518",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B518"
+    },
+    "_anal_13x31_12080": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 12080",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_12080"
+    },
+    "_anal_8x9_1B2D8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B2D8",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B2D8"
+    },
+    "_anal_14x1_D4A8": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at D4A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D4A8"
+    },
+    "_anal_11x1_A4D4": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A4D4",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_96C8_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_A4D4"
+    },
+    "_anal_9x1_B678": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B678",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_3",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B678"
+    },
+    "_anal_12x12_1C5D8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1C5D8",
+      "datatype": "float",
+      "height": 12,
+      "width": 12,
+      "name": "_anal_12x12_1C5D8"
+    },
+    "_anal_15x9_45164": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 45164",
+      "datatype": "float",
+      "height": 9,
+      "width": 15,
+      "name": "_anal_15x9_45164"
+    },
+    "_anal_8x9_1B998": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B998",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B998"
+    },
+    "_anal_7x1_A850": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at A850",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_250_125",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_A850"
+    },
+    "_anal_14x29_2710C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 2710C",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_2710C"
+    },
+    "_anal_11x1_3BFC8": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BFC8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BFC8"
+    },
+    "_anal_9x1_2F66C": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 2F66C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F66C"
+    },
+    "_anal_13x1_A284": {
+      "category": "Auto-analyzed (sub_707B4)",
+      "description": "Auto-analyzed table at A284",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_A284"
+    },
+    "_anal_14x28_2CD3C": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 2CD3C",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_2CD3C"
+    },
+    "_anal_7x5_1C0CC": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at 1C0CC",
+      "datatype": "float",
+      "height": 5,
+      "width": 7,
+      "name": "_anal_7x5_1C0CC"
+    },
+    "_anal_14x1_D470": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at D470",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D470"
+    },
+    "_anal_4x1_2EFC0": {
+      "category": "Auto-analyzed (sub_A577A)",
+      "description": "Auto-analyzed table at 2EFC0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_53_15",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_2EFC0"
+    },
+    "_anal_13x31_29958": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 29958",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_29958"
+    },
+    "_anal_35x1_CBFC": {
+      "category": "Auto-analyzed (sub_AEF90)",
+      "description": "Auto-analyzed table at CBFC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 35,
+      "name": "_anal_35x1_CBFC"
+    },
+    "_anal_9x1_AE58": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at AE58",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_AE58"
+    },
+    "_anal_12x1_C434": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C434",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_944C_12",
+      "height": 1,
+      "width": 12,
+      "name": "_anal_12x1_C434"
+    },
+    "_anal_8x1_D66C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at D66C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_D66C"
+    },
+    "_anal_14x1_A700": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A700",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A700"
+    },
+    "_anal_8x28_1DBA0": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1DBA0",
+      "datatype": "float",
+      "height": 28,
+      "width": 8,
+      "name": "_anal_8x28_1DBA0"
+    },
+    "_anal_7x9_268BC": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 268BC",
+      "datatype": "float",
+      "height": 9,
+      "width": 7,
+      "name": "_anal_7x9_268BC"
+    },
+    "_anal_10x31_1D348": {
+      "category": "Auto-analyzed (sub_54474)",
+      "description": "Auto-analyzed table at 1D348",
+      "datatype": "float",
+      "height": 31,
+      "width": 10,
+      "name": "_anal_10x31_1D348"
+    },
+    "_anal_7x1_AF2C": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at AF2C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_AF2C"
+    },
+    "_anal_8x1_BE10": {
+      "category": "Auto-analyzed (sub_63C96)",
+      "description": "Auto-analyzed table at BE10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_50_10",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BE10"
+    },
+    "_anal_7x1_AF48": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at AF48",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_AF48"
+    },
+    "_anal_13x1_BCDC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BCDC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_BCDC"
+    },
+    "_anal_15x1_AA7C": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AA7C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_AA7C"
+    },
+    "_anal_8x3_2A710": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A710",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A710"
+    },
+    "_anal_14x1_E428": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E428",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E428"
+    },
+    "_anal_15x1_A8DC": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at A8DC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_A8DC"
+    },
+    "_anal_12x1_C47C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C47C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 12,
+      "name": "_anal_12x1_C47C"
+    },
+    "_anal_15x8_4298C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 4298C",
+      "datatype": "float",
+      "height": 8,
+      "width": 15,
+      "name": "_anal_15x8_4298C"
+    },
+    "_anal_13x4_2E3BC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2E3BC",
+      "datatype": "float",
+      "height": 4,
+      "width": 13,
+      "name": "_anal_13x4_2E3BC"
+    },
+    "_anal_14x14_39A40": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 39A40",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_39A40"
+    },
+    "_anal_7x1_D8E0": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D8E0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D8E0"
+    },
+    "_anal_5x1_DC58": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC58",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC58"
+    },
+    "_anal_15x1_AA04": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at AA04",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_AA04"
+    },
+    "_anal_13x1_B9E0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at B9E0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_B9E0"
+    },
+    "_anal_14x1_2EDE4": {
+      "category": "Auto-analyzed (sub_AEF90)",
+      "description": "Auto-analyzed table at 2EDE4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2EDE4"
+    },
+    "_anal_6x1_AFA4": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at AFA4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1000_1000",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_AFA4"
+    },
+    "_anal_7x1_D870": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D870",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D870"
+    },
+    "_anal_16x31_F2F8": {
+      "category": "Auto-analyzed (sub_707B4)",
+      "description": "Auto-analyzed table at F2F8",
+      "datatype": "float",
+      "height": 31,
+      "width": 16,
+      "name": "_anal_16x31_F2F8"
+    },
+    "_anal_11x1_3BA54": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3BA54",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BA54"
+    },
+    "_anal_13x1_2ED44": {
+      "category": "Auto-analyzed (sub_ABE68)",
+      "description": "Auto-analyzed table at 2ED44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2ED44"
+    },
+    "_anal_13x1_37D10": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at 37D10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_0",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_37D10"
+    },
+    "_anal_17x1_C534": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C534",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_C534"
+    },
+    "_anal_14x16_258CC": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 258CC",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_258CC"
+    },
+    "_anal_9x15_31F20": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at 31F20",
+      "datatype": "float",
+      "height": 15,
+      "width": 9,
+      "name": "_anal_9x15_31F20"
+    },
+    "_anal_28x1_CFF0": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CFF0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CEA0_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_CFF0"
+    },
+    "_anal_8x1_BBDC": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at BBDC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BBDC"
+    },
+    "_anal_11x1_B0A8": {
+      "category": "Auto-analyzed (sub_6C1F8)",
+      "description": "Auto-analyzed table at B0A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-250_50",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B0A8"
+    },
+    "_anal_21x1_3BD94": {
+      "category": "Auto-analyzed (sub_E4128)",
+      "description": "Auto-analyzed table at 3BD94",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-100_10",
+      "height": 1,
+      "width": 21,
+      "name": "_anal_21x1_3BD94"
+    },
+    "_anal_8x1_B440": {
+      "category": "Auto-analyzed (sub_78DA0)",
+      "description": "Auto-analyzed table at B440",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_7_7",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_B440"
+    },
+    "_anal_14x1_E220": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E220",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E220"
+    },
+    "_anal_7x1_B5F8": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B5F8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B5F8"
+    },
+    "_anal_8x1_AE00": {
+      "category": "Auto-analyzed (sub_54474)",
+      "description": "Auto-analyzed table at AE00",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_AE00"
+    },
+    "_anal_10x8_2655C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2655C",
+      "datatype": "float",
+      "height": 8,
+      "width": 10,
+      "name": "_anal_10x8_2655C"
+    },
+    "_anal_8x1_2F6F8": {
+      "category": "Auto-analyzed (sub_C5062)",
+      "description": "Auto-analyzed table at 2F6F8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_30",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2F6F8"
+    },
+    "_anal_15x1_B7D8": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B7D8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_B7D8"
+    },
+    "_anal_14x6_29FF8": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 29FF8",
+      "datatype": "float",
+      "height": 6,
+      "width": 14,
+      "name": "_anal_14x6_29FF8"
+    },
+    "_anal_10x1_3B220": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B220",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_3B220"
+    },
+    "_anal_14x1_B918": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B918",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_1",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B918"
+    },
+    "_anal_16x1_BB9C": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BB9C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_9190_16",
+      "height": 1,
+      "width": 16,
+      "name": "_anal_16x1_BB9C"
+    },
+    "_anal_8x1_37CF0": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at 37CF0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_37CF0"
+    },
+    "_anal_13x6_2A9C8": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2A9C8",
+      "datatype": "float",
+      "height": 6,
+      "width": 13,
+      "name": "_anal_13x6_2A9C8"
+    },
+    "_anal_10x8_2535C": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at 2535C",
+      "datatype": "float",
+      "height": 8,
+      "width": 10,
+      "name": "_anal_10x8_2535C"
+    },
+    "_anal_8x1_A244": {
+      "category": "Auto-analyzed (sub_764EE)",
+      "description": "Auto-analyzed table at A244",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A244"
+    },
+    "_anal_11x1_E07C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at E07C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_10",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_E07C"
+    },
+    "_anal_10x1_2F054": {
+      "category": "Auto-analyzed (sub_BEA08)",
+      "description": "Auto-analyzed table at 2F054",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_2F054"
+    },
+    "_anal_15x1_DB34": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DB34",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_DB34"
+    },
+    "_anal_7x1_2EED0": {
+      "category": "Auto-analyzed (sub_AA198)",
+      "description": "Auto-analyzed table at 2EED0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_30_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EED0"
+    },
+    "_anal_11x1_3BEC0": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BEC0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BEC0"
+    },
+    "_anal_11x1_3B8C8": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B8C8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B8C8"
+    },
+    "_anal_9x1_DB10": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DB10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_DB10"
+    },
+    "_anal_11x1_3BA28": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3BA28",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BA28"
+    },
+    "_anal_8x1_DD10": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DD10",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40428_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_DD10"
+    },
+    "_anal_15x1_A7E4": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at A7E4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_A7E4"
+    },
+    "_anal_13x1_BD10": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BD10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_BD10"
+    },
+    "_anal_20x1_E198": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E198",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40480_20",
+      "height": 1,
+      "width": 20,
+      "name": "_anal_20x1_E198"
+    },
+    "_anal_13x31_2930C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 2930C",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_2930C"
+    },
+    "_anal_11x1_3B818": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B818",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B7EC_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B818"
+    },
+    "_anal_8x1_AC70": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AC70",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_AC70"
+    },
+    "_anal_13x31_14C94": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 14C94",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_14C94"
+    },
+    "_anal_4x1_BFC8": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at BFC8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_BFB8_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_BFC8"
+    },
+    "_anal_7x8_31B14": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 31B14",
+      "datatype": "float",
+      "height": 8,
+      "width": 7,
+      "name": "_anal_7x8_31B14"
+    },
+    "_anal_8x1_DCD0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DCD0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_403E8_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_DCD0"
+    },
+    "_anal_8x1_2F3A0": {
+      "category": "Auto-analyzed (sub_C5062)",
+      "description": "Auto-analyzed table at 2F3A0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_30",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2F3A0"
+    },
+    "_anal_14x1_2F554": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2F554",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F554"
+    },
+    "_anal_14x32_28C0C": {
+      "category": "Auto-analyzed (sub_6DEFC)",
+      "description": "Auto-analyzed table at 28C0C",
+      "datatype": "float",
+      "height": 32,
+      "width": 14,
+      "name": "_anal_14x32_28C0C"
+    },
+    "_anal_11x1_3C04C": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3C04C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3C04C"
+    },
+    "_anal_8x1_37EF8": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37EF8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_37EF8"
+    },
+    "_anal_8x1_A330": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at A330",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A330"
+    },
+    "_anal_15x33_43A30": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 43A30",
+      "datatype": "float",
+      "height": 33,
+      "width": 15,
+      "name": "_anal_15x33_43A30"
+    },
+    "_anal_15x20_411C4": {
+      "category": "Auto-analyzed (sub_8A79A)",
+      "description": "Auto-analyzed table at 411C4",
+      "datatype": "float",
+      "height": 20,
+      "width": 15,
+      "name": "_anal_15x20_411C4"
+    },
+    "_anal_29x1_AAD8": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AAD8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 29,
+      "name": "_anal_29x1_AAD8"
+    },
+    "_anal_13x16_306B4": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 306B4",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_306B4"
+    },
+    "_anal_7x1_A314": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at A314",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_A314"
+    },
+    "_anal_14x32_24BFC": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at 24BFC",
+      "datatype": "float",
+      "height": 32,
+      "width": 14,
+      "name": "_anal_14x32_24BFC"
+    },
+    "_anal_8x1_B838": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B838",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_B838"
+    },
+    "_anal_10x1_AFBC": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at AFBC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_AFBC"
+    },
+    "_anal_7x4_2A3A0": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2A3A0",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2A3A0"
+    },
+    "_anal_9x1_2F690": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 2F690",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F690"
+    },
+    "_anal_21x1_3BCEC": {
+      "category": "Auto-analyzed (sub_E4128)",
+      "description": "Auto-analyzed table at 3BCEC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-100_10",
+      "height": 1,
+      "width": 21,
+      "name": "_anal_21x1_3BCEC"
+    },
+    "_anal_11x1_3BC3C": {
+      "category": "Auto-analyzed (sub_E332E)",
+      "description": "Auto-analyzed table at 3BC3C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BC3C"
+    },
+    "_anal_10x1_AF04": {
+      "category": "Auto-analyzed (sub_6DEFC)",
+      "description": "Auto-analyzed table at AF04",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_AF04"
+    },
+    "_anal_11x1_2F3EC": {
+      "category": "Auto-analyzed (sub_C5B68)",
+      "description": "Auto-analyzed table at 2F3EC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-15_5",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_2F3EC"
+    },
+    "_anal_14x4_23A98": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 23A98",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_23A98"
+    },
+    "_anal_14x28_1F260": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1F260",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_1F260"
+    },
+    "_anal_14x1_E460": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E460",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E460"
+    },
+    "_anal_14x31_20128": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 20128",
+      "datatype": "float",
+      "height": 31,
+      "width": 14,
+      "name": "_anal_14x31_20128"
+    },
+    "_anal_5x1_DC08": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC08",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC08"
+    },
+    "_anal_8x3_2A590": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A590",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A590"
+    },
+    "_anal_14x1_E540": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at E540",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E540"
+    },
+    "_anal_15x1_CA60": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at CA60",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_400EC_15",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_CA60"
+    },
+    "_anal_8x1_BDDC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BDDC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BDDC"
+    },
+    "_anal_14x1_3B62C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B62C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B62C"
+    },
+    "_anal_8x28_1D820": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1D820",
+      "datatype": "float",
+      "height": 28,
+      "width": 8,
+      "name": "_anal_8x28_1D820"
+    },
+    "_anal_14x1_CE68": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CE68",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CE68"
+    },
+    "_anal_15x1_AA40": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AA40",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_AA40"
+    },
+    "_anal_7x1_D8A8": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D8A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D8A8"
+    },
+    "_anal_13x16_316F4": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 316F4",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_316F4"
+    },
+    "_anal_14x1_E498": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E498",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E498"
+    },
+    "_anal_14x1_A738": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A738",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A738"
+    },
+    "_anal_14x14_39D50": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 39D50",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_39D50"
+    },
+    "_anal_15x17_3833C": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 3833C",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_3833C"
+    },
+    "_anal_7x4_2B174": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2B174",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2B174"
+    },
+    "_anal_14x4_239B8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 239B8",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_239B8"
+    },
+    "_anal_14x1_CE30": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CE30",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CE30"
+    },
+    "_anal_8x9_1AE58": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1AE58",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1AE58"
+    },
+    "_anal_14x9_36E30": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 36E30",
+      "datatype": "float",
+      "height": 9,
+      "width": 14,
+      "name": "_anal_14x9_36E30"
+    },
+    "_anal_8x3_2A470": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A470",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A470"
+    },
+    "_anal_17x1_E634": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at E634",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_E634"
+    },
+    "_anal_13x31_18540": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 18540",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_18540"
+    },
+    "_anal_14x16_3328C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 3328C",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_3328C"
+    },
+    "_anal_5x6_1BAB8": {
+      "category": "Auto-analyzed (sub_6AA5C)",
+      "description": "Auto-analyzed table at 1BAB8",
+      "datatype": "float",
+      "height": 6,
+      "width": 5,
+      "name": "_anal_5x6_1BAB8"
+    },
+    "_anal_13x6_2A890": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2A890",
+      "datatype": "float",
+      "height": 6,
+      "width": 13,
+      "name": "_anal_13x6_2A890"
+    },
+    "_anal_10x13_22F40": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 22F40",
+      "datatype": "float",
+      "height": 13,
+      "width": 10,
+      "name": "_anal_10x13_22F40"
+    },
+    "_anal_8x1_BD7C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BD7C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BD7C"
+    },
+    "_anal_9x1_B96C": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at B96C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B96C"
+    },
+    "_anal_129x1_C5FC": {
+      "category": "Auto-analyzed (sub_764EE)",
+      "description": "Auto-analyzed table at C5FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 129,
+      "name": "_anal_129x1_C5FC"
+    },
+    "_anal_13x31_1725C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1725C",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_1725C"
+    },
+    "_anal_14x1_B214": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at B214",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B214"
+    },
+    "_anal_14x1_2F51C": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2F51C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F51C"
+    },
+    "_anal_8x1_BD9C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BD9C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BD9C"
+    },
+    "_anal_14x4_237F8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 237F8",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_237F8"
+    },
+    "_anal_13x1_19310": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 19310",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1000_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_19310"
+    },
+    "_anal_8x3_252FC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at 252FC",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_252FC"
+    },
+    "_anal_14x1_D3C8": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at D3C8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D3C8"
+    },
+    "_anal_13x1_2ED78": {
+      "category": "Auto-analyzed (sub_ABE68)",
+      "description": "Auto-analyzed table at 2ED78",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2ED78"
+    },
+    "_anal_5x1_9FC4": {
+      "category": "Auto-analyzed (sub_707B4)",
+      "description": "Auto-analyzed table at 9FC4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_25",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_9FC4"
+    },
+    "_anal_11x1_E7E4": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E7E4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_100",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_E7E4"
+    },
+    "_anal_13x31_17EF4": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 17EF4",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_17EF4"
+    },
+    "_anal_14x1_A990": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at A990",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A990"
+    },
+    "_anal_7x5_1C040": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at 1C040",
+      "datatype": "float",
+      "height": 5,
+      "width": 7,
+      "name": "_anal_7x5_1C040"
+    },
+    "_anal_9x1_B630": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B630",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_125",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B630"
+    },
+    "_anal_14x17_1A980": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1A980",
+      "datatype": "float",
+      "height": 17,
+      "width": 14,
+      "name": "_anal_14x17_1A980"
+    },
+    "_anal_16x1_3B08C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B08C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B04C_16",
+      "height": 1,
+      "width": 16,
+      "name": "_anal_16x1_3B08C"
+    },
+    "_anal_11x1_3B8F4": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B8F4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B8F4"
+    },
+    "_anal_8x3_2A6B0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A6B0",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A6B0"
+    },
+    "_anal_14x29_41674": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at 41674",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_41674"
+    },
+    "_anal_7x4_2669C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2669C",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2669C"
+    },
+    "_anal_8x9_1B638": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B638",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B638"
+    },
+    "_anal_14x29_41CCC": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at 41CCC",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_41CCC"
+    },
+    "_anal_7x8_31A34": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 31A34",
+      "datatype": "float",
+      "height": 8,
+      "width": 7,
+      "name": "_anal_7x8_31A34"
+    },
+    "_anal_7x1_D838": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at D838",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D838"
+    },
+    "_anal_9x1_D9D8": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at D9D8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_D9D8"
+    },
+    "_anal_6x4_2A340": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2A340",
+      "datatype": "float",
+      "height": 4,
+      "width": 6,
+      "name": "_anal_6x4_2A340"
+    },
+    "_anal_7x4_2ACC0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2ACC0",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2ACC0"
+    },
+    "_anal_14x1_37028": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 37028",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_37028"
+    },
+    "_anal_9x1_A424": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A424",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A424"
+    },
+    "_anal_13x15_246E0": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at 246E0",
+      "datatype": "float",
+      "height": 15,
+      "width": 13,
+      "name": "_anal_13x15_246E0"
+    },
+    "_anal_11x1_37E3C": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37E3C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_37DCC_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_37E3C"
+    },
+    "_anal_10x1_B178": {
+      "category": "Auto-analyzed (sub_6C1F8)",
+      "description": "Auto-analyzed table at B178",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B178"
+    },
+    "_anal_8x1_ACD0": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at ACD0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_ACD0"
+    },
+    "_anal_14x28_32C6C": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 32C6C",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_32C6C"
+    },
+    "_anal_15x1_2F4C0": {
+      "category": "Auto-analyzed (sub_B1BA8)",
+      "description": "Auto-analyzed table at 2F4C0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_2F4C0"
+    },
+    "_anal_11x1_E7B8": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E7B8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_100",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_E7B8"
+    },
+    "_anal_14x16_2F864": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 2F864",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_2F864"
+    },
+    "_anal_8x3_2A650": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A650",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A650"
+    },
+    "_anal_11x1_3BE68": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BE68",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BE68"
+    },
+    "_anal_14x1_BA84": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at BA84",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BA84"
+    },
+    "_anal_13x31_15F78": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 15F78",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_15F78"
+    },
+    "_anal_8x6_2B030": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2B030",
+      "datatype": "float",
+      "height": 6,
+      "width": 8,
+      "name": "_anal_8x6_2B030"
+    },
+    "_anal_15x1_B5BC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B5BC",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_400EC_15",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_B5BC"
+    },
+    "_anal_5x1_DBF4": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DBF4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DBF4"
+    },
+    "_anal_13x16_309F4": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 309F4",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_309F4"
+    },
+    "_anal_15x9_3440C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3440C",
+      "datatype": "float",
+      "height": 9,
+      "width": 15,
+      "name": "_anal_15x9_3440C"
+    },
+    "_anal_13x1_AC3C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at AC3C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_125",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_AC3C"
+    },
+    "_anal_10x1_B4C8": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B4C8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B4C8"
+    },
+    "_anal_14x14_39420": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 39420",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_39420"
+    },
+    "_anal_8x3_2A4D0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A4D0",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A4D0"
+    },
+    "_anal_13x16_31074": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 31074",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_31074"
+    },
+    "_anal_6x1_C5BC": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at C5BC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_C5BC"
+    },
+    "_anal_11x1_3B844": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B844",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B7EC_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B844"
+    },
+    "_anal_8x1_ACB0": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at ACB0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_ACB0"
+    },
+    "_anal_7x1_B584": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B584",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_15",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B584"
+    },
+    "_anal_14x28_1DF20": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1DF20",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_1DF20"
+    },
+    "_anal_11x1_3BFF4": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BFF4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BFF4"
+    },
+    "_anal_14x1_E508": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at E508",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E508"
+    },
+    "_anal_13x1_E3C0": {
+      "category": "Auto-analyzed (sub_66980)",
+      "description": "Auto-analyzed table at E3C0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E324_13",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_E3C0"
+    },
+    "_anal_14x14_3A060": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 3A060",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_3A060"
+    },
+    "_anal_7x8_2AB00": {
+      "category": "Auto-analyzed (sub_760E0)",
+      "description": "Auto-analyzed table at 2AB00",
+      "datatype": "float",
+      "height": 8,
+      "width": 7,
+      "name": "_anal_7x8_2AB00"
+    },
+    "_anal_17x1_E29C": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at E29C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E258_17",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_E29C"
+    },
+    "_anal_14x1_2EE54": {
+      "category": "Auto-analyzed (sub_AEF90)",
+      "description": "Auto-analyzed table at 2EE54",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2EE54"
+    },
+    "_anal_14x1_3B664": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B664",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B664"
+    },
+    "_anal_12x1_C404": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C404",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_944C_12",
+      "height": 1,
+      "width": 12,
+      "name": "_anal_12x1_C404"
+    },
+    "_anal_4x1_CA9C": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at CA9C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_CA9C"
+    },
+    "_anal_14x9_36A40": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 36A40",
+      "datatype": "float",
+      "height": 9,
+      "width": 14,
+      "name": "_anal_14x9_36A40"
+    },
+    "_anal_9x1_B69C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B69C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_3",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B69C"
+    },
+    "_anal_14x1_A770": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A770",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A770"
+    },
+    "_anal_8x1_CA24": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at CA24",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_CA24"
+    },
+    "_anal_8x1_B7B8": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B7B8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_B7B8"
+    },
+    "_anal_14x1_BD44": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at BD44",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_1",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BD44"
+    },
+    "_anal_7x1_B538": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B538",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_3",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B538"
+    },
+    "_anal_14x1_BA14": {
+      "category": "Auto-analyzed (sub_643AC)",
+      "description": "Auto-analyzed table at BA14",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BA14"
+    },
+    "_anal_7x1_B5A0": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B5A0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_15",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B5A0"
+    },
+    "_anal_11x1_C4AC": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C4AC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_C4AC"
+    },
+    "_anal_7x1_BF5C": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at BF5C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_BF40_7",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_BF5C"
+    },
+    "_anal_9x1_AFE4": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at AFE4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_6",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_AFE4"
+    },
+    "_anal_7x1_2F4A4": {
+      "category": "Auto-analyzed (sub_934B4)",
+      "description": "Auto-analyzed table at 2F4A4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2F4A4"
+    },
+    "_anal_14x1_D6AC": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D6AC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D6AC"
+    },
+    "_anal_7x4_2670C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2670C",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2670C"
+    },
+    "_anal_14x1_BCA4": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BCA4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BCA4"
+    },
+    "_anal_7x1_D854": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D854",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D854"
+    },
+    "_anal_9x1_40508": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 40508",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_40508"
+    },
+    "_anal_7x1_E6B0": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at E6B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E678_7",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_E6B0"
+    },
+    "_anal_14x4_23638": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 23638",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_23638"
+    },
+    "_anal_14x33_19758": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at 19758",
+      "datatype": "float",
+      "height": 33,
+      "width": 14,
+      "name": "_anal_14x33_19758"
+    },
+    "_anal_14x29_2B254": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at 2B254",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_2B254"
+    },
+    "_anal_15x1_D7E0": {
+      "category": "Auto-analyzed (sub_877A8)",
+      "description": "Auto-analyzed table at D7E0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_6_0",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_D7E0"
+    },
+    "_anal_11x9_22BAC": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at 22BAC",
+      "datatype": "float",
+      "height": 9,
+      "width": 11,
+      "name": "_anal_11x9_22BAC"
+    },
+    "_anal_10x1_D3A0": {
+      "category": "Auto-analyzed (sub_6DEFC)",
+      "description": "Auto-analyzed table at D3A0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_D3A0"
+    },
+    "_anal_14x1_E4D0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E4D0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_404D0_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E4D0"
+    },
+    "_anal_14x1_CD88": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CD88",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CD88"
+    },
+    "_anal_8x1_E6CC": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E6CC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_50_10",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_E6CC"
+    },
+    "_anal_5x1_DC6C": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC6C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC6C"
+    },
+    "_anal_5x1_CB50": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at CB50",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_CB50"
+    },
+    "_anal_14x1_BC6C": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BC6C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BC6C"
+    },
+    "_anal_14x1_A958": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at A958",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A958"
+    },
+    "_anal_14x31_207F0": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 207F0",
+      "datatype": "float",
+      "height": 31,
+      "width": 14,
+      "name": "_anal_14x31_207F0"
+    },
+    "_anal_9x1_2EFD0": {
+      "category": "Auto-analyzed (sub_A577A)",
+      "description": "Auto-analyzed table at 2EFD0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2EFD0"
+    },
+    "_anal_8x3_2A830": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A830",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A830"
+    },
+    "_anal_8x1_A918": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at A918",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A918"
+    },
+    "_anal_13x31_12D18": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 12D18",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_12D18"
+    },
+    "_anal_56x1_C0F0": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C0F0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 56,
+      "name": "_anal_56x1_C0F0"
+    },
+    "_anal_7x1_B6C0": {
+      "category": "Auto-analyzed (sub_78DA0)",
+      "description": "Auto-analyzed table at B6C0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B6C0"
+    },
+    "_anal_14x1_AE20": {
+      "category": "Auto-analyzed (sub_6DEFC)",
+      "description": "Auto-analyzed table at AE20",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_AE20"
+    },
+    "_anal_8x1_3B248": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B248",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_3B248"
+    },
+    "_anal_9x1_BE74": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at BE74",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_2",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_BE74"
+    },
+    "_anal_14x29_27764": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 27764",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_27764"
+    },
+    "_anal_13x31_1592C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1592C",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_1592C"
+    },
+    "_anal_14x33_2B8AC": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at 2B8AC",
+      "datatype": "float",
+      "height": 33,
+      "width": 14,
+      "name": "_anal_14x33_2B8AC"
+    },
+    "_anal_8x3_196F8": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at 196F8",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_196F8"
+    },
+    "_anal_10x10_28294": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at 28294",
+      "datatype": "float",
+      "height": 10,
+      "width": 10,
+      "name": "_anal_10x10_28294"
+    },
+    "_anal_14x4_238D8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 238D8",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_238D8"
+    },
+    "_anal_15x12_42B6C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 42B6C",
+      "datatype": "float",
+      "height": 12,
+      "width": 15,
+      "name": "_anal_15x12_42B6C"
+    },
+    "_anal_9x9_1FEA0": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1FEA0",
+      "datatype": "float",
+      "height": 9,
+      "width": 9,
+      "name": "_anal_9x9_1FEA0"
+    },
+    "_anal_14x1_E724": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at E724",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E724"
+    },
+    "_anal_13x1_E3F4": {
+      "category": "Auto-analyzed (sub_66980)",
+      "description": "Auto-analyzed table at E3F4",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E324_13",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_E3F4"
+    },
+    "_anal_13x31_126CC": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 126CC",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_126CC"
+    },
+    "_anal_14x1_3B584": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B584",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B584"
+    },
+    "_anal_8x1_A500": {
+      "category": "Auto-analyzed (sub_565F8)",
+      "description": "Auto-analyzed table at A500",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A500"
+    },
+    "_anal_7x1_2EF24": {
+      "category": "Auto-analyzed (sub_A3E40)",
+      "description": "Auto-analyzed table at 2EF24",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EF24"
+    },
+    "_anal_14x1_2EE1C": {
+      "category": "Auto-analyzed (sub_AEF90)",
+      "description": "Auto-analyzed table at 2EE1C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2EE1C"
+    },
+    "_anal_11x1_3BAAC": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3BAAC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BAAC"
+    },
+    "_anal_15x1_DB70": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DB70",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_DB70"
+    },
+    "_anal_14x1_3B514": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B514",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B514"
+    },
+    "_anal_15x1_3B2C0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B2C0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_3B2C0"
+    },
+    "_anal_9x1_E75C": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at E75C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_2",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_E75C"
+    },
+    "_anal_17x1_D940": {
+      "category": "Auto-analyzed (sub_6A3FE)",
+      "description": "Auto-analyzed table at D940",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_D940"
+    },
+    "_anal_10x13_23148": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 23148",
+      "datatype": "float",
+      "height": 13,
+      "width": 10,
+      "name": "_anal_10x13_23148"
+    },
+    "_anal_11x9_22A20": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at 22A20",
+      "datatype": "float",
+      "height": 9,
+      "width": 11,
+      "name": "_anal_11x9_22A20"
+    },
+    "_anal_13x1_2ECDC": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2ECDC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2ECDC"
+    },
+    "_anal_9x1_DE90": {
+      "category": "Auto-analyzed (sub_BE366)",
+      "description": "Auto-analyzed table at DE90",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_DE90"
+    },
+    "_anal_7x1_D7C4": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at D7C4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_2",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D7C4"
+    },
+    "_anal_9x1_A370": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A370",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A370"
+    },
+    "_anal_14x1_3B1B0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B1B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B1B0"
+    },
+    "_anal_7x1_A86C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A86C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_A86C"
+    },
+    "_anal_8x1_ABDC": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at ABDC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_ABDC"
+    },
+    "_anal_11x1_2F418": {
+      "category": "Auto-analyzed (sub_C5062)",
+      "description": "Auto-analyzed table at 2F418",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-15_5",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_2F418"
+    },
+    "_anal_14x1_A5B0": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at A5B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_A5B0"
+    },
+    "_anal_29x1_AB4C": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at AB4C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 29,
+      "name": "_anal_29x1_AB4C"
+    },
+    "_anal_6x1_2F014": {
+      "category": "Auto-analyzed (sub_BDBCC)",
+      "description": "Auto-analyzed table at 2F014",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_2F014"
+    },
+    "_anal_3x1_DCA4": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DCA4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-100_100",
+      "height": 1,
+      "width": 3,
+      "name": "_anal_3x1_DCA4"
+    },
+    "_anal_11x15_1BB30": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at 1BB30",
+      "datatype": "float",
+      "height": 15,
+      "width": 11,
+      "name": "_anal_11x15_1BB30"
+    },
+    "_anal_8x3_2A7D0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A7D0",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A7D0"
+    },
+    "_anal_11x1_3BA80": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3BA80",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BA80"
+    },
+    "_anal_9x1_2EC88": {
+      "category": "Auto-analyzed (sub_B1BA8)",
+      "description": "Auto-analyzed table at 2EC88",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2EC88"
+    },
+    "_anal_13x1_2F470": {
+      "category": "Auto-analyzed (sub_934B4)",
+      "description": "Auto-analyzed table at 2F470",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2F470"
+    },
+    "_anal_9x1_B654": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B654",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_125",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_B654"
+    },
+    "_anal_11x1_B008": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at B008",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B008"
+    },
+    "_anal_14x1_2F634": {
+      "category": "Auto-analyzed (sub_AF764)",
+      "description": "Auto-analyzed table at 2F634",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F634"
+    },
+    "_anal_9x1_DEB4": {
+      "category": "Auto-analyzed (sub_B497C)",
+      "description": "Auto-analyzed table at DEB4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_DEB4"
+    },
+    "_anal_14x1_9F7C": {
+      "category": "Auto-analyzed (sub_97E8C)",
+      "description": "Auto-analyzed table at 9F7C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_9F7C"
+    },
+    "_anal_14x1_BC34": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BC34",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BC34"
+    },
+    "_anal_7x9_23C58": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at 23C58",
+      "datatype": "float",
+      "height": 9,
+      "width": 7,
+      "name": "_anal_7x9_23C58"
+    },
+    "_anal_8x9_1B758": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B758",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B758"
+    },
+    "_anal_9x1_D50C": {
+      "category": "Auto-analyzed (sub_8E5B0)",
+      "description": "Auto-analyzed table at D50C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_69_8",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_D50C"
+    },
+    "_anal_14x1_CDF8": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CDF8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CDF8"
+    },
+    "_anal_14x1_E6EC": {
+      "category": "Auto-analyzed (sub_57100)",
+      "description": "Auto-analyzed table at E6EC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_E6EC"
+    },
+    "_anal_10x1_B8B0": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B8B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40128_10",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B8B0"
+    },
+    "_anal_4x1_CAAC": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at CAAC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_CAAC"
+    },
+    "_anal_11x1_3BC94": {
+      "category": "Auto-analyzed (sub_E332E)",
+      "description": "Auto-analyzed table at 3BC94",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BC94"
+    },
+    "_anal_6x21_2A148": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2A148",
+      "datatype": "float",
+      "height": 21,
+      "width": 6,
+      "name": "_anal_6x21_2A148"
+    },
+    "_anal_11x1_37EAC": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37EAC",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_37E10_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_37EAC"
+    },
+    "_anal_11x6_2E00C": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at 2E00C",
+      "datatype": "float",
+      "height": 6,
+      "width": 11,
+      "name": "_anal_11x6_2E00C"
+    },
+    "_anal_11x1_3B9D0": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3B9D0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B9D0"
+    },
+    "_anal_14x1_BBFC": {
+      "category": "Auto-analyzed (sub_9492E)",
+      "description": "Auto-analyzed table at BBFC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BBFC"
+    },
+    "_anal_13x1_2F718": {
+      "category": "Auto-analyzed (sub_C5062)",
+      "description": "Auto-analyzed table at 2F718",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_4000_250",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_2F718"
+    },
+    "_anal_28x1_D198": {
+      "category": "Auto-analyzed (sub_5AF58)",
+      "description": "Auto-analyzed table at D198",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_D128_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_D198"
+    },
+    "_anal_9x1_A3DC": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A3DC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A3DC"
+    },
+    "_anal_7x1_B39C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B39C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B39C"
+    },
+    "_anal_14x4_23558": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 23558",
+      "datatype": "float",
+      "height": 4,
+      "width": 14,
+      "name": "_anal_14x4_23558"
+    },
+    "_anal_14x1_AECC": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at AECC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_AECC"
+    },
+    "_anal_4x1_2ECBC": {
+      "category": "Auto-analyzed (sub_B1BA8)",
+      "description": "Auto-analyzed table at 2ECBC",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_2ECAC_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_2ECBC"
+    },
+    "_anal_14x1_3B1E8": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B1E8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B1E8"
+    },
+    "_anal_13x31_10750": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 10750",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_10750"
+    },
+    "_anal_10x8_262DC": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 262DC",
+      "datatype": "float",
+      "height": 8,
+      "width": 10,
+      "name": "_anal_10x8_262DC"
+    },
+    "_anal_8x1_D68C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at D68C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_D68C"
+    },
+    "_anal_14x16_3408C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 3408C",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_3408C"
+    },
+    "_anal_14x27_21298": {
+      "category": "Auto-analyzed (sub_6A6A6)",
+      "description": "Auto-analyzed table at 21298",
+      "datatype": "float",
+      "height": 27,
+      "width": 14,
+      "name": "_anal_14x27_21298"
+    },
+    "_anal_34x1_B3B8": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B3B8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40064_34",
+      "height": 1,
+      "width": 34,
+      "name": "_anal_34x1_B3B8"
+    },
+    "_anal_8x1_2F168": {
+      "category": "Auto-analyzed (sub_C3CC2)",
+      "description": "Auto-analyzed table at 2F168",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_0",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2F168"
+    },
+    "_anal_13x31_178A8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 178A8",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_178A8"
+    },
+    "_anal_14x28_1F880": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1F880",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_1F880"
+    },
+    "_anal_13x31_16C10": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 16C10",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_16C10"
+    },
+    "_anal_14x1_D6E4": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D6E4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D6E4"
+    },
+    "_anal_14x14_39730": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 39730",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_39730"
+    },
+    "_anal_11x1_3BF18": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BF18",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BF18"
+    },
+    "_anal_14x1_B364": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at B364",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B364"
+    },
+    "_anal_9x1_A394": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at A394",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_A394"
+    },
+    "_anal_8x3_2A5F0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A5F0",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A5F0"
+    },
+    "_anal_7x1_CB34": {
+      "category": "Auto-analyzed (sub_78DA0)",
+      "description": "Auto-analyzed table at CB34",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_40_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_CB34"
+    },
+    "_anal_8x1_AC1C": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at AC1C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_AC1C"
+    },
+    "_anal_8x1_BDBC": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at BDBC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BDBC"
+    },
+    "_anal_14x1_2F5C4": {
+      "category": "Auto-analyzed (sub_B14C8)",
+      "description": "Auto-analyzed table at 2F5C4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_2F5C4"
+    },
+    "_anal_14x1_3B4DC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B4DC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B4DC"
+    },
+    "_anal_10x7_2F74C": {
+      "category": "Auto-analyzed (sub_A577A)",
+      "description": "Auto-analyzed table at 2F74C",
+      "datatype": "float",
+      "height": 7,
+      "width": 10,
+      "name": "_anal_10x7_2F74C"
+    },
+    "_anal_9x1_37F18": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37F18",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_6_1",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_37F18"
+    },
+    "_anal_5x1_DC30": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC30",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DC30"
+    },
+    "_anal_11x1_3B920": {
+      "category": "Auto-analyzed (sub_E12C2)",
+      "description": "Auto-analyzed table at 3B920",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B920"
+    },
+    "_anal_14x14_3A370": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 3A370",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_3A370"
+    },
+    "_anal_9x1_D9B4": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at D9B4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_D9B4"
+    },
+    "_anal_6x1_C51C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at C51C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1_1",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_C51C"
+    },
+    "_anal_2x1_B77C": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B77C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 2,
+      "name": "_anal_2x1_B77C"
+    },
+    "_anal_11x1_3BEEC": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BEEC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BEEC"
+    },
+    "_anal_15x17_43238": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 43238",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_43238"
+    },
+    "_anal_6x1_AF8C": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at AF8C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1000_1000",
+      "height": 1,
+      "width": 6,
+      "name": "_anal_6x1_AF8C"
+    },
+    "_anal_10x13_22D38": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 22D38",
+      "datatype": "float",
+      "height": 13,
+      "width": 10,
+      "name": "_anal_10x13_22D38"
+    },
+    "_anal_8x3_2A410": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at 2A410",
+      "datatype": "float",
+      "height": 3,
+      "width": 8,
+      "name": "_anal_8x3_2A410"
+    },
+    "_anal_7x1_B1A0": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at B1A0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_1000_500",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B1A0"
+    },
+    "_anal_14x28_1E540": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1E540",
+      "datatype": "float",
+      "height": 28,
+      "width": 14,
+      "name": "_anal_14x28_1E540"
+    },
+    "_anal_9x1_DA20": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at DA20",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_DA20"
+    },
+    "_anal_15x17_38738": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 38738",
+      "datatype": "float",
+      "height": 17,
+      "width": 15,
+      "name": "_anal_15x17_38738"
+    },
+    "_anal_11x1_A8B0": {
+      "category": "Auto-analyzed (sub_73E84)",
+      "description": "Auto-analyzed table at A8B0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_1",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_A8B0"
+    },
+    "_anal_15x8_38F30": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 38F30",
+      "datatype": "float",
+      "height": 8,
+      "width": 15,
+      "name": "_anal_15x8_38F30"
+    },
+    "_anal_3x1_DC8C": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC8C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_20",
+      "height": 1,
+      "width": 3,
+      "name": "_anal_3x1_DC8C"
+    },
+    "_anal_13x1_40738": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 40738",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_4076C_13",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_40738"
+    },
+    "_anal_8x1_C314": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at C314",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-10_10",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_C314"
+    },
+    "_anal_16x33_EAB8": {
+      "category": "Auto-analyzed (sub_707B4)",
+      "description": "Auto-analyzed table at EAB8",
+      "datatype": "float",
+      "height": 33,
+      "width": 16,
+      "name": "_anal_16x33_EAB8"
+    },
+    "_anal_14x33_19E90": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at 19E90",
+      "datatype": "float",
+      "height": 33,
+      "width": 14,
+      "name": "_anal_14x33_19E90"
+    },
+    "_anal_5x1_AD10": {
+      "category": "Auto-analyzed (sub_583C6)",
+      "description": "Auto-analyzed table at AD10",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_AD10"
+    },
+    "_anal_15x33_449A8": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 449A8",
+      "datatype": "float",
+      "height": 33,
+      "width": 15,
+      "name": "_anal_15x33_449A8"
+    },
+    "_anal_11x1_B050": {
+      "category": "Auto-analyzed (sub_6C1F8)",
+      "description": "Auto-analyzed table at B050",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-250_50",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B050"
+    },
+    "_anal_15x1_A7A8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at A7A8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_A7A8"
+    },
+    "_anal_10x13_23350": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at 23350",
+      "datatype": "float",
+      "height": 13,
+      "width": 10,
+      "name": "_anal_10x13_23350"
+    },
+    "_anal_8x1_AAB8": {
+      "category": "Auto-analyzed (sub_78198)",
+      "description": "Auto-analyzed table at AAB8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_AAB8"
+    },
+    "_anal_7x4_2626C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2626C",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2626C"
+    },
+    "_anal_11x1_B07C": {
+      "category": "Auto-analyzed (sub_6C1F8)",
+      "description": "Auto-analyzed table at B07C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-250_50",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B07C"
+    },
+    "_anal_6x4_2685C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2685C",
+      "datatype": "float",
+      "height": 4,
+      "width": 6,
+      "name": "_anal_6x4_2685C"
+    },
+    "_anal_8x1_2EE8C": {
+      "category": "Auto-analyzed (sub_ABE68)",
+      "description": "Auto-analyzed table at 2EE8C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-10_10",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_2EE8C"
+    },
+    "_anal_7x1_BEB4": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at BEB4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_BEB4"
+    },
+    "_anal_14x1_B1DC": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at B1DC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B1DC"
+    },
+    "_anal_3x1_DC80": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DC80",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_20_20",
+      "height": 1,
+      "width": 3,
+      "name": "_anal_3x1_DC80"
+    },
+    "_anal_15x1_D5F8": {
+      "category": "Auto-analyzed (Unidentified_6)",
+      "description": "Auto-analyzed table at D5F8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_D5F8"
+    },
+    "_anal_5x1_DBE0": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at DBE0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 5,
+      "name": "_anal_5x1_DBE0"
+    },
+    "_anal_8x1_A264": {
+      "category": "Auto-analyzed (sub_764EE)",
+      "description": "Auto-analyzed table at A264",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A264"
+    },
+    "_anal_8x9_1AF78": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1AF78",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1AF78"
+    },
+    "_anal_13x16_30D34": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 30D34",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_30D34"
+    },
+    "_anal_14x1_3B178": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B178",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B178"
+    },
+    "_anal_14x33_2BFE4": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at 2BFE4",
+      "datatype": "float",
+      "height": 33,
+      "width": 14,
+      "name": "_anal_14x33_2BFE4"
+    },
+    "_anal_56x1_C1D0": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C1D0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 56,
+      "name": "_anal_56x1_C1D0"
+    },
+    "_anal_7x1_BE98": {
+      "category": "Auto-analyzed (sub_64B24)",
+      "description": "Auto-analyzed table at BE98",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_BE98"
+    },
+    "_anal_13x1_E164": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at E164",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 13,
+      "name": "_anal_13x1_E164"
+    },
+    "_anal_7x1_2EF08": {
+      "category": "Auto-analyzed (sub_AA198)",
+      "description": "Auto-analyzed table at 2EF08",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_30_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_2EF08"
+    },
+    "_anal_13x8_191D8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 191D8",
+      "datatype": "float",
+      "height": 8,
+      "width": 13,
+      "name": "_anal_13x8_191D8"
+    },
+    "_anal_11x1_3B978": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3B978",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B978"
+    },
+    "_anal_8x9_1B878": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B878",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B878"
+    },
+    "_anal_13x31_139B0": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 139B0",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_139B0"
+    },
+    "_anal_9x1_2EC64": {
+      "category": "Auto-analyzed (sub_B1BA8)",
+      "description": "Auto-analyzed table at 2EC64",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2EC64"
+    },
+    "_anal_10x1_CB64": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at CB64",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_CB64"
+    },
+    "_anal_10x31_32794": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at 32794",
+      "datatype": "float",
+      "height": 31,
+      "width": 10,
+      "name": "_anal_10x31_32794"
+    },
+    "_anal_14x1_B24C": {
+      "category": "Auto-analyzed (sub_55310)",
+      "description": "Auto-analyzed table at B24C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B24C"
+    },
+    "_anal_11x1_3B9A4": {
+      "category": "Auto-analyzed (sub_E68F4)",
+      "description": "Auto-analyzed table at 3B9A4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3B9A4"
+    },
+    "_anal_12x12_1C158": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1C158",
+      "datatype": "float",
+      "height": 12,
+      "width": 12,
+      "name": "_anal_12x12_1C158"
+    },
+    "_anal_13x16_34DE8": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 34DE8",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_34DE8"
+    },
+    "_anal_9x1_2F6B4": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 2F6B4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_250",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F6B4"
+    },
+    "_anal_4x1_BFA8": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at BFA8",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_BF98_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_BFA8"
+    },
+    "_anal_16x1_3B10C": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B10C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_3B0CC_16",
+      "height": 1,
+      "width": 16,
+      "name": "_anal_16x1_3B10C"
+    },
+    "_anal_14x14_39110": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 39110",
+      "datatype": "float",
+      "height": 14,
+      "width": 14,
+      "name": "_anal_14x14_39110"
+    },
+    "_anal_4x1_9FB4": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at 9FB4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_0",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_9FB4"
+    },
+    "_anal_12x12_1C398": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1C398",
+      "datatype": "float",
+      "height": 12,
+      "width": 12,
+      "name": "_anal_12x12_1C398"
+    },
+    "_anal_8x28_1EEE0": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at 1EEE0",
+      "datatype": "float",
+      "height": 28,
+      "width": 8,
+      "name": "_anal_8x28_1EEE0"
+    },
+    "_anal_14x1_CD50": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at CD50",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CCA8_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_CD50"
+    },
+    "_anal_14x1_BFD8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at BFD8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_5",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_BFD8"
+    },
+    "_anal_7x9_269B8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 269B8",
+      "datatype": "float",
+      "height": 9,
+      "width": 7,
+      "name": "_anal_7x9_269B8"
+    },
+    "_anal_14x29_3213C": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at 3213C",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_3213C"
+    },
+    "_anal_7x4_2B1E4": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2B1E4",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2B1E4"
+    },
+    "_anal_8x1_37ED8": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 37ED8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_37ED8"
+    },
+    "_anal_14x16_33D0C": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 33D0C",
+      "datatype": "float",
+      "height": 16,
+      "width": 14,
+      "name": "_anal_14x16_33D0C"
+    },
+    "_anal_8x1_BE30": {
+      "category": "Auto-analyzed (sub_63C96)",
+      "description": "Auto-analyzed table at BE30",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_50_10",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BE30"
+    },
+    "_anal_8x6_2AF70": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2AF70",
+      "datatype": "float",
+      "height": 6,
+      "width": 8,
+      "name": "_anal_8x6_2AF70"
+    },
+    "_anal_13x16_34AA8": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 34AA8",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_34AA8"
+    },
+    "_anal_11x1_3BCC0": {
+      "category": "Auto-analyzed (sub_E332E)",
+      "description": "Auto-analyzed table at 3BCC0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BCC0"
+    },
+    "_anal_8x6_2AEB0": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 2AEB0",
+      "datatype": "float",
+      "height": 6,
+      "width": 8,
+      "name": "_anal_8x6_2AEB0"
+    },
+    "_anal_13x16_30034": {
+      "category": "Auto-analyzed (sub_93A04)",
+      "description": "Auto-analyzed table at 30034",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_30034"
+    },
+    "_anal_8x1_B1BC": {
+      "category": "Auto-analyzed (sub_55D6A)",
+      "description": "Auto-analyzed table at B1BC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-200_100",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_B1BC"
+    },
+    "_anal_14x1_DED8": {
+      "category": "Auto-analyzed (sub_55310)",
+      "description": "Auto-analyzed table at DED8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_DED8"
+    },
+    "_anal_9x16_34868": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 34868",
+      "datatype": "float",
+      "height": 16,
+      "width": 9,
+      "name": "_anal_9x16_34868"
+    },
+    "_anal_8x1_C2D0": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at C2D0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_C2D0"
+    },
+    "_anal_4x1_B908": {
+      "category": "Auto-analyzed (sub_60156)",
+      "description": "Auto-analyzed table at B908",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40170_4",
+      "height": 1,
+      "width": 4,
+      "name": "_anal_4x1_B908"
+    },
+    "_anal_14x1_B2BC": {
+      "category": "Auto-analyzed (sub_6C5D6)",
+      "description": "Auto-analyzed table at B2BC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_B2BC"
+    },
+    "_anal_8x1_BEF0": {
+      "category": "Auto-analyzed (sub_627C2)",
+      "description": "Auto-analyzed table at BEF0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_40150_8",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_BEF0"
+    },
+    "_anal_9x16_34628": {
+      "category": "Auto-analyzed (sub_9050C)",
+      "description": "Auto-analyzed table at 34628",
+      "datatype": "float",
+      "height": 16,
+      "width": 9,
+      "name": "_anal_9x16_34628"
+    },
+    "_anal_14x1_D32C": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D32C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D32C"
+    },
+    "_anal_9x1_2F120": {
+      "category": "Auto-analyzed (sub_BEA08)",
+      "description": "Auto-analyzed table at 2F120",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_10_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_2F120"
+    },
+    "_anal_7x1_D8C4": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at D8C4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_10",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_D8C4"
+    },
+    "_anal_28x1_D060": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D060",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_CEA0_28",
+      "height": 1,
+      "width": 28,
+      "name": "_anal_28x1_D060"
+    },
+    "_anal_7x1_B614": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B614",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B614"
+    },
+    "_anal_14x17_1A5C8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 1A5C8",
+      "datatype": "float",
+      "height": 17,
+      "width": 14,
+      "name": "_anal_14x17_1A5C8"
+    },
+    "_anal_8x9_1B098": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B098",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B098"
+    },
+    "_anal_17x1_E5F0": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at E5F0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_E5F0"
+    },
+    "_anal_11x1_3BE3C": {
+      "category": "Auto-analyzed (sub_E6FD0)",
+      "description": "Auto-analyzed table at 3BE3C",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_20",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_3BE3C"
+    },
+    "_anal_15x1_D574": {
+      "category": "Auto-analyzed (Unidentified_6)",
+      "description": "Auto-analyzed table at D574",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_10",
+      "height": 1,
+      "width": 15,
+      "name": "_anal_15x1_D574"
+    },
+    "_anal_17x1_E2E0": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at E2E0",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_E258_17",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_E2E0"
+    },
+    "_anal_14x1_3B5BC": {
+      "category": "Auto-analyzed (sub_D45C4)",
+      "description": "Auto-analyzed table at 3B5BC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_3B5BC"
+    },
+    "_anal_8x1_A2D8": {
+      "category": "Auto-analyzed (sub_52D12)",
+      "description": "Auto-analyzed table at A2D8",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-40_20",
+      "height": 1,
+      "width": 8,
+      "name": "_anal_8x1_A2D8"
+    },
+    "_anal_11x1_B9B4": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at B9B4",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_8F40_11",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B9B4"
+    },
+    "_anal_13x31_113E8": {
+      "category": "Auto-analyzed (sub_7C59C)",
+      "description": "Auto-analyzed table at 113E8",
+      "datatype": "float",
+      "height": 31,
+      "width": 13,
+      "name": "_anal_13x31_113E8"
+    },
+    "_anal_14x1_D78C": {
+      "category": "Auto-analyzed (sub_71858)",
+      "description": "Auto-analyzed table at D78C",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_D754_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_D78C"
+    },
+    "_anal_13x16_2549C": {
+      "category": "Auto-analyzed (sub_578AE)",
+      "description": "Auto-analyzed table at 2549C",
+      "datatype": "float",
+      "height": 16,
+      "width": 13,
+      "name": "_anal_13x16_2549C"
+    },
+    "_anal_14x8_3817C": {
+      "category": "Auto-analyzed (sub_8C530)",
+      "description": "Auto-analyzed table at 3817C",
+      "datatype": "float",
+      "height": 8,
+      "width": 14,
+      "name": "_anal_14x8_3817C"
+    },
+    "_anal_17x1_D530": {
+      "category": "Auto-analyzed (sub_8E5B0)",
+      "description": "Auto-analyzed table at D530",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_38",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_D530"
+    },
+    "_anal_14x1_AD70": {
+      "category": "Auto-analyzed (sub_583C6)",
+      "description": "Auto-analyzed table at AD70",
+      "datatype": "float",
+      "axisx": "_anal_axis_memory_AD38_14",
+      "height": 1,
+      "width": 14,
+      "name": "_anal_14x1_AD70"
+    },
+    "_anal_7x4_2677C": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at 2677C",
+      "datatype": "float",
+      "height": 4,
+      "width": 7,
+      "name": "_anal_7x4_2677C"
+    },
+    "_anal_17x1_E000": {
+      "category": "Auto-analyzed (sub_6E8A8)",
+      "description": "Auto-analyzed table at E000",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_250",
+      "height": 1,
+      "width": 17,
+      "name": "_anal_17x1_E000"
+    },
+    "_anal_14x29_285B4": {
+      "category": "Auto-analyzed (sub_D8140)",
+      "description": "Auto-analyzed table at 285B4",
+      "datatype": "float",
+      "height": 29,
+      "width": 14,
+      "name": "_anal_14x29_285B4"
+    },
+    "_anal_8x9_1AD38": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1AD38",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1AD38"
+    },
+    "_anal_10x1_B4F0": {
+      "category": "Auto-analyzed (sub_5C334)",
+      "description": "Auto-analyzed table at B4F0",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_500_500",
+      "height": 1,
+      "width": 10,
+      "name": "_anal_10x1_B4F0"
+    },
+    "_anal_7x1_B950": {
+      "category": "Auto-analyzed (sub_66C6C)",
+      "description": "Auto-analyzed table at B950",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_0_15",
+      "height": 1,
+      "width": 7,
+      "name": "_anal_7x1_B950"
+    },
+    "_anal_8x9_1B3F8": {
+      "category": "Auto-analyzed (sub_59080)",
+      "description": "Auto-analyzed table at 1B3F8",
+      "datatype": "float",
+      "height": 9,
+      "width": 8,
+      "name": "_anal_8x9_1B3F8"
+    },
+    "_anal_9x1_D9FC": {
+      "category": "Auto-analyzed (sub_549B6)",
+      "description": "Auto-analyzed table at D9FC",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-20_10",
+      "height": 1,
+      "width": 9,
+      "name": "_anal_9x1_D9FC"
+    },
+    "_anal_11x1_B0D4": {
+      "category": "Auto-analyzed (sub_6C1F8)",
+      "description": "Auto-analyzed table at B0D4",
+      "datatype": "float",
+      "axisx": "_anal_axis_linear_-250_50",
+      "height": 1,
+      "width": 11,
+      "name": "_anal_11x1_B0D4"
+    },
+    "_anal_14x27_21880": {
+      "category": "Auto-analyzed (sub_6A6A6)",
+      "description": "Auto-analyzed table at 21880",
+      "datatype": "float",
+      "height": 27,
+      "width": 14,
+      "name": "_anal_14x27_21880"
+    }
+  },
+  "baudrate": 500000,
+  "name": "Mazdaspeed 3/Mazda 3 MPS",
+  "transfer": {
+    "serverid": 2016,
+    "flashmode": "MazdaT1",
+    "downloadmode": "Mazda23"
+  },
+  "axes": {
+    "_anal_axis_linear_2000_500": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 2000.0,
+      "increment": 500.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_69_8": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 69.33000183105469,
+      "increment": 8.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_250_125": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 250.0,
+      "increment": 125.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_-10_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -10.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_96C8_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_linear_500_500": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 500.0,
+      "increment": 500.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_403E8_8": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 8
+    },
+    "_anal_axis_linear_-20_1": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -20.3125,
+      "increment": 1.5625,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_40170_4": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 4
+    },
+    "_anal_axis_memory_2ECAC_4": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 4
+    },
+    "_anal_axis_memory_CABC_15": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 15
+    },
+    "_anal_axis_memory_40128_10": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 10
+    },
+    "_anal_axis_linear_-40_160": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -40.0,
+      "increment": 160.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_7_7": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 7.866000175476074,
+      "increment": 7.999000072479248,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_-20_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -20.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_40064_34": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 34
+    },
+    "_anal_axis_linear_500_250": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 500.0,
+      "increment": 250.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_3B7EC_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_memory_40428_8": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 8
+    },
+    "_anal_axis_memory_37DF8_6": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 6
+    },
+    "_anal_axis_linear_450_50": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 450.0,
+      "increment": 50.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_403C8_8": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 8
+    },
+    "_anal_axis_memory_D754_14": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 14
+    },
+    "_anal_axis_memory_9190_16": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 16
+    },
+    "_anal_axis_memory_3B0CC_16": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 16
+    },
+    "_anal_axis_memory_CEA0_28": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 28
+    },
+    "_anal_axis_linear_-100_100": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -100.0,
+      "increment": 100.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_10_0": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 10.0,
+      "increment": 0.5,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_20_20": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 20.0,
+      "increment": 20.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_AD38_14": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 14
+    },
+    "_anal_axis_linear_0_12": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 12.5,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_BFB8_4": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 4
+    },
+    "_anal_axis_linear_0_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_15": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 15.625,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_50_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 50.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_1_1": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 1.0,
+      "increment": 1.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_4076C_13": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 13
+    },
+    "_anal_axis_linear_1000_1000": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 1000.0,
+      "increment": 1000.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_8F40_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_linear_1000_500": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 1000.0,
+      "increment": 500.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_6_0": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 6.0,
+      "increment": 0.5,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_6_1": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 6.5,
+      "increment": 1.25,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_400EC_15": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 15
+    },
+    "_anal_axis_linear_-15_5": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -15.0,
+      "increment": 5.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_4000_250": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 4000.0,
+      "increment": 250.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_40480_20": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 20
+    },
+    "_anal_axis_linear_20_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 20.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_3B04C_16": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 16
+    },
+    "_anal_axis_memory_944C_12": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 12
+    },
+    "_anal_axis_linear_53_15": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 53.928001403808594,
+      "increment": 15.82699966430664,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_0": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -0.05000000074505806,
+      "increment": 0.15000000596046448,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_1": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 1.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_2": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 2.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_100": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 100.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_5": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 5.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_6": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 6.25,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_7": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 7.519999980926514,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_30_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 30.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_40150_8": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 8
+    },
+    "_anal_axis_linear_-250_50": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -250.0,
+      "increment": 50.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_404D0_14": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 14
+    },
+    "_anal_axis_linear_500_125": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 500.0,
+      "increment": 125.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_BF98_4": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 4
+    },
+    "_anal_axis_linear_-100_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -100.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_E678_7": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 7
+    },
+    "_anal_axis_linear_-40_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -40.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_E258_17": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 17
+    },
+    "_anal_axis_linear_-200_100": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -200.0,
+      "increment": 100.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_37DCC_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_linear_10_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 10.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_3": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 3.75,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_D128_28": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 28
+    },
+    "_anal_axis_linear_90_1": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 90.0,
+      "increment": 1.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_37E10_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_memory_E324_13": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 13
+    },
+    "_anal_axis_linear_0_30": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 30.143999099731445,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_38": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 38.53499984741211,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_400_25": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 400.0,
+      "increment": 25.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_3B14C_11": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 11
+    },
+    "_anal_axis_linear_-40_20": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -40.0,
+      "increment": 20.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_BF78_4": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 4
+    },
+    "_anal_axis_memory_BF40_7": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 7
+    },
+    "_anal_axis_linear_0_125": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 125.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_-20_20": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": -20.0,
+      "increment": 20.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_500_100": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 500.0,
+      "increment": 100.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_20": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 20.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_linear_0_25": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 25.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_40408_8": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 8
+    },
+    "_anal_axis_linear_0_250": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 0.0,
+      "increment": 250.0,
+      "type": "linear",
+      "size": 100
+    },
+    "_anal_axis_memory_CCA8_14": {
+      "datatype": "float",
+      "type": "memory",
+      "name": "Unknown",
+      "size": 14
+    },
+    "_anal_axis_linear_40_10": {
+      "name": "Unknown",
+      "datatype": "float",
+      "minimum": 40.0,
+      "increment": 10.0,
+      "type": "linear",
+      "size": 100
+    }
+  },
+  "romsize": 1048576,
+  "id": "mazdaspeed3",
+  "logmode": "uds",
+  "auth": {
+    "flash_sessionid": 133,
+    "download_sessionid": 135,
+    "key": "MazdA"
+  },
+  "flashregion": {
+    "offset": 32768,
+    "size": 1015808
+  },
+  "pids": [],
+  "vins": [
+    "JM1GG12L........."
+  ]
+}

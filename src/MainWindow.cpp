@@ -12,6 +12,7 @@
 #include "dialogs/QuickStartDialog.h"
 #include "uiutil.h"
 
+#include <dialogs/FlashDialog.h>
 #include <link/platformlink.h>
 #include <models/TableModel.h>
 #include <rom/rom.h>
@@ -24,6 +25,9 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainW
     setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
     tablesSortModel_.setSourceModel(&tablesModel_);
+    tablesSortModel_.setFilterKeyColumn(0);
+    tablesSortModel_.setFilterRole(Qt::DisplayRole);
+    tablesSortModel_.setRecursiveFilteringEnabled(true);
     ui->treeView->setModel(&tablesSortModel_);
     ui->treeDetails->setModel(&detailsModel_);
 
@@ -31,6 +35,11 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainW
     settings.beginGroup("MainWindow");
     restoreState(settings.value("State").toByteArray());
     restoreGeometry(settings.value("Geometry").toByteArray());
+
+    updateRecent();
+
+    connect(ui->lineSearch, &QLineEdit::textEdited, [this](const QString &) { updateSearch(); });
+    connect(ui->checkRegex, &QCheckBox::stateChanged, [this](int) { updateSearch(); });
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -79,14 +88,17 @@ void MainWindow::importCalibration(const QString & path)
         QMessageBox::warning(this, "Import Error", "Could not find a definition for the calibration");
 
     // Add path to history
-    QSettings settings;
-    settings.beginGroup("QuickStart");
-    QStringList history = settings.value("History").toStringList();
-    if (!history.contains(path))
     {
+        QSettings settings;
+        settings.beginGroup("QuickStart");
+        QStringList history = settings.value("History").toStringList();
+        history.removeAll(path);
+
         history.push_front(path);
         settings.setValue("History", history);
     }
+
+    updateRecent();
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -235,10 +247,8 @@ void MainWindow::displayDownloadDialog()
                                   tr("The download was successful. It is recommended that you backup this calibration "
                                      "somewhere safe. IF YOU MODIFY THIS CALIBRATION WITHOUT BACKING IT UP, YOU WILL "
                                      "NOT BE ABLE TO RECOVER IT. Would you like to save a copy of it now?"));
-        if (res != QMessageBox::Ok)
-        {
+        if (res != QMessageBox::Yes)
             return;
-        }
     }
 
     QString fileName =
@@ -256,7 +266,71 @@ void MainWindow::displayDownloadDialog()
     file.close();
 }
 
+void MainWindow::displayFlashDialog()
+{
+    const lt::Model * model = calibration_.model();
+    if (model == nullptr)
+        return;
+    const lt::Platform & platform = model->platform();
+
+    FlashDialog fd;
+    if (fd.exec() != QDialog::Accepted)
+        return;
+
+    lt::DataLink * link = fd.dataLink();
+    if (link == nullptr)
+    {
+        QMessageBox::warning(this, tr("Unable to download"), tr("An interface has not been selected"));
+        return;
+    }
+
+    lt::PlatformLink pl(*link, platform);
+    lt::FlasherPtr flasher;
+    catchWarning([&pl, &flasher]() { flasher = pl.flasher(); }, tr("Unable to flash"));
+
+    if (!flasher)
+    {
+        QMessageBox::warning(this, tr("Unable to flash"),
+                             tr("Unable to create a flash interface. Does the platform support reflashing and is the "
+                                "proper interface selected?"));
+        return;
+    }
+
+    QProgressDialog progress(tr("Flash Calibration"), tr("Cancel"), 0, 10000, this);
+    progress.show();
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setAutoClose(false);
+
+    flasher->setProgressCallback([&progress](float v) {
+        QMetaObject::invokeMethod(&progress, "setValue", Qt::QueuedConnection,
+                                  Q_ARG(int, static_cast<int>(v * 10000.f)));
+    });
+
+    connect(&progress, &QProgressDialog::canceled, [&flasher]() { flasher->cancel(); });
+
+    calibration_.correctChecksums();
+
+    std::atomic_bool successful(false);
+    BackgroundTask<void()> bt(
+        [&flasher, &successful, this]() { successful = flasher->flash(lt::FlashMap(calibration_)); });
+    catchCritical(
+        [&bt]() {
+            bt();
+            bt.future().get();
+        },
+        tr("Error while downloading"));
+
+    if (!successful)
+        return;
+
+    // Save backup somewhere
+    QMessageBox::information(this, tr("Reflash successful"),
+                             tr("The calibration has been flashed. Please power cycle the ECU."));
+}
+
 void MainWindow::on_actionDownload_triggered() { displayDownloadDialog(); }
+
+void MainWindow::on_actionFlash_triggered() { displayFlashDialog(); }
 
 bool MainWindow::closeCalibration()
 {
@@ -353,3 +427,65 @@ bool MainWindow::setCalibration(const lt::Platform * platform, const uint8_t * d
 void MainWindow::on_actionSave_triggered() { saveCalibration(); }
 
 void MainWindow::on_actionSave_As_triggered() { saveCalibration(true); }
+
+void MainWindow::addRecentFiles()
+{
+    QSettings settings;
+    settings.beginGroup("QuickStart");
+    QStringList history = settings.value("History").toStringList();
+
+    // ui->actionRecent_Files->
+}
+
+void MainWindow::updateSearch()
+{
+    if (ui->checkRegex->isChecked())
+    {
+        tablesSortModel_.setFilterRegularExpression(ui->lineSearch->text());
+    }
+    else
+    {
+        tablesSortModel_.setFilterFixedString(ui->lineSearch->text());
+    }
+}
+
+void MainWindow::updateRecent()
+{
+    QSettings settings;
+    settings.beginGroup("QuickStart");
+    QStringList history = settings.value("History").toStringList();
+    ui->menuRecent_Files->clear();
+    for (const QString & s : history)
+    {
+        QAction * action = ui->menuRecent_Files->addAction(s);
+        connect(action, &QAction::triggered, [this, s]() { importCalibration(s); });
+    }
+}
+
+void MainWindow::on_buttonModifyScale_clicked()
+{
+    bool ok;
+    double scale = ui->lineModifier->text().toDouble(&ok);
+    if (!ok)
+        return;
+
+    auto * tab = reinterpret_cast<TableView *>(ui->tabs->currentWidget());
+    if (tab == nullptr)
+        return;
+
+    tab->model()->scaleAll(scale);
+}
+
+void MainWindow::on_buttonModifyAdd_clicked()
+{
+    bool ok;
+    double amount = ui->lineModifier->text().toDouble(&ok);
+    if (!ok)
+        return;
+
+    auto * tab = reinterpret_cast<TableView *>(ui->tabs->currentWidget());
+    if (tab == nullptr)
+        return;
+
+    tab->model()->addAll(amount);
+}
