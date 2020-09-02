@@ -1,3 +1,7 @@
+WARNING:
+========
+This project is no longer maintained. It is not in a usable state; please do not waste your time.
+
 LibreTuner
 =========
 Open source engine tuning software for Mazda platforms
