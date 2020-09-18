@@ -1,6 +1,6 @@
 WARNING:
 ========
-This project is no longer maintained. It is not in a usable state; please do not waste your time.
+This project is no longer maintained.
 
 LibreTuner
 =========
