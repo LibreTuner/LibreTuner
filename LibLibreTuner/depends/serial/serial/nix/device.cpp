@@ -1,7 +1,8 @@
 #include "device.h"
 #include <stdexcept>
 
-#include <asm/termios.h>
+#include <asm/ioctls.h>
+#include <asm/termbits.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -9,7 +10,7 @@
 
 #include <cassert>
 #include <cstring>
-#include <stropts.h>
+#include <sys/ioctl.h>
 #include <vector>
 #include <filesystem>
 
