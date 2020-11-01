@@ -4,282 +4,334 @@
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>1047</width>
-       <height>642</height>
+    <x>0</x>
+    <y>0</y>
+    <width>1047</width>
+    <height>642</height>
    </rect>
   </property>
-     <property name="windowTitle">
-         <string>Overboost</string>
+  <property name="windowTitle">
+   <string>Overboost</string>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLineEdit" name="lineModifier">
+        <property name="placeholderText">
+         <string>Amount</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonModifyScale">
+        <property name="text">
+         <string>Scale All</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonModifyAdd">
+        <property name="text">
+         <string>Add All</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabs">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1047</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuCalibration">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuRecent_Files">
+     <property name="title">
+      <string>Recent Files</string>
      </property>
-     <property name="dockOptions">
-         <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+     <addaction name="actionClear_List"/>
+    </widget>
+    <addaction name="actionOpen"/>
+    <addaction name="menuRecent_Files"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_As"/>
+    <addaction name="actionSettings"/>
+    <addaction name="actionDownload"/>
+    <addaction name="actionFlash"/>
+   </widget>
+   <addaction name="menuCalibration"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockTables">
+   <property name="windowTitle">
+    <string>Tables</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>5</number>
      </property>
-     <widget class="QWidget" name="centralwidget">
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-             <property name="spacing">
-                 <number>0</number>
-             </property>
-             <property name="leftMargin">
-                 <number>5</number>
-             </property>
-             <property name="topMargin">
-                 <number>5</number>
-             </property>
-             <property name="rightMargin">
-                 <number>5</number>
-             </property>
-             <property name="bottomMargin">
-                 <number>3</number>
-             </property>
-             <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout">
-                     <item>
-                         <widget class="QLineEdit" name="lineModifier">
-                             <property name="placeholderText">
-                                 <string>Amount</string>
-                             </property>
-                         </widget>
-                     </item>
-                     <item>
-                         <widget class="QPushButton" name="buttonModifyScale">
-                             <property name="text">
-                                 <string>Scale All</string>
-                             </property>
-                         </widget>
-                     </item>
-                     <item>
-                         <widget class="QPushButton" name="buttonModifyAdd">
-                             <property name="text">
-                                 <string>Add All</string>
-                             </property>
-                         </widget>
-                     </item>
-                     <item>
-                         <spacer name="horizontalSpacer">
-                             <property name="orientation">
-                                 <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                                 <size>
-                                     <width>40</width>
-                                     <height>20</height>
-                                 </size>
-                             </property>
-                         </spacer>
-                     </item>
-                 </layout>
-             </item>
-             <item>
-                 <widget class="QTabWidget" name="tabs">
-                     <property name="currentIndex">
-                         <number>-1</number>
-                     </property>
-                     <property name="tabsClosable">
-                         <bool>true</bool>
-                     </property>
-                     <property name="movable">
-                         <bool>true</bool>
-                     </property>
-                 </widget>
-             </item>
-         </layout>
-     </widget>
-     <widget class="QMenuBar" name="menubar">
-         <property name="geometry">
-             <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>1047</width>
-                 <height>21</height>
-             </rect>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="lineSearch">
+         <property name="placeholderText">
+          <string>Search</string>
          </property>
-         <widget class="QMenu" name="menuCalibration">
-             <property name="title">
-                 <string>File</string>
-             </property>
-             <widget class="QMenu" name="menuRecent_Files">
-                 <property name="title">
-                     <string>Recent Files</string>
-                 </property>
-                 <addaction name="actionClear_List"/>
-             </widget>
-             <addaction name="actionOpen"/>
-             <addaction name="menuRecent_Files"/>
-             <addaction name="actionSave"/>
-             <addaction name="actionSave_As"/>
-             <addaction name="actionSettings"/>
-             <addaction name="actionDownload"/>
-             <addaction name="actionFlash"/>
-         </widget>
-         <addaction name="menuCalibration"/>
-     </widget>
-     <widget class="QStatusBar" name="statusbar"/>
-     <widget class="QDockWidget" name="dockTables">
-         <property name="windowTitle">
-             <string>Tables</string>
-         </property>
-         <attribute name="dockWidgetArea">
-             <number>1</number>
-         </attribute>
-         <widget class="QWidget" name="dockWidgetContents">
-             <layout class="QVBoxLayout" name="verticalLayout">
-                 <property name="leftMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="topMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="rightMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="bottomMargin">
-                     <number>5</number>
-                 </property>
-                 <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_2">
-                         <item>
-                             <widget class="QLineEdit" name="lineSearch">
-                                 <property name="placeholderText">
-                                     <string>Search</string>
-                                 </property>
-                             </widget>
-                         </item>
-                         <item>
-                             <widget class="QCheckBox" name="checkRegex">
-                                 <property name="text">
-                                     <string>RegEx</string>
-                                 </property>
-                             </widget>
-                         </item>
-                     </layout>
-                 </item>
-                 <item>
-                     <widget class="QTreeView" name="treeView">
-                         <property name="sortingEnabled">
-                             <bool>true</bool>
-                         </property>
-                     </widget>
-                 </item>
-             </layout>
-         </widget>
-     </widget>
-     <widget class="QDockWidget" name="dockWidget">
-         <property name="windowTitle">
-             <string>Graph</string>
-         </property>
-         <attribute name="dockWidgetArea">
-             <number>1</number>
-         </attribute>
-         <widget class="QWidget" name="dockWidgetContents_2">
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-                 <property name="leftMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="topMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="rightMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="bottomMargin">
-                     <number>5</number>
-                 </property>
-                 <item>
-                     <widget class="GraphWidget" name="graph" native="true"/>
-                 </item>
-             </layout>
-         </widget>
-     </widget>
-     <widget class="QDockWidget" name="dockSidebar">
-         <property name="windowTitle">
-             <string>Sidebar</string>
-         </property>
-         <attribute name="dockWidgetArea">
-             <number>2</number>
-         </attribute>
-         <widget class="QWidget" name="dockWidgetContents_3">
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-                 <property name="leftMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="topMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="rightMargin">
-                     <number>5</number>
-                 </property>
-                 <property name="bottomMargin">
-                     <number>5</number>
-                 </property>
-                 <item>
-                     <widget class="QLabel" name="labelDescription">
-                         <property name="text">
-                             <string>Select a table</string>
-                         </property>
-                         <property name="alignment">
-                             <set>Qt::AlignCenter</set>
-                         </property>
-                         <property name="wordWrap">
-                             <bool>true</bool>
-                         </property>
-                     </widget>
-                 </item>
-                 <item>
-                     <widget class="QTreeView" name="treeDetails">
-                         <property name="alternatingRowColors">
-                             <bool>true</bool>
-                         </property>
-                     </widget>
-                 </item>
-             </layout>
-         </widget>
-     </widget>
-     <action name="actionSettings">
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkRegex">
          <property name="text">
-             <string>Settings</string>
+          <string>RegEx</string>
          </property>
-     </action>
-     <action name="actionOpen">
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTreeView" name="treeView">
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>Graph</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="GraphWidget" name="graph" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockSidebar">
+   <property name="windowTitle">
+    <string>Sidebar</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="labelDescription">
+       <property name="text">
+        <string>Select a table</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeView" name="treeDetails">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockDatalog">
+   <property name="windowTitle">
+    <string>Data Logging</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockDatalogContents"/>
+  </widget>
+  <widget class="QDockWidget" name="dockPids">
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle">
+    <string>PIDs</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLineEdit" name="linePIdSearch">
+         <property name="placeholderText">
+          <string>Search</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkPidRegex">
          <property name="text">
-             <string>Open</string>
+          <string>RegEx</string>
          </property>
-         <property name="shortcut">
-             <string>Ctrl+O</string>
-         </property>
-     </action>
-     <action name="actionDownload">
-         <property name="text">
-             <string>Download</string>
-         </property>
-     </action>
-     <action name="actionSave">
-         <property name="text">
-             <string>Save</string>
-         </property>
-         <property name="shortcut">
-             <string>Ctrl+S</string>
-         </property>
-     </action>
-     <action name="actionSave_As">
-         <property name="text">
-             <string>Save As</string>
-         </property>
-         <property name="shortcut">
-             <string>Ctrl+Shift+S</string>
-         </property>
-     </action>
-     <action name="actionClear_List">
-         <property name="text">
-             <string>Clear List</string>
-         </property>
-     </action>
-     <action name="actionFlash">
-         <property name="text">
-             <string>Flash</string>
-         </property>
-     </action>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonStartLog">
+       <property name="text">
+        <string>Start Logging</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListView" name="treePids"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionDownload">
+   <property name="text">
+    <string>Download</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSave_As">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionClear_List">
+   <property name="text">
+    <string>Clear List</string>
+   </property>
+  </action>
+  <action name="actionFlash">
+   <property name="text">
+    <string>Flash</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

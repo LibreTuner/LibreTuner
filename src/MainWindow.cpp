@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QTableView>
+#include <QChartView>
 
 #include "BackgroundTask.h"
 #include "dialogs/DownloadDialog.h"
@@ -30,6 +31,29 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent), ui(new Ui::MainW
     tablesSortModel_.setRecursiveFilteringEnabled(true);
     ui->treeView->setModel(&tablesSortModel_);
     ui->treeDetails->setModel(&detailsModel_);
+
+    pidsSortModel_.setSourceModel(&pidsModel_);
+    pidsSortModel_.setFilterKeyColumn(0);
+    pidsSortModel_.setFilterRole(Qt::DisplayRole);
+    pidsSortModel_.setRecursiveFilteringEnabled(true);
+    ui->treePids->setModel(&pidsSortModel_);
+
+    // Create datalog chart
+    auto * chart = new QChart;
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setBackgroundRoundness(0);
+    chart->layout()->setContentsMargins(0, 0, 0, 0);
+
+    datalogChartView_ = new QtCharts::QChartView(chart);
+    datalogChartView_->setVisible(false);
+
+    datalogHelper_ = new QLabel(tr("Use the 'PID' menu to select PIDs and start logging"));
+    datalogHelper_->setAlignment(Qt::AlignCenter);
+
+    auto *datalogLayout = new QVBoxLayout;
+    datalogLayout->addWidget(datalogChartView_);
+    datalogLayout->addWidget(datalogHelper_);
+    ui->dockDatalogContents->setLayout(datalogLayout);
 
     QSettings settings;
     settings.beginGroup("MainWindow");
@@ -420,6 +444,7 @@ bool MainWindow::setCalibration(const lt::Platform * platform, const uint8_t * d
     }
 
     tablesModel_.setDefinition(model);
+    pidsModel_.setPlatform(&model->platform());
     calibrationPath_ = path;
     return true;
 }

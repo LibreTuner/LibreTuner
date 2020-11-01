@@ -6,10 +6,17 @@
 #include <QPointer>
 
 #include <models/CategorizedTablesModel.h>
+#include <models/PidsModel.h>
 #include <models/TableDetailsModel.h>
 #include <rom/rom.h>
 
 class GraphWidget;
+
+namespace QtCharts
+{
+class QChartView;
+}
+class QLabel;
 
 namespace Ui
 {
@@ -74,7 +81,13 @@ private:
     QSortFilterProxyModel tablesSortModel_;
     TableDetailsModel detailsModel_;
 
+    PidsModel pidsModel_;
+    QSortFilterProxyModel pidsSortModel_;
+
     lt::Calibration calibration_;
+
+    QtCharts::QChartView *datalogChartView_;
+    QLabel *datalogHelper_;
 
     QString calibrationPath_;
     QString calibrationName_;

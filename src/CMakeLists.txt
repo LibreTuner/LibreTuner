@@ -49,8 +49,11 @@ set(libretuner_SRC
         widgets/VerticalLabel.h
         widgets/GraphWidget.cpp
         widgets/GraphWidget.h
+        widgets/DataLoggerWidget.cpp
+        widgets/DataLoggerWidget.h
+        widgets/DataLoggerWidget.ui
 
-        ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS})
+        ${QHEXVIEW_SOURCES} ${QHEXVIEW_HEADERS} models/PidsModel.cpp models/PidsModel.h)
 
 if (UNIX AND NOT APPLE)
 

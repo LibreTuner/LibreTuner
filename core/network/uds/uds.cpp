@@ -51,7 +51,7 @@ std::vector<uint8_t> Uds::requestSession(uint8_t type)
 {
     UdsPacket res = request(UDS_REQ_SESSION, &type, 1);
     if (res.data.empty())
-    {
+        {
         throw std::runtime_error("received empty session control response");
     }
 
